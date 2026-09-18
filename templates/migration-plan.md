@@ -60,6 +60,10 @@ evidence_summary:
 | `{{ COMPONENT }}.module:hook_field_info` | `field: field_related_item` | `ENTITY_REFERENCE` | `core.base_field_override` / `field.storage` | `REFERENCE_REMAP` | `MIGRATED` |
 | `{{ COMPONENT }}.module` | `form: {{ COMPONENT }}_filter_form` | `FORM_BASE` | `src/Form/FilterForm.php` | `FORMBASE_REWRITE` (`@entity_type.manager`) | `MIGRATED` |
 | `{{ COMPONENT }}.module` | `ajax: {{ COMPONENT }}_ajax_filter_callback` | `AJAX_CALLBACK` | `src/Form/FilterForm.php::ajaxFilterCallback` | `AJAX_REWRITE` (returns `AjaxResponse`) | `MIGRATED` |
+| `templates/node--article.tpl.php` | `template: node--article` | `TWIG_TEMPLATE` | `templates/node/node--article.html.twig` | `DIRECT_TWIG_MIGRATION` | `MIGRATED` |
+| `template.php:example_theme_preprocess_page` | `hook_preprocess_page` | `PREPROCESS_HOOK` | `{{ COMPONENT }}.theme:{{ COMPONENT }}_preprocess_page` | `PREPROCESS_REFACTOR` | `MIGRATED` |
+| `template.php:example_theme_breadcrumb` | `theme_breadcrumb()` | `THEME_FUNCTION_REPLACEMENT` | `templates/navigation/breadcrumb.html.twig` | `THEME_FUNCTION_TO_TWIG` | `MIGRATED` |
+| `theme-settings.php` | `theme settings form` | `THEME_CONFIGURATION` | `config/schema/{{ COMPONENT }}.schema.yml` | `THEME_SETTINGS_TO_CONFIG` | `MIGRATED` |
 | `{{ COMPONENT }}.views_default.inc` | `view: {{ COMPONENT }}_content_listing` | `VIEW_DISPLAY_PAGE` | `config/install/views.view.{{ COMPONENT }}_content_listing.yml` | `VIEW_CONFIG_REBUILD` | `MIGRATED` |
 | `includes/views/handlers/field.inc` | `class views_handler_field_custom_calc` | `VIEW_FIELD_PLUGIN` | `src/Plugin/views/field/CustomCalc.php` | `HANDLER_PLUGIN_REWRITE` (`@ViewsField`) | `MIGRATED` |
 | `{{ COMPONENT }}.module:hook_views_query_alter` | `hook_views_query_alter` | `VIEWS_QUERY_ALTER` | `{{ COMPONENT }}.views_execution.inc:hook_views_query_alter` | `QUERY_ALTER_REWRITE` | `MIGRATED` |
@@ -100,6 +104,8 @@ evidence_summary:
 | CREATED | `src/Entity/RecordEntity.php` | `hook_entity_info()` | Modern Content Entity class |
 | CREATED | `src/Form/FilterForm.php` | `{{ COMPONENT }}_filter_form` | Modern FormBase class with AJAX handlers |
 | CREATED | `src/Service/ExampleProcessor.php` | `lib/ExampleProcessor.php` | Modernized PSR-4 service class with constructor DI |
+| CREATED | `templates/node/node--article.html.twig` | `templates/node--article.tpl.php` | Modern Twig template |
+| CREATED | `{{ COMPONENT }}.theme` | `template.php` | Theme preprocess & suggestions |
 
 ---
 
@@ -110,6 +116,7 @@ evidence_summary:
 - **Form Test**: `tests/src/Kernel/FilterFormTest.php`
 - **Frontend / Library Test**: `tests/src/Kernel/LibraryRegistrationTest.php`
 - **Views Test**: `tests/src/Kernel/ViewsConfigurationTest.php`
+- **Theme & Twig Test**: `tests/src/Kernel/ThemeTemplateTest.php`
 
 
 ---

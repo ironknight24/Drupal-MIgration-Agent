@@ -1,7 +1,7 @@
 ---
 name: custom-module-migration
-description: End-to-end modernization methodology for migrating Drupal 7 custom modules, procedural hooks, database schemas, configuration variables, entities, forms, AJAX interactions, frontend assets, and Views/custom plugins into PSR-4 Drupal 10/11 modules.
-version: 1.8.0
+description: End-to-end modernization methodology for migrating Drupal 7 custom modules, procedural hooks, database schemas, configuration variables, entities, forms, AJAX interactions, frontend assets, Views/custom plugins, and theme presentation layers into PSR-4 Drupal 10/11 modules.
+version: 1.9.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Custom Module Modernization Playbook Skill
 
 ## Overview
-This skill provides the operational engineering playbook for re-engineering Drupal 7 custom modules into modern, object-oriented Drupal 10 and Drupal 11 modules without altering source files. It enforces exhaustive discovery and re-engineering of legacy procedural hook implementations (core, contrib, custom, alter, entity, form, theme, install/update), `hook_menu()` decomposition, configuration and state variables (`variable_get/set/del`), custom entities, field definitions, revisions, translations, forms (`FormBase`, `ConfigFormBase`, `ConfirmFormBase`), Form API structures, AJAX commands, custom event dispatching, legacy custom PHP source files, OOP classes, constructors, interfaces, traits, `.inc` files, inclusion trees, Drush commands, frontend JavaScript/CSS/libraries, Views definitions (`views.view.*.yml`), custom Views plugins, and `hook_views_data` into modern PSR-4 architectures.
+This skill provides the operational engineering playbook for re-engineering Drupal 7 custom modules into modern, object-oriented Drupal 10 and Drupal 11 modules without altering source files. It enforces exhaustive discovery and re-engineering of legacy procedural hook implementations (core, contrib, custom, alter, entity, form, theme, install/update), `hook_menu()` decomposition, configuration and state variables (`variable_get/set/del`), custom entities, field definitions, revisions, translations, forms (`FormBase`, `ConfigFormBase`, `ConfirmFormBase`), Form API structures, AJAX commands, custom event dispatching, legacy custom PHP source files, OOP classes, constructors, interfaces, traits, `.inc` files, inclusion trees, Drush commands, frontend JavaScript/CSS/libraries, Views definitions (`views.view.*.yml`), custom Views plugins, `hook_views_data`, and theme presentation layers into modern PSR-4 architectures.
 
 ---
 

@@ -428,6 +428,65 @@ target_system:
 #       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
 #       exclusion_reason: null
 #       evidence: "my_module.views_default.inc:L25 defines custom_content_listing view with page_1 display and exposed filters"
+#   # Comprehensive Themes, Templates, Preprocess, Theme Hooks & Theme Layer Accounting (Step 20)
+#   theme_items:
+#     - item_id: "TH-001"
+#       source_path: "sites/all/themes/my_theme/templates/node--article.tpl.php"
+#       source_theme: "my_theme"
+#       base_theme: "zen" # or null / "false"
+#       artifact_type: "PHPTEMPLATE_FILE" # THEME_INFO | TEMPLATE_FILE | THEME_FUNCTION | HOOK_THEME | PREPROCESS_HOOK | PROCESS_HOOK | THEME_SUGGESTION | DYNAMIC_SUGGESTION | THEME_REGION | THEME_SETTING | THEME_ASSET
+#       theme_hook: "node"
+#       template_name: "node--article"
+#       template_suggestions: ["node--article", "node--article--full"]
+#       source_function: "my_theme_preprocess_node" # or null
+#       source_hooks: ["hook_preprocess_node", "hook_theme"]
+#       preprocess_dependencies: ["template_preprocess", "template_preprocess_node", "my_module_preprocess_node"]
+#       process_dependencies: ["template_process", "template_process_node"]
+#       variables_consumed: ["$title", "$content", "$submitted", "$user_picture"]
+#       variables_produced: ["$author_badge", "$formatted_publication_date"]
+#       region: "content" # or null
+#       entity_type: "node" # or null
+#       bundle: "article" # or null
+#       view_mode: "full" # or null
+#       field_name: "field_image" # or null
+#       display_context: "page" # or null
+#       library_dependencies: ["my_theme/global_styling", "core/drupal"]
+#       frontend_handoff: "Step 18 handles custom JS/CSS packaging; Step 20 handles Twig template integration and library attachment"
+#       configuration_dependencies: ["my_theme.settings"]
+#       cache_dependencies:
+#         tags: ["node:123", "user:456"]
+#         contexts: ["user.roles", "languages"]
+#         max_age: -1
+#       security_dependencies: "Auto-escaping in Twig; verify raw markup filters are replaced with safe Twig filters or render arrays"
+#       accessibility_dependencies: "ARIA landmarks, semantic HTML5 structure (<article>, <header>, <time>), alt text validation"
+#       callers: ["theme('node', ...)", "render($content)"]
+#       callees: ["theme('image', ...)", "render($content['field_image'])"]
+#       dependency_items: ["core/drupal", "my_theme/components"]
+#       target_architecture: "TWIG_TEMPLATE" # 30 Target Architectures:
+#       # THEME | BASE_THEME | SUB_THEME | THEME_INFO | THEME_REGION | TWIG_TEMPLATE | TWIG_TEMPLATE_OVERRIDE |
+#       # THEME_HOOK | CUSTOM_THEME_HOOK | PREPROCESS_HOOK | PROCESS_HOOK | THEME_SUGGESTION | DYNAMIC_THEME_SUGGESTION |
+#       # THEME_FUNCTION_REPLACEMENT | RENDER_ARRAY | RENDER_ELEMENT | THEME_SERVICE | THEME_CONFIGURATION |
+#       # THEME_LIBRARY | TEMPLATE_VARIABLE_PROVIDER | ENTITY_TEMPLATE | FIELD_TEMPLATE | VIEW_TEMPLATE |
+#       # FORM_TEMPLATE | BLOCK_TEMPLATE | MENU_TEMPLATE | PAGE_TEMPLATE | OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       target_artifacts:
+#         - "templates/content/node--article.html.twig"
+#       migration_strategy: "DIRECT_TWIG_MIGRATION" # 22 Migration Strategies:
+#       # DIRECT_TWIG_MIGRATION | TWIG_WITH_PREPROCESS | THEME_FUNCTION_TO_TWIG | THEME_FUNCTION_TO_RENDER_ARRAY |
+#       # THEME_FUNCTION_TO_SERVICE | PREPROCESS_REFACTOR | PROCESS_TO_PREPROCESS | TEMPLATE_SUGGESTION_REFACTOR |
+#       # DYNAMIC_SUGGESTION_HUMAN_REVIEW | REGION_TO_THEME_REGION | BASE_THEME_REFACTOR | SUB_THEME_MIGRATION |
+#       # THEME_SETTINGS_TO_CONFIG | LIBRARY_HANDOFF_TO_STEP18 | ENTITY_TEMPLATE_REFACTOR | FIELD_TEMPLATE_REFACTOR |
+#       # SECURITY_ESCAPING_REFACTOR | CACHE_METADATA_REFACTOR | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON |
+#       # HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       validation_strategy: "TWIG_SYNTAX_AND_RENDER_TEST" # TWIG_SYNTAX_AND_RENDER_TEST | PREPROCESS_VARIABLE_TEST | THEME_SETTINGS_SCHEMA_TEST | ACCESSIBILITY_ARIA_AUDIT | VISUAL_REGRESSION_TEST
+#       confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
+#       dynamic: false
+#       runtime_required: false
+#       human_decision_required: false
+#       ownership: "THEME_LAYER" # THEME_LAYER | MODULE_LAYER | CORE_THEME
+#       evidence: "sites/all/themes/my_theme/templates/node--article.tpl.php contains PHPTemplate node template with preprocess variable calls"
+#       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       exclusion_reason: null
+#       notes: "Converted PHPTemplate print statements to Twig expressions and attached asset library"
 custom_modules: []
 
 # ------------------------------------------------------------------------------

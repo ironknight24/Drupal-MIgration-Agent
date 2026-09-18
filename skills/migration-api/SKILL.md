@@ -337,6 +337,69 @@ Apply one of the 21 explicit strategies to every discovered Views item:
 
 ---
 
+## 30 Theme & Presentation Target Architecture Classifications (Step 20)
+
+Every discovered theme artifact is categorized into one of 30 standard target architectures:
+1. **`THEME`**: Root modern theme package declaration.
+2. **`BASE_THEME`**: Parent theme providing inherited templates, styling, and regions.
+3. **`SUB_THEME`**: Child theme extending base theme with overrides.
+4. **`THEME_INFO`**: Theme metadata declaration (`<theme>.info.yml`).
+5. **`THEME_REGION`**: Layout region definition in `info.yml` and `page.html.twig`.
+6. **`TWIG_TEMPLATE`**: Standard Twig presentation template (`templates/**/*.html.twig`).
+7. **`TWIG_TEMPLATE_OVERRIDE`**: Twig template overriding core, module, or base theme template.
+8. **`THEME_HOOK`**: Registered presentation theme hook definition.
+9. **`CUSTOM_THEME_HOOK`**: Module- or theme-defined custom theme hook implementation.
+10. **`PREPROCESS_HOOK`**: Preprocess function (`<theme>_preprocess_HOOK`) in `<theme>.theme`.
+11. **`PROCESS_HOOK`**: Process function refactored to modern preprocess implementation.
+12. **`THEME_SUGGESTION`**: Static template suggestion based on route, bundle, or view mode.
+13. **`DYNAMIC_THEME_SUGGESTION`**: Runtime-calculated template suggestion requiring alter hooks.
+14. **`THEME_FUNCTION_REPLACEMENT`**: Procedural `theme_*()` function converted to Twig or render element.
+15. **`RENDER_ARRAY`**: Structured renderable array produced by theme functions or preprocess.
+16. **`RENDER_ELEMENT`**: Plugin-based render element (`#type`).
+17. **`THEME_SERVICE`**: Injected helper service supporting complex presentation calculations.
+18. **`THEME_CONFIGURATION`**: CMI theme configuration (`config/install/<theme>.settings.yml`).
+19. **`THEME_LIBRARY`**: Modular asset library in `<theme>.libraries.yml`.
+20. **`TEMPLATE_VARIABLE_PROVIDER`**: Preprocess hook computing presentation variables.
+21. **`ENTITY_TEMPLATE`**: Entity-specific presentation template (`node.html.twig`, `user.html.twig`).
+22. **`FIELD_TEMPLATE`**: Field-level template (`field.html.twig`, `field--<field_name>.html.twig`).
+23. **`VIEW_TEMPLATE`**: Views presentation template override (`views-view.html.twig`).
+24. **`FORM_TEMPLATE`**: Form-level wrapper or element template.
+25. **`BLOCK_TEMPLATE`**: Block wrapper template (`block.html.twig`).
+26. **`MENU_TEMPLATE`**: Menu navigation template (`menu.html.twig`).
+27. **`PAGE_TEMPLATE`**: Global page layout template (`page.html.twig`).
+28. **`OBSOLETE`**: Deprecated theme artifact with no modern equivalent.
+29. **`HUMAN_DECISION_REQUIRED`**: Ambiguous presentation logic or dynamic suggestions flagged for human review.
+30. **`UNVERIFIED`**: Presentation behavior dependent on unavailable runtime state.
+
+---
+
+## 22 Standardized Theme Migration Strategies (Step 20)
+
+1. **`DIRECT_TWIG_MIGRATION`**: Direct conversion of `.tpl.php` to `.html.twig` without logic refactoring.
+2. **`TWIG_WITH_PREPROCESS`**: Twig conversion with extracted business/data logic moved to `.theme` preprocess functions.
+3. **`THEME_FUNCTION_TO_TWIG`**: Procedural `theme_*()` converted to a standalone Twig template.
+4. **`THEME_FUNCTION_TO_RENDER_ARRAY`**: Procedural `theme_*()` converted to structured render arrays.
+5. **`THEME_FUNCTION_TO_SERVICE`**: Complex theme function extracted to an injectable service.
+6. **`PREPROCESS_REFACTOR`**: Preprocess function modernized with typehinted `$variables` array access and bubbleable metadata.
+7. **`PROCESS_TO_PREPROCESS`**: Legacy D7 process hook refactored into a modern preprocess hook.
+8. **`TEMPLATE_SUGGESTION_REFACTOR`**: Modernized to `hook_theme_suggestions_HOOK_alter()`.
+9. **`DYNAMIC_SUGGESTION_HUMAN_REVIEW`**: Non-deterministic runtime suggestions escalated for architecture review.
+10. **`REGION_TO_THEME_REGION`**: D7 region definitions mapped to D10/D11 theme regions.
+11. **`BASE_THEME_REFACTOR`**: Base theme declaration updated to Olivero, Claro, or custom starterkit.
+12. **`SUB_THEME_MIGRATION`**: Sub-theme configuration and inheritance tree modernized.
+13. **`THEME_SETTINGS_TO_CONFIG`**: Theme settings form converted to typed CMI configuration and schema.
+14. **`LIBRARY_HANDOFF_TO_STEP18`**: Theme asset files packaged into `<theme>.libraries.yml` per Step 18 standards.
+15. **`ENTITY_TEMPLATE_REFACTOR`**: Entity template modernized preserving Step 16 field structures.
+16. **`FIELD_TEMPLATE_REFACTOR`**: Field template modernized with semantic attributes.
+17. **`SECURITY_ESCAPING_REFACTOR`**: Unsafe print statements refactored to Twig auto-escaping and sanitized filters.
+18. **`CACHE_METADATA_REFACTOR`**: Dynamic template logic annotated with cache tags, contexts, and max-age.
+19. **`REPLACED`**: Legacy theme component replaced by modern Drupal core or contrib theme.
+20. **`OBSOLETE`**: Deprecated theme helper, polyfill, or grid framework removed.
+21. **`EXCLUDED_WITH_REASON`**: Explicitly excluded with documented rationale.
+22. **`HUMAN_DECISION_REQUIRED`**: Complex template logic or custom design system refactor requiring human approval.
+
+---
+
 ## Data Integrity Verification & Checksums
 
 Before certifying a data migration pipeline as complete:

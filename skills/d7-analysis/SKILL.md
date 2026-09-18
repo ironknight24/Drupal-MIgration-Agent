@@ -524,10 +524,65 @@ Audit interactive frontend components and programmatic executions:
 - **Approved Terminal Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
 - **Forbidden Terminal States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`.
 
+### 62. Exhaustive Theme, Sub-theme & Metadata Discovery
+Recursively discover all Drupal 7 custom and contrib themes without location assumptions:
+- **Theme `.info` Declarations**: Scans `*.info` in theme directories, parsing `name`, `description`, `core`, `engine`, `base theme`, `regions`, `stylesheets`, `scripts`, `settings`, and `features`.
+- **Theme Source Artifacts**: Scans `template.php`, `theme-settings.php`, `*.tpl.php`, `*.theme`, theme-specific `.inc` files, CSS/SCSS/LESS stylesheets, and JavaScript files.
+- **Base Theme & Sub-theme Hierarchy**: Traces parent-child theme inheritance (`base theme = parent_theme`), inherited regions, inherited templates, inherited preprocess functions, and asset override chains.
+
+### 63. PHPTemplate `.tpl.php` to Twig Analysis Heuristics
+Analyze every `.tpl.php` template for variables, markup structure, and business logic:
+- **Template Types & Core Hooks**: Page (`page.tpl.php`), Region (`region.tpl.php`), Block (`block.tpl.php`), Node (`node.tpl.php`, `node--<type>.tpl.php`), User (`user-profile.tpl.php`), Comment (`comment.tpl.php`), Taxonomy (`taxonomy-term.tpl.php`), Field (`field.tpl.php`, `field--<field_name>.tpl.php`), Views (`views-view.tpl.php`, `views-view-fields.tpl.php`), and custom component templates.
+- **Variable Inputs & Render Array Tracing**: Catalogs all variables consumed (`$title`, `$content`, `$classes`, `$attributes`, `$submitted`, `$user_picture`) and render array extractions (`render($content['field_name'])`).
+- **PHP Logic Extraction & Decoupling**: Identifies embedded SQL queries, direct entity loading (`node_load()`), global state access (`$user`, `$language`), and procedural API calls $\rightarrow$ flag for extraction to preprocess functions (`.theme`) or custom module services.
+- **Markup, Sanitization & Escaping**: Audits PHP print statements (`print $title`, `print render($content)`) for raw HTML output vs `check_plain()` / `filter_xss()`, mapping to Twig auto-escaping or explicit `|raw` / `|t` / `|striptags` filters.
+
+### 64. Theme Functions, `hook_theme()`, Registry & Alterations
+Exhaustively discover and analyze procedural theme functions and theme hooks:
+- **Theme Functions**: Discovers `theme_<hook_name>()` implementations in `template.php` and custom modules.
+- **Theme Registry Implementations**: Discovers `hook_theme()` declarations, auditing registered hooks, variables, render elements, template file references, and path declarations.
+- **Theme Registry Alterations**: Discovers `hook_theme_registry_alter()`, tracing modified template paths, overridden preprocess call chains, and changed theme implementations.
+- **Modern Mapping Target**: Re-engineers theme functions into modern Twig templates (`templates/`), render elements (`#type`), preprocess functions in `<theme>.theme`, or dedicated theme helper services.
+
+### 65. Preprocess & Process Hook Discovery & Execution Flow
+Audit preprocess and process execution chains across themes and custom modules:
+- **Preprocess Hooks**: Discovers `hook_preprocess()`, `hook_preprocess_HOOK()`, `template_preprocess_*()`, and theme-specific preprocess implementations (`<theme>_preprocess_*`).
+- **Process Hooks**: Discovers legacy `hook_process()` and `hook_process_HOOK()`, refactoring execution into modern D10/D11 `hook_preprocess_HOOK()` implementations in `<theme>.theme`.
+- **Variable Mutation Call Graph**: Traces variables added, modified, or removed across the execution sequence:
+  $$\text{Module Preprocess} \longrightarrow \text{Base Theme Preprocess} \longrightarrow \text{Sub-theme Preprocess} \longrightarrow \text{Twig Template}$$
+
+### 66. Template Suggestions & Dynamic Suggestion Tracking
+Exhaustively discover and catalog template suggestions and naming conventions:
+- **D7 Theme Hook Suggestions**: Discovers `$variables['theme_hook_suggestions']` array modifications in preprocess functions.
+- **Suggestion Patterns**: Path-based (`page--node--1.tpl.php`), bundle-based (`node--article.tpl.php`), view-mode-based (`node--article--teaser.tpl.php`), user/role-based, and language-based suggestions.
+- **Modern Alter Hooks**: Maps legacy `$variables['theme_hook_suggestions']` mutations to modern `hook_theme_suggestions_HOOK_alter()` and `hook_theme_suggestions_HOOK()` implementations.
+- **Dynamic Suggestions**: Flags runtime-computed or non-deterministic template suggestions as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.
+
+### 67. Theme Regions, Page/Block Rendering & Theme Settings
+Audit layout regions, page rendering pipelines, and theme configuration forms:
+- **Theme Regions**: Reconciles declared regions in `.info` with regions used in `page.tpl.php` / `page.html.twig`, mapping to modern region structures and empty-region conditions (`{% if page.sidebar_first %}`).
+- **Theme Settings**: Discovers `theme_get_setting()`, `theme_settings.php`, and custom theme settings forms, modernizing to typed CMI configuration (`config/install/<theme>.settings.yml`) and schema (`config/schema/<theme>.schema.yml`).
+
+### 68. Markup Sanitization, Escaping, Security, Accessibility & Cache Metadata
+Audit presentation security, accessibility compliance, and cache dependencies:
+- **Presentation Security & XSS**: Replaces manual `check_plain()` / `htmlspecialchars()` with Twig auto-escaping; audits raw markup filters (`|raw`) to guarantee user input sanitization.
+- **Accessibility & ARIA Support**: Verifies semantic HTML5 markup (`<header>`, `<main>`, `<nav>`, `<article>`, `<footer>`), ARIA roles/landmarks (`role="navigation"`, `role="banner"`), form labels/descriptions, and image alt text.
+- **Cache Metadata & Bubbling**: Identifies dynamic output dependent on user roles, language, or URL parameters, mapping to modern render array cache tags (`$build['#cache']['tags']`), contexts (`user.roles`, `url.path`), and max-age.
+
+### 69. Cross-Capability Coordination & Step 18 Frontend Boundary
+- **Step 18 (Frontend)**: Owns generic JavaScript behaviors, `@drupal/once` patterns, and modular `*.libraries.yml` packaging.
+- **Step 20 (Themes)**: Owns theme-specific presentation templates (`templates/**/*.html.twig`), `<theme>.info.yml`, `<theme>.libraries.yml`, `<theme>.theme` preprocess logic, and library attachments (`{{ attach_library('theme/library') }}`).
+
+### 70. 30 Theme Target Architecture Taxonomy & 22 Migration Strategies
+- **30 Theme Target Architecture Classifications**: `THEME`, `BASE_THEME`, `SUB_THEME`, `THEME_INFO`, `THEME_REGION`, `TWIG_TEMPLATE`, `TWIG_TEMPLATE_OVERRIDE`, `THEME_HOOK`, `CUSTOM_THEME_HOOK`, `PREPROCESS_HOOK`, `PROCESS_HOOK`, `THEME_SUGGESTION`, `DYNAMIC_THEME_SUGGESTION`, `THEME_FUNCTION_REPLACEMENT`, `RENDER_ARRAY`, `RENDER_ELEMENT`, `THEME_SERVICE`, `THEME_CONFIGURATION`, `THEME_LIBRARY`, `TEMPLATE_VARIABLE_PROVIDER`, `ENTITY_TEMPLATE`, `FIELD_TEMPLATE`, `VIEW_TEMPLATE`, `FORM_TEMPLATE`, `BLOCK_TEMPLATE`, `MENU_TEMPLATE`, `PAGE_TEMPLATE`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Standardized Migration Strategies (22 Strategies)**: `DIRECT_TWIG_MIGRATION`, `TWIG_WITH_PREPROCESS`, `THEME_FUNCTION_TO_TWIG`, `THEME_FUNCTION_TO_RENDER_ARRAY`, `THEME_FUNCTION_TO_SERVICE`, `PREPROCESS_REFACTOR`, `PROCESS_TO_PREPROCESS`, `TEMPLATE_SUGGESTION_REFACTOR`, `DYNAMIC_SUGGESTION_HUMAN_REVIEW`, `REGION_TO_THEME_REGION`, `BASE_THEME_REFACTOR`, `SUB_THEME_MIGRATION`, `THEME_SETTINGS_TO_CONFIG`, `LIBRARY_HANDOFF_TO_STEP18`, `ENTITY_TEMPLATE_REFACTOR`, `FIELD_TEMPLATE_REFACTOR`, `SECURITY_ESCAPING_REFACTOR`, `CACHE_METADATA_REFACTOR`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Approved Terminal Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Forbidden Terminal States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`.
+
 ---
 
 ## Output Reporting Standard
 All discovery outputs must:
-1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, JavaScript behavior names, library identifiers, view IDs, display IDs, plugin IDs, and line numbers (`[OBSERVED FACT]`).
-2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, and `views_plugins_items` in `state/migration-manifest.yml`.
-3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback / dynamic JS setting / dynamic View ID as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.
+1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, JavaScript behavior names, library identifiers, view IDs, display IDs, plugin IDs, theme names, template names, and line numbers (`[OBSERVED FACT]`).
+2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, and `theme_items` in `state/migration-manifest.yml`.
+3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback / dynamic JS setting / dynamic View ID / dynamic template suggestion as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.

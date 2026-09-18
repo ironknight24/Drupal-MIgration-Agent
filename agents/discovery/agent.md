@@ -166,19 +166,29 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
     - Analyze `hook_views_data()` and `hook_views_data_alter()` declarations: table definitions, joins, column plugin assignments, and entity relationship chains.
     - Discover Views query alterations (`hook_views_query_alter()`) and execution hooks (`hook_views_pre_view`, `hook_views_pre_execute`, `hook_views_pre_render`).
     - Trace programmatic Views calls (`views_get_view()`, `views_embed_view()`, `views_get_view_result()`) across controllers, blocks, and services.
-16. **Database API & Static SQL Query Discovery**:
+16. **Themes, Templates, Preprocess, Theme Hooks & Theme Settings Discovery (Step 20)**:
+    - Exhaustively discover all custom and sub-themes across `sites/all/themes/`, `sites/default/themes/`, and `profiles/`.
+    - Extract theme metadata from `.info` files: `name`, `description`, `core`, `engine`, `base theme`, `regions`, `stylesheets`, `scripts`, `settings`, `features`.
+    - Build inheritance trees for base themes and sub-themes, tracking inherited regions, templates, preprocess hooks, and asset overrides.
+    - Recursively discover all PHPTemplate `.tpl.php` templates and analyze variable consumption, control structures, render arrays, and API calls.
+    - Discover all theme functions (`theme_*()`), `hook_theme()` registrations, and `hook_theme_registry_alter()` alterations.
+    - Discover all preprocess and process implementations (`hook_preprocess`, `hook_preprocess_HOOK`, `hook_process`, `template_preprocess_*`).
+    - Trace template suggestions (`theme_hook_suggestions_*`, `hook_theme_suggestions_HOOK_alter()`) and identify dynamic suggestions.
+    - Discover theme settings forms (`theme-settings.php`, `theme_get_setting()`, `theme_set_setting()`) and map to CMI config schemas.
+    - Map entity/field templates (Step 16), form templates (Step 17), frontend assets (Step 18), and Views templates (Step 19).
+17. **Database API & Static SQL Query Discovery**:
     - Inventory procedural database calls: `db_query()`, `db_query_range()`, `db_select()`, `db_insert()`, `db_update()`, `db_delete()`, `db_merge()`, `db_transaction()`.
     - Detect dynamically constructed SQL (e.g. `$table = $config['table']; db_query("SELECT ... FROM {$table}")`) and flag as `[UNVERIFIED RESULT]` / `HUMAN_DECISION_REQUIRED`.
     - Perform SQL safety analysis identifying user inputs, missing placeholders, and raw SQL concatenations.
-17. **Data Semantics, Serialization & Entity Relationships**:
+18. **Data Semantics, Serialization & Entity Relationships**:
     - Classify custom tables into the 17 semantic categories: `CONTENT`, `CONFIGURATION`, `STATE`, `USER_DATA`, `ENTITY_DATA`, `FIELD_DATA`, `RELATIONSHIP_DATA`, `TRANSACTION_DATA`, `AUDIT_DATA`, `CACHE_DATA`, `QUEUE_DATA`, `TEMPORARY_DATA`, `INTEGRATION_DATA`, `LOOKUP_DATA`, `REFERENCE_DATA`, `LEGACY_DATA`, `UNKNOWN`.
     - Detect serialized data payloads (PHP serialize/unserialize, JSON, encoded objects, HTML).
     - Detect entity references (`uid`, `nid`, `tid`, `fid`, `entity_id`, `delta`) and cross-table entity relationships.
     - Map complete CRUD call trees (CREATE, READ, UPDATE, DELETE callers) across all services, forms, controllers, queue workers, cron, and Drush.
-18. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
-19. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, and `views_plugins_items` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
-20. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
-21. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
+19. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
+20. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, and `theme_items` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
+21. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
+22. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
 
 ---
 

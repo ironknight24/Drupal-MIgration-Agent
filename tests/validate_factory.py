@@ -2348,11 +2348,11 @@ class FactoryValidator:
         has_doc_sync = (
             taxonomy_in_d7 and
             "1.1.0" in config_skill and
-            any(v in mapping_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0"]) and
-            any(v in custom_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0"]) and
-            any(v in dep_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0"]) and
-            any(v in test_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0"]) and
-            any(v in val_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0"])
+            any(v in mapping_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"]) and
+            any(v in custom_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"]) and
+            any(v in dep_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"]) and
+            any(v in test_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"]) and
+            any(v in val_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"])
         )
 
         if has_doc_sync:
@@ -3724,11 +3724,11 @@ class FactoryValidator:
         taxonomy_in_d7 = "21 frontend target architecture" in d7_skill.lower() or "21-class" in d7_skill.lower() or "21 frontend" in d7_skill.lower()
         has_doc_sync = (
             taxonomy_in_d7 and
-            any(v in mapping_skill for v in ["1.6.0", "1.7.0", "1.8.0"]) and
-            any(v in custom_skill for v in ["1.7.0", "1.8.0"]) and
-            any(v in dep_skill for v in ["1.7.0", "1.8.0"]) and
-            any(v in test_skill for v in ["1.6.0", "1.7.0", "1.8.0"]) and
-            any(v in val_skill for v in ["1.7.0", "1.8.0"])
+            any(v in mapping_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0"]) and
+            any(v in custom_skill for v in ["1.7.0", "1.8.0", "1.9.0"]) and
+            any(v in dep_skill for v in ["1.7.0", "1.8.0", "1.9.0"]) and
+            any(v in test_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0"]) and
+            any(v in val_skill for v in ["1.7.0", "1.8.0", "1.9.0"])
         )
 
         if has_doc_sync:
@@ -4307,6 +4307,562 @@ class FactoryValidator:
                               "Cross-capability compatibility check failed across manifest, skills, or documentation.",
                               "Views capability must maintain seamless compatibility with frontend, form, entity, config, hook, database, and class capabilities.")
 
+    def validate_themes_and_presentation_suite(self):
+        """Step 20: D7 Themes, Theme Templates, Preprocess, Theme Hooks & Theme Layer Re-engineering Validation Suite."""
+        d7_skill = (self.repo_root / "skills/d7-analysis/SKILL.md").read_text(encoding='utf-8')
+        mapping_skill = (self.repo_root / "skills/d7-to-d10-mapping/SKILL.md").read_text(encoding='utf-8')
+        theme_skill = (self.repo_root / "skills/theme-modernization/SKILL.md").read_text(encoding='utf-8')
+        custom_skill = (self.repo_root / "skills/custom-module-migration/SKILL.md").read_text(encoding='utf-8')
+        mig_skill = (self.repo_root / "skills/migration-api/SKILL.md").read_text(encoding='utf-8')
+        dep_skill = (self.repo_root / "skills/dependency-analysis/SKILL.md").read_text(encoding='utf-8')
+        test_skill = (self.repo_root / "skills/testing/SKILL.md").read_text(encoding='utf-8')
+        val_skill = (self.repo_root / "skills/behavioral-validation/SKILL.md").read_text(encoding='utf-8')
+        discovery_agent = (self.repo_root / "agents/discovery/agent.md").read_text(encoding='utf-8')
+        theme_agent = (self.repo_root / "agents/custom-theme/agent.md").read_text(encoding='utf-8')
+        manifest_text = (self.repo_root / "state/migration-manifest.yml").read_text(encoding='utf-8')
+        readme_text = (self.repo_root / "README.md").read_text(encoding='utf-8')
+        arch_text = (self.repo_root / "ARCHITECTURE.md").read_text(encoding='utf-8')
+
+        # 20.1 Theme & Presentation Discovery Completeness
+        has_theme_disc = (
+            ("Exhaustive Theme" in d7_skill or "Theme, Sub-theme" in d7_skill) and
+            "theme-settings.php" in d7_skill and
+            "template.php" in d7_skill and
+            "tpl.php" in d7_skill and
+            "Step 20" in discovery_agent
+        )
+
+        if has_theme_disc:
+            self.record_check("CHECK-THEME-01", "discovery", "Theme & Presentation Discovery Completeness", "PASS",
+                              "Factory implements recursive, source-driven discovery of all theme artifacts (*.info, template.php, theme-settings.php, *.tpl.php, .theme, *.inc) without conventional location assumptions.",
+                              "Verified exhaustive theme and template discovery implementation.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "agents/discovery/agent.md"])
+        else:
+            self.record_check("CHECK-THEME-01", "discovery", "Theme & Presentation Discovery Completeness", "FAIL",
+                              "Missing comprehensive theme or template discovery specifications.",
+                              "Factory must discover all theme artifacts recursively.")
+
+        # 20.2 Theme Metadata & .info to .info.yml Mapping
+        has_info_mapping = (
+            "base theme" in mapping_skill and
+            "core_version_requirement" in mapping_skill and
+            "regions" in mapping_skill and
+            "libraries" in mapping_skill and
+            "THEME_INFO" in theme_skill
+        )
+
+        if has_info_mapping:
+            self.record_check("CHECK-THEME-02", "metadata", "Theme Metadata & .info to .info.yml Mapping", "PASS",
+                              "Skills accurately map D7 theme .info metadata (name, description, core, base theme, regions, stylesheets, scripts) to D10/D11 .info.yml and .libraries.yml declarations.",
+                              "Verified theme metadata and .info modernization mapping.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-02", "metadata", "Theme Metadata & .info to .info.yml Mapping", "FAIL",
+                              "Missing theme .info to .info.yml mapping rules in skills.",
+                              "Factory must define complete .info to .info.yml metadata translation.")
+
+        # 20.3 Base Theme & Sub-Theme Inheritance Hierarchy Accounting
+        has_inheritance = (
+            ("base-theme" in d7_skill.lower() or "base theme" in d7_skill.lower()) and
+            "SUB_THEME_MIGRATION" in d7_skill and
+            "BASE_THEME_REFACTOR" in d7_skill
+        )
+
+        if has_inheritance:
+            self.record_check("CHECK-THEME-03", "inheritance", "Base Theme & Sub-Theme Inheritance Hierarchy Accounting", "PASS",
+                              "Factory traces multi-tier base-theme and sub-theme inheritance chains, accounting for inherited regions, templates, preprocess hooks, and asset override behavior.",
+                              "Verified base theme and sub-theme inheritance accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-03", "inheritance", "Base Theme & Sub-Theme Inheritance Hierarchy Accounting", "FAIL",
+                              "Missing base theme / sub-theme inheritance analysis rules.",
+                              "Factory must account for theme inheritance trees.")
+
+        # 20.4 Theme Region & Page Layout Architecture
+        has_regions = (
+            "THEME_REGION" in d7_skill and
+            "REGION_TO_THEME_REGION" in d7_skill and
+            "page.html.twig" in theme_skill
+        )
+
+        if has_regions:
+            self.record_check("CHECK-THEME-04", "regions", "Theme Region & Page Layout Architecture", "PASS",
+                              "Skills map D7 theme regions and page template layout rendering to modern D10 page regions, blocks, and Twig layout containers.",
+                              "Verified theme region and page layout architecture mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-04", "regions", "Theme Region & Page Layout Architecture", "FAIL",
+                              "Missing theme region or page layout mapping specifications.",
+                              "Factory must account for theme region definitions and rendering.")
+
+        # 20.5 PHPTemplate .tpl.php Discovery & Twig Mapping
+        has_phptemplate_twig = (
+            "tpl.php" in d7_skill and
+            "html.twig" in mapping_skill and
+            "DIRECT_TWIG_MIGRATION" in d7_skill and
+            "TWIG_TEMPLATE" in d7_skill
+        )
+
+        if has_phptemplate_twig:
+            self.record_check("CHECK-THEME-05", "templates", "PHPTemplate .tpl.php Discovery & Twig Mapping", "PASS",
+                              "Factory exhaustively discovers PHPTemplate .tpl.php files and maps them to modern .html.twig templates organized into standard template subdirectories.",
+                              "Verified PHPTemplate to Twig modernization mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-05", "templates", "PHPTemplate .tpl.php Discovery & Twig Mapping", "FAIL",
+                              "Missing PHPTemplate to Twig mapping specifications.",
+                              "Factory must convert all .tpl.php templates to Twig .html.twig.")
+
+        # 20.6 Template Variable Consumption & External Dependency Accounting
+        has_var_consumption = (
+            ("variables consumed" in d7_skill.lower() or "variables_consumed" in d7_skill) and
+            "preprocess" in d7_skill.lower() and
+            "render" in d7_skill.lower()
+        )
+
+        if has_var_consumption:
+            self.record_check("CHECK-THEME-06", "variables", "Template Variable Consumption & Dependency Accounting", "PASS",
+                              "Skills trace variables consumed by templates vs generated by preprocess functions vs legacy global state dependencies, preventing uninitialized variable errors.",
+                              "Verified template variable consumption and dependency tracking.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-06", "variables", "Template Variable Consumption & Dependency Accounting", "FAIL",
+                              "Missing template variable consumption analysis in skills.",
+                              "Factory must account for all template variable dependencies.")
+
+        # 20.7 Template Control Structures & Filter Modernization
+        has_control_structures = (
+            "{% if" in mapping_skill and
+            "{% for" in mapping_skill and
+            ("clean_class" in mapping_skill or "addClass" in mapping_skill) and
+            "|t" in mapping_skill
+        )
+
+        if has_control_structures:
+            self.record_check("CHECK-THEME-07", "syntax", "Template Control Structures & Filter Modernization", "PASS",
+                              "Skills define comprehensive syntax conversion rules from PHP conditionals/loops to Twig tags and filters (|t, |clean_class, |render, |without).",
+                              "Verified Twig control structures and filter modernization rules.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-07", "syntax", "Template Control Structures & Filter Modernization", "FAIL",
+                              "Missing Twig control structure and filter conversion rules.",
+                              "Factory must define complete Twig syntax translation.")
+
+        # 20.8 Theme Function Discovery & Modernization
+        has_theme_functions = (
+            ("theme_" in d7_skill or "theme_*" in d7_skill) and
+            "THEME_FUNCTION_TO_TWIG" in d7_skill and
+            "THEME_FUNCTION_TO_RENDER_ARRAY" in d7_skill and
+            "THEME_FUNCTION_REPLACEMENT" in d7_skill
+        )
+
+        if has_theme_functions:
+            self.record_check("CHECK-THEME-08", "functions", "Theme Function Discovery & Modernization", "PASS",
+                              "Skills discover legacy theme_*() procedural functions and modernize them into Twig templates, custom @RenderElement plugins, or theme services.",
+                              "Verified theme function discovery and modernization strategies.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-08", "functions", "Theme Function Discovery & Modernization", "FAIL",
+                              "Missing theme function discovery or replacement strategies.",
+                              "Factory must account for all theme_*() procedural functions.")
+
+        # 20.9 hook_theme() & Theme Registry Accounting
+        has_hook_theme = (
+            "hook_theme()" in d7_skill and
+            "THEME_HOOK" in d7_skill and
+            "hook_theme" in mapping_skill
+        )
+
+        if has_hook_theme:
+            self.record_check("CHECK-THEME-09", "registry", "hook_theme() & Theme Registry Accounting", "PASS",
+                              "Skills discover all hook_theme() implementations, theme hooks, variables declarations, and render elements across modules and themes.",
+                              "Verified hook_theme() discovery and theme registry accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-09", "registry", "hook_theme() & Theme Registry Accounting", "FAIL",
+                              "Missing hook_theme() discovery or registry accounting in skills.",
+                              "Factory must discover and modernize all hook_theme() registrations.")
+
+        # 20.10 hook_theme_registry_alter() Accounting
+        has_theme_alter = (
+            "hook_theme_registry_alter" in d7_skill and
+            "hook_theme_registry_alter" in mapping_skill
+        )
+
+        if has_theme_alter:
+            self.record_check("CHECK-THEME-10", "registry_alter", "hook_theme_registry_alter() Accounting", "PASS",
+                              "Skills analyze hook_theme_registry_alter() implementations, tracing registry overrides, template path alterations, and preprocess order mutations.",
+                              "Verified theme registry alter discovery and modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-10", "registry_alter", "hook_theme_registry_alter() Accounting", "FAIL",
+                              "Missing hook_theme_registry_alter() analysis in skills.",
+                              "Factory must discover and analyze all theme registry alterations.")
+
+        # 20.11 Preprocess Hook Discovery & Modernization
+        has_preprocess = (
+            "hook_preprocess" in d7_skill and
+            "PREPROCESS_HOOK" in d7_skill and
+            "PREPROCESS_REFACTOR" in d7_skill and
+            ".theme" in mapping_skill
+        )
+
+        if has_preprocess:
+            self.record_check("CHECK-THEME-11", "preprocess", "Preprocess Hook Discovery & Modernization", "PASS",
+                              "Skills discover all hook_preprocess() and hook_preprocess_HOOK() implementations, modernizing procedural preprocessing into clean <theme>.theme functions.",
+                              "Verified preprocess hook discovery and modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-11", "preprocess", "Preprocess Hook Discovery & Modernization", "FAIL",
+                              "Missing preprocess hook discovery or modernization rules.",
+                              "Factory must discover and modernize all preprocess hooks.")
+
+        # 20.12 Process Hook Refactoring
+        has_process = (
+            "hook_process" in d7_skill and
+            "PROCESS_TO_PREPROCESS" in d7_skill and
+            "PROCESS_HOOK" in d7_skill
+        )
+
+        if has_process:
+            self.record_check("CHECK-THEME-12", "process", "Process Hook Refactoring", "PASS",
+                              "Skills identify legacy hook_process() implementations (which are removed in modern Drupal) and refactor them to preprocess hooks or Twig template filters.",
+                              "Verified legacy process hook refactoring rules.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-12", "process", "Process Hook Refactoring", "FAIL",
+                              "Missing hook_process() refactoring rules in skills.",
+                              "Factory must refactor legacy process hooks to preprocess hooks.")
+
+        # 20.13 Template Suggestions & hook_theme_suggestions_HOOK_alter()
+        has_suggestions = (
+            "theme_hook_suggestions" in d7_skill and
+            "hook_theme_suggestions_" in mapping_skill and
+            "TEMPLATE_SUGGESTION_REFACTOR" in d7_skill
+        )
+
+        if has_suggestions:
+            self.record_check("CHECK-THEME-13", "suggestions", "Template Suggestions & Suggestions Alter Modernization", "PASS",
+                              "Skills discover template suggestions ($variables['theme_hook_suggestions']) and modernize them to explicit hook_theme_suggestions_HOOK_alter() implementations.",
+                              "Verified template suggestions modernization mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-13", "suggestions", "Template Suggestions & Suggestions Alter Modernization", "FAIL",
+                              "Missing template suggestion discovery or modernization rules.",
+                              "Factory must modernize theme hook suggestions to modern suggestion hooks.")
+
+        # 20.14 Dynamic Suggestion Tracking & Decision Gating
+        has_dynamic_suggestions = (
+            "DYNAMIC_THEME_SUGGESTION" in d7_skill and
+            "DYNAMIC_SUGGESTION_HUMAN_REVIEW" in d7_skill and
+            "HUMAN_DECISION_REQUIRED" in d7_skill
+        )
+
+        if has_dynamic_suggestions:
+            self.record_check("CHECK-THEME-14", "dynamic_suggestions", "Dynamic Suggestion Tracking & Decision Gating", "PASS",
+                              "Dynamic template suggestions constructed at runtime are explicitly identified, classified as DYNAMIC_THEME_SUGGESTION, and gated under HUMAN_DECISION_REQUIRED / UNVERIFIED.",
+                              "Verified dynamic template suggestion tracking and decision gating.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-14", "dynamic_suggestions", "Dynamic Suggestion Tracking & Decision Gating", "FAIL",
+                              "Missing dynamic suggestion tracking or human decision gating in skills.",
+                              "Factory must gate dynamic template suggestions under HUMAN_DECISION_REQUIRED.")
+
+        # 20.15 Entity & Bundle Template Accounting
+        has_entity_templates = (
+            "ENTITY_TEMPLATE" in d7_skill and
+            "ENTITY_TEMPLATE_REFACTOR" in d7_skill and
+            ("Step 16" in dep_skill or "Step 16" in theme_skill)
+        )
+
+        if has_entity_templates:
+            self.record_check("CHECK-THEME-15", "entity_templates", "Entity & Bundle Template Accounting", "PASS",
+                              "Skills discover node, taxonomy, comment, and custom entity templates, cross-referencing Step 16 entity models while isolating presentation ownership to Step 20.",
+                              "Verified entity and bundle template accounting with Step 16 cross-referencing.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-15", "entity_templates", "Entity & Bundle Template Accounting", "FAIL",
+                              "Missing entity template accounting or Step 16 cross-referencing.",
+                              "Factory must account for entity templates with Step 16 coordination.")
+
+        # 20.16 Field & Formatter Template Accounting
+        has_field_templates = (
+            "FIELD_TEMPLATE" in d7_skill and
+            "FIELD_TEMPLATE_REFACTOR" in d7_skill and
+            "field.html.twig" in theme_skill
+        )
+
+        if has_field_templates:
+            self.record_check("CHECK-THEME-16", "field_templates", "Field & Formatter Template Accounting", "PASS",
+                              "Skills discover field templates and field formatter rendering logic, modernizing them to field.html.twig templates and Twig field render pipelines.",
+                              "Verified field template accounting and modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-16", "field_templates", "Field & Formatter Template Accounting", "FAIL",
+                              "Missing field template accounting in skills.",
+                              "Factory must account for field and formatter templates.")
+
+        # 20.17 Views Template Override Accounting
+        has_views_templates = (
+            "VIEW_TEMPLATE" in d7_skill and
+            ("Step 19" in dep_skill or "Step 19" in theme_skill) and
+            "views-view" in theme_skill
+        )
+
+        if has_views_templates:
+            self.record_check("CHECK-THEME-17", "views_templates", "Views Template Override Accounting", "PASS",
+                              "Skills account for Views template overrides (views-view.html.twig, row templates, field templates), coordinating presentation boundaries with Step 19 Views.",
+                              "Verified Views template override accounting with Step 19 cross-referencing.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-17", "views_templates", "Views Template Override Accounting", "FAIL",
+                              "Missing Views template override accounting in skills.",
+                              "Factory must account for Views template overrides with Step 19 coordination.")
+
+        # 20.18 Form Template & Presentation Accounting
+        has_form_templates = (
+            "FORM_TEMPLATE" in d7_skill and
+            ("Step 17" in dep_skill or "Step 17" in theme_skill) and
+            "form-element" in theme_skill
+        )
+
+        if has_form_templates:
+            self.record_check("CHECK-THEME-18", "form_templates", "Form Template & Presentation Accounting", "PASS",
+                              "Skills account for form templates, input wrappers, and container rendering, coordinating Form API structure ownership with Step 17.",
+                              "Verified form template and presentation accounting with Step 17 cross-referencing.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-18", "form_templates", "Form Template & Presentation Accounting", "FAIL",
+                              "Missing form template accounting in skills.",
+                              "Factory must account for form templates with Step 17 coordination.")
+
+        # 20.19 AJAX & Frontend Theme Coordination
+        has_ajax_frontend = (
+            "LIBRARY_HANDOFF_TO_STEP18" in d7_skill and
+            ("Step 18" in dep_skill or "Step 18" in theme_skill) and
+            "THEME_LIBRARY" in d7_skill
+        )
+
+        if has_ajax_frontend:
+            self.record_check("CHECK-THEME-19", "frontend_coordination", "AJAX & Frontend Theme Coordination", "PASS",
+                              "Skills establish clear ownership boundaries for theme-owned CSS/JS assets, libraries, and AJAX containers in coordination with Step 18 Frontend.",
+                              "Verified AJAX and frontend theme coordination.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-19", "frontend_coordination", "AJAX & Frontend Theme Coordination", "FAIL",
+                              "Missing frontend asset coordination rules in theme skills.",
+                              "Factory must define clear theme asset handoffs to Step 18.")
+
+        # 20.20 Theme Settings Modernization
+        has_theme_settings = (
+            "theme-settings.php" in d7_skill and
+            "THEME_SETTINGS_TO_CONFIG" in d7_skill and
+            "THEME_CONFIGURATION" in d7_skill and
+            "theme_get_setting" in d7_skill
+        )
+
+        if has_theme_settings:
+            self.record_check("CHECK-THEME-20", "settings", "Theme Settings Modernization", "PASS",
+                              "Skills discover theme settings forms (theme-settings.php) and theme_get_setting() calls, re-engineering them into typed CMI configuration schemas (config/schema/<theme>.schema.yml).",
+                              "Verified theme settings modernization to CMI schema.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-20", "settings", "Theme Settings Modernization", "FAIL",
+                              "Missing theme settings modernization rules in skills.",
+                              "Factory must re-engineer theme settings into CMI schema.")
+
+        # 20.21 Markup Sanitization & Twig Auto-Escaping Preservation
+        has_sanitization = (
+            "SECURITY_ESCAPING_REFACTOR" in d7_skill and
+            "check_plain" in d7_skill and
+            "auto-escaping" in d7_skill.lower()
+        )
+
+        if has_sanitization:
+            self.record_check("CHECK-THEME-21", "security", "Markup Sanitization & Auto-Escaping Preservation", "PASS",
+                              "Skills audit legacy check_plain/filter_xss sanitization, preserving security semantics under Twig automatic output escaping and modern MarkupInterface handling.",
+                              "Verified markup sanitization and auto-escaping security preservation.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-21", "security", "Markup Sanitization & Auto-Escaping Preservation", "FAIL",
+                              "Missing markup sanitization or auto-escaping preservation rules.",
+                              "Factory must preserve security and escaping semantics in Twig.")
+
+        # 20.22 Presentation Accessibility & ARIA Landmarks
+        has_accessibility = (
+            "accessibility" in d7_skill.lower() and
+            "aria" in d7_skill.lower() and
+            "accessibility" in theme_skill.lower()
+        )
+
+        if has_accessibility:
+            self.record_check("CHECK-THEME-22", "accessibility", "Presentation Accessibility & ARIA Landmarks", "PASS",
+                              "Skills enforce semantic HTML5 landmarks (<header>, <nav>, <main>, <footer>) and ARIA attributes in modernized Twig templates for accessibility compliance.",
+                              "Verified presentation accessibility and ARIA landmark enforcement.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-22", "accessibility", "Presentation Accessibility & ARIA Landmarks", "FAIL",
+                              "Missing accessibility or ARIA standards in theme skills.",
+                              "Factory must enforce accessibility standards in modernized templates.")
+
+        # 20.23 Theme Cache Metadata & Context Bubbling
+        has_caching = (
+            "CACHE_METADATA_REFACTOR" in d7_skill and
+            "cache" in theme_skill.lower() and
+            "tags" in d7_skill.lower() and
+            "contexts" in d7_skill.lower()
+        )
+
+        if has_caching:
+            self.record_check("CHECK-THEME-23", "caching", "Theme Cache Metadata & Context Bubbling", "PASS",
+                              "Skills trace cache dependencies across templates and preprocess hooks, attaching cache tags, contexts, and max-age to render arrays to support dynamic bubbling.",
+                              "Verified theme cache metadata and context bubbling rules.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-23", "caching", "Theme Cache Metadata & Context Bubbling", "FAIL",
+                              "Missing cache metadata or context bubbling rules in theme skills.",
+                              "Factory must account for cache tags and contexts in theme rendering.")
+
+        # 20.24 Single Directory Component (SDC) Compatibility
+        has_sdc = (
+            ("Single Directory Component" in theme_skill or "SDC" in theme_skill) and
+            "components/" in theme_skill
+        )
+
+        if has_sdc:
+            self.record_check("CHECK-THEME-24", "sdc", "Single Directory Component (SDC) Compatibility", "PASS",
+                              "Theme modernization skill incorporates Drupal 10.3+ / Drupal 11 Single Directory Component (SDC) architecture standards for encapsulated UI components.",
+                              "Verified Single Directory Component (SDC) compatibility.",
+                              affected_files=["skills/theme-modernization/SKILL.md", "agents/custom-theme/agent.md"])
+        else:
+            self.record_check("CHECK-THEME-24", "sdc", "Single Directory Component (SDC) Compatibility", "FAIL",
+                              "Missing Single Directory Component (SDC) compatibility in theme skill.",
+                              "Theme modernization skill must support SDC architecture.")
+
+        # 20.25 Theme Dependency Graph Integration
+        has_dep_graph = (
+            "Presentation & Theme Couplings" in dep_skill and
+            "theme" in dep_skill.lower()
+        )
+
+        if has_dep_graph:
+            self.record_check("CHECK-THEME-25", "dependencies", "Theme Dependency Graph Integration", "PASS",
+                              "Dependency analysis skill integrates theme inheritance trees, template dependencies, preprocess hooks, and asset couplings into the DAG wave scheduler.",
+                              "Verified theme dependency graph integration.",
+                              affected_files=["skills/dependency-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-25", "dependencies", "Theme Dependency Graph Integration", "FAIL",
+                              "Missing theme dependency graph integration in dependency analysis skill.",
+                              "Dependency skill must integrate theme couplings into DAG wave scheduler.")
+
+        # 20.26 30 Theme Target Architecture Classifications
+        theme_target_tax = [
+            "THEME", "BASE_THEME", "SUB_THEME", "THEME_INFO", "THEME_REGION", "TWIG_TEMPLATE",
+            "TWIG_TEMPLATE_OVERRIDE", "THEME_HOOK", "CUSTOM_THEME_HOOK", "PREPROCESS_HOOK",
+            "PROCESS_HOOK", "THEME_SUGGESTION", "DYNAMIC_THEME_SUGGESTION", "THEME_FUNCTION_REPLACEMENT",
+            "RENDER_ARRAY", "RENDER_ELEMENT", "THEME_SERVICE", "THEME_CONFIGURATION", "THEME_LIBRARY",
+            "TEMPLATE_VARIABLE_PROVIDER", "ENTITY_TEMPLATE", "FIELD_TEMPLATE", "VIEW_TEMPLATE",
+            "FORM_TEMPLATE", "BLOCK_TEMPLATE", "MENU_TEMPLATE", "PAGE_TEMPLATE", "OBSOLETE",
+            "HUMAN_DECISION_REQUIRED", "UNVERIFIED"
+        ]
+        found_theme_tax = sum(1 for t in theme_target_tax if t in d7_skill or t in mig_skill)
+
+        if found_theme_tax >= 28:
+            self.record_check("CHECK-THEME-26", "taxonomy", "30 Theme Target Architecture Classifications", "PASS",
+                              f"Skills define the complete 30-class Theme target architecture taxonomy ({found_theme_tax}/30 detected) supporting all template, hook, preprocess, region, and presentation modernizations.",
+                              "Verified 30 Theme target architecture classifications.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-26", "taxonomy", "30 Theme Target Architecture Classifications", "FAIL",
+                              f"Only {found_theme_tax}/30 Theme target architecture classifications found in skills.",
+                              "Factory must define all 30 Theme target architecture classifications.")
+
+        # 20.27 22 Theme Migration Strategies
+        theme_strats = [
+            "DIRECT_TWIG_MIGRATION", "TWIG_WITH_PREPROCESS", "THEME_FUNCTION_TO_TWIG",
+            "THEME_FUNCTION_TO_RENDER_ARRAY", "THEME_FUNCTION_TO_SERVICE", "PREPROCESS_REFACTOR",
+            "PROCESS_TO_PREPROCESS", "TEMPLATE_SUGGESTION_REFACTOR", "DYNAMIC_SUGGESTION_HUMAN_REVIEW",
+            "REGION_TO_THEME_REGION", "BASE_THEME_REFACTOR", "SUB_THEME_MIGRATION", "THEME_SETTINGS_TO_CONFIG",
+            "LIBRARY_HANDOFF_TO_STEP18", "ENTITY_TEMPLATE_REFACTOR", "FIELD_TEMPLATE_REFACTOR",
+            "SECURITY_ESCAPING_REFACTOR", "CACHE_METADATA_REFACTOR", "OBSOLETE", "REPLACED",
+            "HUMAN_DECISION_REQUIRED", "UNVERIFIED"
+        ]
+        found_theme_strats = sum(1 for s in theme_strats if s in d7_skill or s in mig_skill)
+
+        if found_theme_strats >= 20:
+            self.record_check("CHECK-THEME-27", "strategies", "22 Theme Migration Strategies", "PASS",
+                              f"Skills define all 22 standardized Theme migration strategies ({found_theme_strats}/22 detected) separating modernization methodology from terminal outcome status.",
+                              "Verified 22 Theme migration strategies.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md", "skills/theme-modernization/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-27", "strategies", "22 Theme Migration Strategies", "FAIL",
+                              f"Only {found_theme_strats}/22 Theme migration strategies found in skills.",
+                              "Factory must define all 22 Theme migration strategies.")
+
+        # 20.28 Manifest theme_items Schema Structure
+        has_theme_manifest = (
+            "theme_items" in manifest_text and
+            "item_id" in manifest_text and
+            "source_theme" in manifest_text and
+            "template_name" in manifest_text and
+            "preprocess_dependencies" in manifest_text and
+            "variables_consumed" in manifest_text
+        )
+
+        if has_theme_manifest:
+            self.record_check("CHECK-THEME-28", "manifest", "Manifest theme_items Schema Structure", "PASS",
+                              "Manifest schema defines the exhaustive theme_items collection with 36 metadata properties for templates, preprocess hooks, theme functions, regions, and theme settings.",
+                              "Verified theme_items collection schema in migration-manifest.yml.",
+                              affected_files=["state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-THEME-28", "manifest", "Manifest theme_items Schema Structure", "FAIL",
+                              "Missing theme_items schema definition in state/migration-manifest.yml.",
+                              "Manifest must include theme_items with comprehensive properties.")
+
+        # 20.29 Zero-Omission Theme Outcome Enforcement & Forbidden State Rejection
+        has_theme_zero_omission = (
+            "theme_items" in val_skill or "theme" in val_skill.lower() and
+            "UNACCOUNTED" in val_skill and
+            "UNKNOWN_WITHOUT_REASON" in val_skill and
+            "SILENTLY_OMITTED" in val_skill
+        )
+
+        if has_theme_zero_omission:
+            self.record_check("CHECK-THEME-29", "zero_omission", "Zero-Omission Theme Outcome Enforcement", "PASS",
+                              "Behavioral validation skill enforces strict zero-omission rules for all theme artifacts, immediately rejecting UNACCOUNTED, UNKNOWN_WITHOUT_REASON, and SILENTLY_OMITTED states.",
+                              "Verified zero-omission outcome enforcement for theme artifacts.",
+                              affected_files=["skills/behavioral-validation/SKILL.md"])
+        else:
+            self.record_check("CHECK-THEME-29", "zero_omission", "Zero-Omission Theme Outcome Enforcement", "FAIL",
+                              "Behavioral validation skill does not enforce zero-omission rules for theme artifacts.",
+                              "All theme artifacts must resolve to approved terminal states.")
+
+        # 20.30 Cross-Capability Compatibility & Purity
+        has_cross_compat = (
+            "theme_items" in manifest_text and
+            "inc_files" in manifest_text and
+            "custom_php_files" in manifest_text and
+            "custom_database_tables" in manifest_text and
+            "hook_implementations" in manifest_text and
+            "configuration_state_items" in manifest_text and
+            "entities_fields_items" in manifest_text and
+            "forms_ajax_items" in manifest_text and
+            "frontend_assets_items" in manifest_text and
+            "views_plugins_items" in manifest_text and
+            "Themes, Templates, Preprocess" in readme_text and
+            "Themes, Templates, Preprocess" in arch_text
+        )
+
+        if has_cross_compat:
+            self.record_check("CHECK-THEME-30", "compatibility", "Cross-Capability Compatibility & Purity", "PASS",
+                              "Theme and presentation accounting seamlessly integrates with Views (Step 19), frontend assets (Step 18), forms (Step 17), custom entities (Step 16), configuration (Step 15), procedural hooks (Step 14), database schemas (Step 13), custom PHP files (Step 12), and .inc files (Step 11) with 100% generic purity.",
+                              "Verified cross-capability architectural compatibility and purity.",
+                              affected_files=["state/migration-manifest.yml", "README.md", "ARCHITECTURE.md", "AGENT_PROTOCOL.md"])
+        else:
+            self.record_check("CHECK-THEME-30", "compatibility", "Cross-Capability Compatibility & Purity", "FAIL",
+                              "Cross-capability compatibility check failed across manifest, skills, or documentation.",
+                              "Theme capability must maintain seamless compatibility with all other factory capabilities.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -4327,6 +4883,7 @@ class FactoryValidator:
         self.validate_forms_and_ajax_suite()
         self.validate_frontend_assets_and_libraries_suite()
         self.validate_views_and_custom_plugins_suite()
+        self.validate_themes_and_presentation_suite()
 
     def generate_result_json(self):
         return {

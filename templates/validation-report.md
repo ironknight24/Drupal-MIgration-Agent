@@ -38,6 +38,11 @@ evidence_summary:
 - **Views Definitions Accounted For**: {{ VIEWS_ACCOUNTED_COUNT }} / {{ VIEWS_TOTAL_COUNT }}
 - **Views Displays Accounted For**: {{ DISPLAYS_ACCOUNTED_COUNT }} / {{ DISPLAYS_TOTAL_COUNT }}
 - **Custom Views Plugins & Handlers Accounted For**: {{ PLUGINS_ACCOUNTED_COUNT }} / {{ PLUGINS_TOTAL_COUNT }}
+- **Themes & Sub-themes Accounted For**: {{ THEMES_ACCOUNTED_COUNT }} / {{ THEMES_TOTAL_COUNT }}
+- **PHPTemplate Templates Accounted For**: {{ TEMPLATES_ACCOUNTED_COUNT }} / {{ TEMPLATES_TOTAL_COUNT }}
+- **Theme Preprocess & Process Hooks Accounted For**: {{ PREPROCESS_ACCOUNTED_COUNT }} / {{ PREPROCESS_TOTAL_COUNT }}
+- **Theme Functions & Registry Hooks Accounted For**: {{ THEME_HOOKS_ACCOUNTED_COUNT }} / {{ THEME_HOOKS_TOTAL_COUNT }}
+- **Theme Settings Forms Accounted For**: {{ THEME_SETTINGS_ACCOUNTED_COUNT }} / {{ THEME_SETTINGS_TOTAL_COUNT }}
 
 ---
 
@@ -60,7 +65,7 @@ evidence_summary:
 
 ---
 
-## 3. Custom Class, Hook, Database, Entity, Form & Configuration Outcome Verification
+## 3. Custom Class, Hook, Database, Entity, Form, Frontend, Views & Theme Outcome Verification
 
 | D7 Source File / Schema / Key / Entity / Form | Class / Hook / Table / Variable / Field / Form ID | Legacy Dependencies / Fallback | D10 Target Implementation | Final Outcome Status | Verification Evidence / Reason |
 |---|---|---|---|---|---|
@@ -70,6 +75,10 @@ evidence_summary:
 | `{{ COMPONENT }}.module:hook_field_info` | `field: field_related_item` | `entityreference` | `field.storage.record.field_related_item` | `MIGRATED` | Reference integrity & lookup verified |
 | `{{ COMPONENT }}.module` | `form: {{ COMPONENT }}_filter_form` | `drupal_get_form` | `src/Form/FilterForm.php` | `MIGRATED` | Form submission & validation test passed |
 | `{{ COMPONENT }}.module` | `ajax: {{ COMPONENT }}_ajax_filter_callback` | `#ajax` callback | `src/Form/FilterForm.php::ajaxFilterCallback` | `MIGRATED` | AjaxResponse command test passed |
+| `templates/node--article.tpl.php` | `template: node--article` | `theme_render_template` | `templates/node/node--article.html.twig` | `MIGRATED` | Twig rendering & auto-escaping verified |
+| `template.php:example_theme_preprocess_page` | `hook_preprocess_page` | `template.php` | `{{ COMPONENT }}.theme:{{ COMPONENT }}_preprocess_page` | `MIGRATED` | Preprocess variable injection verified |
+| `template.php:example_theme_breadcrumb` | `theme_breadcrumb()` | `theme()` | `templates/navigation/breadcrumb.html.twig` | `MIGRATED` | Twig template override verified |
+| `theme-settings.php` | `theme settings form` | `theme_get_setting` | `config/schema/{{ COMPONENT }}.schema.yml` | `MIGRATED` | CMI theme config schema verified |
 | `{{ COMPONENT }}.views_default.inc` | `view: {{ COMPONENT }}_content_listing` | `hook_views_default_views` | `config/install/views.view.{{ COMPONENT }}_content_listing.yml` | `MIGRATED` | View execution & result assertion verified |
 | `includes/views/field.inc` | `handler: views_handler_field_custom_calc` | `views_handler_field` | `src/Plugin/views/field/CustomCalc.php` | `MIGRATED` | Field plugin render & DI test passed |
 | `js/widget.js` | `behavior: {{ COMPONENT }}Widget` | `jQuery.once` | `js/widget.js` (`core/once`) | `MIGRATED` | `once()` behavior execution verified |

@@ -99,15 +99,17 @@ Modernizes Drupal 7 PHPTemplate custom themes into modern Drupal 10/11 Twig them
 ---
 
 ## 12. Operational Execution Procedure
-1. **Tier Evaluation**: Classify theme assets into Tier 1 (Direct translation), Tier 2 (Review required), and Tier 3 (Redesign required).
+1. **Tier Evaluation & Architecture Mapping**: Classify theme assets into Tier 1 (Direct translation), Tier 2 (Review required), and Tier 3 (Redesign required), and assign one of the 30 target architecture classifications (`THEME`, `BASE_THEME`, `SUB_THEME`, `THEME_INFO`, `THEME_REGION`, `TWIG_TEMPLATE`, `TWIG_TEMPLATE_OVERRIDE`, `THEME_HOOK`, `CUSTOM_THEME_HOOK`, `PREPROCESS_HOOK`, `PROCESS_HOOK`, `THEME_SUGGESTION`, `DYNAMIC_THEME_SUGGESTION`, `THEME_FUNCTION_REPLACEMENT`, `RENDER_ARRAY`, `RENDER_ELEMENT`, `THEME_SERVICE`, `THEME_CONFIGURATION`, `THEME_LIBRARY`, `TEMPLATE_VARIABLE_PROVIDER`, `ENTITY_TEMPLATE`, `FIELD_TEMPLATE`, `VIEW_TEMPLATE`, `FORM_TEMPLATE`, `BLOCK_TEMPLATE`, `MENU_TEMPLATE`, `PAGE_TEMPLATE`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`) and one of the 22 migration strategies.
 2. **Author Theme Migration Plan**: Write `reports/themes/PLAN-<THEME>.md`.
 3. **Scaffold Modern Theme**:
-   - Create `<target_theme_dir>/<THEME>/<THEME>.info.yml` referencing base theme.
-   - Author `<THEME>.libraries.yml` declaring CSS/JS asset dependencies.
-   - Author `<THEME>.theme` with modern preprocess hooks.
+   - Create `<target_theme_dir>/<THEME>/<THEME>.info.yml` referencing base theme, core version requirement, regions, and default libraries.
+   - Author `<THEME>.libraries.yml` declaring CSS/JS asset dependencies with SMACSS categorization and `core/once`.
+   - Author `<THEME>.theme` with modern preprocess hooks, `hook_theme_suggestions_HOOK_alter()`, and template suggestions.
 4. **Twig Template Modernization**:
    - Convert `.tpl.php` files into `templates/<category>/<template>.html.twig`.
-   - Replace PHP echo tags, control structures, and filters with Twig equivalents.
+   - Replace PHP echo tags, control structures, and filters with Twig equivalents (`{{ variable }}`, `{% if %}`, `{% for %}`, `|t`, `|clean_class`).
+   - Refactor theme functions (`theme_*()`) into Twig templates, custom render elements, or theme services.
+   - Refactor theme settings forms (`theme-settings.php`) into `config/schema/<THEME>.schema.yml` and CMI configurations.
    - Refactor jQuery `.live()` / `$.browser` to vanilla ES6 and `core/once`.
 5. **Log File Mutations**: Record every generated file in `logs/file-change-log/`.
 6. **Author Implementation Report**: Generate `reports/themes/REPORT-<THEME>.md`.

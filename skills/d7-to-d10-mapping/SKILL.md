@@ -1,7 +1,7 @@
 ---
 name: d7-to-d10-mapping
 description: Exhaustive pattern mapping rules for converting Drupal 7 procedural code, inc files, custom database schemas, procedural hooks, configuration variables, entities, forms, and frontend assets into modern Drupal 10/11 object-oriented architecture.
-version: 1.7.0
+version: 1.9.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep
@@ -239,3 +239,62 @@ In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual li
 - **Programmatic Dispatches**:
   - `views_get_view($name)` $\rightarrow$ `\Drupal\views\Views::getView($name)`
   - `views_embed_view($name, $display_id, ...$args)` $\rightarrow$ `views_embed_view($name, $display_id, ...$args)`
+
+## 12. Themes, Templates, Preprocess & Theme Layer Modernization
+- **Theme Metadata & Declaration (`<theme>.info.yml`)**:
+  - Converts D7 `<theme>.info` into modern YAML format:
+    ```yaml
+    name: 'Custom Corporate'
+    type: theme
+    description: 'Custom responsive corporate theme'
+    core_version_requirement: ^10 || ^11
+    base theme: olivero # or claro, starterkit, false
+    libraries:
+      - custom_corp/global_styling
+    regions:
+      header: 'Header'
+      primary_menu: 'Primary menu'
+      content: 'Content'
+      sidebar_first: 'Sidebar first'
+      footer: 'Footer'
+    ```
+- **PHPTemplate (`.tpl.php`) to Modern Twig (`.html.twig`) Conversion**:
+  - All PHP tags (`<?php ... ?>`) are eliminated and converted to Twig expressions:
+    - `<?php print $title; ?>` $\rightarrow$ `{{ title }}`
+    - `<?php print render($page['content']); ?>` $\rightarrow$ `{{ page.content }}`
+    - `<?php print render($content['field_image']); ?>` $\rightarrow$ `{{ content.field_image }}`
+    - `<?php if ($logged_in): ?>` $\rightarrow$ `{% if logged_in %}`
+    - `<?php foreach ($items as $item): ?>` $\rightarrow$ `{% for item in items %}`
+    - `<?php print $classes; ?>` $\rightarrow$ `{{ attributes.addClass(classes) }}` or `{{ node.bundle|clean_class }}`
+    - `<?php print $attributes; ?>` $\rightarrow$ `{{ attributes }}`
+    - `<?php print t('Read more'); ?>` $\rightarrow$ `{{ 'Read more'|t }}`
+    - `views-view.tpl.php` $\rightarrow$ `views-view.html.twig` (Views presentation override)
+- **Theme Preprocess Modernization (`<theme>.theme`)**:
+  - Preprocess functions in `template.php` are refactored into `<theme>.theme`:
+    ```php
+    /**
+     * Implements hook_preprocess_HOOK() for node templates.
+     */
+    function custom_corp_preprocess_node(array &$variables): void {
+      $node = $variables['node'] ?? null;
+      if ($node instanceof \Drupal\node\NodeInterface) {
+        $variables['publication_date'] = \Drupal::service('date.formatter')->format($node->getCreatedTime(), 'short');
+      }
+    }
+    ```
+- **Template Suggestions (`hook_theme_suggestions_HOOK_alter()`)**:
+  - Replaces legacy `$variables['theme_hook_suggestions']` with structured suggestion hooks:
+    ```php
+    /**
+     * Implements hook_theme_suggestions_HOOK_alter() for page templates.
+     */
+    function custom_corp_theme_suggestions_page_alter(array &$suggestions, array $variables): void {
+      if (\Drupal::service('path.matcher')->isFrontPage()) {
+        $suggestions[] = 'page__front';
+      }
+    }
+    ```
+- **Theme Functions to Twig Templates / Render Elements**:
+  - Procedural `theme_*()` functions generating markup are rewritten into dedicated `.html.twig` templates or custom render elements (`#type`).
+- **Theme Settings Modernization**:
+  - `theme-settings.php` forms are migrated to modern CMI configuration schemas (`config/schema/<theme>.schema.yml`) and default settings (`config/install/<theme>.settings.yml`).

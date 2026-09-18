@@ -132,7 +132,17 @@ evidence_summary:
 
 ---
 
-## 13. Contributed Modules Inventory
+## 13. Themes, Templates, Preprocess, Theme Hooks & Settings Inventory (Step 20)
+
+| Theme / Module | Source Path | Artifact Type (11 Types) | Theme Hook / Template | Base Theme / Regions | Preprocess / Suggestion Logic | Consumed Variables / Render Arrays | Target Architecture (30 Types) | Migration Strategy (22 Strategies) | Status |
+|---|---|---|---|---|---|---|---|---|---|
+| `example_theme` | `templates/node--article.tpl.php` | `PHPTEMPLATE_FILE` | `node` | Regions: `content`, `sidebar_first` | `example_theme_preprocess_node` | `$title`, `$content`, `$submitted` | `TWIG_TEMPLATE` | `DIRECT_TWIG_MIGRATION` | `MIGRATED` |
+| `example_theme` | `template.php` | `PREPROCESS_HOOK` | `page` | Base: `claro` | Adds `$custom_header_banner` | Render array `$page['header']` | `PREPROCESS_HOOK` | `PREPROCESS_REFACTOR` | `MIGRATED` |
+| `example_theme` | `theme-settings.php` | `THEME_SETTINGS` | N/A | None | Settings form alters | `theme_get_setting('banner_color')` | `THEME_CONFIGURATION` | `THEME_SETTINGS_TO_CONFIG` | `MIGRATED` |
+
+---
+
+## 14. Contributed Modules Inventory
 
 | Contrib Module | D7 Version | Core in D10? | D10 Available? | Community Replacement | Action Plan |
 |---|---|---|---|---|---|
@@ -141,15 +151,15 @@ evidence_summary:
 
 ---
 
-## 14. Custom Themes Inventory
+## 15. Custom Themes Summary
 
-| Theme Name | Path | Base Theme | Template Files (.tpl.php) | Preprocess Functions |
-|---|---|---|---|---|
-| `example_theme` | `themes/custom/example` | None | 14 | 6 |
+| Theme Name | Path | Base Theme | Template Files (.tpl.php) | Preprocess Functions | Theme Functions | Theme Settings |
+|---|---|---|---|---|---|---|
+| `example_theme` | `themes/custom/example` | None | 14 | 6 | 2 | Yes |
 
 ---
 
-## 15. Custom Database Tables & Data-Model Inventory
+## 16. Custom Database Tables & Data-Model Inventory
 
 | Module | Table Name | Schema Location (`hook_schema`) | Primary Key & Indexes | Entity References (`uid`, `nid`, etc.) | Data Semantics (17 Categories) | Serialization (`PHP_SERIALIZE`, `JSON`, etc.) | CRUD Callers (Create/Read/Update/Delete) | Target Architecture |
 |---|---|---|---|---|---|---|---|---|
@@ -157,7 +167,7 @@ evidence_summary:
 
 ---
 
-## 16. Entity & Data Architecture
+## 17. Entity & Data Architecture
 - **Content Types**:
 - **Taxonomy Vocabularies**:
 - **Custom SQL Tables**:
@@ -165,13 +175,13 @@ evidence_summary:
 
 ---
 
-## 17. Integrations, External Endpoints & Drush Commands
+## 18. Integrations, External Endpoints & Drush Commands
 - **Webhooks & APIs**:
 - **Authentication Protocols**:
 - **Custom Drush Commands**:
 
 ---
 
-## 18. Baseline Audit Findings & Risks
+## 19. Baseline Audit Findings & Risks
 - **Risk Assessment**:
 - **Recommended Sequence Overrides**:
