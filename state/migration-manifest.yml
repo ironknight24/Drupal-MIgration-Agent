@@ -76,6 +76,64 @@ target_system:
 #           injected_services: ["database", "config.factory", "current_user"]
 #           status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
 #           exclusion_reason: null
+#   # Comprehensive Custom Database Schema & Data Model Accounting
+#   custom_database_tables:
+#     - table_name: "my_module_records"
+#       schema_source: "my_module.install:hook_schema" # hook_schema | hook_install | hook_update_N | DYNAMIC_TABLE | UNVERIFIED
+#       columns:
+#         - name: "record_id"
+#           type: "serial"
+#           unsigned: true
+#           not_null: true
+#           description: "Primary key for records."
+#         - name: "uid"
+#           type: "int"
+#           unsigned: true
+#           not_null: true
+#           entity_reference: "user" # user (uid) | node (nid) | taxonomy_term (tid) | file (fid) | comment (cid) | custom_entity | null
+#         - name: "data_payload"
+#           type: "blob"
+#           serialization: "PHP_SERIALIZE" # NONE | PHP_SERIALIZE | JSON | ENCODED_OBJECT | DELIMITED_VALUES | HTML_MARKUP | UNKNOWN
+#       primary_key: ["record_id"]
+#       indexes:
+#         my_module_uid_idx: ["uid"]
+#       unique_keys: {}
+#       foreign_keys:
+#         owner_user:
+#           table: "users"
+#           columns: {"uid": "uid"}
+#       data_semantics: "USER_DATA" # 17 Semantic Categories:
+#       # CONTENT | CONFIGURATION | STATE | USER_DATA | ENTITY_DATA | FIELD_DATA | RELATIONSHIP_DATA |
+#       # TRANSACTION_DATA | AUDIT_DATA | CACHE_DATA | QUEUE_DATA | TEMPORARY_DATA | INTEGRATION_DATA |
+#       # LOOKUP_DATA | REFERENCE_DATA | LEGACY_DATA | UNKNOWN
+#       variable_relationships: [] # Related variable_get/set or $conf keys
+#       crud_operations:
+#         create: ["my_module_record_save()"] # db_insert / db_merge callers
+#         read: ["my_module_record_load()", "my_module_get_user_records()"] # db_query / db_select callers
+#         update: ["my_module_record_update()"] # db_update / db_merge callers
+#         delete: ["my_module_record_delete()", "my_module_user_cancel()"] # db_delete callers
+#       database_api_usage:
+#         - operation: "db_select"
+#           function: "my_module_get_user_records"
+#           is_dynamic_sql: false
+#           sql_safety: "PARAMETERIZED" # PARAMETERIZED | CONCATENATION_DETECTED | UNVERIFIED_DYNAMIC | ESCAPED
+#       transaction_concurrency:
+#         uses_transactions: true
+#         locking_mechanism: "db_transaction"
+#       target_architecture: "CONTENT_ENTITY" # Target D10 Architecture:
+#       # CONTENT_ENTITY | CONFIG_ENTITY | CONFIG_API | STATE_API | KEYVALUE_API | DATABASE_API_QUERY_BUILDER |
+#       # CUSTOM_REPOSITORY_SERVICE | CUSTOM_STORAGE_HANDLER | QUEUE_STORAGE | CACHE_BIN | TEMPORARY_STORAGE |
+#       # EXTERNAL_SYSTEM | OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       target_destination: "src/Entity/MyRecord.php"
+#       migration_strategy: "ENTITY_MIGRATION" # 10 Migration Data Strategies:
+#       # DIRECT_MIGRATION | TRANSFORMED_MIGRATION | ENTITY_MIGRATION | CONFIG_MIGRATION | STATE_MIGRATION |
+#       # CUSTOM_MIGRATION | REPLACED | OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       migration_order_dependencies: ["d7_user"]
+#       validation_strategy: "SEMANTIC_CARDINALITY_AND_ROW_COUNT" # ROW_COUNT_EQUALITY | SEMANTIC_CARDINALITY_AND_ROW_COUNT | CHECKSUM | ENTITY_REFERENCE_INTEGRITY | SERIALIZED_PAYLOAD_TRANSFORMATION
+#       confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
+#       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       exclusion_reason: null
+#       evidence: "hook_schema defines table with primary key record_id; 4 CRUD callers in my_module.module"
 custom_modules: []
 
 # ------------------------------------------------------------------------------

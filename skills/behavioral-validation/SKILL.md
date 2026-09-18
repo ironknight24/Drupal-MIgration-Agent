@@ -29,7 +29,7 @@ Every evaluated component must be audited across the following 12 dimensions:
 | 1 | **Functionality** | Do core module features, custom classes, and UI actions produce equivalent outcomes? | Execution test output or automated assertion. |
 | 2 | **Business Rules** | Are calculations, state transitions, constraints, and validation rules preserved? | Unit test result or verified calculation comparison. |
 | 3 | **Permissions & Access** | Are route requirements, entity access checks, and role permissions correctly enforced? | Access check log / automated kernel test asserting 403 vs 200. |
-| 4 | **Data Integrity** | Are record counts, UTF-8 character sets, and timestamps preserved without truncation? | Database count query output comparing D7 to D10. |
+| 4 | **Data Integrity** | Are record and database row counts, UTF-8 character sets, and timestamps preserved without truncation? | Database row count query output comparing D7 to D10. |
 | 5 | **Relationships** | Are entity references, parent-child links, and taxonomy associations accurate? | Sample query verifying target entity reference IDs. |
 | 6 | **Configuration** | Does exported CMI configuration match intended runtime site behavior? | CMI validation against `config/schema/`. |
 | 7 | **Routes & URLs** | Do legacy paths, route aliases, redirects, and query parameters resolve? | Route definition inspection and HTTP status response. |
@@ -41,22 +41,22 @@ Every evaluated component must be audited across the following 12 dimensions:
 
 ---
 
-## Mandatory Custom PHP File, Class & `.inc` Outcome Accounting
+## Mandatory Custom PHP File, Class, .inc & Database Schema Outcome Accounting
 
-In addition to the 12 functional dimensions, validate that every custom PHP source file, class, interface, trait, constructor, method, and `.inc` file discovered in the D7 source has reached an approved, certified outcome:
+In addition to the 12 functional dimensions, validate that every custom PHP source file, class, interface, trait, constructor, method, `.inc` file, custom database table, and stored data-model artifact discovered in the D7 source has reached an approved, certified outcome:
 
 ### Approved Outcome States
-- **`MIGRATED`**: The class/function/behavior has been re-engineered into a target D10 PSR-4 class/service with verified tests.
-- **`REPLACED`**: The legacy behavior is superseded by a modern Drupal 10 core API, contrib module, or service with documented mapping.
-- **`OBSOLETE`**: The functionality is dead code or deprecated API with documented evidence.
+- **`MIGRATED`**: The class/function/behavior/table has been re-engineered into a target D10 PSR-4 class, service, repository, or Content Entity with verified tests.
+- **`REPLACED`**: The legacy behavior/table is superseded by a modern Drupal 10 core API, contrib module, or service with documented mapping.
+- **`OBSOLETE`**: The functionality/table is dead code, temporary cache, or deprecated API with documented evidence.
 - **`EXCLUDED_WITH_REASON`**: Explicitly excluded from migration scope with documented business/architectural rationale.
-- **`HUMAN_DECISION_REQUIRED`**: Unresolved business logic or ambiguity flagged for human decision in `reports/blocked/`.
-- **`UNVERIFIED`**: Dynamic behavior that cannot be statically verified, explicitly marked with `[UNVERIFIED RESULT]`.
+- **`HUMAN_DECISION_REQUIRED`**: Unresolved business logic, ambiguous schema relationships, or unverified dynamic SQL flagged for human decision in `reports/blocked/`.
+- **`UNVERIFIED`**: Dynamic behavior or runtime database state that cannot be statically verified, explicitly marked with `[UNVERIFIED RESULT]`.
 
 ### Forbidden States (Immediate Validation `FAIL`)
-- **`UNACCOUNTED`**: Any custom PHP file, class, constructor, method, or `.inc` file present in discovery but missing from the migration plan or report.
-- **`UNKNOWN_WITHOUT_REASON`**: Any excluded or omitted code lacking documented technical or business rationale.
-- **`SILENTLY_OMITTED`**: Any code dropped during refactoring without an explicit record.
+- **`UNACCOUNTED`**: Any custom PHP file, class, constructor, method, `.inc` file, or custom database table present in discovery but missing from the migration plan or report.
+- **`UNKNOWN_WITHOUT_REASON`**: Any excluded or omitted code or database table lacking documented technical or business rationale.
+- **`SILENTLY_OMITTED`**: Any code or database table dropped during refactoring without an explicit record.
 
 ---
 

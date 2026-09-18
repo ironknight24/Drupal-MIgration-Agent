@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260918201853",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260918204114",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T20:18:53.661059+00:00",
+  "executed_at": "2026-09-18T20:41:14.059189+00:00",
   "summary": {
-    "checks_total": 112,
-    "passed": 111,
+    "checks_total": 125,
+    "passed": 124,
     "failed": 0,
     "warnings": 0,
     "unverified": 1
@@ -1320,6 +1320,185 @@
       "status": "PASS",
       "evidence": "README, ARCHITECTURE, and AGENT_PROTOCOL consistently document recursive custom PHP file and OOP class re-engineering architecture.",
       "details": "Verified public documentation and template consistency for custom PHP classes.",
+      "affected_files": [
+        "README.md",
+        "ARCHITECTURE.md",
+        "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DB-01",
+      "category": "discovery",
+      "name": "Custom Database Artifacts Explicit Discovery Contract",
+      "status": "PASS",
+      "evidence": "Discovery agent and D7 analysis skill define explicit contracts for custom database tables, schemas, and data model discovery.",
+      "details": "Verified custom database artifact discovery contract and manifest schema representation.",
+      "affected_files": [
+        "agents/discovery/agent.md",
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DB-02",
+      "category": "analysis",
+      "name": "hook_schema() & Table Definition Analysis",
+      "status": "PASS",
+      "evidence": "D7 analysis skill and manifest schema analyze hook_schema() definitions, columns, types, primary keys, indexes, unique constraints, and foreign keys.",
+      "details": "Verified exhaustive hook_schema() and table definition heuristics.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DB-03",
+      "category": "analysis",
+      "name": "D7 Database API & Procedural Query Discovery",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills explicitly catalog procedural database APIs (db_query, db_select, db_insert, db_update, db_delete, db_merge, db_transaction).",
+      "details": "Verified procedural database API discovery heuristics.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DB-04",
+      "category": "accounting",
+      "name": "CRUD & Business Behavior Accounting",
+      "status": "PASS",
+      "evidence": "Discovery and manifest trace complete CRUD (Create/Read/Update/Delete) caller trees across services, controllers, forms, queue workers, cron, and Drush.",
+      "details": "Verified comprehensive CRUD and business behavior accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml",
+        "agents/discovery/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DB-05",
+      "category": "safety",
+      "name": "Dynamic SQL Handling & SQL Safety Analysis",
+      "status": "PASS",
+      "evidence": "Dynamic SQL string concatenations are flagged as UNVERIFIED RESULT / HUMAN_DECISION_REQUIRED, and queries are audited for parameterization safety.",
+      "details": "Verified dynamic SQL handling and SQL injection safety analysis.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DB-06",
+      "category": "transformation",
+      "name": "Serialized Data & Transformation Handling",
+      "status": "PASS",
+      "evidence": "Detects PHP serialized data, JSON, and encoded objects, defining safe migration process plugins and structured target storage.",
+      "details": "Verified serialized data discovery and transformation handling.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DB-07",
+      "category": "relationships",
+      "name": "Entity & Field Relationship Handling",
+      "status": "PASS",
+      "evidence": "Traces entity reference columns (uid, nid, tid, fid, entity_id) and maps target Entity Reference / Entity API architectures.",
+      "details": "Verified entity reference and relational field heuristics.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DB-08",
+      "category": "architecture",
+      "name": "Target Architecture & Non-1:1 Storage Mapping",
+      "status": "PASS",
+      "evidence": "Maps custom database tables to Content Entities, Config Entities, Config API, State API, or Repository Services, supporting 1-to-many and many-to-one transformations.",
+      "details": "Verified target database architecture mapping and non-1:1 storage support.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/custom-module-migration/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DB-09",
+      "category": "migration",
+      "name": "Migration Strategy (10 Strategies) & Relational Ordering",
+      "status": "PASS",
+      "evidence": "All 10 standardized migration data strategies are defined, and relational migration ordering (Users -> Taxonomy -> Files -> Entities -> Dependent Tables) is enforced.",
+      "details": "Verified 10 migration data strategies and relational dependency ordering.",
+      "affected_files": [
+        "skills/migration-api/SKILL.md",
+        "skills/dependency-analysis/SKILL.md",
+        "agents/data-migration/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DB-10",
+      "category": "validation",
+      "name": "Zero-Omission Outcome Enforcement",
+      "status": "PASS",
+      "evidence": "Validation agent and skill enforce approved terminal outcomes across all custom database tables, schemas, and data models.",
+      "details": "Verified zero-omission outcome enforcement for custom database artifacts.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "agents/validation/agent.md",
+        "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DB-11",
+      "category": "validation",
+      "name": "Data Validation Strategy & Integrity Proofs",
+      "status": "PASS",
+      "evidence": "Validation strategy verifies row counts, semantic cardinality, entity reference integrity, serialized payload transformation, and rollback behavior.",
+      "details": "Verified data validation strategy and validation report template consistency.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "skills/migration-api/SKILL.md",
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DB-12",
+      "category": "safety",
+      "name": "No Forbidden Silent Outcome Rejection",
+      "status": "PASS",
+      "evidence": "Validation and analysis skills explicitly reject forbidden silent states (UNACCOUNTED, UNKNOWN_WITHOUT_REASON, SILENTLY_OMITTED) for all custom database tables.",
+      "details": "Verified rejection of forbidden silent outcome states.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "skills/d7-analysis/SKILL.md",
+        "agents/validation/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DB-13",
+      "category": "documentation",
+      "name": "Template & Documentation Consistency",
+      "status": "PASS",
+      "evidence": "README, ARCHITECTURE, and AGENT_PROTOCOL consistently document custom database, schema, SQL safety, and data model re-engineering architecture.",
+      "details": "Verified public documentation and template consistency for custom database artifacts.",
       "affected_files": [
         "README.md",
         "ARCHITECTURE.md",

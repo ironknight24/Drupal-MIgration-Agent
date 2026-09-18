@@ -21,6 +21,7 @@ evidence_summary:
 - **Discovered Source Files**: [OBSERVED FACT] (`.module`, `.inc`, `.install`, `*.php`)
 - **Discovered Custom Classes**: [OBSERVED FACT]
 - **Constructors & Initializers**: [OBSERVED FACT]
+- **Discovered Custom Database Tables & Schemas**: [OBSERVED FACT] (`hook_schema`, columns, primary keys, foreign keys)
 - **Hooks & Endpoints**: [OBSERVED FACT]
 - **Business Logic Rules**: [OBSERVED FACT]
 - **Autoloading / Include Tree**: [OBSERVED FACT]
@@ -31,6 +32,9 @@ evidence_summary:
 - **Target Namespace**: `Drupal\{{ COMPONENT }}`
 - **Services & Constructor Dependency Injection**:
   - `Drupal\{{ COMPONENT }}\Service\BusinessService` (injected with `Connection`, `EntityTypeManagerInterface`)
+- **Database & Repository Architecture**:
+  - Content Entity: `Drupal\{{ COMPONENT }}\Entity\RecordEntity`
+  - Repository Service: `Drupal\{{ COMPONENT }}\Repository\RecordRepository` (injected with `Connection`)
 - **Routing & Controllers**:
   - Route name: `{{ COMPONENT }}.main` -> `Drupal\{{ COMPONENT }}\Controller\MainController::index`
 - **Plugins / Event Subscribers**:
@@ -39,16 +43,17 @@ evidence_summary:
 
 ---
 
-## 3. File-to-Class/Function Accounting & D10 Architectural Mapping
+## 3. File, Class & Custom Database Table Accounting & D10 Architectural Mapping
 
-| D7 Source File | Legacy Class / Callable | Legacy Constructor / Init | Architectural Classification | Target D10 Class / Service | Injected Services (DI) | Planned Outcome Status |
-|---|---|---|---|---|---|---|
-| `lib/ExampleProcessor.php` | `class ExampleProcessor` | `ExampleProcessor($db)` | `SERVICE_BUSINESS_LOGIC` | `src/Service/ExampleProcessor.php` | `@database`, `@config.factory` | `MIGRATED` |
-| `{{ COMPONENT }}.module` | `{{ COMPONENT }}_view()` | N/A | `CONTROLLER` | `src/Controller/ViewController.php` | `@current_user` | `MIGRATED` |
-| `includes/admin.inc` | `{{ COMPONENT }}_admin_settings()` | N/A | `FORM` | `src/Form/SettingsForm.php` | `@config.factory` | `MIGRATED` |
-| `includes/helper.inc` | `{{ COMPONENT }}_calculate_tax()` | N/A | `SERVICE_BUSINESS_LOGIC` | `src/Service/CalculationService.php` | N/A | `MIGRATED` |
-| `includes/drush.inc` | `drush_{{ COMPONENT }}_sync()` | N/A | `DRUSH_COMMAND` | `src/Drush/Commands/SyncCommands.php` | `@entity_type.manager` | `MIGRATED` |
-| `lib/LegacyCompat.php` | `class LegacyCompat` | `none` | `LEGACY_OBSOLETE` | N/A | N/A | `OBSOLETE` |
+| D7 Source File / Schema | Legacy Artifact / Class / Table | Classification / Semantics | Target D10 Class / Storage Destination | Migration Strategy / Injected Services | Planned Outcome Status |
+|---|---|---|---|---|---|
+| `lib/ExampleProcessor.php` | `class ExampleProcessor` | `SERVICE_BUSINESS_LOGIC` | `src/Service/ExampleProcessor.php` | `@database`, `@config.factory` | `MIGRATED` |
+| `{{ COMPONENT }}.install` | `table: {{ COMPONENT }}_records` | `USER_DATA` | `src/Entity/RecordEntity.php` | `ENTITY_MIGRATION` | `MIGRATED` |
+| `{{ COMPONENT }}.module` | `{{ COMPONENT }}_view()` | `CONTROLLER` | `src/Controller/ViewController.php` | `@current_user` | `MIGRATED` |
+| `includes/admin.inc` | `{{ COMPONENT }}_admin_settings()` | `FORM` | `src/Form/SettingsForm.php` | `@config.factory` | `MIGRATED` |
+| `includes/helper.inc` | `{{ COMPONENT }}_calculate_tax()` | `SERVICE_BUSINESS_LOGIC` | `src/Service/CalculationService.php` | N/A | `MIGRATED` |
+| `includes/drush.inc` | `drush_{{ COMPONENT }}_sync()` | `DRUSH_COMMAND` | `src/Drush/Commands/SyncCommands.php` | `@entity_type.manager` | `MIGRATED` |
+| `lib/LegacyCompat.php` | `class LegacyCompat` | `LEGACY_OBSOLETE` | N/A | N/A | `OBSOLETE` |
 
 ---
 

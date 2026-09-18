@@ -62,11 +62,23 @@ In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual li
 - **Configuration (CMI)**: Static settings that should be deployed across environments map to Configuration Objects (`config/install/<module>.settings.yml` and `config/schema/`).
 - **State API**: Dynamic environment-specific values (`last_cron_run`, synchronization timestamps) map to the `state` service (`\Drupal::state()` or injected `StateInterface`).
 
-### 6. Entity & Database Abstraction
-- Direct `db_query()` targeting core tables (`{node}`, `{users}`) MUST be replaced by Entity Queries via `EntityTypeManagerInterface`.
-- Direct `db_query()` targeting bespoke custom tables must be refactored into either:
-  1. A custom Content Entity type (preferred for structured business data).
-  2. The injected `Connection` service using parameterized SQL queries.
+### 6. Entity, Custom Database & Repository Abstraction
+- **Core Entity Queries**: Direct `db_query()` targeting core tables (`{node}`, `{users}`, `{taxonomy_term_data}`, `{file_managed}`) MUST be replaced by Entity Queries or Entity Storage via `EntityTypeManagerInterface`.
+- **Custom Database Table Target Architecture Mapping**:
+  - *Content Entity (`src/Entity/`)*: Appropriate when the table represents domain content, user submissions, or business objects with fieldable requirements, revisioning, or access control.
+  - *Config Entity / Config API (`config.factory`)*: Appropriate when table stores site/module configuration, settings, or administrative options.
+  - *State API (`\Drupal::state()`)*: Appropriate for transient, environment-specific timestamps, counters, or flags.
+  - *KeyValue API (`keyvalue` / `keyvalue.expirable`)*: Appropriate for key-value collections, tokens, or temporary storage.
+  - *Custom Repository Service (`src/Repository/`)*: Appropriate when non-entity relational data requires high-performance direct SQL access via injected `\Drupal\Core\Database\Connection`.
+  - *Queue Storage (`@queue`)*: Appropriate when table stores asynchronous work payloads.
+- **Database API & Query Builder Modernization**:
+  - Procedural `db_query()`, `db_query_range()`, `db_select()` $\rightarrow$ Injected `Connection` service `$connection->query()`, `$connection->select()`, or Repository query methods.
+  - Procedural `db_insert()`, `db_update()`, `db_delete()`, `db_merge()` $\rightarrow$ `$connection->insert()`, `$connection->update()`, `$connection->delete()`, `$connection->merge()`.
+  - Transaction Modernization: Procedural `db_transaction()` $\rightarrow$ `$transaction = $connection->startTransaction()` with comprehensive `try { ... } catch (\Exception $e) { $transaction->rollBack(); ... }` error handling.
+  - SQL Safety & Injection Hardening: Eliminate string concatenation in SQL queries; enforce named parameter arrays (`[':id' => $id]`). Dynamic SQL where query structure or tables cannot be verified statically must be marked `HUMAN_DECISION_REQUIRED` or `UNVERIFIED`.
+- **Serialized Data Modernization**:
+  - Migrate legacy PHP serialized strings (`serialize()` / `unserialize()`) to modern structured formats (JSON, typed entity properties, or typed arrays).
+  - Explicitly flag serialized PHP objects requiring custom migration process plugins.
 
 ### 7. Hook Alter & Event Conversion
 - System events (e.g., user login, response filters, routing alterations) map to Symfony `EventSubscriberInterface`.

@@ -123,12 +123,21 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
    - Extract legacy Drush commands from `*.drush.inc` and arbitrary `.inc`/`.php` files, cataloging command names, arguments, options, aliases, and side effects.
 10. **Theme, Hook & Database Inventory**:
     - Locate themes, base themes, and `.tpl.php` templates.
-    - Grep for `hook_menu()`, `hook_schema()`, `hook_node_info()`, `hook_form_alter()`, `hook_views_api()`.
-    - Catalog custom database tables defined in `.install` files.
-11. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
-12. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files` and `custom_php_files` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
-13. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
-14. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
+    - Grep for `hook_menu()`, `hook_schema()`, `hook_install()`, `hook_uninstall()`, `hook_update_N()`, `hook_node_info()`, `hook_form_alter()`, `hook_views_api()`.
+    - Catalog custom database tables defined in `.install`, `.module`, and `.inc` files with columns, primary keys, indexes, unique constraints, and foreign keys.
+11. **Database API & Static SQL Query Discovery**:
+    - Inventory procedural database calls: `db_query()`, `db_query_range()`, `db_select()`, `db_insert()`, `db_update()`, `db_delete()`, `db_merge()`, `db_transaction()`.
+    - Detect dynamically constructed SQL (e.g. `$table = $config['table']; db_query("SELECT ... FROM {$table}")`) and flag as `[UNVERIFIED RESULT]` / `HUMAN_DECISION_REQUIRED`.
+    - Perform SQL safety analysis identifying user inputs, missing placeholders, and raw SQL concatenations.
+12. **Data Semantics, Serialization & Entity Relationships**:
+    - Classify custom tables into the 17 semantic categories: `CONTENT`, `CONFIGURATION`, `STATE`, `USER_DATA`, `ENTITY_DATA`, `FIELD_DATA`, `RELATIONSHIP_DATA`, `TRANSACTION_DATA`, `AUDIT_DATA`, `CACHE_DATA`, `QUEUE_DATA`, `TEMPORARY_DATA`, `INTEGRATION_DATA`, `LOOKUP_DATA`, `REFERENCE_DATA`, `LEGACY_DATA`, `UNKNOWN`.
+    - Detect serialized data payloads (PHP serialize/unserialize, JSON, encoded objects, HTML).
+    - Detect entity references (`uid`, `nid`, `tid`, `fid`, `entity_id`, `delta`) and cross-table entity relationships.
+    - Map complete CRUD call trees (CREATE, READ, UPDATE, DELETE callers) across all services, forms, controllers, queue workers, cron, and Drush.
+13. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
+14. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, and `custom_database_tables` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
+15. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
+16. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
 
 ---
 

@@ -38,21 +38,24 @@ To establish an accurate DAG, inspect source assets across 5 distinct coupling v
   - Trace whether the called function/class represents a public service candidate or an internal private helper to avoid creating false dependency edges.
 
 ### 3. Database & Schema Couplings
-- Inspect `hook_schema()` declarations in `.install` files:
-  - Foreign keys pointing to tables owned by other modules.
-  - Direct queries (`db_query`, `db_select`) joining or updating tables belonging to external modules.
+- Inspect `hook_schema()` declarations, table ownership, and queries across all module source files:
+  - Module-to-table and cross-module table dependencies: trace `module -> table`, `class -> table`, `service -> table`, `form -> table`, `controller -> table`, `queue -> table`, `cron -> table`, `Drush -> table`.
+  - Foreign keys pointing to tables owned by other custom or core modules.
+  - Cross-module joins and queries (`db_query`, `db_select`, `db_insert`, `db_update`, `db_delete`) where module A mutates or queries tables defined by module B.
+  - Shared junction tables and entity reference columns (`uid`, `nid`, `tid`, `fid`, `entity_id`).
 
 ### 4. Presentation & Theme Couplings
 - Identify custom theme templates (`.tpl.php`) or preprocess functions invoking custom module APIs.
 - Custom modules that provide default themes or template suggestions via `hook_theme()`.
 
-### 5. Data Migration Hierarchy Couplings
-- Relational entity hierarchies where dependent data cannot be migrated before parent entities:
-  - Roles & Permissions -> Users
-  - Users -> Content Authors
-  - Taxonomy Vocabularies -> Taxonomy Terms
-  - Terms / Content Types -> Entity Reference Fields
-  - Nodes -> Node Revisions & Comments
+### 5. Data Migration Hierarchy & Database Ordering Couplings
+- Relational entity and custom table hierarchies where dependent data cannot be migrated before parent entities:
+  - Roles & Permissions $\rightarrow$ Users
+  - Users $\rightarrow$ Taxonomy Vocabularies $\rightarrow$ Taxonomy Terms
+  - Files / Managed Media $\rightarrow$ Content Types & Custom Entities
+  - Custom Entities $\rightarrow$ Relationship Junction Tables
+  - Entities $\rightarrow$ Custom Dependent Database Records $\rightarrow$ Serialized Payloads $\rightarrow$ Revisions & Comments
+- Circular database dependencies must be detected, flagged, and mapped to two-pass migration pipelines (stubbing references in pass 1, populating relations in pass 2).
 
 ---
 

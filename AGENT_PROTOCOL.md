@@ -130,20 +130,23 @@ Before committing any proposed state transition to `state/migration-state.yml`, 
 8. **Evidence Citation**: `evidence` cites empirical facts (`[OBSERVED FACT]`, `[VERIFIED RESULT]`, test logs).
 9. **Blocker Classification**: If `execution_status` is `BLOCKED` or `STOPPED`, blocker record exists with valid `remediation_stage`.
 10. **Target Version Consistency**: Modern code patterns conform to configured `target.core_version`.
-11. **Custom PHP File, Class & `.inc` Accounting Integrity**: For custom module components, all custom PHP source files, OOP classes, interfaces, traits, constructors, methods, and `.inc` files cataloged in discovery must have an explicit outcome status (`MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`) with zero unaccounted or silently omitted functionality.
+11. **Custom Database, Schema, PHP File, Class & `.inc` Accounting Integrity**: For custom module components, all custom database tables, schemas (`hook_schema`), custom PHP source files, OOP classes, interfaces, traits, constructors, methods, and `.inc` files cataloged in discovery must have an explicit outcome status (`MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`) with zero unaccounted or silently omitted functionality.
 
 *On Validation Failure*: The Orchestrator rejects the result, generates an `EVIDENCE_GAP` or `STATE_INCONSISTENCY` blocker, and does NOT commit the proposed state change.
 
 ---
 
-## 5. Legacy Custom PHP File, OOP Class & `.inc` Re-engineering Architecture
+## 5. Legacy Custom Database, Schema, Data Model, Legacy Custom PHP File, OOP Class & Legacy `.inc` File Re-engineering Architecture
 
-The factory recursively analyzes `.inc` files within Drupal 7 custom modules and recursively analyzes custom PHP files, OOP classes, constructors, interfaces, traits, and functions to migrate the functionality they contain into appropriate Drupal 10/11 architecture.
+The factory recursively discovers and re-engineers Legacy Custom Database schemas, database access calls, stored data models, Legacy Custom PHP Files, OOP classes, constructors, interfaces, traits, and Legacy `.inc` Files within Drupal 7 custom modules into modern Drupal 10/11 architectures.
 
-- **Discovery & Class Analysis**: Discovery recursively inventories all `*.php`, `*.inc`, and `*.module` files, extracting classes, interfaces, traits, and constructors (`__construct()` and legacy `ClassName()`).
-- **Include & Autoloading Graphs**: Analyzes loading mechanisms (`files[]`, `include`/`require`, custom autoloaders) and converts them to standard PSR-4 autoloading.
-- **Non-1:1 Mapping & Constructor DI**: Functionality is analyzed per class/method/callable and mapped to modern PSR-4 services, controllers, form classes, plugins, or Drush commands with constructor Dependency Injection.
-- **Zero Omission**: Every custom PHP file, class, constructor, method, and `.inc` file must be accounted for with verified outcomes before validation sign-off.
+- **Discovery & Schema Analysis**: Discovery recursively inventories all `*.install`, `*.module`, `*.inc`, and `*.php` files, extracting `hook_schema()` definitions, columns, primary keys, indexes, unique constraints, foreign keys, and entity references (`uid`, `nid`, `tid`, `fid`, `entity_id`).
+- **Database APIs, Dynamic SQL & Safety**: Inventories `db_query()`, `db_select()`, `db_insert()`, `db_update()`, `db_delete()`, `db_merge()`, `db_transaction()`. Refactors queries into safe parameterized statements (`:placeholder`) or query builders, flagging unresolved dynamic SQL as `[UNVERIFIED RESULT]` / `HUMAN_DECISION_REQUIRED`.
+- **17 Data Semantic Categories**: Semantically classifies custom data into `CONTENT`, `CONFIGURATION`, `STATE`, `USER_DATA`, `ENTITY_DATA`, `FIELD_DATA`, `RELATIONSHIP_DATA`, `TRANSACTION_DATA`, `AUDIT_DATA`, `CACHE_DATA`, `QUEUE_DATA`, `TEMPORARY_DATA`, `INTEGRATION_DATA`, `LOOKUP_DATA`, `REFERENCE_DATA`, `LEGACY_DATA`, or `UNKNOWN`.
+- **Serialized Data & Transformations**: Identifies PHP serialized payloads (`serialize()` / `unserialize()`), JSON, and encoded objects, defining safe migration transformation pipelines into modern structured formats.
+- **Target Architecture & Non-1:1 Mapping**: Re-engineers custom tables and data models into Content Entities (`src/Entity/`), Config Entities, Config API (`config.factory`), State API (`\Drupal::state()`), KeyValue stores, or dedicated Repository Services (`src/Repository/`) with constructor DI (`ConnectionInterface`). Supports one-to-many and many-to-one transformations.
+- **10 Migration Data Strategies**: Executes standardized ETL pipelines: `DIRECT_MIGRATION`, `TRANSFORMED_MIGRATION`, `ENTITY_MIGRATION`, `CONFIG_MIGRATION`, `STATE_MIGRATION`, `CUSTOM_MIGRATION`, `REPLACED`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Zero Omission**: Every custom database table, schema definition, data model, custom PHP file, class, constructor, method, and `.inc` file must be accounted for with verified outcomes before validation sign-off. The states `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, and `SILENTLY_OMITTED` are strictly forbidden.
 
 ---
 

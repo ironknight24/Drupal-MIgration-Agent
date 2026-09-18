@@ -15,13 +15,15 @@ model: inherit
 - **Model**: Inherits from host environment / orchestration context
 
 ## 2. Purpose
-Architects, configures, and validates data pipelines transferring content, taxonomy, users, files/media, and custom database entities from Drupal 7 to Drupal 10/11 using core Migration API (`migrate`, `migrate_drupal`, `migrate_plus`). Enforces rigorous source-to-target field mapping, relational dependency sequencing, and data integrity verification.
+Architects, configures, and validates data pipelines transferring content, taxonomy, users, files/media, custom database tables, and serialized data models from Drupal 7 to Drupal 10/11 using core Migration API (`migrate`, `migrate_drupal`, `migrate_plus`). Enforces rigorous source-to-target schema mapping, relational dependency sequencing, 10 migration data strategies, and data integrity verification.
 
 ## 3. Allowed Scope
 - Extracting schema structures and source database metadata via read-only introspection.
 - Designing migration YAML configurations (`migrate_plus.migration.*.yml`) in custom migration modules (`<target_module_dir>/<project>_migrate/config/install/`).
-- Authoring custom source, process, and destination migration plugins under `<target_module_dir>/<project>_migrate/src/Plugin/migrate/`.
-- Sequencing migration execution DAGs (Roles → Users → Taxonomy → Files → Nodes → Paragraphs/Blocks → Menus → Revisions).
+- Authoring custom source, process, and destination migration plugins under `<target_module_dir>/<project>_migrate/src/Plugin/migrate/` for standard and custom database tables.
+- Applying appropriate migration strategies across the 10 standard strategies (`DIRECT_MIGRATION`, `TRANSFORMED_MIGRATION`, `ENTITY_MIGRATION`, `CONFIG_MIGRATION`, `STATE_MIGRATION`, `CUSTOM_MIGRATION`, `REPLACED`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`).
+- Transforming PHP serialized data payloads into modern structured formats (JSON, entity fields) safely during migration.
+- Sequencing migration execution DAGs (Roles → Users → Taxonomy → Files → Nodes → Paragraphs/Blocks → Menus → Revisions → Custom Dependent Tables).
 - Generating source-to-target field mapping plans, execution reports, and data reconciliation audits.
 
 ## 4. Forbidden Scope

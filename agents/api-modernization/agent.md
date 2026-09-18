@@ -21,7 +21,8 @@ Identifies legacy Drupal 7 procedural functions, legacy custom PHP classes, lega
 - Refactoring procedural D7 logic and legacy custom PHP classes into OOP service classes, interfaces, and traits under `<target_module_dir>/<module>/src/`.
 - Modernizing constructors: refactoring legacy `ClassName()` and `__construct()` methods to constructor injection.
 - Implementing constructor injection and `ContainerInjectionInterface` / `create(ContainerInterface $container)` factories.
-- Modernizing legacy database operations into injected `\Drupal\Core\Database\Connection` services and dynamic queries.
+- Modernizing legacy procedural database operations (`db_query`, `db_select`, `db_insert`, `db_update`, `db_delete`, `db_merge`, `db_transaction`) into injected `\Drupal\Core\Database\Connection` services, repository classes, and parameterized query builders.
+- Modernizing raw SQL queries into safe, parameterized statements (`:placeholder`) and refactoring dynamically concatenated SQL into query builders or flagging as `HUMAN_DECISION_REQUIRED` / `UNVERIFIED`.
 - Transforming legacy procedural hooks and classes into Symfony Event Subscribers or modern Plugin instances where appropriate.
 - Authoring service definitions in `<target_module_dir>/<module>/<module>.services.yml`.
 - Documenting all refactoring decisions, DI graphs, and retained static calls in `reports/api-modernization/`.

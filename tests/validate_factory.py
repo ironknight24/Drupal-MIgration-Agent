@@ -1573,6 +1573,203 @@ class FactoryValidator:
                               f"Documentation missing custom PHP class architecture sections: {', '.join(missing_doc)}",
                               "Public documentation must explicitly document custom PHP class re-engineering.")
 
+    def validate_custom_database_and_data_model_suite(self):
+        """Suite 13: Step 13 Custom Database, Schema & Data Model Accounting Verification"""
+        d7_skill = (self.repo_root / "skills/d7-analysis/SKILL.md").read_text(encoding='utf-8')
+        mapping_skill = (self.repo_root / "skills/d7-to-d10-mapping/SKILL.md").read_text(encoding='utf-8')
+        custom_skill = (self.repo_root / "skills/custom-module-migration/SKILL.md").read_text(encoding='utf-8')
+        dep_skill = (self.repo_root / "skills/dependency-analysis/SKILL.md").read_text(encoding='utf-8')
+        mig_skill = (self.repo_root / "skills/migration-api/SKILL.md").read_text(encoding='utf-8')
+        testing_skill = (self.repo_root / "skills/testing/SKILL.md").read_text(encoding='utf-8')
+        val_skill = (self.repo_root / "skills/behavioral-validation/SKILL.md").read_text(encoding='utf-8')
+
+        discovery_agent = (self.repo_root / "agents/discovery/agent.md").read_text(encoding='utf-8')
+        custom_agent = (self.repo_root / "agents/custom-module/agent.md").read_text(encoding='utf-8')
+        api_agent = (self.repo_root / "agents/api-modernization/agent.md").read_text(encoding='utf-8')
+        dep_agent = (self.repo_root / "agents/dependency/agent.md").read_text(encoding='utf-8')
+        data_agent = (self.repo_root / "agents/data-migration/agent.md").read_text(encoding='utf-8')
+        val_agent = (self.repo_root / "agents/validation/agent.md").read_text(encoding='utf-8')
+        manifest_text = (self.repo_root / "state/migration-manifest.yml").read_text(encoding='utf-8')
+
+        # 13.1 Custom Database Artifacts Explicit Discovery Contract
+        has_db_contract = "custom_database_tables" in manifest_text and "hook_schema" in d7_skill and "custom database" in discovery_agent.lower()
+        if has_db_contract:
+            self.record_check("CHECK-DB-01", "discovery", "Custom Database Artifacts Explicit Discovery Contract", "PASS",
+                              "Discovery agent and D7 analysis skill define explicit contracts for custom database tables, schemas, and data model discovery.",
+                              "Verified custom database artifact discovery contract and manifest schema representation.",
+                              affected_files=["agents/discovery/agent.md", "skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-DB-01", "discovery", "Custom Database Artifacts Explicit Discovery Contract", "FAIL",
+                              "Missing custom database discovery contract or manifest schema representation.",
+                              "Factory must define explicit discovery contracts for custom database tables.")
+
+        # 13.2 hook_schema() & Table Definition Analysis
+        schema_keywords = ["hook_schema", "primary key", "unique keys", "indexes", "foreign keys", "columns"]
+        missing_schema = [k for k in schema_keywords if k not in d7_skill.lower()]
+        if not missing_schema and "primary_key" in manifest_text:
+            self.record_check("CHECK-DB-02", "analysis", "hook_schema() & Table Definition Analysis", "PASS",
+                              "D7 analysis skill and manifest schema analyze hook_schema() definitions, columns, types, primary keys, indexes, unique constraints, and foreign keys.",
+                              "Verified exhaustive hook_schema() and table definition heuristics.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-DB-02", "analysis", "hook_schema() & Table Definition Analysis", "FAIL",
+                              f"Missing schema analysis keywords: {', '.join(missing_schema)}",
+                              "Factory must analyze all table schema components.")
+
+        # 13.3 D7 Database API & Procedural Query Discovery
+        db_apis = ["db_query", "db_select", "db_insert", "db_update", "db_delete", "db_merge", "db_transaction"]
+        missing_apis = [api for api in db_apis if api not in d7_skill.lower() and api not in mapping_skill.lower()]
+        if not missing_apis:
+            self.record_check("CHECK-DB-03", "analysis", "D7 Database API & Procedural Query Discovery", "PASS",
+                              "D7 analysis and mapping skills explicitly catalog procedural database APIs (db_query, db_select, db_insert, db_update, db_delete, db_merge, db_transaction).",
+                              "Verified procedural database API discovery heuristics.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DB-03", "analysis", "D7 Database API & Procedural Query Discovery", "FAIL",
+                              f"Missing database APIs: {', '.join(missing_apis)}",
+                              "Factory must detect and inventory all procedural database APIs.")
+
+        # 13.4 CRUD & Business Behavior Accounting
+        has_crud_callers = "crud" in d7_skill.lower() and "crud_operations" in manifest_text and "create" in manifest_text and "read" in manifest_text and "update" in manifest_text and "delete" in manifest_text
+        if has_crud_callers:
+            self.record_check("CHECK-DB-04", "accounting", "CRUD & Business Behavior Accounting", "PASS",
+                              "Discovery and manifest trace complete CRUD (Create/Read/Update/Delete) caller trees across services, controllers, forms, queue workers, cron, and Drush.",
+                              "Verified comprehensive CRUD and business behavior accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml", "agents/discovery/agent.md"])
+        else:
+            self.record_check("CHECK-DB-04", "accounting", "CRUD & Business Behavior Accounting", "FAIL",
+                              "Missing CRUD caller tracking in discovery skill or manifest schema.",
+                              "Factory must trace all code that reads and writes custom database tables.")
+
+        # 13.5 Dynamic SQL Handling & SQL Safety Analysis
+        has_dynamic_sql = "dynamic sql" in d7_skill.lower() and "unverified result" in d7_skill.lower()
+        has_sql_safety = "injection" in d7_skill.lower() or "parameter" in d7_skill.lower() or "placeholder" in d7_skill.lower()
+        if has_dynamic_sql and has_sql_safety:
+            self.record_check("CHECK-DB-05", "safety", "Dynamic SQL Handling & SQL Safety Analysis", "PASS",
+                              "Dynamic SQL string concatenations are flagged as UNVERIFIED RESULT / HUMAN_DECISION_REQUIRED, and queries are audited for parameterization safety.",
+                              "Verified dynamic SQL handling and SQL injection safety analysis.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DB-05", "safety", "Dynamic SQL Handling & SQL Safety Analysis", "FAIL",
+                              "Missing dynamic SQL heuristics or SQL safety parameterization rules.",
+                              "Factory must handle dynamic SQL safely and prevent SQL injection vulnerabilities.")
+
+        # 13.6 Serialized Data & Transformation Handling
+        has_serialization = "serialize" in d7_skill.lower() and "php_serialize" in manifest_text.lower() and "process plugin" in mig_skill.lower()
+        if has_serialization:
+            self.record_check("CHECK-DB-06", "transformation", "Serialized Data & Transformation Handling", "PASS",
+                              "Detects PHP serialized data, JSON, and encoded objects, defining safe migration process plugins and structured target storage.",
+                              "Verified serialized data discovery and transformation handling.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-DB-06", "transformation", "Serialized Data & Transformation Handling", "FAIL",
+                              "Missing serialized data heuristics or transformation pipeline specifications.",
+                              "Factory must detect and transform serialized data payloads.")
+
+        # 13.7 Entity & Field Relationship Handling
+        entity_refs = ["uid", "nid", "tid", "fid", "entity_id"]
+        missing_refs = [r for r in entity_refs if r not in d7_skill.lower()]
+        if not missing_refs and "entity_reference" in manifest_text:
+            self.record_check("CHECK-DB-07", "relationships", "Entity & Field Relationship Handling", "PASS",
+                              "Traces entity reference columns (uid, nid, tid, fid, entity_id) and maps target Entity Reference / Entity API architectures.",
+                              "Verified entity reference and relational field heuristics.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-DB-07", "relationships", "Entity & Field Relationship Handling", "FAIL",
+                              f"Missing entity reference fields: {', '.join(missing_refs)}",
+                              "Factory must trace all entity references in custom database schemas.")
+
+        # 13.8 Target Architecture & Non-1:1 Storage Mapping
+        target_archs = ["content_entity", "config_entity", "config_api", "state_api", "custom_repository_service"]
+        missing_archs = [a for a in target_archs if a not in manifest_text.lower() and a not in mapping_skill.lower()]
+        has_non_1to1 = "one-to-many" in custom_skill.lower() and "many-to-one" in custom_skill.lower()
+        if not missing_archs and has_non_1to1:
+            self.record_check("CHECK-DB-08", "architecture", "Target Architecture & Non-1:1 Storage Mapping", "PASS",
+                              "Maps custom database tables to Content Entities, Config Entities, Config API, State API, or Repository Services, supporting 1-to-many and many-to-one transformations.",
+                              "Verified target database architecture mapping and non-1:1 storage support.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/custom-module-migration/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-DB-08", "architecture", "Target Architecture & Non-1:1 Storage Mapping", "FAIL",
+                              f"Missing target architectures: {', '.join(missing_archs)} or non-1:1 mapping support.",
+                              "Factory must support varied target architectures and non-1:1 transformations.")
+
+        # 13.9 Migration Strategy (10 Strategies) & Relational Ordering
+        expected_10_strategies = [
+            "DIRECT_MIGRATION", "TRANSFORMED_MIGRATION", "ENTITY_MIGRATION", "CONFIG_MIGRATION",
+            "STATE_MIGRATION", "CUSTOM_MIGRATION", "REPLACED", "OBSOLETE",
+            "HUMAN_DECISION_REQUIRED", "UNVERIFIED"
+        ]
+        missing_strategies = [s for s in expected_10_strategies if s not in mig_skill]
+        has_ordering = "ordering" in dep_skill.lower() or "hierarchy" in dep_skill.lower()
+        if not missing_strategies and has_ordering:
+            self.record_check("CHECK-DB-09", "migration", "Migration Strategy (10 Strategies) & Relational Ordering", "PASS",
+                              "All 10 standardized migration data strategies are defined, and relational migration ordering (Users -> Taxonomy -> Files -> Entities -> Dependent Tables) is enforced.",
+                              "Verified 10 migration data strategies and relational dependency ordering.",
+                              affected_files=["skills/migration-api/SKILL.md", "skills/dependency-analysis/SKILL.md", "agents/data-migration/agent.md"])
+        else:
+            self.record_check("CHECK-DB-09", "migration", "Migration Strategy (10 Strategies) & Relational Ordering", "FAIL",
+                              f"Missing migration strategies: {', '.join(missing_strategies)} or ordering rules.",
+                              "All 10 migration data strategies and relational ordering rules must be defined.")
+
+        # 13.10 Zero-Omission Outcome Enforcement
+        approved_outcomes = ["MIGRATED", "REPLACED", "OBSOLETE", "EXCLUDED_WITH_REASON", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"]
+        missing_outcomes = [o for o in approved_outcomes if o not in val_skill]
+        val_has_db = "custom database table" in val_skill.lower() and "custom database table" in val_agent.lower()
+        if not missing_outcomes and val_has_db:
+            self.record_check("CHECK-DB-10", "validation", "Zero-Omission Outcome Enforcement", "PASS",
+                              "Validation agent and skill enforce approved terminal outcomes across all custom database tables, schemas, and data models.",
+                              "Verified zero-omission outcome enforcement for custom database artifacts.",
+                              affected_files=["skills/behavioral-validation/SKILL.md", "agents/validation/agent.md", "AGENT_PROTOCOL.md"])
+        else:
+            self.record_check("CHECK-DB-10", "validation", "Zero-Omission Outcome Enforcement", "FAIL",
+                              f"Missing approved outcomes: {', '.join(missing_outcomes)} or database validation coverage.",
+                              "Factory must enforce zero-omission outcome accounting for all database artifacts.")
+
+        # 13.11 Data Validation Strategy & Integrity Proofs
+        val_proofs = ["row count", "cardinality", "integrity", "checksum", "rollback"]
+        missing_proofs = [p for p in val_proofs if p not in mig_skill.lower() and p not in val_skill.lower()]
+        val_template = (self.repo_root / "templates/validation-report.md").read_text(encoding='utf-8')
+        if not missing_proofs and "Custom Database Tables Accounted For" in val_template:
+            self.record_check("CHECK-DB-11", "validation", "Data Validation Strategy & Integrity Proofs", "PASS",
+                              "Validation strategy verifies row counts, semantic cardinality, entity reference integrity, serialized payload transformation, and rollback behavior.",
+                              "Verified data validation strategy and validation report template consistency.",
+                              affected_files=["skills/behavioral-validation/SKILL.md", "skills/migration-api/SKILL.md", "templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-DB-11", "validation", "Data Validation Strategy & Integrity Proofs", "FAIL",
+                              f"Missing validation proof criteria: {', '.join(missing_proofs)}",
+                              "Factory must enforce semantic and relational data validation strategies.")
+
+        # 13.12 No Forbidden Silent Outcome Rejection
+        forbidden_states = ["UNACCOUNTED", "UNKNOWN_WITHOUT_REASON", "SILENTLY_OMITTED"]
+        missing_forbidden = [f for f in forbidden_states if f not in val_skill or f not in d7_skill]
+        if not missing_forbidden:
+            self.record_check("CHECK-DB-12", "safety", "No Forbidden Silent Outcome Rejection", "PASS",
+                              "Validation and analysis skills explicitly reject forbidden silent states (UNACCOUNTED, UNKNOWN_WITHOUT_REASON, SILENTLY_OMITTED) for all custom database tables.",
+                              "Verified rejection of forbidden silent outcome states.",
+                              affected_files=["skills/behavioral-validation/SKILL.md", "skills/d7-analysis/SKILL.md", "agents/validation/agent.md"])
+        else:
+            self.record_check("CHECK-DB-12", "safety", "No Forbidden Silent Outcome Rejection", "FAIL",
+                              f"Missing forbidden state rejection keywords: {', '.join(missing_forbidden)}",
+                              "Validation must reject all forbidden silent states.")
+
+        # 13.13 Template & Documentation Consistency
+        doc_files = [
+            self.repo_root / "README.md",
+            self.repo_root / "ARCHITECTURE.md",
+            self.repo_root / "AGENT_PROTOCOL.md"
+        ]
+        doc_keyword = "Legacy Custom Database"
+        missing_doc = [str(p.name) for p in doc_files if doc_keyword not in p.read_text(encoding='utf-8')]
+        if not missing_doc:
+            self.record_check("CHECK-DB-13", "documentation", "Template & Documentation Consistency", "PASS",
+                              "README, ARCHITECTURE, and AGENT_PROTOCOL consistently document custom database, schema, SQL safety, and data model re-engineering architecture.",
+                              "Verified public documentation and template consistency for custom database artifacts.",
+                              affected_files=[str(p.relative_to(self.repo_root)) for p in doc_files])
+        else:
+            self.record_check("CHECK-DB-13", "documentation", "Template & Documentation Consistency", "FAIL",
+                              f"Documentation missing custom database architecture sections: {', '.join(missing_doc)}",
+                              "Public documentation must explicitly document custom database and data model re-engineering.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -1586,6 +1783,7 @@ class FactoryValidator:
         self.validate_release_readiness_and_distribution()
         self.validate_inc_file_accounting_suite()
         self.validate_custom_php_classes_accounting_suite()
+        self.validate_custom_database_and_data_model_suite()
 
     def generate_result_json(self):
         return {

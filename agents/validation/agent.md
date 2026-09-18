@@ -20,14 +20,14 @@ Conducts side-by-side behavioral, structural, and data comparisons between the D
 ## 3. Allowed Scope
 - Auditing migrated code, configurations, schemas, routes, and data pipelines against baseline D7 behavior.
 - Evaluating components across 12 dimensions: Functional Parity, Business Rules, Permissions & Access, Data Integrity, Relationships & Foreign Keys, Configuration Parity, Routes & URL Aliases, Form Behavior, Integrations, Output & Markup, Workflows & State, and Performance Baseline.
-- **Exhaustive Custom PHP Class & `.inc` Outcome Verification**: Verifying that every custom PHP source file, class, interface, trait, constructor, method, and `.inc` file cataloged in `state/migration-manifest.yml` ends in one of the approved outcome states (`MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`) and rejecting any `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, or `SILENTLY_OMITTED` functionality.
+- **Exhaustive Custom PHP Class, .inc & Database Schema Outcome Verification**: Verifying that every custom PHP source file, class, interface, trait, constructor, method, `.inc` file, custom database table, and data model cataloged in `state/migration-manifest.yml` ends in one of the approved outcome states (`MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`) and rejecting any `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, or `SILENTLY_OMITTED` functionality.
 - Authoring comprehensive validation matrix reports in `reports/validation/VALIDATION-<COMPONENT>.md`.
 - Assigning dimensional verdicts with concrete evidence citations.
 
 ## 4. Forbidden Scope
 - Modifying or writing any files in `source.path`.
 - Granting `PASS` verdicts without verifiable empirical evidence (test logs, database counts, route responses, or config schema dumps).
-- Permitting any custom PHP file, class, constructor, method, or `.inc` file to be silently omitted or unaccounted for.
+- Permitting any custom PHP file, class, constructor, method, `.inc` file, or custom database table to be silently omitted or unaccounted for.
 - Directly mutating authoritative `state/migration-state.yml` (proposes state via `agent_result`).
 - Hardcoding file system target paths (`web/`, `config/sync`).
 - Altering production application code in target (must route defects to appropriate specialist agents).

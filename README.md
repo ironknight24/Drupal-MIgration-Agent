@@ -17,21 +17,27 @@ This repository serves as a **distributable Claude Code plugin package** that de
 
 ---
 
-## Legacy Custom PHP File, OOP Class & `.inc` Re-engineering Architecture
+## Legacy Custom Database, Schema, Data Model, Legacy Custom PHP File, OOP Class & Legacy `.inc` File Re-engineering Architecture
 
-The factory recursively analyzes `.inc` files within Drupal 7 custom modules and recursively analyzes custom PHP files, OOP classes, constructors, interfaces, traits, and functions to migrate the functionality they contain into appropriate Drupal 10/11 architecture.
+The factory recursively discovers and re-engineers Legacy Custom Database schemas, database access calls, stored data models, Legacy Custom PHP Files, OOP classes, constructors, interfaces, traits, and Legacy `.inc` Files within Drupal 7 custom modules into modern Drupal 10/11 architectures.
 
 - **Recursive Discovery Without Naming Assumptions**: Scans all custom module roots and nested subdirectories (`includes/`, `lib/`, `classes/`, `src/`, `admin/`, `forms/`, `pages/`, `commands/`, etc.) discovering all `*.php`, `*.inc`, `*.module`, `*.install`, `*.profile`, and `*.drush.inc` files.
+- **Custom Database & Schema Discovery (`hook_schema`)**: Discovers custom tables in `hook_schema()`, analyzing columns, types, lengths, primary keys, unique constraints, indexes, compound indexes, and foreign keys. Catalogs entity reference fields (`uid`, `nid`, `tid`, `fid`, `entity_id`).
+- **Database Lifecycle & Update Hooks**: Analyzes `hook_install()`, `hook_uninstall()`, and `hook_update_N()`, distinguishing base schema from historical upgrade steps to determine resulting schema and data behavior.
+- **Database API, Static & Dynamic SQL Analysis**: Analyzes procedural database operations (`db_query`, `db_select`, `db_insert`, `db_update`, `db_delete`, `db_merge`, `db_transaction`). Detects dynamic SQL concatenations and flags unresolvable dynamic queries as `[UNVERIFIED RESULT]` / `HUMAN_DECISION_REQUIRED`.
+- **SQL Safety & Parameterization**: Identifies missing placeholders, raw concatenations, and user inputs, modernizing queries into safe parameterized statements or Query Builders.
+- **17 Data Semantic Categories**: Semantically classifies custom data into `CONTENT`, `CONFIGURATION`, `STATE`, `USER_DATA`, `ENTITY_DATA`, `FIELD_DATA`, `RELATIONSHIP_DATA`, `TRANSACTION_DATA`, `AUDIT_DATA`, `CACHE_DATA`, `QUEUE_DATA`, `TEMPORARY_DATA`, `INTEGRATION_DATA`, `LOOKUP_DATA`, `REFERENCE_DATA`, `LEGACY_DATA`, or `UNKNOWN`.
+- **Serialized Data & Transformation**: Detects PHP serialized strings (`serialize()` / `unserialize()`), JSON, and encoded objects, defining safe migration transformation pipelines into modern structured formats.
+- **CRUD & Concurrency Accounting**: Maps complete CREATE, READ, UPDATE, DELETE call trees across all services, controllers, forms, queue workers, cron, and Drush commands, preserving transactional consistency (`$connection->startTransaction()`).
+- **Target Architecture & Non-1:1 Mapping**: Re-engineers custom tables and data models into Content Entities (`src/Entity/`), Config Entities, Config API (`config.factory`), State API (`\Drupal::state()`), KeyValue stores, or dedicated Repository Services (`src/Repository/`) utilizing `\Drupal\Core\Database\Connection`. Supports one-to-many and many-to-one transformations.
+- **10 Migration Data Strategies**: Applies standardized ETL strategies: `DIRECT_MIGRATION`, `TRANSFORMED_MIGRATION`, `ENTITY_MIGRATION`, `CONFIG_MIGRATION`, `STATE_MIGRATION`, `CUSTOM_MIGRATION`, `REPLACED`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
 - **Custom OOP PHP Class & Constructor Discovery**: Extracts classes, abstract classes, interfaces, traits, parent classes, used traits, constants, properties, and methods. Analyzes constructors (modern `__construct()` and legacy PHP4/D7 `ClassName()` constructors), parameter dependencies, global state usage (`$user`, `$language`, `variable_get()`), direct SQL queries, and side effects.
 - **Include, Require & Autoloading Analysis**: Analyzes how custom classes become available in D7 (direct `require`, `module_load_include()`, `.info` `files[]`, custom autoloaders) and modernizes them into PSR-4 compliant autoloading without preserving legacy manual includes.
 - **Caller & Reference Analysis**: Traces callers, class instantiations (`new ClassName()`), and static method calls across the owning module and other custom modules.
 - **22-Class Architectural Taxonomy**: Classifies every functional piece into standard categories (`SERVICE_BUSINESS_LOGIC`, `CONTROLLER`, `FORM`, `PLUGIN`, `EVENT_SUBSCRIBER`, `ACCESS_CHECKER`, `ENTITY_LOGIC`, `FIELD_LOGIC`, `QUEUE_WORKER`, `BATCH_PROCESSOR`, `CRON_HANDLER`, `DRUSH_COMMAND`, `CONFIGURATION_HANDLER`, `INTEGRATION_CLIENT`, `DATA_ACCESS`, `VALUE_OBJECT`, `DOMAIN_OBJECT`, `UTILITY_HELPER`, `TEST_SUPPORT`, `LIBRARY_EXTERNAL_DEPENDENCY`, `LEGACY_OBSOLETE`, `HUMAN_DECISION_REQUIRED` / `UNVERIFIED`).
 - **Constructor Dependency Injection Modernization**: Refactors legacy constructors to modern `__construct(...)` with explicit typehints and constructor-injected services (`database`, `entity_type.manager`, `config.factory`, `current_user`) avoiding service proliferation.
-- **Non-1:1 Architectural Re-engineering (1-to-Many & Many-to-One)**:
-  - Custom PHP files and `.inc` files are not copied blindly.
-  - One legacy PHP file may produce multiple modern PSR-4 classes (e.g. `src/Service/`, `src/Form/`, `src/Controller/`), and multiple legacy files may merge into one modern service.
 - **Drush Command Modernization**: Discovered Drush commands in `.inc` and `.php` files are cataloged and re-engineered into modern Drush 12+ command classes and services (`drush.services.yml`).
-- **Zero-Omission Accounting**: Every custom PHP file, class, constructor, method, and `.inc` file must end in an approved state: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, or `UNVERIFIED`. The states `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, and `SILENTLY_OMITTED` are strictly forbidden and trigger validation failure.
+- **Zero-Omission Accounting**: Every custom database table, schema, data model, custom PHP file, class, constructor, and method must end in an approved state: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, or `UNVERIFIED`. The states `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, and `SILENTLY_OMITTED` are strictly forbidden and trigger validation failure.
 - **Human Decision Gates & Verifiable Boundaries**: Where business intent or dynamic behavior cannot be established statically, human decisions are required (`reports/blocked/`) rather than making assumptions.
 
 ---

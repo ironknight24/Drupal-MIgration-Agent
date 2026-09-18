@@ -116,14 +116,92 @@ Classify every custom PHP class, interface, trait, and standalone function into 
   - Avoid service proliferation; only inject dependencies genuinely utilized by the modernized class.
 
 ### 8. Approved Outcome States vs Forbidden Silent States
-Every custom PHP file, class, interface, trait, function, and constructor must reach an explicit outcome:
+Every custom PHP file, class, interface, trait, function, constructor, custom database table, and data-model artifact must reach an explicit outcome:
 - **Approved Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
 - **Forbidden Silent States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`. (Any presence of forbidden states triggers a fatal validation failure).
+
+### 9. Custom Database & Schema Discovery (`hook_schema`)
+Explicitly detect, inventory, and inspect all custom schema definitions in `*.install`, `*.module`, and include files:
+- **Schema Definitions Detected**:
+  - `hook_schema()` implementations returning schema arrays: `$schema['table_name'] = [...]`.
+  - Columns: name, type (`serial`, `int`, `varchar`, `text`, `blob`, `numeric`, `float`), length/size (`tiny`, `small`, `medium`, `big`, `normal`), `not null`, `default`, `description`, `unsigned`.
+  - Keys & Constraints: `primary key`, `unique keys`, `indexes`, compound indexes.
+  - Foreign Key Definitions: explicit `foreign keys` declarations in `$schema` arrays or implicit code relationships.
+  - Indicators of special storage: timestamps (`created`, `updated`, `changed`, `timestamp`), status flags (`status`, `enabled`, `active`), delta fields (`delta`), language fields (`language`).
+- **Entity Reference Heuristics**:
+  - Identify column names referencing Drupal entities: `uid` (user), `nid` / `vid` (node / node revision), `tid` (taxonomy term), `fid` (file), `cid` (comment), `entity_id` / `entity_type` (dynamic entity reference), `delta` (field item delta).
+  - Cross-reference with codebase queries and joins to confirm whether an integer field genuinely represents an entity reference rather than an arbitrary internal identifier.
+
+### 10. Install / Update / Uninstall Database Lifecycle Analysis
+Detect and analyze database schema manipulations across module lifecycle hooks:
+- **Lifecycle Hooks Detected**: `hook_install()`, `hook_uninstall()`, `hook_schema()`, `hook_update_N()`.
+- **Schema Modification Functions**: `db_create_table()`, `db_drop_table()`, `db_add_field()`, `db_drop_field()`, `db_change_field()`, `db_add_index()`, `db_drop_index()`, `db_add_unique_key()`, `db_drop_unique_key()`, `db_add_primary_key()`, `db_drop_primary_key()`.
+- **Lifecycle Role Classification**:
+  - *Initial Schema*: Base table structure required for module operation.
+  - *Historical Upgrade*: One-off historical migration from older versions (e.g. D6 $\rightarrow$ D7). Do NOT automatically recreate historical `hook_update_N()` scripts in D10/D11; account for the final resulting schema and data state.
+  - *Runtime Table Management*: Tables dynamically created/dropped during module execution.
+  - *Cleanup Logic*: Proper `hook_uninstall()` table and variable cleanup.
+
+### 11. D7 Database API & Static SQL Query Analysis
+Exhaustively inventory procedural D7 database API calls across all module source files:
+- **Database APIs Detected**: `db_query()`, `db_query_range()`, `db_select()`, `db_insert()`, `db_update()`, `db_delete()`, `db_merge()`, `db_transaction()`, `db_set_active()`, `db_ignore_replication()`.
+- **Static SQL Inspection**:
+  - Parse SQL operations: `SELECT`, `INSERT`, `UPDATE`, `DELETE`, `MERGE`, `JOIN` (INNER, LEFT, RIGHT), `UNION`, `GROUP BY`, `ORDER BY`, `HAVING`, subqueries, aggregations (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`), table locking (`FOR UPDATE`).
+  - Trace target tables, column projections, join conditions, and filter expressions.
+- **Dynamic SQL & Variable Table Detection**:
+  - Detect dynamically constructed SQL strings (e.g., `db_query("SELECT ... FROM {" . $table_var . "}")` or `$sql = $base . $where_clause;`).
+  - Flag dynamically constructed SQL where table or query structure cannot be statically verified as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED` with explicit evidence.
+
+### 12. SQL Safety & Parameterization Analysis
+Analyze every custom SQL execution path for injection vulnerabilities and parameter safety:
+- **Safety Patterns Detected**:
+  - Named placeholders (`:uid`, `:status`) and positional placeholders (`%d`, `%s` in legacy D6-style wrappers).
+  - Unsafe concatenation of user input or request variables (`$_GET`, `$_POST`, `$_REQUEST`, `$form_state['values']`).
+  - Dynamic table names and column names derived from runtime configuration or user input.
+  - Missing escaping or improper use of `db_escape_table()` / `db_like()`.
+- **Modern Target Modernization**:
+  - Classify target query architecture: Modern Database API (`\Drupal::database()`), Select Query Builder (`$connection->select(...)`), Entity Query (`\Drupal::entityQuery(...)`), or Custom Repository Service.
+  - Any unresolved security-sensitive query pattern must be marked `HUMAN_DECISION_REQUIRED` or `UNVERIFIED`.
+
+### 13. Data Semantics & Serialization Classification
+Exhaustively classify stored data semantics and payload formats:
+- **17 Data Semantic Categories**:
+  - `CONTENT`: Editorial or user-generated domain records (e.g., articles, submissions, profiles).
+  - `CONFIGURATION`: Site or module behavioral settings, options, flags.
+  - `STATE`: Environment-specific runtime markers, timestamps, sequence counters.
+  - `USER_DATA`: User-specific metadata, preferences, historical user actions.
+  - `ENTITY_DATA`: Custom entities or field data attachments.
+  - `FIELD_DATA`: Field-like key-value or delta storage associated with entities.
+  - `RELATIONSHIP_DATA`: Cross-entity mappings, junction tables, many-to-many associations.
+  - `TRANSACTION_DATA`: E-commerce orders, payments, audit logs, financial events.
+  - `AUDIT_DATA`: Activity logs, revision histories, change tracking.
+  - `CACHE_DATA`: Transient computed data, rendered output caches.
+  - `QUEUE_DATA`: Asynchronous jobs, work items, retry queues.
+  - `TEMPORARY_DATA`: Ephemeral session caches, temporary import buffers.
+  - `INTEGRATION_DATA`: External system IDs, synchronization tokens, webhook payloads.
+  - `LOOKUP_DATA`: Static code lists, postal codes, country/state lookup dictionaries.
+  - `REFERENCE_DATA`: Reusable domain taxonomies, categories, classification tags.
+  - `LEGACY_DATA`: Obsolete historical records retained for archival only.
+  - `UNKNOWN`: Insufficient evidence to classify with certainty (triggers `HUMAN_DECISION_REQUIRED`).
+- **Serialization Formats**:
+  - Detect `serialize()` / `unserialize()` usage on text/blob columns.
+  - Identify JSON payloads (`drupal_json_encode`, `json_decode`), base64 payloads, delimited strings (`explode`, `implode`), or HTML markup.
+  - Explicitly flag serialized PHP objects (`O:`) and class-dependent structures that require migration transforms.
+
+### 14. CRUD & Business Behavior Accounting
+For every custom table, trace complete CRUD call trees across the codebase:
+- **CREATE**: Trace all `db_insert()`, `db_merge()`, or raw `INSERT` callers (forms, API clients, queue workers, cron).
+- **READ**: Trace all `db_query()`, `db_select()`, or raw `SELECT` callers (controllers, views plugins, blocks, services).
+- **UPDATE**: Trace all `db_update()`, `db_merge()`, or raw `UPDATE` callers.
+- **DELETE**: Trace all `db_delete()`, `hook_user_cancel()`, `hook_node_delete()`, or cleanup routines.
+- **Transaction & Concurrency**:
+  - Identify `db_transaction()`, explicit locking (`$txn = db_transaction()`), race-condition sensitive counters, atomic increment operations.
+  - Ensure target D10/D11 architecture preserves transactional consistency.
 
 ---
 
 ## Output Reporting Standard
 All discovery outputs must:
-1. Provide verifiable file paths, class names, method signatures, and line numbers (`[OBSERVED FACT]`).
-2. Populate `custom_php_files` and `inc_files` in `state/migration-manifest.yml`.
-3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation as `[UNVERIFIED RESULT]`.
+1. Provide verifiable file paths, class names, method signatures, table names, and line numbers (`[OBSERVED FACT]`).
+2. Populate `custom_php_files`, `inc_files`, and `custom_database_tables` in `state/migration-manifest.yml`.
+3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL as `[UNVERIFIED RESULT]`.

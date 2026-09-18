@@ -22,10 +22,11 @@ Analyzes inter-module couplings, core requirements, contributed module dependenc
 ## 3. Allowed Scope
 - Analyzing declared dependencies in `.info` files (`dependencies[]`).
 - Analyzing implicit code couplings across `.module`, `.php`, and `.inc` files (`module_invoke`, `module_exists`, `drupal_alter`, direct cross-module `.inc` function calls, cross-module class instantiations `new ClassName()`, static method calls).
-- Analyzing database schema couplings (foreign keys, shared tables).
-- Constructing the project dependency DAG and detecting cycles across all module assets (including `.inc` inclusion trees and class dependencies).
+- Analyzing database schema couplings (foreign keys, custom database table ownership, cross-table queries, and entity reference relationships).
+- Calculating data migration ordering dependencies (Users $\rightarrow$ Taxonomy $\rightarrow$ Files $\rightarrow$ Entities $\rightarrow$ Custom Dependent Records).
+- Constructing the project dependency DAG and detecting cycles across all module assets, database tables, and migration pipelines.
 - Calculating topological in-degrees and authoring the canonical dependency report in `reports/dependencies/`.
-- Classifying dependency evidence strictly (`[OBSERVED FACT]` for declared vs `[INFERENCE]` for dynamic hook/include calls).
+- Classifying dependency evidence strictly (`[OBSERVED FACT]` for declared vs `[INFERENCE]` for dynamic hook/include/query calls).
 
 ---
 

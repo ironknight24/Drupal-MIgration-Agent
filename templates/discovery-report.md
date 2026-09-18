@@ -80,7 +80,15 @@ evidence_summary:
 
 ---
 
-## 8. Entity & Data Architecture
+## 8. Custom Database Tables & Data-Model Inventory
+
+| Module | Table Name | Schema Location (`hook_schema`) | Primary Key & Indexes | Entity References (`uid`, `nid`, etc.) | Data Semantics (17 Categories) | Serialization (`PHP_SERIALIZE`, `JSON`, etc.) | CRUD Callers (Create/Read/Update/Delete) | Target Architecture |
+|---|---|---|---|---|---|---|---|---|
+| `example_module` | `example_records` | `example.install:hook_schema` | PK: `record_id`, Idx: `uid` | `uid` (user) | `USER_DATA` | `PHP_SERIALIZE` | C: `example_save()`, R: `example_load()`, U: `example_update()`, D: `example_delete()` | `CONTENT_ENTITY` |
+
+---
+
+## 9. Entity & Data Architecture
 - **Content Types**:
 - **Taxonomy Vocabularies**:
 - **Custom SQL Tables**:

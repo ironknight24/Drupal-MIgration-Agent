@@ -30,10 +30,13 @@ When testing modernized custom OOP classes and services, configure tests appropr
    - Assert all required services are properly injected rather than accessed statically.
 3. **Public API & Business Logic Parity**:
    - Author PHPUnit Unit tests targeting domain calculations, validation algorithms, and state transitions.
-4. **Integration & Storage Operations**:
-   - Author PHPUnit Kernel tests targeting entity CRUD, dynamic SQL queries, and configuration schema adherence.
-5. **Error Handling & Edge Cases**:
-   - Assert exception throwing on invalid inputs, missing dependencies, or failed external requests.
+4. **Integration, Custom Database & Repository Operations**:
+   - Author PHPUnit Kernel tests targeting custom entity CRUD, custom database table repository queries, dynamic SQL filters, and configuration schema adherence.
+   - Verify transaction rollback semantics: ensure failed operations rollback completely without leaving orphaned records.
+5. **Data Migration ETL Pipeline Tests**:
+   - Author Kernel migration tests verifying source-to-destination mappings, serialized payload transformations, entity reference lookups, and rollback behavior.
+6. **Error Handling & Edge Cases**:
+   - Assert exception throwing on invalid inputs, missing dependencies, database constraint violations, or failed external requests.
 
 ---
 
