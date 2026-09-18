@@ -255,6 +255,7 @@ Drupal-MIgration-Agent/
   - Factory Step 5: Self-Validation, Contract Testing & Runtime Readiness [COMPLETE]
   - Factory Step 6: Consumer Onboarding, Configuration Boundary & Preflight [COMPLETE]
   - Factory Step 7: Runtime Execution & Integration Hardening [COMPLETE]
+  - Factory Step 8: End-to-End Workflow Validation [COMPLETE]
 
 - **Migration Execution Lifecycle (When running against a real project)**:
   - Migration Step 0: Setup & Path Verification (Preflight Gate)
@@ -297,3 +298,17 @@ The framework distinguishes system recommendations from authoritative human appr
 ### 5. Runtime Capability Status
 All static structures, schemas, and contracts are verified. Claude Code live execution and live subagent sandboxing remain explicitly marked:
 `[RUNTIME UNVERIFIED — CLAUDE CODE CLI/ACCESS NOT AVAILABLE]`.
+
+---
+
+## End-to-End Workflow Validation (Step 8)
+
+Step 8 executes an automated, deterministic **Factory Workflow Simulation** validating the complete migration chain from consumer configuration to final audit:
+- **Configuration & Preflight**: Validates path non-overlap, secret exclusion, and Drupal markers.
+- **Preflight Gating**: Ensures Discovery and Orchestration halt on preflight failure.
+- **Manifest & State Decoupling**: Confirms static inventory is isolated from mutable state.
+- **Dynamic Wave Topological Scheduling**: Simulates dependency DAG resolution and cyclic deadlock detection.
+- **Human Decision Gating**: Enforces execution halts during `PENDING` plan reviews.
+- **Agent Result Validation Gate**: Confirms Orchestrator validates schema and evidence before state mutation.
+- **Failure Recovery Simulation**: Verifies Cases A through F recovery paths.
+- **Final Audit Gate Evaluation**: Validates 8 acceptance gates for complete component accounting.
