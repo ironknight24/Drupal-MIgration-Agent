@@ -738,8 +738,114 @@ Ensure clean architectural boundaries across the migration factory:
 
 ---
 
+## Cache, Session, Security, Concurrency & Runtime Behavior Analysis (Step 23)
+
+### 91. Exhaustive Cache API Discovery, Cache Bins, Keys & Semantics
+Recursively scan custom D7 modules and themes for all caching operations:
+- **Cache API Calls**: `cache_get()`, `cache_set()`, `cache_clear_all()`, `cache_flush()`, `drupal_static()`, `drupal_static_reset()`, static variable caches (`static $cache = array()`), static cache to service modernizations, persistent caches, and custom cache backend implementations.
+- **Cache Bins**: Inventory standard core cache bins (`cache`, `cache_page`, `cache_block`, `cache_menu`, `cache_form`, `cache_views`, `cache_filter`) and custom cache bins/tables declared in `hook_schema()`.
+- **Render Cache & Page Cache**: Analyze render cache (`#cache` render arrays), render caching, page cache, page caching, block cache, and Views cache behaviors.
+- **Cache Key & Granularity Analysis**: Extract cache keys, key construction logic (e.g., concatenated entity IDs, user roles, language codes, timestamps), cache bin targets, and lifetime/expiration settings (`CACHE_PERMANENT`, `CACHE_TEMPORARY`, unix timestamps). Dynamic cache keys cross-reference Step 21.
+- **Context Dependencies**: Analyze if cached values depend on user (`user.roles`, `user.permissions`, `user`), language (`languages:language_interface`), timezone, route/path (`url.path`, `url.query_args`), or HTTP headers.
+
+### 92. Cache Invalidation, Tags, Contexts & Max-Age Modeling
+Analyze cache clearing and invalidation mechanics to construct modern cache metadata:
+- **Invalidation Calls & Triggers**: Detect `cache_clear_all('prefix', 'bin', TRUE)`, `cache_clear_all('key', 'bin')`, `drupal_static_reset()`, `hook_cache_flush()`, entity hook invalidations (`hook_entity_update`, `hook_node_save`), and configuration-driven invalidations. Map to modern `Cache::invalidateTags()` and `CacheableMetadata`.
+- **Modern Cache Metadata Construction**:
+  - **Cache Tags (`#cache['tags']`)**: Map entity and data invalidations to granular tags (e.g., `node:123`, `node_list`, `user:45`, `config:system.site`).
+  - **Cache Contexts (`#cache['contexts']`)**: Map request-sensitive variations to standard D10/D11 contexts (e.g., `user.roles`, `url.query_args:page`, `languages:language_interface`).
+  - **Cache Max-Age (`#cache['max-age']`)**: Map fixed expirations to seconds or `Cache::PERMANENT` / `0` (un-cacheable).
+
+### 93. Session Lifecycle, Session Variables & Anonymous/Authenticated State
+Discover all session interactions across custom code:
+- **Session API & `$_SESSION` Usage**: Identify `$_SESSION` reads, writes, and unsets, session initialization triggers, and session destruction hooks (`hook_user_logout()`, `drupal_session_destroy_timestamp()`).
+- **Session-Dependent Rendering & Logic**: Track logic where rendered output or access decisions depend on session variables (e.g., wizard forms, temporary shopping carts, session flash messages).
+- **Anonymous vs Authenticated Sessions**: Distinguish lazy anonymous sessions from authenticated sessions, ensuring migration to `\Symfony\Component\HttpFoundation\Session\SessionInterface` or Drupal `tempstore.private` / `tempstore.shared` without forcing session initiation for anonymous users.
+- **Secret Isolation**: Never copy or persist actual session IDs or token values in manifests or reports.
+
+### 94. Cookie Discovery, Temporary Storage & Request State
+Catalog cookie manipulation and temporary runtime state:
+- **Cookie Usage**: Detect `setcookie()`, `$_COOKIE` reads, and cookie deletion. Document purpose (e.g., UI preferences, affiliate tracking, auth tokens) and security flags (`HttpOnly`, `Secure`, `SameSite`).
+- **Temporary State Stores**: Identify custom database temporary tables, serialized scratch buffers, and `ctools_object_cache` usage. Map to modern PrivateTempStore (`tempstore.private`) or KeyValueExpirable stores (`keyvalue.expirable`).
+
+### 95. Access Control, Permissions, Node/Entity/Field Access & Route Access
+Exhaustively analyze security and authorization decision points:
+- **Routing Access Callbacks**: Detect `access callback` and `access arguments` in `hook_menu()`, custom access functions, and parameter requirements. Map to modern route requirement attributes (`_permission`, `_role`, `_access: 'Drupal\my_module\Access\CustomAccessCheck::access'`).
+- **Permission Checks**: Trace `user_access()`, role checks (`in_array('administrator', $user->roles)`), and custom permission declarations in `hook_permission()`. Map to `PermissionInterface` and `permissions.yml`.
+- **Entity & Node Access**: Identify `hook_node_access()`, `hook_node_grants()`, `hook_node_access_records()`, and `hook_entity_access()`. Modernize to Entity Access Control Handlers (`@EntityAccessControlHandler` / `AccessResult`).
+- **Field Access**: Detect `hook_field_access()`. Modernize to `hook_entity_field_access()`.
+
+### 96. CSRF, XSS, Input Validation, Output Escaping & File/URL Security
+Audit input validation, output sanitization, and request security:
+- **CSRF Token Validation**: Detect `drupal_get_token()`, `drupal_valid_token()`, Form API `#token`, and custom route token requirements (`_csrf_token: 'TRUE'`).
+- **XSS & Output Escaping**: Trace `check_plain()`, `filter_xss()`, `filter_xss_admin()`, `check_url()`, and raw HTML outputs. Modernize to Twig auto-escaping, `Html::escape()`, `Xss::filter()`, and `UrlHelper::filterBadProtocol()`.
+- **File & Upload Security**: Discover file upload validation hooks, extension restrictions (`file_validate_extensions`), MIME verification, and public vs private URI schemes (`public://`, `private://`).
+- **URL & Redirect Security**: Audit `drupal_goto()`, `url()`, and external redirects for Open Redirect vulnerabilities. Modernize to `TrustedRedirectResponse` and `Url::fromUserInput()`.
+
+### 97. Request Lifecycle, Bootstrap, Shutdown & Cron/Queue/Batch Runtime
+Trace lifecycle hooks and execution context constraints:
+- **Lifecycle Hooks**: Detect `hook_boot()`, `hook_init()`, `hook_exit()`, and `drupal_register_shutdown_function()`. Modernize to Symfony HttpKernel Event Subscribers (`kernel.request`, `kernel.response`, `kernel.terminate`).
+- **Cron, Queue & Batch Processing**: Identify `hook_cron()`, `hook_cron_queue_info()`, `batch_set()`, and batch operation callbacks. Modernize to `@QueueWorker` plugins and modern Batch API controllers.
+- **Execution Contexts**: Distinguish CLI execution (`drupal_is_cli()`, Drush command context) from Web requests (`\Drupal::request()`).
+
+### 98. Concurrency, Locking, Transactions & Environment/Runtime Dependencies
+Analyze concurrency controls and runtime platform requirements:
+- **Lock API**: Detect `lock_acquire()`, `lock_wait()`, `lock_release()`. Modernize to `\Drupal\Core\Lock\LockBackendInterface` (`lock` service).
+- **Database Transactions**: Detect `db_transaction()`, transaction rollbacks, and nested transactions. Modernize to `$connection->startTransaction()` with RAII scoping.
+- **Environment Dependencies**: Catalog dependencies on PHP extensions (e.g., `ext-curl`, `ext-gd`, `ext-soap`), PHP version constraints, memory limits (`ini_set('memory_limit')`), time limits (`set_time_limit()`), and OS CLI tools (`exec`, `shell_exec`).
+
+### 99. Static/Global State, Runtime Registries & Error/Fallback Behavior
+Catalog runtime state containers and error resilience:
+- **Global & Static State**: Detect `$GLOBALS`, `$user`, `$language`, global registries, and procedural singletons. Modernize to Dependency Injection and Container services.
+- **Error & Exception Handling**: Identify `set_error_handler()`, `try/catch` blocks, custom exception classes, and fallback data providers. Modernize to typed PHP 8.1+ exceptions and Symfony Error Handler event listeners.
+
+### 100. 40 Runtime Target Architecture Taxonomy & 25 Migration Strategies
+- **40 Runtime Target Architecture Classifications**:
+  `CACHE_METADATA`, `CACHE_CONTEXT`, `CACHE_TAG`, `CACHE_MAX_AGE`, `CACHE_BIN`,
+  `RENDER_CACHE`, `STATIC_CACHE`, `PERSISTENT_CACHE`, `CACHE_INVALIDATION`,
+  `SESSION_BEHAVIOR`, `SESSION_SERVICE`, `COOKIE_BEHAVIOR`, `TEMPORARY_STATE`,
+  `RUNTIME_STATE`, `ACCESS_CHECK`, `ACCESS_CHECKER_SERVICE`, `PERMISSION_CHECK`,
+  `ENTITY_ACCESS`, `FIELD_ACCESS`, `CSRF_PROTECTION`, `INPUT_VALIDATION`,
+  `OUTPUT_ESCAPING`, `FILE_SECURITY`, `URL_SECURITY`, `WEBHOOK_SECURITY`,
+  `REQUEST_LIFECYCLE`, `EVENT_SUBSCRIBER_LIFECYCLE`, `CRON_RUNTIME`, `QUEUE_RUNTIME`,
+  `BATCH_RUNTIME`, `LOCKING`, `TRANSACTION`, `CONCURRENCY_CONTROL`,
+  `ENVIRONMENT_DEPENDENCY`, `TIME_DEPENDENCY`, `LOCALE_DEPENDENCY`, `USER_CONTEXT_DEPENDENCY`,
+  `RUNTIME_REGISTRY`, `ERROR_HANDLER`, `FALLBACK_BEHAVIOR`,
+  `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **25 Standardized Runtime Migration Strategies**:
+  `CACHE_METADATA_REFACTOR`, `CACHE_CONTEXT_MAPPING`, `CACHE_TAG_MAPPING`,
+  `CACHE_INVALIDATION_REFACTOR`, `STATIC_CACHE_TO_SERVICE`, `SESSION_SERVICE_MIGRATION`,
+  `COOKIE_BEHAVIOR_MIGRATION`, `TEMPORARY_STORE_MIGRATION`, `ACCESS_CHECK_MIGRATION`,
+  `PERMISSION_MIGRATION`, `ENTITY_ACCESS_REFACTOR`, `FIELD_ACCESS_REFACTOR`,
+  `CSRF_PROTECTION_MIGRATION`, `INPUT_VALIDATION_REFACTOR`, `OUTPUT_ESCAPING_REFACTOR`,
+  `SECURITY_API_REFACTOR`, `REQUEST_LIFECYCLE_REFACTOR`, `CRON_MIGRATION`,
+  `QUEUE_WORKER_MIGRATION`, `BATCH_MIGRATION`, `LOCK_API_MIGRATION`,
+  `TRANSACTION_REFACTOR`, `CONCURRENCY_REFACTOR`, `ENVIRONMENT_DEPENDENCY_MAPPING`,
+  `RUNTIME_SERVICE_MIGRATION`, `ERROR_HANDLER_REFACTOR`, `FALLBACK_BEHAVIOR_PRESERVATION`,
+  `RUNTIME_VERIFICATION_REQUIRED`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`, `OBSOLETE`.
+- **Approved Terminal Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Forbidden Terminal States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`.
+
+### 101. Cross-Capability Ownership & Inter-Step Boundaries (Step 23)
+Step 23 establishes explicit boundaries with prior capabilities:
+- **Step 11 (.inc Files)**: Inclusion hierarchies and legacy procedural files.
+- **Step 12 (OOP PHP Classes)**: Class structures, constructors, and PSR-4 mapping.
+- **Step 13 (Database & Schema)**: Schema definitions, table taxonomy, and queries.
+- **Step 14 (Hooks)**: Procedural hook cataloging and lifecycle dispatch.
+- **Step 15 (Configuration & State)**: Persistent variables, CMI schemas, and State API items.
+- **Step 16 (Entities & Fields)**: Entity types, bundles, field storage, revisions, and translations.
+- **Step 17 (Forms & AJAX)**: Form builder functions, validation, submit handlers, and AJAX commands.
+- **Step 18 (Frontend Assets)**: JavaScript behaviors, `once()`, libraries, and CSS.
+- **Step 19 (Views & Plugins)**: Views default definitions, displays, and custom handler plugins.
+- **Step 20 (Themes & Templates)**: PHPTemplate conversion, Twig templates, and preprocess hooks.
+- **Step 21 (Dynamic Dependencies)**: Dynamic callables, variable plugin IDs, reflection probes, and uncertainty resolution.
+- **Step 22 (External Integrations)**: External HTTP clients, endpoints, webhooks, authentication protocols, and third-party SDKs.
+- **Step 23 (Runtime & Security)**: Runtime behavior, cache/session semantics, security-sensitive runtime behavior, lifecycle behavior, concurrency, environment/runtime dependencies, and runtime verification requirements.
+
+---
+
 ## Output Reporting Standard
 All discovery outputs must:
-1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, JavaScript behavior names, library identifiers, view IDs, display IDs, plugin IDs, theme names, template names, dynamic expressions, probe targets, external endpoints, and line numbers (`[OBSERVED FACT]`).
-2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, `dynamic_dependency_items`, and `external_integrations_items` in `state/migration-manifest.yml`.
-3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback / dynamic JS setting / dynamic View ID / dynamic template suggestion / dynamic callable / external endpoint as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.
+1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, JavaScript behavior names, library identifiers, view IDs, display IDs, plugin IDs, theme names, template names, dynamic expressions, probe targets, external endpoints, runtime behavior IDs, and line numbers (`[OBSERVED FACT]`).
+2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, `dynamic_dependency_items`, `external_integrations_items`, and `runtime_behavior_items` in `state/migration-manifest.yml`.
+3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback / dynamic JS setting / dynamic View ID / dynamic template suggestion / dynamic callable / external endpoint / runtime behavior as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.

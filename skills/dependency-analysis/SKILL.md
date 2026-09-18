@@ -1,7 +1,7 @@
 ---
 name: dependency-analysis
 description: Exhaustive dependency graph analysis, coupling detection, execution wave computation, and topological sorting across Drupal 7 and modern Drupal 10/11 architectures.
-version: 1.11.0
+version: 1.12.0
 user-invocable: false
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -130,6 +130,14 @@ To establish an accurate DAG, inspect source assets across 11 distinct coupling 
     - External system failures must not block internal dependency resolution; wrap external integrations in resilient Gateway Services or Queue Workers.
     - Schedule external integrations and complex webhook pipelines into **Wave 4** (Complex Integrations & AJAX Endpoints).
 
+### 13. Cache, Session, Security & Runtime Lifecycle Couplings (Step 23)
+- Trace runtime dependencies across caching, session state, access control, concurrency locks, and execution lifecycles:
+  - `CACHE_INVALIDATION_EDGE`: Invalidation cascades where entity or config changes invalidate downstream render caches or custom cache tags (`node:123`, `node_list`, `config:system.site`).
+  - `SESSION_STATE_EDGE`: State pipelines where multi-step forms, wizards, or temporary cart stores depend on session isolation and `PrivateTempStore`.
+  - `SECURITY_ACCESS_EDGE`: Authorization decision trees where routes and controllers depend on custom `AccessCheckInterface` services, permissions, and node grants.
+  - `LIFECYCLE_ORDERING_EDGE`: Bootstrap, request initialization, and shutdown execution ordering mediated by Symfony HttpKernel event priority.
+  - `CONCURRENCY_LOCK_EDGE`: Mutex and lock acquisition boundaries (`LockBackendInterface`) preventing race conditions across cron, queue workers, and batch tasks.
+
 ---
 
 ## Directed Acyclic Graph (DAG) Construction & Cycle Resolution
@@ -160,3 +168,4 @@ Components are scheduled into ordered execution waves:
 | **Wave 4** | **Complex Integrations & AJAX Endpoints** | Webhooks, third-party sync, bi-directional entity reference resolution, complex AJAX forms. | Core module services & entities operational. |
 | **Wave 5** | **Presentation Layer & Entity View Builders** | Themes, Twig templates, UI asset libraries, custom formatters/widgets. | Final entity render structures finalized. |
 | **Wave 6** | **Dynamic Runtime Probes & Re-engineering** | Modernized plugin managers, dynamic callable services, runtime probe verification. | Target components operational. |
+| **Wave 7** | **Runtime Lifecycle & Security Orchestration** | Cache invalidation subscribers, access checks, session managers, lock handlers. | Core services, themes, and plugins in place. |

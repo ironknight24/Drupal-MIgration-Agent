@@ -1,7 +1,7 @@
 ---
 name: d7-to-d10-mapping
 description: Definitive mapping patterns, API conversions, and structural transformations from Drupal 7 to Drupal 10/11.
-version: 1.11.0
+version: 1.12.0
 user-invocable: false
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Drupal 7 to Drupal 10/11 Architectural Mapping Skill
 
 ## Overview
-This skill provides the architectural mapping rules required to translate Drupal 7 procedural constructs, hooks (core, contrib, custom, alter, entity, form, theme, install/update), persistent variables, configuration forms, runtime state, custom entities, fields, bundles, revisions, translations, forms, Form API elements, AJAX commands, legacy custom PHP classes, constructors, interfaces, traits, and `.inc` files into modern Symfony/Drupal 10 and Drupal 11 object-oriented paradigms, prioritizing Dependency Injection, PSR-4 autoloading, service containers, event subscribers, typed configuration, and testability.
+This skill provides the architectural mapping rules required to translate Drupal 7 procedural constructs, hooks (core, contrib, custom, alter, entity, form, theme, install/update), persistent variables, configuration forms, runtime state, custom entities, fields, bundles, revisions, translations, forms, Form API elements, AJAX commands, frontend assets, Views plugins, theme templates, dynamic dependencies, external integrations, cache operations, session lifecycle, access checks, security, and concurrency into modern Symfony/Drupal 10 and Drupal 11 object-oriented paradigms, prioritizing Dependency Injection, PSR-4 autoloading, service containers, event subscribers, typed configuration, and testability.
 
 ---
 
@@ -370,3 +370,29 @@ In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual li
   - Legacy `exec()` / `shell_exec()` calls are modernized to `Symfony\Component\Process\Process` with strict argument escaping.
 - **Asynchronous External Operations $\rightarrow$ Drupal Queue API (`@QueueWorker`)**:
   - Heavy external API syncs or batch requests are refactored into Queue Worker plugins (`src/Plugin/QueueWorker/<Worker>.php`) for non-blocking execution.
+
+## 15. Cache, Session, Security, Concurrency & Runtime Modernization (Step 23)
+- **Procedural Cache API (`cache_get()`, `cache_set()`) $\rightarrow$ Cache Backend & Bubbleable Cache Metadata**:
+  - Direct cache manipulation is modernized to injected `\Drupal\Core\Cache\CacheBackendInterface` services (`cache.default`, `cache.render`) or bubbleable cache metadata (`\Drupal\Core\Cache\CacheableMetadata`) on render arrays:
+    ```php
+    $build['#cache'] = [
+      'tags' => ['node:' . $node->id(), 'user:' . $user->id()],
+      'contexts' => ['user.roles', 'languages:language_interface'],
+      'max-age' => 3600,
+    ];
+    ```
+  - Cache invalidations are modernized to `\Drupal\Core\Cache\Cache::invalidateTags(['node:' . $node->id()]);`.
+- **Direct `$_SESSION` Usage $\rightarrow$ Symfony SessionInterface & PrivateTempStore**:
+  - Direct `$_SESSION` manipulation is refactored to `\Symfony\Component\HttpFoundation\Session\SessionInterface` or Drupal `\Drupal\Core\TempStore\PrivateTempStoreFactory` (`tempstore.private`) to preserve session isolation and avoid breaking anonymous page caching.
+- **Routing `access callback` $\rightarrow$ AccessCheckInterface & Route Requirements**:
+  - Procedural access callbacks are modernized to custom Access Checker services implementing `\Drupal\Core\Routing\Access\AccessInterface` returning `\Drupal\Core\Access\AccessResultInterface` (`AccessResult::allowedIf(...)`), declared in `services.yml` with the `tag: { name: access_check, applies_to: _custom_access }`.
+- **CSRF Token Validation (`drupal_get_token()`, `drupal_valid_token()`) $\rightarrow$ Route Requirements & CsrfTokenGenerator**:
+  - State-changing GET/POST routes declare `_csrf_token: 'TRUE'` in `.routing.yml`. Programmatic token generation/validation uses `\Drupal\Core\Access\CsrfTokenGenerator` (`csrf_token` service or `\Drupal::csrfToken()`).
+- **Procedural Output Escaping (`check_plain()`, `filter_xss()`) $\rightarrow$ Twig Auto-escaping & Utility Classes**:
+  - Manual sanitization in templates is removed in favor of Twig auto-escaping. Server-side text sanitization uses `\Drupal\Component\Utility\Html::escape()` and `\Drupal\Component\Utility\Xss::filter()`. URL validation uses `\Drupal\Component\Utility\UrlHelper::isExternal()`.
+- **Lock API (`lock_acquire()`, `lock_release()`) $\rightarrow$ LockBackendInterface**:
+  - Legacy procedural lock functions are modernized to `\Drupal\Core\Lock\LockBackendInterface` injected via `\Drupal::lock()` or service container injection (`lock` service).
+- **Database Transactions (`db_transaction()`) $\rightarrow$ Connection Transaction RAII Scope**:
+  - Legacy `db_transaction()` calls are refactored to `$transaction = $connection->startTransaction()` utilizing RAII transaction scope management.
+- **Bootstrap & Lifecycle Hooks (`hook_boot()`, `hook_init()`, `hook_exit()`) $\rightarrow$ HttpKernel Event Subscribers**:
+  - Procedural lifecycle hooks are modernized to Symfony `EventSubscriberInterface` listeners subscribing to `KernelEvents::REQUEST`, `KernelEvents::RESPONSE`, and `KernelEvents::TERMINATE`.

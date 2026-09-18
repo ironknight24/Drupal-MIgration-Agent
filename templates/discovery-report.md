@@ -160,7 +160,18 @@ evidence_summary:
 
 ---
 
-## 16. Contributed Modules Inventory
+## 16. Cache, Session, Security & Runtime Behavior Inventory (Step 23)
+
+| Module | Runtime ID | Source Location | Behavior Type (20 Types) | Lifecycle Trigger | Cache / Session / Security Details | Concurrency / Lock / Transaction | Target Architecture (40 Types) | Migration Strategy (25 Strategies) | Status |
+|---|---|---|---|---|---|---|---|---|---|
+| `example_module` | `RUN-001` | `example.module:45` | `CACHE_OPERATION` | Request execution | Bin: `cache`, Key: `example:user:$uid`, Max-Age: `3600`, Tags: `user:$uid` | None | `CACHE_METADATA` | `CACHE_METADATA_REFACTOR` | `MIGRATED` |
+| `example_module` | `RUN-002` | `example.module:110` | `SESSION_USAGE` | Form multistep submit | Key: `example_wizard_step`, Storage: `$_SESSION` | None | `TEMPORARY_STATE` | `TEMPORARY_STORE_MIGRATION` | `MIGRATED` |
+| `example_module` | `RUN-003` | `example.module:180` | `ACCESS_CONTROL` | Route dispatch | Callback: `example_custom_access`, Perm: `administer example` | None | `ACCESS_CHECKER_SERVICE` | `ACCESS_CHECK_MIGRATION` | `MIGRATED` |
+| `example_module` | `RUN-004` | `example.module:230` | `LOCK_OPERATION` | Cron execution | Lock name: `example_sync_lock`, Timeout: `30` | Mutex lock | `LOCKING` | `LOCK_API_MIGRATION` | `MIGRATED` |
+
+---
+
+## 17. Contributed Modules Inventory
 
 | Contrib Module | D7 Version | Core in D10? | D10 Available? | Community Replacement | Action Plan |
 |---|---|---|---|---|---|
@@ -169,7 +180,7 @@ evidence_summary:
 
 ---
 
-## 17. Custom Themes Summary
+## 18. Custom Themes Summary
 
 | Theme Name | Path | Base Theme | Template Files (.tpl.php) | Preprocess Functions | Theme Functions | Theme Settings |
 |---|---|---|---|---|---|---|
@@ -177,7 +188,7 @@ evidence_summary:
 
 ---
 
-## 18. Custom Database Tables & Data-Model Inventory
+## 19. Custom Database Tables & Data-Model Inventory
 
 | Module | Table Name | Schema Location (`hook_schema`) | Primary Key & Indexes | Entity References (`uid`, `nid`, etc.) | Data Semantics (17 Categories) | Serialization (`PHP_SERIALIZE`, `JSON`, etc.) | CRUD Callers (Create/Read/Update/Delete) | Target Architecture |
 |---|---|---|---|---|---|---|---|---|
@@ -185,7 +196,7 @@ evidence_summary:
 
 ---
 
-## 19. Entity & Data Architecture
+## 20. Entity & Data Architecture
 - **Content Types**:
 - **Taxonomy Vocabularies**:
 - **Custom SQL Tables**:
@@ -193,13 +204,13 @@ evidence_summary:
 
 ---
 
-## 20. Integrations, External Endpoints & Drush Commands
+## 21. Integrations, External Endpoints & Drush Commands
 - **Webhooks & APIs**:
 - **Authentication Protocols**:
 - **Custom Drush Commands**:
 
 ---
 
-## 21. Baseline Audit Findings & Risks
+## 22. Baseline Audit Findings & Risks
 - **Risk Assessment**:
 - **Recommended Sequence Overrides**:

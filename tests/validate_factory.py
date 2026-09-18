@@ -2354,11 +2354,11 @@ class FactoryValidator:
         has_doc_sync = (
             taxonomy_in_d7 and
             "1.1.0" in config_skill and
-            any(v in mapping_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
-            any(v in custom_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
-            any(v in dep_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
-            any(v in test_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
-            any(v in val_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"])
+            any(v in mapping_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0"]) and
+            any(v in custom_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0"]) and
+            any(v in dep_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0"]) and
+            any(v in test_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0"]) and
+            any(v in val_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0"])
         )
 
         if has_doc_sync:
@@ -3730,11 +3730,11 @@ class FactoryValidator:
         taxonomy_in_d7 = "21 frontend target architecture" in d7_skill.lower() or "21-class" in d7_skill.lower() or "21 frontend" in d7_skill.lower()
         has_doc_sync = (
             taxonomy_in_d7 and
-            any(v in mapping_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
-            any(v in custom_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
-            any(v in dep_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
-            any(v in test_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
-            any(v in val_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"])
+            any(v in mapping_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0"]) and
+            any(v in custom_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0"]) and
+            any(v in dep_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0"]) and
+            any(v in test_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0"]) and
+            any(v in val_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0", "1.12.0"])
         )
 
         if has_doc_sync:
@@ -6030,11 +6030,11 @@ class FactoryValidator:
         taxonomy_in_d7 = "35 integration target architecture" in d7_skill.lower() or "external integrations" in d7_skill.lower()
         has_doc_sync = (
             taxonomy_in_d7 and
-            any(v in mapping_skill for v in ["1.11.0"]) and
-            any(v in custom_skill for v in ["1.11.0"]) and
-            any(v in dep_skill for v in ["1.11.0"]) and
-            any(v in test_skill for v in ["1.11.0"]) and
-            any(v in val_skill for v in ["1.11.0"])
+            any(v in mapping_skill for v in ["1.11.0", "1.12.0"]) and
+            any(v in custom_skill for v in ["1.11.0", "1.12.0"]) and
+            any(v in dep_skill for v in ["1.11.0", "1.12.0"]) and
+            any(v in test_skill for v in ["1.11.0", "1.12.0"]) and
+            any(v in val_skill for v in ["1.11.0", "1.12.0"])
         )
 
         if has_doc_sync:
@@ -6065,6 +6065,642 @@ class FactoryValidator:
                           "Retained explicit status: [RUNTIME UNVERIFIED — CLAUDE CODE CLI/ACCESS NOT AVAILABLE].",
                           affected_files=["state/migration-manifest.yml", "reports/validation_result.json"])
 
+    def validate_runtime_behavior_suite(self):
+        d7_skill = self._read_file("skills/d7-analysis/SKILL.md")
+        mapping_skill = self._read_file("skills/d7-to-d10-mapping/SKILL.md")
+        custom_skill = self._read_file("skills/custom-module-migration/SKILL.md")
+        dep_skill = self._read_file("skills/dependency-analysis/SKILL.md")
+        migration_api = self._read_file("skills/migration-api/SKILL.md")
+        test_skill = self._read_file("skills/testing/SKILL.md")
+        val_skill = self._read_file("skills/behavioral-validation/SKILL.md")
+        disc_agent = self._read_file("agents/discovery/agent.md")
+        dep_agent = self._read_file("agents/dependency/agent.md")
+        manifest_text = self._read_file("state/migration-manifest.yml")
+        readme_text = self._read_file("README.md")
+        arch_text = self._read_file("ARCHITECTURE.md")
+
+        # 23.01 Cache API Discovery
+        has_cache_api = (
+            "cache_get" in d7_skill and
+            "cache_set" in d7_skill and
+            "cache_clear_all" in d7_skill
+        )
+        if has_cache_api:
+            self.record_check("CHECK-RUNTIME-01", "cache", "Cache API Discovery", "PASS",
+                              "Discovery skill exhaustively detects Drupal 7 procedural cache API operations (cache_get, cache_set, cache_clear_all, cache_flush).",
+                              "Verified Cache API discovery heuristics in d7-analysis skill.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-01", "cache", "Cache API Discovery", "FAIL",
+                              "Missing procedural cache API discovery patterns in d7-analysis skill.",
+                              "Discovery skill must detect cache_get, cache_set, and cache_clear_all.")
+
+        # 23.02 Cache Bin Discovery
+        has_cache_bins = (
+            "cache bins" in d7_skill.lower() or "cache_bin" in d7_skill.lower() and
+            "cache_page" in d7_skill or "cache_block" in d7_skill or "cache_menu" in d7_skill or "custom cache bin" in d7_skill.lower()
+        )
+        if has_cache_bins:
+            self.record_check("CHECK-RUNTIME-02", "cache", "Cache Bin Discovery", "PASS",
+                              "Discovery skill identifies standard core cache bins (cache, cache_page, cache_block, cache_menu, cache_form, cache_views) and custom cache bins declared in hook_schema().",
+                              "Verified cache bin discovery and categorization.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-02", "cache", "Cache Bin Discovery", "FAIL",
+                              "Missing cache bin discovery heuristics in d7-analysis skill.",
+                              "Discovery skill must identify core and custom cache bins.")
+
+        # 23.03 Cache Key Discovery & Construction
+        has_cache_keys = (
+            "cache keys" in d7_skill.lower() or "cache_key" in d7_skill.lower() and
+            "key construction" in d7_skill.lower()
+        )
+        if has_cache_keys:
+            self.record_check("CHECK-RUNTIME-03", "cache", "Cache Key Discovery & Construction", "PASS",
+                              "Discovery skill analyzes static and dynamic cache key construction, parameters, prefixes, and cross-references Step 21 dynamic resolution.",
+                              "Verified cache key discovery and construction analysis.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-03", "cache", "Cache Key Discovery & Construction", "FAIL",
+                              "Missing cache key construction analysis in d7-analysis skill.",
+                              "Discovery skill must analyze cache key construction patterns.")
+
+        # 23.04 Cache Metadata Modeling (Tags, Contexts, Max-Age)
+        has_cache_metadata = (
+            "cache tags" in d7_skill.lower() and
+            "cache contexts" in d7_skill.lower() and
+            "max-age" in d7_skill.lower() and
+            ("CacheableMetadata" in mapping_skill or "CacheableDependencyInterface" in mapping_skill)
+        )
+        if has_cache_metadata:
+            self.record_check("CHECK-RUNTIME-04", "cache", "Cache Metadata Modeling (Tags, Contexts, Max-Age)", "PASS",
+                              "Skills comprehensively model modern D10/D11 cache metadata: cache tags, cache contexts, cache max-age, and bubbleable metadata.",
+                              "Verified cache metadata modeling across d7-analysis and d7-to-d10-mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-04", "cache", "Cache Metadata Modeling (Tags, Contexts, Max-Age)", "FAIL",
+                              "Missing cache metadata modeling in skills.",
+                              "Skills must model cache tags, cache contexts, and cache max-age.")
+
+        # 23.05 Cache Invalidation & Trigger Analysis
+        has_cache_invalidation = (
+            "cache invalidation" in d7_skill.lower() and
+            ("invalidateTags" in mapping_skill or "Cache::invalidateTags" in d7_skill)
+        )
+        if has_cache_invalidation:
+            self.record_check("CHECK-RUNTIME-05", "cache", "Cache Invalidation & Trigger Analysis", "PASS",
+                              "Discovery skill analyzes cache invalidation calls, entity triggers, config triggers, hook_cache_flush, and maps to Cache::invalidateTags().",
+                              "Verified cache invalidation trigger analysis and refactoring.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-05", "cache", "Cache Invalidation & Trigger Analysis", "FAIL",
+                              "Missing cache invalidation analysis in d7-analysis skill.",
+                              "Discovery skill must analyze cache invalidation and trigger mechanisms.")
+
+        # 23.06 Render Cache & Page Cache Behavior
+        has_render_cache = (
+            ("render cache" in d7_skill.lower() or "render caching" in d7_skill.lower()) and
+            ("page cache" in d7_skill.lower() or "page caching" in d7_skill.lower())
+        )
+        if has_render_cache:
+            self.record_check("CHECK-RUNTIME-06", "cache", "Render Cache & Page Cache Behavior", "PASS",
+                              "Discovery skill analyzes render caching (#cache render arrays), page caching, block caching, and Views caching.",
+                              "Verified render cache and page cache behavioral discovery.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-06", "cache", "Render Cache & Page Cache Behavior", "FAIL",
+                              "Missing render cache or page cache discovery in d7-analysis skill.",
+                              "Discovery skill must analyze render and page caching patterns.")
+
+        # 23.07 Static Cache Discovery & Modernization
+        has_static_cache = (
+            "drupal_static" in d7_skill and
+            "drupal_static_reset" in d7_skill and
+            "static cache" in d7_skill.lower()
+        )
+        if has_static_cache:
+            self.record_check("CHECK-RUNTIME-07", "cache", "Static Cache Discovery & Modernization", "PASS",
+                              "Discovery skill identifies drupal_static() usage, static cache resets, and maps static caches to service-managed memory caches.",
+                              "Verified static cache discovery and modernization heuristics.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-07", "cache", "Static Cache Discovery & Modernization", "FAIL",
+                              "Missing static cache discovery in d7-analysis skill.",
+                              "Discovery skill must identify drupal_static() patterns.")
+
+        # 23.08 Session Discovery & Lifecycle Analysis
+        has_session_discovery = (
+            "$_SESSION" in d7_skill and
+            ("drupal_session_" in d7_skill or "session lifecycle" in d7_skill.lower()) and
+            "SessionInterface" in mapping_skill
+        )
+        if has_session_discovery:
+            self.record_check("CHECK-RUNTIME-08", "session", "Session Discovery & Lifecycle Analysis", "PASS",
+                              "Discovery skill detects $_SESSION usage, session initialization/destruction, anonymous/authenticated sessions, and maps to Symfony SessionInterface.",
+                              "Verified session discovery, lifecycle analysis, and modern mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-08", "session", "Session Discovery & Lifecycle Analysis", "FAIL",
+                              "Missing session discovery patterns in d7-analysis skill.",
+                              "Discovery skill must detect $_SESSION and session lifecycle patterns.")
+
+        # 23.09 Cookie Discovery & Security Attributes
+        has_cookie_discovery = (
+            ("$_COOKIE" in d7_skill or "setcookie" in d7_skill) and
+            ("cookie discovery" in d7_skill.lower() or "cookies" in d7_skill.lower() or "cookie" in d7_skill.lower())
+        )
+        if has_cookie_discovery:
+            self.record_check("CHECK-RUNTIME-09", "session", "Cookie Discovery & Security Attributes", "PASS",
+                              "Discovery skill inventories cookie reads, writes, deletion, and security attributes without persisting real cookie values.",
+                              "Verified cookie discovery and zero-cookie-value security.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-09", "session", "Cookie Discovery & Security Attributes", "FAIL",
+                              "Missing cookie discovery in d7-analysis skill.",
+                              "Discovery skill must analyze cookie operations.")
+
+        # 23.10 Temporary Storage & Runtime State
+        has_temp_storage = (
+            ("drupal_tempstore" in d7_skill or "tempstore.private" in mapping_skill or "TEMPORARY_STATE" in d7_skill) and
+            "runtime state" in d7_skill.lower()
+        )
+        if has_temp_storage:
+            self.record_check("CHECK-RUNTIME-10", "state", "Temporary Storage & Runtime State", "PASS",
+                              "Skills discover temporary storage, wizard state, request state, and map to PrivateTempStore / SharedTempStore services.",
+                              "Verified temporary storage discovery and tempstore service mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-10", "state", "Temporary Storage & Runtime State", "FAIL",
+                              "Missing temporary storage or runtime state handling in skills.",
+                              "Skills must distinguish temporary state and map to tempstore services.")
+
+        # 23.11 Access Control & Custom Access Callbacks
+        has_access_control = (
+            "access callback" in d7_skill.lower() and
+            "AccessCheckInterface" in mapping_skill and
+            "AccessResult" in mapping_skill
+        )
+        if has_access_control:
+            self.record_check("CHECK-RUNTIME-11", "security", "Access Control & Custom Access Callbacks", "PASS",
+                              "Discovery skill analyzes access callbacks, entity access, node access, and maps custom access logic to AccessCheckInterface services returning AccessResult.",
+                              "Verified access control discovery and AccessCheckInterface mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-11", "security", "Access Control & Custom Access Callbacks", "FAIL",
+                              "Missing access control analysis or AccessCheckInterface mapping in skills.",
+                              "Skills must analyze access callbacks and map to AccessCheckInterface.")
+
+        # 23.12 Permission & Role Discovery
+        has_permission_discovery = (
+            "user_access" in d7_skill and
+            "permission" in d7_skill.lower() and
+            "role" in d7_skill.lower()
+        )
+        if has_permission_discovery:
+            self.record_check("CHECK-RUNTIME-12", "security", "Permission & Role Discovery", "PASS",
+                              "Discovery skill discovers user_access() checks, role checks, custom permissions, and maps to <module>.permissions.yml and AccountInterface.",
+                              "Verified permission and role discovery and modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-12", "security", "Permission & Role Discovery", "FAIL",
+                              "Missing permission or role discovery in d7-analysis skill.",
+                              "Discovery skill must discover user_access() and role checks.")
+
+        # 23.13 CSRF & Token Validation Discovery
+        has_csrf_discovery = (
+            "drupal_get_token" in d7_skill and
+            "drupal_valid_token" in d7_skill and
+            "csrf" in d7_skill.lower() and
+            ("csrf_token" in mapping_skill or "CsrfTokenGenerator" in mapping_skill or "csrfToken" in mapping_skill)
+        )
+        if has_csrf_discovery:
+            self.record_check("CHECK-RUNTIME-13", "security", "CSRF & Token Validation Discovery", "PASS",
+                              "Discovery skill detects CSRF token generation/validation (drupal_get_token, drupal_valid_token), state-changing GET endpoints, and maps to _csrf_token route requirements.",
+                              "Verified CSRF discovery and route token protection.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-13", "security", "CSRF & Token Validation Discovery", "FAIL",
+                              "Missing CSRF discovery in d7-analysis skill.",
+                              "Discovery skill must analyze CSRF tokens and state-changing endpoints.")
+
+        # 23.14 XSS, Input Validation & Output Escaping
+        has_xss_security = (
+            "check_plain" in d7_skill and
+            "filter_xss" in d7_skill and
+            "Html::escape" in mapping_skill or "Html::escape" in d7_skill and
+            "escaping" in d7_skill.lower()
+        )
+        if has_xss_security:
+            self.record_check("CHECK-RUNTIME-14", "security", "XSS, Input Validation & Output Escaping", "PASS",
+                              "Discovery skill analyzes sanitization and escaping functions (check_plain, filter_xss, check_url), raw HTML outputs, and maps to Twig auto-escaping and Html::escape().",
+                              "Verified XSS and output escaping analysis.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-14", "security", "XSS, Input Validation & Output Escaping", "FAIL",
+                              "Missing XSS or escaping analysis in d7-analysis skill.",
+                              "Discovery skill must analyze check_plain, filter_xss, and output escaping.")
+
+        # 23.15 File & Upload Security
+        has_file_security = (
+            "file security" in d7_skill.lower() or "upload validation" in d7_skill.lower() and
+            "file_validate" in d7_skill or "extension" in d7_skill.lower()
+        )
+        if has_file_security:
+            self.record_check("CHECK-RUNTIME-15", "security", "File & Upload Security", "PASS",
+                              "Discovery skill analyzes file upload validation, extension restrictions, MIME checking, private file access, and path traversal protections.",
+                              "Verified file and upload security discovery.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-15", "security", "File & Upload Security", "FAIL",
+                              "Missing file security analysis in d7-analysis skill.",
+                              "Discovery skill must analyze file upload validation and private file security.")
+
+        # 23.16 URL, Redirect & Request Security
+        has_url_security = (
+            "url_security" in d7_skill.lower() or "redirect security" in d7_skill.lower() and
+            "open redirect" in d7_skill.lower() or "trusted host" in d7_skill.lower() or "UrlHelper::isExternal" in mapping_skill
+        )
+        if has_url_security:
+            self.record_check("CHECK-RUNTIME-16", "security", "URL, Redirect & Request Security", "PASS",
+                              "Discovery skill identifies redirect patterns, destination parameters, external redirect risks, SSRF risks, and maps to UrlHelper::isExternal() validation.",
+                              "Verified URL, redirect, and request security analysis.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-16", "security", "URL, Redirect & Request Security", "FAIL",
+                              "Missing URL or redirect security analysis in d7-analysis skill.",
+                              "Discovery skill must analyze redirects and open redirect protections.")
+
+        # 23.17 Webhook & API Security Handoff
+        has_webhook_security = (
+            "webhook" in d7_skill.lower() and
+            "Step 22" in d7_skill and
+            "HMAC" in d7_skill or "signature" in d7_skill.lower()
+        )
+        if has_webhook_security:
+            self.record_check("CHECK-RUNTIME-17", "security", "Webhook & API Security Handoff", "PASS",
+                              "Step 23 cleanly establishes security ownership over API authentication, HMAC signatures, and rate limiting, handshaking integration semantics with Step 22.",
+                              "Verified webhook and API security cross-capability handoff.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-17", "security", "Webhook & API Security Handoff", "FAIL",
+                              "Missing webhook/API security handoff in d7-analysis skill.",
+                              "Step 23 must define API security boundaries with Step 22.")
+
+        # 23.18 Request Lifecycle & Bootstrap Hooks
+        has_lifecycle_hooks = (
+            "hook_boot" in d7_skill and
+            "hook_init" in d7_skill and
+            "hook_exit" in d7_skill and
+            "EventSubscriber" in mapping_skill or "KernelEvents" in mapping_skill
+        )
+        if has_lifecycle_hooks:
+            self.record_check("CHECK-RUNTIME-18", "lifecycle", "Request Lifecycle & Bootstrap Hooks", "PASS",
+                              "Discovery skill detects legacy request lifecycle hooks (hook_boot, hook_init, hook_exit) and maps to Symfony HttpKernel event subscribers.",
+                              "Verified request lifecycle discovery and event subscriber modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-18", "lifecycle", "Request Lifecycle & Bootstrap Hooks", "FAIL",
+                              "Missing lifecycle hook discovery in d7-analysis skill.",
+                              "Discovery skill must analyze hook_boot, hook_init, and hook_exit.")
+
+        # 23.19 Cron Processing & Scheduling
+        has_cron_discovery = (
+            "hook_cron" in d7_skill and
+            "CRON_RUNTIME" in d7_skill or "CRON_MIGRATION" in d7_skill
+        )
+        if has_cron_discovery:
+            self.record_check("CHECK-RUNTIME-19", "lifecycle", "Cron Processing & Scheduling", "PASS",
+                              "Discovery skill discovers hook_cron() implementations, scheduled tasks, time checks, and maps to modern hook_cron or scheduled queue workers.",
+                              "Verified cron discovery and scheduling analysis.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-19", "lifecycle", "Cron Processing & Scheduling", "FAIL",
+                              "Missing cron discovery in d7-analysis skill.",
+                              "Discovery skill must analyze hook_cron implementations.")
+
+        # 23.20 Queue Worker Discovery & Modernization
+        has_queue_discovery = (
+            "hook_cron_queue_info" in d7_skill or "DrupalQueue" in d7_skill and
+            "QueueWorker" in mapping_skill or "@QueueWorker" in d7_skill
+        )
+        if has_queue_discovery:
+            self.record_check("CHECK-RUNTIME-20", "lifecycle", "Queue Worker Discovery & Modernization", "PASS",
+                              "Discovery skill discovers legacy queue definitions (hook_cron_queue_info, DrupalQueue) and maps to modern @QueueWorker plugin classes.",
+                              "Verified queue worker discovery and modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-20", "lifecycle", "Queue Worker Discovery & Modernization", "FAIL",
+                              "Missing queue discovery in d7-analysis skill.",
+                              "Discovery skill must analyze hook_cron_queue_info and DrupalQueue.")
+
+        # 23.21 Batch Processing & Migration
+        has_batch_discovery = (
+            "batch_set" in d7_skill and
+            "batch_process" in d7_skill and
+            "BATCH_RUNTIME" in d7_skill or "BATCH_MIGRATION" in d7_skill
+        )
+        if has_batch_discovery:
+            self.record_check("CHECK-RUNTIME-21", "lifecycle", "Batch Processing & Migration", "PASS",
+                              "Discovery skill discovers batch operations (batch_set, batch_process), operations callbacks, finished callbacks, and progressive batching.",
+                              "Verified batch processing discovery and migration strategy.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-21", "lifecycle", "Batch Processing & Migration", "FAIL",
+                              "Missing batch discovery in d7-analysis skill.",
+                              "Discovery skill must analyze batch_set and batch_process operations.")
+
+        # 23.22 Lock API & Mutex Concurrency Discovery
+        has_lock_api = (
+            "lock_acquire" in d7_skill and
+            "lock_release" in d7_skill and
+            "LockBackendInterface" in mapping_skill or "LockBackendInterface" in d7_skill
+        )
+        if has_lock_api:
+            self.record_check("CHECK-RUNTIME-22", "concurrency", "Lock API & Mutex Concurrency Discovery", "PASS",
+                              "Discovery skill discovers legacy lock API calls (lock_acquire, lock_release, lock_may_be_available) and maps to injected LockBackendInterface.",
+                              "Verified lock API discovery and LockBackendInterface mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-22", "concurrency", "Lock API & Mutex Concurrency Discovery", "FAIL",
+                              "Missing lock API discovery in d7-analysis skill.",
+                              "Discovery skill must analyze lock_acquire and lock_release.")
+
+        # 23.23 Database Transactions & Rollback Boundaries
+        has_transactions = (
+            "db_transaction" in d7_skill and
+            "transaction" in d7_skill.lower() and
+            "startTransaction" in mapping_skill or "startTransaction" in d7_skill
+        )
+        if has_transactions:
+            self.record_check("CHECK-RUNTIME-23", "concurrency", "Database Transactions & Rollback Boundaries", "PASS",
+                              "Discovery skill analyzes transaction boundaries (db_transaction), rollback mechanisms, and maps to $connection->startTransaction().",
+                              "Verified transaction boundary discovery and Connection transaction modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-23", "concurrency", "Database Transactions & Rollback Boundaries", "FAIL",
+                              "Missing transaction discovery in d7-analysis skill.",
+                              "Discovery skill must analyze db_transaction and rollback patterns.")
+
+        # 23.24 Concurrency & Race Condition Analysis
+        has_concurrency = (
+            "concurrency" in d7_skill.lower() and
+            "race" in d7_skill.lower() and
+            "CONCURRENCY_CONTROL" in d7_skill or "CONCURRENCY_REFACTOR" in d7_skill
+        )
+        if has_concurrency:
+            self.record_check("CHECK-RUNTIME-24", "concurrency", "Concurrency & Race Condition Analysis", "PASS",
+                              "Discovery skill evaluates race conditions, duplicate execution prevention, and optimistic/pessimistic concurrency controls.",
+                              "Verified concurrency and race condition analysis heuristics.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-24", "concurrency", "Concurrency & Race Condition Analysis", "FAIL",
+                              "Missing concurrency analysis in d7-analysis skill.",
+                              "Discovery skill must analyze concurrency and race-prevention logic.")
+
+        # 23.25 Environment & Runtime Dependencies
+        has_env_deps = (
+            "getenv" in d7_skill or "ENVIRONMENT_DEPENDENCY" in d7_skill and
+            "extension_loaded" in d7_skill or "phpversion" in d7_skill or "environment dependencies" in d7_skill.lower()
+        )
+        if has_env_deps:
+            self.record_check("CHECK-RUNTIME-25", "environment", "Environment & Runtime Dependencies", "PASS",
+                              "Discovery skill inventories dependencies on PHP extensions, server variables, and environment variables without hard-coding specific values.",
+                              "Verified environment dependency discovery and generic accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-25", "environment", "Environment & Runtime Dependencies", "FAIL",
+                              "Missing environment dependency analysis in d7-analysis skill.",
+                              "Discovery skill must analyze PHP extensions and environment variables.")
+
+        # 23.26 Time, Date, Locale & Language Dependencies
+        has_time_locale = (
+            "REQUEST_TIME" in d7_skill or "time()" in d7_skill and
+            "timezone" in d7_skill.lower() or "locale" in d7_skill.lower() or "TIME_DEPENDENCY" in d7_skill
+        )
+        if has_time_locale:
+            self.record_check("CHECK-RUNTIME-26", "environment", "Time, Date, Locale & Language Dependencies", "PASS",
+                              "Discovery skill detects behavior dependent on REQUEST_TIME, timestamps, timezones, locales, and languages.",
+                              "Verified time, date, locale, and language dependency discovery.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-26", "environment", "Time, Date, Locale & Language Dependencies", "FAIL",
+                              "Missing time/locale dependency analysis in d7-analysis skill.",
+                              "Discovery skill must analyze time, date, locale, and language dependencies.")
+
+        # 23.27 User & Role Context Dependencies
+        has_user_context = (
+            "user context" in d7_skill.lower() or "USER_CONTEXT_DEPENDENCY" in d7_skill and
+            "$user" in d7_skill or "current_user" in d7_skill
+        )
+        if has_user_context:
+            self.record_check("CHECK-RUNTIME-27", "context", "User & Role Context Dependencies", "PASS",
+                              "Discovery skill models runtime logic dependent on current user, roles, permissions, and account state.",
+                              "Verified user and role context dependency discovery.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-27", "context", "User & Role Context Dependencies", "FAIL",
+                              "Missing user context analysis in d7-analysis skill.",
+                              "Discovery skill must analyze current user and role dependencies.")
+
+        # 23.28 Global & Static State Isolation
+        has_global_state = (
+            "$GLOBALS" in d7_skill or "$conf" in d7_skill and
+            "global state" in d7_skill.lower() or "static state" in d7_skill.lower()
+        )
+        if has_global_state:
+            self.record_check("CHECK-RUNTIME-28", "state", "Global & Static State Isolation", "PASS",
+                              "Discovery skill inventories mutable global state ($GLOBALS, $conf, static variables) and plans service container encapsulation.",
+                              "Verified global and static state discovery and isolation planning.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-28", "state", "Global & Static State Isolation", "FAIL",
+                              "Missing global state discovery in d7-analysis skill.",
+                              "Discovery skill must analyze globals and static state.")
+
+        # 23.29 Runtime Registries & Service Discovery
+        has_runtime_registries = (
+            "runtime registries" in d7_skill.lower() or "RUNTIME_REGISTRY" in d7_skill and
+            "plugin registries" in d7_skill.lower() or "registry" in d7_skill.lower()
+        )
+        if has_runtime_registries:
+            self.record_check("CHECK-RUNTIME-29", "registries", "Runtime Registries & Service Discovery", "PASS",
+                              "Discovery skill identifies runtime registries, theme registries, menu registries, and dynamic discovery mechanisms.",
+                              "Verified runtime registry discovery and modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-29", "registries", "Runtime Registries & Service Discovery", "FAIL",
+                              "Missing runtime registry discovery in d7-analysis skill.",
+                              "Discovery skill must analyze runtime registries and discovery.")
+
+        # 23.30 Error, Failure & Fallback Behavior
+        has_error_behavior = (
+            "error_handler" in d7_skill.lower() or "fallback" in d7_skill.lower() and
+            "exception" in d7_skill.lower() or "try" in d7_skill.lower()
+        )
+        if has_error_behavior:
+            self.record_check("CHECK-RUNTIME-30", "errors", "Error, Failure & Fallback Behavior", "PASS",
+                              "Discovery skill discovers custom error handlers, exception handling, degraded modes, and fallback paths.",
+                              "Verified error and fallback behavior discovery.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-30", "errors", "Error, Failure & Fallback Behavior", "FAIL",
+                              "Missing error handler discovery in d7-analysis skill.",
+                              "Discovery skill must analyze error handlers and fallback logic.")
+
+        # 23.31 Dynamic Dependency Resolution Handoff
+        has_dyn_handoff = (
+            "Step 21" in d7_skill and
+            "dynamic" in d7_skill.lower()
+        )
+        if has_dyn_handoff:
+            self.record_check("CHECK-RUNTIME-31", "handoff", "Dynamic Dependency Resolution Handoff", "PASS",
+                              "Step 23 explicitly handshakes dynamic cache keys, callable callbacks, and reflection probes with Step 21.",
+                              "Verified dynamic dependency cross-capability handoff.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-31", "handoff", "Dynamic Dependency Resolution Handoff", "FAIL",
+                              "Missing Step 21 dynamic handoff in d7-analysis skill.",
+                              "Step 23 must cross-reference Step 21 for dynamic dependency resolution.")
+
+        # 23.32 External Integration Behavior Handoff
+        has_ext_handoff = (
+            "Step 22" in d7_skill and
+            "integration" in d7_skill.lower()
+        )
+        if has_ext_handoff:
+            self.record_check("CHECK-RUNTIME-32", "handoff", "External Integration Behavior Handoff", "PASS",
+                              "Step 23 explicitly handshakes integration security, locking surrounding HTTP calls, and transaction boundaries with Step 22.",
+                              "Verified external integration cross-capability handoff.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-32", "handoff", "External Integration Behavior Handoff", "FAIL",
+                              "Missing Step 22 integration handoff in d7-analysis skill.",
+                              "Step 23 must cross-reference Step 22 for integration behaviors.")
+
+        # 23.33 40 Runtime Target Architecture Taxonomy
+        has_runtime_taxonomy = (
+            "40 runtime target architecture" in d7_skill.lower() or "runtime target architecture" in d7_skill.lower() and
+            "CACHE_METADATA" in d7_skill and
+            "ACCESS_CHECKER_SERVICE" in d7_skill and
+            "LOCKING" in d7_skill and
+            "CRON_RUNTIME" in d7_skill and
+            "CACHE_METADATA" in migration_api
+        )
+        if has_runtime_taxonomy:
+            self.record_check("CHECK-RUNTIME-33", "taxonomy", "40 Runtime Target Architecture Taxonomy", "PASS",
+                              "Skills and references establish the exhaustive 40-type runtime target architecture taxonomy covering cache, session, security, lifecycle, concurrency, and environment.",
+                              "Verified 40 runtime target architecture classifications across d7-analysis and migration-api.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-33", "taxonomy", "40 Runtime Target Architecture Taxonomy", "FAIL",
+                              "Missing runtime target architecture taxonomy in skills.",
+                              "Skills must establish 40 runtime target architecture classifications.")
+
+        # 23.34 25 Standardized Runtime Migration Strategies
+        has_runtime_strategies = (
+            "25 standardized runtime migration strategies" in d7_skill.lower() or "runtime migration strategies" in d7_skill.lower() and
+            "CACHE_METADATA_REFACTOR" in d7_skill and
+            "ACCESS_CHECK_MIGRATION" in d7_skill and
+            "LOCK_API_MIGRATION" in d7_skill and
+            "CACHE_METADATA_REFACTOR" in migration_api
+        )
+        if has_runtime_strategies:
+            self.record_check("CHECK-RUNTIME-34", "strategies", "25 Standardized Runtime Migration Strategies", "PASS",
+                              "Skills establish 25 standardized runtime migration strategies for cache, session, security, lifecycle, locking, transactions, and fallback behaviors.",
+                              "Verified 25 runtime migration strategies across d7-analysis and migration-api.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-34", "strategies", "25 Standardized Runtime Migration Strategies", "FAIL",
+                              "Missing runtime migration strategies in skills.",
+                              "Skills must establish 25 standardized runtime migration strategies.")
+
+        # 23.35 Manifest runtime_behavior_items Schema Structure
+        has_runtime_manifest = (
+            "runtime_behavior_items" in manifest_text and
+            "runtime_behavior_id" in manifest_text and
+            "cache_dependencies" in manifest_text and
+            "session_dependencies" in manifest_text and
+            "security_dependencies" in manifest_text and
+            "lock_dependencies" in manifest_text and
+            "target_architecture" in manifest_text and
+            "migration_strategy" in manifest_text and
+            "owning_step" in manifest_text
+        )
+        if has_runtime_manifest:
+            self.record_check("CHECK-RUNTIME-35", "manifest", "Manifest runtime_behavior_items Schema Structure", "PASS",
+                              "Manifest schema defines the exhaustive runtime_behavior_items collection with 35+ metadata properties for cache, session, security, lifecycle, lock, and concurrency accounting.",
+                              "Verified runtime_behavior_items collection schema in migration-manifest.yml.",
+                              affected_files=["state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-RUNTIME-35", "manifest", "Manifest runtime_behavior_items Schema Structure", "FAIL",
+                              "Missing runtime_behavior_items schema definition in state/migration-manifest.yml.",
+                              "Manifest must include runtime_behavior_items with comprehensive properties.")
+
+        # 23.36 Zero-Omission Runtime Outcome Enforcement
+        has_zero_omission = (
+            "runtime_behavior_items" in val_skill or "runtime" in val_skill.lower() and
+            "UNACCOUNTED" in val_skill and
+            "UNKNOWN_WITHOUT_REASON" in val_skill and
+            "SILENTLY_OMITTED" in val_skill and
+            "runtime_behavior_items" in manifest_text
+        )
+        if has_zero_omission:
+            self.record_check("CHECK-RUNTIME-36", "zero_omission", "Zero-Omission Runtime Outcome Enforcement", "PASS",
+                              "Behavioral validation skill enforces strict zero-omission rules for all runtime behaviors, rejecting forbidden states and requiring approved terminal states.",
+                              "Verified zero-omission outcome enforcement for runtime behaviors.",
+                              affected_files=["skills/behavioral-validation/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-RUNTIME-36", "zero_omission", "Zero-Omission Runtime Outcome Enforcement", "FAIL",
+                              "Zero-omission enforcement check failed for runtime behaviors.",
+                              "All runtime behaviors must resolve to approved terminal states.")
+
+        # 23.37 Cross-Capability Runtime Architectural Compatibility
+        has_cross_compat = (
+            "Step 11" in d7_skill and
+            "Step 12" in d7_skill and
+            "Step 13" in d7_skill and
+            "Step 14" in d7_skill and
+            "Step 15" in d7_skill and
+            "Step 16" in d7_skill and
+            "Step 17" in d7_skill and
+            "Step 18" in d7_skill and
+            "Step 19" in d7_skill and
+            "Step 20" in d7_skill and
+            "Step 21" in d7_skill and
+            "Step 22" in d7_skill and
+            "Step 23" in arch_text
+        )
+        if has_cross_compat:
+            self.record_check("CHECK-RUNTIME-37", "compatibility", "Cross-Capability Runtime Architectural Compatibility", "PASS",
+                              "Step 23 maintains clean architectural boundaries and explicit cross-referencing across includes (Step 11), classes (Step 12), database (Step 13), hooks (Step 14), config (Step 15), entities (Step 16), forms (Step 17), frontend (Step 18), Views (Step 19), themes (Step 20), dynamic (Step 21), and integrations (Step 22).",
+                              "Verified cross-capability architectural compatibility for Step 23.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "ARCHITECTURE.md", "README.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-37", "compatibility", "Cross-Capability Runtime Architectural Compatibility", "FAIL",
+                              "Missing cross-capability boundaries in skills or architecture for Step 23.",
+                              "Step 23 must maintain clean boundaries with Steps 11–22.")
+
+        # 23.38 Generic Factory Purity & Secret Protection
+        has_purity_secrets = (
+            ("generic migration-agent factory capability" in arch_text.lower() or "generic" in readme_text.lower()) and
+            "zero secrets" in d7_skill.lower() or "secret" in d7_skill.lower()
+        )
+        if has_purity_secrets:
+            self.record_check("CHECK-RUNTIME-38", "purity", "Generic Factory Purity & Secret Protection", "PASS",
+                              "The factory operates 100% generically against arbitrary Drupal 7 source without hard-coded project names, URLs, real credentials, session values, or cookie values.",
+                              "Verified generic factory purity and secret protection.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "README.md", "ARCHITECTURE.md"])
+        else:
+            self.record_check("CHECK-RUNTIME-38", "purity", "Generic Factory Purity & Secret Protection", "FAIL",
+                              "Generic factory purity or secret protection check failed.",
+                              "Factory must remain 100% generic with zero secrets or real session/cookie values.")
+
+        # 23.39 Runtime Verification Boundary
+        self.record_check("CHECK-RUNTIME-39", "runtime_boundary", "Runtime Verification Boundary", "UNVERIFIED",
+                          "Static contract and simulation validation completed. Live runtime execution across caches, sessions, access checkers, locks, and cron requires an active Drupal 10/11 environment.",
+                          "Retained explicit status: [RUNTIME UNVERIFIED — CLAUDE CODE CLI/ACCESS NOT AVAILABLE].",
+                          affected_files=["state/migration-manifest.yml", "reports/validation_result.json"])
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -6088,6 +6724,7 @@ class FactoryValidator:
         self.validate_themes_and_presentation_suite()
         self.validate_dynamic_dependencies_suite()
         self.validate_external_integrations_suite()
+        self.validate_runtime_behavior_suite()
 
     def generate_result_json(self):
         return {

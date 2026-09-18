@@ -51,41 +51,47 @@ When testing modernized custom OOP classes, services, procedural hook replacemen
    - **Form Validation Handlers**: Assert `validateForm()` flags invalid inputs via `$form_state->setErrorByName()` and rejects malicious/corrupt input.
    - **Form Submission Handlers**: Assert `submitForm()` executes expected database/entity/config mutations and sets expected redirects (`$form_state->setRedirect()`).
    - **AJAX Response & Commands**: Assert AJAX callbacks return valid `AjaxResponse` objects containing expected `CommandInterface` instances (`ReplaceCommand`, `HtmlCommand`, `InvokeCommand`, `MessageCommand`).
-   - **Multistep Rebuild State**: Assert multi-step forms correctly transition across steps using `$form_state->setRebuild(TRUE)` and persist state across rebuild requests.
-   - **CSRF & Access Checks**: Assert forms validate CSRF tokens on submission and enforce route/entity permission constraints.
-7. **Frontend JavaScript, CSS & Library Validation (Step 18)**:
-   - **Library Parsing & SMACSS**: Assert `<module>.libraries.yml` parses cleanly, specifies valid SMACSS categories (`base`, `layout`, `component`, `state`, `theme`), and declares required core dependencies (`core/drupal`, `core/drupalSettings`, `core/once`, `core/jquery`).
-   - **`once()` Idempotency**: Assert JavaScript behaviors utilize `once()` to guarantee idempotent execution across multiple AJAX reattachments.
-   - **`drupalSettings` Injection**: Assert PHP attachment pipelines correctly inject settings under `$form['#attached']['drupalSettings']` and scripts read them without errors.
-   - **Accessibility & Focus**: Assert dynamic DOM updates update ARIA attributes (`aria-live`, `aria-expanded`) and manage focus correctly.
-8. **Views & Custom Plugins Validation (Step 19)**:
-   - **Views Configuration Schema**: Assert all `config/install/views.view.*.yml` files conform to core views schema definitions without schema violations.
-   - **Custom Plugin Execution**: Assert custom `@ViewsField`, `@ViewsFilter`, `@ViewsArgument`, `@ViewsSort`, `@ViewsRelationship`, and `@ViewsArea` plugins execute accurately, render expected output, and properly inject services via `ContainerFactoryPluginInterface`.
-   - **Query Alterations**: Assert `hook_views_query_alter()` implementations correctly modify SQL conditions, joins, and sorting without syntax errors or injection vulnerabilities.
-   - **Access Control & Cache Metadata**: Assert Views enforce access control permissions and bubble correct cache tags (`node_list`, `user:uid`), cache contexts (`user.roles`, `url.query_args`), and cache max-age.
-9. **Themes, Twig Templates & Preprocess Validation (Step 20)**:
-   - **Twig Template Syntax & Escaping**: Assert zero PHP tags exist in `.html.twig` templates; verify Twig auto-escaping and safe filter usage.
-   - **Preprocess Variable Formatting**: Assert `<theme>_preprocess_HOOK()` functions compute expected variables and attach required bubbleable cache metadata.
-   - **Theme Settings Schema Adherence**: Assert `<theme>.settings.yml` adheres to `config/schema/<theme>.schema.yml`.
-   - **Accessibility & ARIA Structure**: Assert theme templates render semantic HTML5 landmarks (`<header>`, `<nav>`, `<main>`, `<footer>`) and valid ARIA attributes.
-   - **Asset Library Attachments**: Assert theme templates and preprocess hooks attach registered libraries via `{{ attach_library('theme/library') }}`.
+   - Assert all injected dependencies (`database`, `entity_type.manager`, `config.factory`, `current_user`, `http_client`, `cache.default`, `tempstore.private`, `lock`) are assigned to typed class properties.
+3. **Core Procedural Hook Modernization**:
+   - For migrated hooks refactored to Services: invoke service methods and assert return values/side effects.
+   - For hooks converted to Event Subscribers: dispatch corresponding Event objects and assert listener execution.
+   - For `hook_menu()` routes: assert route resolution, controller execution, and access control requirements.
+4. **Configuration & State API Validation**:
+   - Assert all `config/install/*.yml` adhere to `config/schema/*.schema.yml` without schema errors using `SchemaCheckTestTrait`.
+   - Assert `ConfigFormBase` classes validate inputs, update configuration, and purge legacy variables.
+   - Assert State API items correctly read/write via `\Drupal::state()` and are deleted during `hook_uninstall()`.
+5. **Entity, Field, Revision & Translation Verification**:
+   - Verify entity CRUD operations, storage handlers, revision creation, and data table records.
+   - Verify multilingual translation handling and entity reference relationships.
+6. **Form API, AJAX & Multistep Wizard Validation**:
+   - Assert `buildForm()`, `validateForm()`, and `submitForm()` logic.
+   - Assert AJAX callbacks return expected `AjaxResponse` with correct `CommandInterface` objects.
+   - **CSRF & Access Checks**: Assert form token validation (`#token`, `_csrf_token`) and route access checks.
+7. **Frontend Assets, Behaviors & Library Validation**:
+   - Assert `<module>.libraries.yml` asset definitions and modern `once()` JavaScript behaviors.
+8. **Views & Custom Plugins Validation**:
+   - Assert Views configuration schema and custom Views plugin execution.
+9. **Themes, Twig Templates & Preprocess Validation**:
+   - Assert Twig template auto-escaping, preprocess variables, and library attachments.
 10. **Dynamic Dependencies & Runtime Probe Validation (Step 21)**:
-    - **Plugin Manager Discovery**: Assert custom Plugin Managers discover all registered `@Handler` or custom plugin classes without exceptions.
-    - **Dynamic Callables & Factories**: Test factory services resolving dynamic handler strings to concrete typed service instances.
-    - **Runtime Probe Safety**: Assert all runtime probe specifications are non-destructive and read-only; where runtime CLI is absent, verify explicit `[RUNTIME UNVERIFIED — CLAUDE CODE CLI/ACCESS NOT AVAILABLE]` status.
+    - Assert custom Plugin Managers discover all registered `@Handler` classes.
+    - Assert runtime probe specifications are read-only and non-destructive.
 11. **External Integrations, APIs, Webhooks & Secret Testing (Step 22)**:
-    - **Guzzle MockHandler & HTTP Client Testing**: Assert API client services handle 200 OK, 4xx client errors, 5xx server errors, network timeouts, and JSON serialization using Guzzle `MockHandler` and `HandlerStack`.
-    - **Webhook Signature & Payload Verification**: Assert webhook controllers reject invalid HMAC signatures, validate CSRF tokens, and process incoming JSON/XML payloads safely.
-    - **Secret Protection & Key Module Mocking**: Assert API keys and credentials are retrieved via `KeyRepositoryInterface` or environment variables with zero hardcoded secrets.
-    - **Resilience & Idempotency Testing**: Assert exponential backoff retry loops, idempotency headers, and dead-letter queue routing execute correctly under simulated failure conditions.
-12. **Public API & Business Logic Parity**:
+    - **Guzzle MockHandler & HTTP Client Testing**: Assert API client services handle 200 OK, 4xx/5xx errors, timeouts, and JSON serialization using Guzzle `MockHandler` and `HandlerStack`.
+    - **Webhook Signature & Payload Verification**: Assert webhook controllers reject invalid HMAC signatures and validate CSRF tokens.
+    - **Secret Protection & Key Module Mocking**: Assert credentials are retrieved via `KeyRepositoryInterface` or environment variables with zero hardcoded secrets.
+12. **Cache, Session, Security & Concurrency Testing (Step 23)**:
+    - **Cache Metadata & Invalidation Testing**: Assert render arrays attach accurate cache tags, cache contexts, and max-age; verify `Cache::invalidateTags()` purges cached representations in Kernel tests.
+    - **Session Isolation & TempStore Testing**: Assert `PrivateTempStore` isolates user-specific wizard/cart state and does not trigger session creation for anonymous visitors.
+    - **Access Control & Route Security Testing**: Assert custom `AccessCheckInterface` services permit authorized roles and return `AccessResult::forbidden()` on unauthorized access.
+    - **Locking, Concurrency & Transaction Testing**: Assert `LockBackendInterface` acquires and releases locks; assert `$connection->startTransaction()` rolls back on exceptions without leaving orphaned data.
+13. **Public API & Business Logic Parity**:
     - Author PHPUnit Unit tests targeting domain calculations, validation algorithms, and state transitions.
-13. **Integration, Custom Database & Repository Operations**:
-    - Author PHPUnit Kernel tests targeting custom entity CRUD, custom database table repository queries, dynamic SQL filters, and configuration schema adherence.
-    - Verify transaction rollback semantics: ensure failed operations rollback completely without leaving orphaned records.
-14. **Data Migration ETL Pipeline Tests**:
-    - Author Kernel migration tests verifying source-to-destination mappings, serialized payload transformations, entity reference lookups, revision transfers, translation mappings, and rollback behavior.
-15. **Error Handling & Edge Cases**:
+14. **Integration, Custom Database & Repository Operations**:
+    - Author PHPUnit Kernel tests targeting custom entity CRUD, database repository queries, and schema adherence.
+15. **Data Migration ETL Pipeline Tests**:
+    - Author Kernel migration tests verifying source-to-destination mappings, serialized payload transformations, and rollback behavior.
+16. **Error Handling & Edge Cases**:
     - Assert exception throwing on invalid inputs, missing dependencies, database constraint violations, or failed external requests.
 
 ---

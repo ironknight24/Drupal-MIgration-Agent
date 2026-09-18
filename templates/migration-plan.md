@@ -81,6 +81,10 @@ evidence_summary:
 | `includes/admin.inc` | `{{ COMPONENT }}_admin_settings()` | `CONFIG_FORM_BASE` | `src/Form/SettingsForm.php` | `CONFIG_FORM_REWRITE` (`@config.factory`) | `MIGRATED` |
 | `includes/helper.inc` | `{{ COMPONENT }}_calculate_tax()` | `SERVICE_BUSINESS_LOGIC` | `src/Service/CalculationService.php` | N/A | `MIGRATED` |
 | `includes/drush.inc` | `drush_{{ COMPONENT }}_sync()` | `DRUSH_COMMAND` | `src/Drush/Commands/SyncCommands.php` | `@entity_type.manager` | `MIGRATED` |
+| `{{ COMPONENT }}.module:45` | `cache_set('{{ COMPONENT }}:data')` | `CACHE_METADATA` | `src/Service/DataCacheService.php` | `CACHE_METADATA_REFACTOR` (`@cache.default`) | `MIGRATED` |
+| `{{ COMPONENT }}.module:110` | `$_SESSION['{{ COMPONENT }}_step']` | `TEMPORARY_STATE` | `src/Service/WizardTempStore.php` | `TEMPORARY_STORE_MIGRATION` (`@tempstore.private`) | `MIGRATED` |
+| `{{ COMPONENT }}.module:180` | `{{ COMPONENT }}_custom_access()` | `ACCESS_CHECKER_SERVICE` | `src/Access/CustomAccessCheck.php` | `ACCESS_CHECK_MIGRATION` (`AccessResult`) | `MIGRATED` |
+| `{{ COMPONENT }}.module:230` | `lock_acquire('{{ COMPONENT }}_lock')` | `LOCKING` | `src/Service/SyncLockService.php` | `LOCK_API_MIGRATION` (`@lock`) | `MIGRATED` |
 | `lib/LegacyCompat.php` | `class LegacyCompat` | `LEGACY_OBSOLETE` | N/A | N/A | `OBSOLETE` |
 
 ---
@@ -119,6 +123,8 @@ evidence_summary:
 - **Frontend / Library Test**: `tests/src/Kernel/LibraryRegistrationTest.php`
 - **Views Test**: `tests/src/Kernel/ViewsConfigurationTest.php`
 - **Theme & Twig Test**: `tests/src/Kernel/ThemeTemplateTest.php`
+- **Cache & Invalidation Test**: `tests/src/Kernel/CacheMetadataTest.php`
+- **Session & Access Control Test**: `tests/src/Kernel/AccessControlTest.php`
 
 
 ---

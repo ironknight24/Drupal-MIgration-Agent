@@ -45,6 +45,7 @@ evidence_summary:
 - **Theme Settings Forms Accounted For**: {{ THEME_SETTINGS_ACCOUNTED_COUNT }} / {{ THEME_SETTINGS_TOTAL_COUNT }}
 - **Dynamic & Runtime Dependencies Accounted For**: {{ DYNAMIC_ACCOUNTED_COUNT }} / {{ DYNAMIC_TOTAL_COUNT }}
 - **External Integrations & APIs Accounted For**: {{ INTEGRATIONS_ACCOUNTED_COUNT }} / {{ INTEGRATIONS_TOTAL_COUNT }}
+- **Cache, Session, Security & Runtime Behaviors Accounted For**: {{ RUNTIME_ACCOUNTED_COUNT }} / {{ RUNTIME_TOTAL_COUNT }}
 
 ---
 
@@ -71,6 +72,10 @@ evidence_summary:
 
 | Source Artifact / File | Identifier / Hook / Class / Table / Form ID | D7 Location / Context | Modern Target Destination / Class | Outcome Status | Verification Evidence / Rationale |
 |---|---|---|---|---|---|
+| `{{ COMPONENT }}.module:45` | `RUN-001` | `cache_set()` | `src/Service/DataCacheService.php` | `MIGRATED` | Cache metadata tags & contexts verified |
+| `{{ COMPONENT }}.module:110` | `RUN-002` | `$_SESSION` | `src/Service/WizardTempStore.php` | `MIGRATED` | TempStore private session isolation verified |
+| `{{ COMPONENT }}.module:180` | `RUN-003` | `access callback` | `src/Access/CustomAccessCheck.php` | `MIGRATED` | AccessCheckInterface kernel test passed |
+| `{{ COMPONENT }}.module:230` | `RUN-004` | `lock_acquire()` | `src/Service/SyncLockService.php` | `MIGRATED` | LockBackendInterface mutex lock test passed |
 | `{{ COMPONENT }}.inc:184` | `ext_payment_gateway` | `drupal_http_request()` | `src/Service/PaymentGatewayClient.php` | `MIGRATED` | Guzzle MockHandler & Key module test passed |
 | `{{ COMPONENT }}.module:L142` | `DYN-001` | `call_user_func($handler)` | `src/Plugin/HandlerManager.php` | `MIGRATED` | Dynamic Plugin Manager discovery test passed |
 | `{{ COMPONENT }}.module:80` | `entity: {{ COMPONENT }}_record` | `hook_entity_info` | `src/Entity/RecordEntity.php` | `MIGRATED` | Entity CRUD & access kernel test passed |

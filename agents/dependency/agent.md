@@ -100,15 +100,17 @@ Analyzes inter-module couplings, core requirements, contributed module dependenc
    - Scan `.install` files for `hook_schema()` foreign keys.
    - Extract dynamic runtime dependencies (`dynamic_dependency_items`) and categorize into STATIC, DYNAMIC, RUNTIME_ONLY, and UNRESOLVED edges.
    - Extract external system integrations (`external_integrations_items`) and categorize into OUTBOUND_INTEGRATION, INBOUND_WEBHOOK, AUTH_CREDENTIAL, and DATA_FLOW_PIPELINE edges.
+   - Extract runtime behaviors (`runtime_behavior_items`) and categorize into CACHE_INVALIDATION_EDGE, SESSION_STATE_EDGE, SECURITY_ACCESS_EDGE, LIFECYCLE_ORDERING_EDGE, and CONCURRENCY_LOCK_EDGE.
 2. **DAG Construction & Dynamic Edge Modeling**:
    - Build adjacency matrix representing directed dependencies: $A \to B$ ($A$ depends on $B$).
-   - Represent dynamic and integration edges with resolution confidence annotations (`CONFIRMED`, `INFERRED`, `UNCERTAIN`).
-   - Identify strongly connected components to detect circular dependencies ($A \to B \to A$) and break artificial dynamic callback or integration cycles using Gateway Services, Queue Workers, or Plugin Manager abstraction nodes.
+   - Represent dynamic, integration, and runtime edges with resolution confidence annotations (`CONFIRMED`, `INFERRED`, `UNCERTAIN`).
+   - Identify strongly connected components to detect circular dependencies ($A \to B \to A$) and break artificial dynamic callback, integration, or cache invalidation cycles using Gateway Services, Queue Workers, Event Subscribers, or Plugin Manager abstraction nodes.
 3. **Topological Ordering & Wave Scheduling**:
    - Calculate in-degrees: $\text{in-degree}(C) = |\{D \mid C \text{ depends on } D\}|$.
    - Assign components with in-degree = 0 to Wave 0 / Wave 1.
    - Schedule complex external integrations, webhooks, and third-party sync pipelines into Wave 4.
    - Schedule runtime-dependent probes and dynamic re-engineering into Wave 6.
+   - Schedule cache tag/context metadata, session tempstore services, access checkers, and runtime lifecycle event subscribers into Wave 7.
 4. **Author Canonical Dependency Report**:
    - Write `reports/dependencies/DEPENDENCY-GRAPH-<DATE>.md` using `templates/dependency-graph.md`.
 5. **Generate `agent_result`**: Propose transition of `phase_2_dependencies` to `COMPLETED`.

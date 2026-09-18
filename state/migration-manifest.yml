@@ -598,6 +598,81 @@ target_system:
 #         status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
 #         exclusion_reason: null
 #         notes: "Re-engineered procedural drupal_http_request() to Guzzle-backed PaymentGatewayClient service with Key module secret management"
+#     # Comprehensive Cache, Session, Security, Concurrency & Runtime Behavior Accounting (Step 23)
+#     runtime_behavior_items:
+#       - runtime_behavior_id: "rt_node_custom_access_check"
+#         source_module: "my_module"
+#         source_file: "my_module.module"
+#         line_number: 142
+#         function_or_class: "my_module_node_access"
+#         location_evidence: "my_module.module:L142 hook_node_access() implementation checking user roles and time window"
+#         behavior_type: "ACCESS_CONTROL" # CACHE_OPERATION | SESSION_USAGE | COOKIE_OPERATION | ACCESS_CONTROL | CSRF_PROTECTION | INPUT_VALIDATION | OUTPUT_ESCAPING | FILE_SECURITY | URL_SECURITY | REQUEST_LIFECYCLE | CRON_TASK | QUEUE_TASK | BATCH_TASK | LOCK_ACQUISITION | TRANSACTION_BOUNDARY | ENVIRONMENT_DEPENDENCY | TIME_DEPENDENCY | LOCALE_DEPENDENCY | USER_CONTEXT | STATIC_STATE | RUNTIME_REGISTRY | ERROR_FALLBACK
+#         lifecycle_stage: "ROUTING" # BOOTSTRAP | ROUTING | CONTROLLER_EXECUTION | RENDER | SHUTDOWN | CRON | QUEUE_WORKER | BATCH_PROCESSOR | CLI_COMMAND | TERMINATE
+#         trigger: "node_access_check"
+#         producer: "my_module_node_access()"
+#         consumer: "NodeAccessControlHandler"
+#         cache_dependencies: ["node_list", "user.permissions", "user.roles"]
+#         cache_bin: "cache_render"
+#         cache_key: "my_module:node_access:123"
+#         cache_tags: ["node:123", "user:45"]
+#         cache_contexts: ["user.roles", "languages:language_interface", "timezone"]
+#         cache_max_age: 3600
+#         invalidation_triggers: ["node_update", "user_role_change"]
+#         session_dependencies: ["NONE"]
+#         cookie_dependencies: ["NONE"]
+#         state_dependencies: ["system.maintenance_mode"]
+#         security_dependencies: ["ROLE_PERMISSION_VALIDATION", "TIME_WINDOW_ENFORCEMENT"]
+#         access_dependencies: ["permission:administer nodes", "role:editor"]
+#         csrf_dependencies: ["NONE"]
+#         input_security: "PARAMETERIZED_SQL"
+#         output_security: "TWIG_AUTOESCAPE"
+#         file_security: "PUBLIC_STREAM_VALIDATION"
+#         url_security: "INTERNAL_ROUTE_VALIDATION"
+#         environment_dependencies: ["PHP_VERSION_8_1_PLUS", "MEMORY_LIMIT_256M"]
+#         time_dependencies: ["CURRENT_TIMESTAMP_EXPIRATION"]
+#         locale_dependencies: ["INTERFACE_LANGUAGE_CONTEXT"]
+#         user_context_dependencies: ["CURRENT_USER_ACCOUNT"]
+#         concurrency_dependencies: ["NONE"]
+#         lock_dependencies: ["NONE"]
+#         transaction_dependencies: ["NONE"]
+#         dynamic_dependencies: ["dynamic_role_permission_lookup"]
+#         external_dependencies: ["NONE"]
+#         error_behavior: "ACCESS_DENIED_RESPONSE"
+#         fallback_behavior: "FALLBACK_TO_NEUTRAL_ACCESS"
+#         target_architecture: "ACCESS_CHECKER_SERVICE" # 40 Target Architectures:
+#         # CACHE_METADATA | CACHE_CONTEXT | CACHE_TAG | CACHE_MAX_AGE | CACHE_BIN |
+#         # RENDER_CACHE | STATIC_CACHE | PERSISTENT_CACHE | CACHE_INVALIDATION |
+#         # SESSION_BEHAVIOR | SESSION_SERVICE | COOKIE_BEHAVIOR | TEMPORARY_STATE |
+#         # RUNTIME_STATE | ACCESS_CHECK | ACCESS_CHECKER_SERVICE | PERMISSION_CHECK |
+#         # ENTITY_ACCESS | FIELD_ACCESS | CSRF_PROTECTION | INPUT_VALIDATION |
+#         # OUTPUT_ESCAPING | FILE_SECURITY | URL_SECURITY | WEBHOOK_SECURITY |
+#         # REQUEST_LIFECYCLE | EVENT_SUBSCRIBER_LIFECYCLE | CRON_RUNTIME | QUEUE_RUNTIME |
+#         # BATCH_RUNTIME | LOCKING | TRANSACTION | CONCURRENCY_CONTROL |
+#         # ENVIRONMENT_DEPENDENCY | TIME_DEPENDENCY | LOCALE_DEPENDENCY | USER_CONTEXT_DEPENDENCY |
+#         # RUNTIME_REGISTRY | ERROR_HANDLER | FALLBACK_BEHAVIOR |
+#         # OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#         target_artifacts:
+#           - "src/Access/CustomNodeAccessCheck.php"
+#           - "src/EventSubscriber/AccessCheckSubscriber.php"
+#         migration_strategy: "ACCESS_CHECK_MIGRATION" # 25 Migration Strategies:
+#         # CACHE_METADATA_REFACTOR | CACHE_CONTEXT_MAPPING | CACHE_TAG_MAPPING |
+#         # CACHE_INVALIDATION_REFACTOR | STATIC_CACHE_TO_SERVICE | SESSION_SERVICE_MIGRATION |
+#         # COOKIE_BEHAVIOR_MIGRATION | TEMPORARY_STORE_MIGRATION | ACCESS_CHECK_MIGRATION |
+#         # PERMISSION_MIGRATION | ENTITY_ACCESS_REFACTOR | FIELD_ACCESS_REFACTOR |
+#         # CSRF_PROTECTION_MIGRATION | INPUT_VALIDATION_REFACTOR | OUTPUT_ESCAPING_REFACTOR |
+#         # SECURITY_API_REFACTOR | REQUEST_LIFECYCLE_REFACTOR | CRON_MIGRATION |
+#         # QUEUE_WORKER_MIGRATION | BATCH_MIGRATION | LOCK_API_MIGRATION |
+#         # TRANSACTION_REFACTOR | CONCURRENCY_REFACTOR | ENVIRONMENT_DEPENDENCY_MAPPING |
+#         # RUNTIME_SERVICE_MIGRATION | ERROR_HANDLER_REFACTOR | FALLBACK_BEHAVIOR_PRESERVATION |
+#         # RUNTIME_VERIFICATION_REQUIRED | HUMAN_DECISION_REQUIRED | UNVERIFIED | OBSOLETE
+#         confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
+#         runtime_required: true
+#         human_decision_required: false
+#         owning_step: "STEP_23_SECURITY_RUNTIME"
+#         cross_references: ["STEP_12_PHP_OOP", "STEP_14_PROCEDURAL_HOOKS", "STEP_16_ENTITIES_FIELDS", "STEP_21_DYNAMIC_DEPENDENCIES"]
+#         status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#         exclusion_reason: null
+#         notes: "Re-engineered procedural hook_node_access() into typed AccessCheckInterface service with bubbleable cache metadata"
 custom_modules: []
 
 # ------------------------------------------------------------------------------
@@ -659,3 +734,17 @@ data_migrations: []
 #   secret_classification: "CONFIDENTIAL_API_KEY"
 #   status: "MIGRATED"
 integrations: []
+
+# ------------------------------------------------------------------------------
+# 7. Cache, Session, Security & Runtime Behavior Inventory (Step 23)
+# ------------------------------------------------------------------------------
+# Schema for runtime behavior items:
+# - runtime_behavior_id: "rt_node_custom_access_check"
+#   behavior_type: "ACCESS_CONTROL"
+#   source_reference: "my_module_node_access"
+#   target_architecture: "ACCESS_CHECKER_SERVICE"
+#   migration_strategy: "ACCESS_CHECK_MIGRATION"
+#   cache_tags: ["node:123"]
+#   cache_contexts: ["user.roles"]
+#   status: "MIGRATED"
+runtime_behaviors: []

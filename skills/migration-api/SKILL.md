@@ -530,6 +530,82 @@ Every discovered dynamic dependency is categorized into one of 35 standard targe
 
 ---
 
+## 40 Runtime, Cache, Session & Security Target Architectures (Step 23)
+
+1. **`CACHE_METADATA`**: Bubbleable cache metadata (`tags`, `contexts`, `max-age`) attached to render arrays.
+2. **`CACHE_CONTEXT`**: Parameterized cache context service (`@cache.context`) varying cache representations.
+3. **`CACHE_TAG`**: Invalidation tag registered with CacheTagsInvalidator (`cache_tags_invalidator`).
+4. **`CACHE_MAX_AGE`**: Deterministic cache expiration duration in seconds or `Cache::PERMANENT`.
+5. **`CACHE_BIN`**: Custom cache bin service declared in `.services.yml` (`cache.my_bin`).
+6. **`RENDER_CACHE`**: Render cache element with keys, contexts, and tags.
+7. **`STATIC_CACHE`**: Service-scoped in-memory cache replacing procedural `drupal_static()`.
+8. **`PERSISTENT_CACHE`**: Backend persistent cache utilizing `CacheBackendInterface`.
+9. **`CACHE_INVALIDATION`**: Cache invalidation event subscriber responding to entity/config lifecycle.
+10. **`SESSION_BEHAVIOR`**: Session lifecycle management via `\Symfony\Component\HttpFoundation\Session\SessionInterface`.
+11. **`SESSION_SERVICE`**: Isolated private temp store service (`tempstore.private`) preventing anonymous cache bypass.
+12. **`COOKIE_BEHAVIOR`**: Secure cookie handling with HttpOnly, Secure, and SameSite attributes.
+13. **`TEMPORARY_STATE`**: Expirable key-value store (`keyvalue.expirable`) or PrivateTempStore.
+14. **`RUNTIME_STATE`**: Dynamic operational state managed via Drupal State API (`\Drupal::state()`).
+15. **`ACCESS_CHECK`**: Route access requirement attribute (`_permission`, `_role`, `_custom_access`).
+16. **`ACCESS_CHECKER_SERVICE`**: Dedicated Access Checker service implementing `AccessInterface`.
+17. **`PERMISSION_CHECK`**: Dynamic permission verification using `CurrentUser::hasPermission()`.
+18. **`ENTITY_ACCESS`**: Entity access control handler implementing `EntityAccessControlHandlerInterface`.
+19. **`FIELD_ACCESS`**: Field access control handler implementing `hook_entity_field_access()`.
+20. **`CSRF_PROTECTION`**: CSRF token validation on state-changing routes (`_csrf_token: 'TRUE'`).
+21. **`INPUT_VALIDATION`**: Strict typed input validation and constraint violations.
+22. **`OUTPUT_ESCAPING`**: Safe Twig auto-escaping and `\Drupal\Component\Utility\Html::escape()`.
+23. **`FILE_SECURITY`**: Stream wrapper access checks and file extension/MIME validation.
+24. **`URL_SECURITY`**: Safe redirection validation via `TrustedRedirectResponse` and `UrlHelper`.
+25. **`WEBHOOK_SECURITY`**: Cryptographic HMAC signature verification and replay prevention.
+26. **`REQUEST_LIFECYCLE`**: Symfony HttpKernel event subscriber for request bootstrap/termination.
+27. **`EVENT_SUBSCRIBER_LIFECYCLE`**: Decoupled event listener responding to system/domain events.
+28. **`CRON_RUNTIME`**: Scheduled periodic job managed via Queue API or modern `hook_cron()`.
+29. **`QUEUE_RUNTIME`**: Asynchronous queue worker plugin implementing `QueueWorkerInterface`.
+30. **`BATCH_RUNTIME`**: Multi-step batch processing engine using modern Batch API.
+31. **`LOCKING`**: Mutex locking service implementing `LockBackendInterface`.
+32. **`TRANSACTION`**: Database transaction boundary utilizing `$connection->startTransaction()`.
+33. **`CONCURRENCY_CONTROL`**: Optimistic/pessimistic concurrency controls and race condition prevention.
+34. **`ENVIRONMENT_DEPENDENCY`**: Platform requirement validated via runtime service or requirement checks.
+35. **`TIME_DEPENDENCY`**: Timezone and timestamp calculations managed via Time service (`datetime.time`).
+36. **`LOCALE_DEPENDENCY`**: Interface/content language context managed via `LanguageManagerInterface`.
+37. **`USER_CONTEXT_DEPENDENCY`**: User account and role state managed via `CurrentUserInterface`.
+38. **`RUNTIME_REGISTRY`**: Plugin manager or service container discovery registry.
+39. **`ERROR_HANDLER`**: Exception listener translating domain errors into structured HTTP responses.
+40. **`FALLBACK_BEHAVIOR`**: Resilient degraded mode or default fallback data provider.
+
+---
+
+## 25 Standardized Runtime Migration Strategies (Step 23)
+
+1. **`CACHE_METADATA_REFACTOR`**: Refactoring procedural caching into bubbleable cache tags, contexts, and max-age.
+2. **`CACHE_CONTEXT_MAPPING`**: Implementing custom `@cache.context` service for custom variation logic.
+3. **`CACHE_TAG_MAPPING`**: Mapping database invalidations to granular entity/config cache tags.
+4. **`CACHE_INVALIDATION_REFACTOR`**: Modernizing `cache_clear_all()` into targeted cache tag invalidations.
+5. **`STATIC_CACHE_TO_SERVICE`**: Refactoring `drupal_static()` into in-memory properties of injected services.
+6. **`SESSION_SERVICE_MIGRATION`**: Modernizing `$_SESSION` to Symfony `SessionInterface` or `tempstore.private`.
+7. **`COOKIE_BEHAVIOR_MIGRATION`**: Refactoring `setcookie()` to Symfony `Cookie` instances with security attributes.
+8. **`TEMPORARY_STORE_MIGRATION`**: Migrating scratch tables or CTools object cache to `PrivateTempStore`.
+9. **`ACCESS_CHECK_MIGRATION`**: Refactoring `access callback` to `AccessCheckInterface` service.
+10. **`PERMISSION_MIGRATION`**: Modernizing `hook_permission()` to `permissions.yml` and `_permission` route requirements.
+11. **`ENTITY_ACCESS_REFACTOR`**: Migrating `hook_node_access()` into `EntityAccessControlHandler` classes.
+12. **`FIELD_ACCESS_REFACTOR`**: Migrating `hook_field_access()` into `hook_entity_field_access()`.
+13. **`CSRF_PROTECTION_MIGRATION`**: Enforcing `_csrf_token` route requirements on custom AJAX/POST routes.
+14. **`INPUT_VALIDATION_REFACTOR`**: Implementing Symfony Validator constraints on data inputs.
+15. **`OUTPUT_ESCAPING_REFACTOR`**: Eliminating manual `check_plain()` in favor of Twig auto-escaping.
+16. **`SECURITY_API_REFACTOR`**: Modernizing legacy cryptography and hashing to modern PHP 8.1+ / OpenSSL functions.
+17. **`REQUEST_LIFECYCLE_REFACTOR`**: Migrating `hook_boot()` / `hook_init()` to HttpKernel event subscribers.
+18. **`CRON_MIGRATION`**: Refactoring monolithic cron handlers into discrete `@QueueWorker` plugins.
+19. **`QUEUE_WORKER_MIGRATION`**: Upgrading legacy queue workers to Drupal 10/11 `QueueWorkerInterface`.
+20. **`BATCH_MIGRATION`**: Modernizing procedural batch definitions to OOP Batch Controllers.
+21. **`LOCK_API_MIGRATION`**: Modernizing `lock_acquire()` / `lock_release()` to `LockBackendInterface`.
+22. **`TRANSACTION_REFACTOR`**: Modernizing `db_transaction()` to Connection transaction RAII scoping.
+23. **`CONCURRENCY_REFACTOR`**: Implementing optimistic lock or token verification to prevent race conditions.
+24. **`ENVIRONMENT_DEPENDENCY_MAPPING`**: Validating PHP extensions, memory limits, and binaries in `hook_requirements()`.
+25. **`RUNTIME_SERVICE_MIGRATION`**: Migrating global state containers to Dependency Injection container services.
+
+
+---
+
 ## Data Integrity Verification & Checksums
 
 Before certifying a data migration pipeline as complete:

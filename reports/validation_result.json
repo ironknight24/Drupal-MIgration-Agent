@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260918230005",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260918231522",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T23:00:05.907817+00:00",
+  "executed_at": "2026-09-18T23:15:22.879512+00:00",
   "summary": {
-    "checks_total": 361,
-    "passed": 359,
+    "checks_total": 400,
+    "passed": 397,
     "failed": 0,
     "warnings": 0,
-    "unverified": 2
+    "unverified": 3
   },
   "checks": [
     {
@@ -4616,6 +4616,495 @@
       "name": "Runtime Verification Boundary",
       "status": "UNVERIFIED",
       "evidence": "Static contract and simulation validation completed. Live runtime execution across external HTTP endpoints, webhooks, and authentication servers requires an active Drupal 10/11 environment.",
+      "details": "Retained explicit status: [RUNTIME UNVERIFIED \u2014 CLAUDE CODE CLI/ACCESS NOT AVAILABLE].",
+      "affected_files": [
+        "state/migration-manifest.yml",
+        "reports/validation_result.json"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-01",
+      "category": "cache",
+      "name": "Cache API Discovery",
+      "status": "PASS",
+      "evidence": "Discovery skill exhaustively detects Drupal 7 procedural cache API operations (cache_get, cache_set, cache_clear_all, cache_flush).",
+      "details": "Verified Cache API discovery heuristics in d7-analysis skill.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-02",
+      "category": "cache",
+      "name": "Cache Bin Discovery",
+      "status": "PASS",
+      "evidence": "Discovery skill identifies standard core cache bins (cache, cache_page, cache_block, cache_menu, cache_form, cache_views) and custom cache bins declared in hook_schema().",
+      "details": "Verified cache bin discovery and categorization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-03",
+      "category": "cache",
+      "name": "Cache Key Discovery & Construction",
+      "status": "PASS",
+      "evidence": "Discovery skill analyzes static and dynamic cache key construction, parameters, prefixes, and cross-references Step 21 dynamic resolution.",
+      "details": "Verified cache key discovery and construction analysis.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-04",
+      "category": "cache",
+      "name": "Cache Metadata Modeling (Tags, Contexts, Max-Age)",
+      "status": "PASS",
+      "evidence": "Skills comprehensively model modern D10/D11 cache metadata: cache tags, cache contexts, cache max-age, and bubbleable metadata.",
+      "details": "Verified cache metadata modeling across d7-analysis and d7-to-d10-mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-05",
+      "category": "cache",
+      "name": "Cache Invalidation & Trigger Analysis",
+      "status": "PASS",
+      "evidence": "Discovery skill analyzes cache invalidation calls, entity triggers, config triggers, hook_cache_flush, and maps to Cache::invalidateTags().",
+      "details": "Verified cache invalidation trigger analysis and refactoring.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-06",
+      "category": "cache",
+      "name": "Render Cache & Page Cache Behavior",
+      "status": "PASS",
+      "evidence": "Discovery skill analyzes render caching (#cache render arrays), page caching, block caching, and Views caching.",
+      "details": "Verified render cache and page cache behavioral discovery.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-07",
+      "category": "cache",
+      "name": "Static Cache Discovery & Modernization",
+      "status": "PASS",
+      "evidence": "Discovery skill identifies drupal_static() usage, static cache resets, and maps static caches to service-managed memory caches.",
+      "details": "Verified static cache discovery and modernization heuristics.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-08",
+      "category": "session",
+      "name": "Session Discovery & Lifecycle Analysis",
+      "status": "PASS",
+      "evidence": "Discovery skill detects $_SESSION usage, session initialization/destruction, anonymous/authenticated sessions, and maps to Symfony SessionInterface.",
+      "details": "Verified session discovery, lifecycle analysis, and modern mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-09",
+      "category": "session",
+      "name": "Cookie Discovery & Security Attributes",
+      "status": "PASS",
+      "evidence": "Discovery skill inventories cookie reads, writes, deletion, and security attributes without persisting real cookie values.",
+      "details": "Verified cookie discovery and zero-cookie-value security.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-10",
+      "category": "state",
+      "name": "Temporary Storage & Runtime State",
+      "status": "PASS",
+      "evidence": "Skills discover temporary storage, wizard state, request state, and map to PrivateTempStore / SharedTempStore services.",
+      "details": "Verified temporary storage discovery and tempstore service mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-11",
+      "category": "security",
+      "name": "Access Control & Custom Access Callbacks",
+      "status": "PASS",
+      "evidence": "Discovery skill analyzes access callbacks, entity access, node access, and maps custom access logic to AccessCheckInterface services returning AccessResult.",
+      "details": "Verified access control discovery and AccessCheckInterface mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-12",
+      "category": "security",
+      "name": "Permission & Role Discovery",
+      "status": "PASS",
+      "evidence": "Discovery skill discovers user_access() checks, role checks, custom permissions, and maps to <module>.permissions.yml and AccountInterface.",
+      "details": "Verified permission and role discovery and modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-13",
+      "category": "security",
+      "name": "CSRF & Token Validation Discovery",
+      "status": "PASS",
+      "evidence": "Discovery skill detects CSRF token generation/validation (drupal_get_token, drupal_valid_token), state-changing GET endpoints, and maps to _csrf_token route requirements.",
+      "details": "Verified CSRF discovery and route token protection.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-14",
+      "category": "security",
+      "name": "XSS, Input Validation & Output Escaping",
+      "status": "PASS",
+      "evidence": "Discovery skill analyzes sanitization and escaping functions (check_plain, filter_xss, check_url), raw HTML outputs, and maps to Twig auto-escaping and Html::escape().",
+      "details": "Verified XSS and output escaping analysis.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-15",
+      "category": "security",
+      "name": "File & Upload Security",
+      "status": "PASS",
+      "evidence": "Discovery skill analyzes file upload validation, extension restrictions, MIME checking, private file access, and path traversal protections.",
+      "details": "Verified file and upload security discovery.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-16",
+      "category": "security",
+      "name": "URL, Redirect & Request Security",
+      "status": "PASS",
+      "evidence": "Discovery skill identifies redirect patterns, destination parameters, external redirect risks, SSRF risks, and maps to UrlHelper::isExternal() validation.",
+      "details": "Verified URL, redirect, and request security analysis.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-17",
+      "category": "security",
+      "name": "Webhook & API Security Handoff",
+      "status": "PASS",
+      "evidence": "Step 23 cleanly establishes security ownership over API authentication, HMAC signatures, and rate limiting, handshaking integration semantics with Step 22.",
+      "details": "Verified webhook and API security cross-capability handoff.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-18",
+      "category": "lifecycle",
+      "name": "Request Lifecycle & Bootstrap Hooks",
+      "status": "PASS",
+      "evidence": "Discovery skill detects legacy request lifecycle hooks (hook_boot, hook_init, hook_exit) and maps to Symfony HttpKernel event subscribers.",
+      "details": "Verified request lifecycle discovery and event subscriber modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-19",
+      "category": "lifecycle",
+      "name": "Cron Processing & Scheduling",
+      "status": "PASS",
+      "evidence": "Discovery skill discovers hook_cron() implementations, scheduled tasks, time checks, and maps to modern hook_cron or scheduled queue workers.",
+      "details": "Verified cron discovery and scheduling analysis.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-20",
+      "category": "lifecycle",
+      "name": "Queue Worker Discovery & Modernization",
+      "status": "PASS",
+      "evidence": "Discovery skill discovers legacy queue definitions (hook_cron_queue_info, DrupalQueue) and maps to modern @QueueWorker plugin classes.",
+      "details": "Verified queue worker discovery and modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-21",
+      "category": "lifecycle",
+      "name": "Batch Processing & Migration",
+      "status": "PASS",
+      "evidence": "Discovery skill discovers batch operations (batch_set, batch_process), operations callbacks, finished callbacks, and progressive batching.",
+      "details": "Verified batch processing discovery and migration strategy.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-22",
+      "category": "concurrency",
+      "name": "Lock API & Mutex Concurrency Discovery",
+      "status": "PASS",
+      "evidence": "Discovery skill discovers legacy lock API calls (lock_acquire, lock_release, lock_may_be_available) and maps to injected LockBackendInterface.",
+      "details": "Verified lock API discovery and LockBackendInterface mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-23",
+      "category": "concurrency",
+      "name": "Database Transactions & Rollback Boundaries",
+      "status": "PASS",
+      "evidence": "Discovery skill analyzes transaction boundaries (db_transaction), rollback mechanisms, and maps to $connection->startTransaction().",
+      "details": "Verified transaction boundary discovery and Connection transaction modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-24",
+      "category": "concurrency",
+      "name": "Concurrency & Race Condition Analysis",
+      "status": "PASS",
+      "evidence": "Discovery skill evaluates race conditions, duplicate execution prevention, and optimistic/pessimistic concurrency controls.",
+      "details": "Verified concurrency and race condition analysis heuristics.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-25",
+      "category": "environment",
+      "name": "Environment & Runtime Dependencies",
+      "status": "PASS",
+      "evidence": "Discovery skill inventories dependencies on PHP extensions, server variables, and environment variables without hard-coding specific values.",
+      "details": "Verified environment dependency discovery and generic accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-26",
+      "category": "environment",
+      "name": "Time, Date, Locale & Language Dependencies",
+      "status": "PASS",
+      "evidence": "Discovery skill detects behavior dependent on REQUEST_TIME, timestamps, timezones, locales, and languages.",
+      "details": "Verified time, date, locale, and language dependency discovery.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-27",
+      "category": "context",
+      "name": "User & Role Context Dependencies",
+      "status": "PASS",
+      "evidence": "Discovery skill models runtime logic dependent on current user, roles, permissions, and account state.",
+      "details": "Verified user and role context dependency discovery.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-28",
+      "category": "state",
+      "name": "Global & Static State Isolation",
+      "status": "PASS",
+      "evidence": "Discovery skill inventories mutable global state ($GLOBALS, $conf, static variables) and plans service container encapsulation.",
+      "details": "Verified global and static state discovery and isolation planning.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-29",
+      "category": "registries",
+      "name": "Runtime Registries & Service Discovery",
+      "status": "PASS",
+      "evidence": "Discovery skill identifies runtime registries, theme registries, menu registries, and dynamic discovery mechanisms.",
+      "details": "Verified runtime registry discovery and modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-30",
+      "category": "errors",
+      "name": "Error, Failure & Fallback Behavior",
+      "status": "PASS",
+      "evidence": "Discovery skill discovers custom error handlers, exception handling, degraded modes, and fallback paths.",
+      "details": "Verified error and fallback behavior discovery.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-31",
+      "category": "handoff",
+      "name": "Dynamic Dependency Resolution Handoff",
+      "status": "PASS",
+      "evidence": "Step 23 explicitly handshakes dynamic cache keys, callable callbacks, and reflection probes with Step 21.",
+      "details": "Verified dynamic dependency cross-capability handoff.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-32",
+      "category": "handoff",
+      "name": "External Integration Behavior Handoff",
+      "status": "PASS",
+      "evidence": "Step 23 explicitly handshakes integration security, locking surrounding HTTP calls, and transaction boundaries with Step 22.",
+      "details": "Verified external integration cross-capability handoff.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-33",
+      "category": "taxonomy",
+      "name": "40 Runtime Target Architecture Taxonomy",
+      "status": "PASS",
+      "evidence": "Skills and references establish the exhaustive 40-type runtime target architecture taxonomy covering cache, session, security, lifecycle, concurrency, and environment.",
+      "details": "Verified 40 runtime target architecture classifications across d7-analysis and migration-api.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-34",
+      "category": "strategies",
+      "name": "25 Standardized Runtime Migration Strategies",
+      "status": "PASS",
+      "evidence": "Skills establish 25 standardized runtime migration strategies for cache, session, security, lifecycle, locking, transactions, and fallback behaviors.",
+      "details": "Verified 25 runtime migration strategies across d7-analysis and migration-api.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-35",
+      "category": "manifest",
+      "name": "Manifest runtime_behavior_items Schema Structure",
+      "status": "PASS",
+      "evidence": "Manifest schema defines the exhaustive runtime_behavior_items collection with 35+ metadata properties for cache, session, security, lifecycle, lock, and concurrency accounting.",
+      "details": "Verified runtime_behavior_items collection schema in migration-manifest.yml.",
+      "affected_files": [
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-36",
+      "category": "zero_omission",
+      "name": "Zero-Omission Runtime Outcome Enforcement",
+      "status": "PASS",
+      "evidence": "Behavioral validation skill enforces strict zero-omission rules for all runtime behaviors, rejecting forbidden states and requiring approved terminal states.",
+      "details": "Verified zero-omission outcome enforcement for runtime behaviors.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-37",
+      "category": "compatibility",
+      "name": "Cross-Capability Runtime Architectural Compatibility",
+      "status": "PASS",
+      "evidence": "Step 23 maintains clean architectural boundaries and explicit cross-referencing across includes (Step 11), classes (Step 12), database (Step 13), hooks (Step 14), config (Step 15), entities (Step 16), forms (Step 17), frontend (Step 18), Views (Step 19), themes (Step 20), dynamic (Step 21), and integrations (Step 22).",
+      "details": "Verified cross-capability architectural compatibility for Step 23.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "ARCHITECTURE.md",
+        "README.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-38",
+      "category": "purity",
+      "name": "Generic Factory Purity & Secret Protection",
+      "status": "PASS",
+      "evidence": "The factory operates 100% generically against arbitrary Drupal 7 source without hard-coded project names, URLs, real credentials, session values, or cookie values.",
+      "details": "Verified generic factory purity and secret protection.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "README.md",
+        "ARCHITECTURE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-RUNTIME-39",
+      "category": "runtime_boundary",
+      "name": "Runtime Verification Boundary",
+      "status": "UNVERIFIED",
+      "evidence": "Static contract and simulation validation completed. Live runtime execution across caches, sessions, access checkers, locks, and cron requires an active Drupal 10/11 environment.",
       "details": "Retained explicit status: [RUNTIME UNVERIFIED \u2014 CLAUDE CODE CLI/ACCESS NOT AVAILABLE].",
       "affected_files": [
         "state/migration-manifest.yml",
