@@ -83,10 +83,10 @@ Analyzes inter-module couplings, core requirements, contributed module dependenc
 
 ## 11. Skill & Reference Dependencies
 - **Primary Associated Skill**:
-  - [`skills/dependency-analysis`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/dependency-analysis/SKILL.md) (5-dimensional coupling detection, DAG solver, cycle resolution, in-degree calculation)
+  - [`skills/dependency-analysis`](../../skills/dependency-analysis/SKILL.md) (5-dimensional coupling detection, DAG solver, cycle resolution, in-degree calculation)
 - **Canonical References**:
-  - [Drupal 7 Core APIs Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/apis.md)
-  - [Drupal 7 Hooks to Modern Architecture Catalog](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/hooks.md)
+  - [Drupal 7 Core APIs Reference](../../references/drupal-7/apis.md)
+  - [Drupal 7 Hooks to Modern Architecture Catalog](../../references/drupal-7/hooks.md)
 
 ---
 

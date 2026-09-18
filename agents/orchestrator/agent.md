@@ -93,9 +93,9 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
 ## 11. Skill & Reference Dependencies
 - **Primary Associated Skills**: None (Pure lifecycle governance and workflow supervision).
 - **Canonical References**:
-  - [Migration Lifecycle & Dynamic Execution Model](file:///Users/deepak/Desktop/Projects/drupal-migration/MIGRATION_LIFECYCLE.md)
-  - [Agent Communication & Operational Protocol](file:///Users/deepak/Desktop/Projects/drupal-migration/AGENT_PROTOCOL.md)
-  - [System Architecture](file:///Users/deepak/Desktop/Projects/drupal-migration/ARCHITECTURE.md)
+  - [Migration Lifecycle & Dynamic Execution Model](../../MIGRATION_LIFECYCLE.md)
+  - [Agent Communication & Operational Protocol](../../AGENT_PROTOCOL.md)
+  - [System Architecture](../../ARCHITECTURE.md)
 
 ---
 

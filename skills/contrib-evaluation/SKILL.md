@@ -15,8 +15,8 @@ This skill provides the decision frameworks and evaluation heuristics for assess
 ---
 
 ## Technical References
-- [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
-- [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
+- [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
+- [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
 
 ---
 

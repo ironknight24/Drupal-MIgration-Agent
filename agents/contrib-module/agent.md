@@ -84,10 +84,10 @@ Evaluates all Drupal 7 contributed modules cataloged in `state/migration-manifes
 
 ## 11. Skill & Reference Dependencies
 - **Primary Associated Skill**:
-  - [`skills/contrib-evaluation`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/contrib-evaluation/SKILL.md) (8 assessment criteria, core consolidation taxonomy, D11 core removal evaluation)
+  - [`skills/contrib-evaluation`](../../skills/contrib-evaluation/SKILL.md) (8 assessment criteria, core consolidation taxonomy, D11 core removal evaluation)
 - **Canonical References**:
-  - [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
-  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
+  - [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
+  - [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
 
 ---
 

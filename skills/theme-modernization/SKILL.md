@@ -15,8 +15,8 @@ This skill provides the operational rules, template conversion patterns, and ass
 ---
 
 ## Technical References
-- [PHPTemplate to Modern Twig Conversion Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/twig-filters.md)
-- [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
+- [PHPTemplate to Modern Twig Conversion Reference](../../references/drupal-10/twig-filters.md)
+- [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
 
 ---
 

@@ -94,13 +94,13 @@ Re-engineers legacy Drupal 7 custom modules into modern, object-oriented Drupal 
 
 ## 11. Skill & Reference Dependencies
 - **Primary Associated Skills**:
-  - [`skills/custom-module-migration`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/custom-module-migration/SKILL.md) (12-step modernization playbook)
-  - [`skills/d7-to-d10-mapping`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/d7-to-d10-mapping/SKILL.md) (Procedural-to-OOP architectural translation rules)
-  - [`skills/d10-architecture`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/d10-architecture/SKILL.md) (Modern DI standards, container injection, PHP 8 attributes)
+  - [`skills/custom-module-migration`](../../skills/custom-module-migration/SKILL.md) (12-step modernization playbook)
+  - [`skills/d7-to-d10-mapping`](../../skills/d7-to-d10-mapping/SKILL.md) (Procedural-to-OOP architectural translation rules)
+  - [`skills/d10-architecture`](../../skills/d10-architecture/SKILL.md) (Modern DI standards, container injection, PHP 8 attributes)
 - **Canonical References**:
-  - [Drupal 10 & 11 Plugin Types & Modern Architecture](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/plugin-types.md)
-  - [Drupal 7 Hooks to Modern Architecture Catalog](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/hooks.md)
-  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
+  - [Drupal 10 & 11 Plugin Types & Modern Architecture](../../references/drupal-10/plugin-types.md)
+  - [Drupal 7 Hooks to Modern Architecture Catalog](../../references/drupal-7/hooks.md)
+  - [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
 
 ---
 

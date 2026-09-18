@@ -74,13 +74,13 @@ Identifies legacy Drupal 7 procedural functions, global variable accesses (`$GLO
 
 ## 11. Skill & Reference Dependencies
 - **Primary Skills**:
-  - [`skills/d7-to-d10-mapping`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/d7-to-d10-mapping/SKILL.md) (Procedural-to-OOP architectural translation rules)
-  - [`skills/d10-architecture`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/d10-architecture/SKILL.md) (Constructor Dependency Injection standards, container factories, type safety)
+  - [`skills/d7-to-d10-mapping`](../../skills/d7-to-d10-mapping/SKILL.md) (Procedural-to-OOP architectural translation rules)
+  - [`skills/d10-architecture`](../../skills/d10-architecture/SKILL.md) (Constructor Dependency Injection standards, container factories, type safety)
 - **Technical References**:
-  - [Drupal 7 Core APIs, Database Calls & Globals](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/apis.md)
-  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
-  - [Drupal 7 Hooks to Modern Architecture Catalog](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/hooks.md)
-  - [Drupal 7 Core APIs, Database Calls & Globals](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/apis.md)
+  - [Drupal 7 Core APIs, Database Calls & Globals](../../references/drupal-7/apis.md)
+  - [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
+  - [Drupal 7 Hooks to Modern Architecture Catalog](../../references/drupal-7/hooks.md)
+  - [Drupal 7 Core APIs, Database Calls & Globals](../../references/drupal-7/apis.md)
 
 ## 12. Operational Execution Procedure
 1. **Procedural Code Analysis**:

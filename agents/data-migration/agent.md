@@ -80,11 +80,11 @@ Architects, configures, and validates data pipelines transferring content, taxon
 
 ## 11. Skill & Reference Dependencies
 - **Primary Skill**:
-  - [`skills/migration-api`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/migration-api/SKILL.md) (Core Migration API architecture, source/process/destination plugins, relational sequencing, checksum validation)
+  - [`skills/migration-api`](../../skills/migration-api/SKILL.md) (Core Migration API architecture, source/process/destination plugins, relational sequencing, checksum validation)
 - **Technical References**:
-  - [Field Type & Data Migration Mapping Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/field-mapping.md)
-  - [Drupal 10 & 11 Plugin Types & Modern Architecture](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/plugin-types.md)
-  - [Drupal 7 Core APIs, Database Calls & Globals](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/apis.md)
+  - [Field Type & Data Migration Mapping Reference](../../references/migration-patterns/field-mapping.md)
+  - [Drupal 10 & 11 Plugin Types & Modern Architecture](../../references/drupal-10/plugin-types.md)
+  - [Drupal 7 Core APIs, Database Calls & Globals](../../references/drupal-7/apis.md)
 
 ## 12. Operational Execution Procedure
 1. **Source Data Analysis**:

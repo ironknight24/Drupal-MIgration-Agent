@@ -85,10 +85,10 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
 
 ## 11. Skill & Reference Dependencies
 - **Primary Associated Skill**:
-  - [`skills/d7-analysis`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/d7-analysis/SKILL.md) (Procedural AST inspection, hook cataloging, and global state discovery heuristics)
+  - [`skills/d7-analysis`](../../skills/d7-analysis/SKILL.md) (Procedural AST inspection, hook cataloging, and global state discovery heuristics)
 - **Canonical References**:
-  - [Drupal 7 Core APIs Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/apis.md)
-  - [Drupal 7 Hooks to Modern Architecture Catalog](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/hooks.md)
+  - [Drupal 7 Core APIs Reference](../../references/drupal-7/apis.md)
+  - [Drupal 7 Hooks to Modern Architecture Catalog](../../references/drupal-7/hooks.md)
 
 ---
 

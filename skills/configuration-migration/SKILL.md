@@ -15,9 +15,9 @@ This skill provides the operational heuristics and taxonomy rules for translatin
 ---
 
 ## Technical References
-- [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
-- [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
-- [Field Type & Data Migration Mapping Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/field-mapping.md)
+- [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
+- [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
+- [Field Type & Data Migration Mapping Reference](../../references/migration-patterns/field-mapping.md)
 
 ---
 

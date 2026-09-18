@@ -15,7 +15,7 @@ This skill provides the procedural guidelines and runner configurations for esta
 ---
 
 ## Technical References
-- [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
+- [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
 
 ---
 

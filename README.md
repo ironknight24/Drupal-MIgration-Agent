@@ -149,7 +149,7 @@ Drupal-MIgration-Agent/
   - Factory Step 2: Migration Skills & Knowledge Codification [COMPLETE]
   - Factory Step 3: Workflow Orchestration & Agent Coordination [COMPLETE]
   - Factory Step 4: Agent Operationalization & Execution Contracts [COMPLETE]
-  - Factory Step 5: Distribution & Release Verification [NEXT]
+  - Factory Step 5: Self-Validation, Contract Testing & Runtime Readiness [COMPLETE]
 
 - **Migration Execution Lifecycle (When running against a real project)**:
   - Migration Step 0: Setup & Path Verification

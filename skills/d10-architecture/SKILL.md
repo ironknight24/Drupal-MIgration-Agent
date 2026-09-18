@@ -16,9 +16,9 @@ This skill governs the standards for writing modern, testable, and Drupal 11-rea
 
 ## Technical References
 For full code patterns and catalogs, consult:
-- [Drupal 10 & 11 Plugin Types & Modern Architecture](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/plugin-types.md)
-- [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
-- [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
+- [Drupal 10 & 11 Plugin Types & Modern Architecture](../../references/drupal-10/plugin-types.md)
+- [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
+- [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
 
 ---
 

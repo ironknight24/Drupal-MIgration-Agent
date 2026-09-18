@@ -91,10 +91,10 @@ Modernizes Drupal 7 PHPTemplate custom themes into modern Drupal 10/11 Twig them
 
 ## 11. Skill & Reference Dependencies
 - **Primary Associated Skill**:
-  - [`skills/theme-modernization`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/theme-modernization/SKILL.md) (3-tier modernization scope, Twig conversions, modern asset packaging)
+  - [`skills/theme-modernization`](../../skills/theme-modernization/SKILL.md) (3-tier modernization scope, Twig conversions, modern asset packaging)
 - **Canonical References**:
-  - [PHPTemplate to Modern Twig Conversion Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/twig-filters.md)
-  - [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
+  - [PHPTemplate to Modern Twig Conversion Reference](../../references/drupal-10/twig-filters.md)
+  - [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
 
 ---
 

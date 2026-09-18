@@ -1,0 +1,273 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AgentResult",
+  "description": "Canonical Schema for Drupal Migration Specialist Agent Execution Results (v1.0)",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "execution_id",
+    "attempt_number",
+    "started_at",
+    "completed_at",
+    "agent_name",
+    "component_id",
+    "lifecycle_phase",
+    "current_wave",
+    "execution_status",
+    "state_transition",
+    "outputs",
+    "evidence",
+    "blockers",
+    "decisions_required",
+    "files_changed",
+    "tests",
+    "validation",
+    "next_action"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0"]
+    },
+    "execution_id": {
+      "type": "string",
+      "pattern": "^exec-[a-zA-Z0-9_.-]+-\\d{8}-\\d{3,}$"
+    },
+    "attempt_number": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "agent_name": {
+      "type": "string",
+      "pattern": "^(drupal-migration:)?[a-z0-9-]+$"
+    },
+    "component_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lifecycle_phase": {
+      "type": "string",
+      "enum": [
+        "phase_0_setup",
+        "phase_1_discovery",
+        "phase_2_dependencies",
+        "phase_3_contrib_strategy",
+        "phase_4_implementation",
+        "phase_5_testing",
+        "phase_6_validation",
+        "phase_7_remediation",
+        "phase_8_final_audit",
+        "phase_9_complete"
+      ]
+    },
+    "current_wave": {
+      "type": "string",
+      "pattern": "^wave_\\d+$"
+    },
+    "execution_status": {
+      "type": "string",
+      "enum": ["SUCCESS", "BLOCKED", "STOPPED", "ESCALATED", "FAILED"]
+    },
+    "state_transition": {
+      "type": "object",
+      "required": ["from_state", "proposed_to_state"],
+      "properties": {
+        "target_object": {
+          "type": "string"
+        },
+        "from_state": {
+          "type": "string",
+          "enum": [
+            "NOT_STARTED",
+            "DISCOVERED",
+            "ANALYZED",
+            "PLANNED",
+            "SCAFFOLDED",
+            "IN_PROGRESS",
+            "CODE_COMPLETE",
+            "TESTING",
+            "TESTS_PASSED",
+            "VALIDATING",
+            "VALIDATED",
+            "COMPLETED",
+            "BLOCKED",
+            "BLOCKED_UPSTREAM",
+            "SKIPPED"
+          ]
+        },
+        "proposed_to_state": {
+          "type": "string",
+          "enum": [
+            "NOT_STARTED",
+            "DISCOVERED",
+            "ANALYZED",
+            "PLANNED",
+            "SCAFFOLDED",
+            "IN_PROGRESS",
+            "CODE_COMPLETE",
+            "TESTING",
+            "TESTS_PASSED",
+            "VALIDATING",
+            "VALIDATED",
+            "COMPLETED",
+            "BLOCKED",
+            "BLOCKED_UPSTREAM",
+            "SKIPPED"
+          ]
+        }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "properties": {
+        "code_artifacts": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "report_artifacts": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "observed_facts": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "verified_results": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["blocker_id", "category", "remediation_stage"],
+        "properties": {
+          "blocker_id": { "type": "string" },
+          "category": {
+            "type": "string",
+            "enum": [
+              "SOURCE_AMBIGUITY",
+              "ARCHITECTURAL_DESIGN",
+              "CONTRIB_UNAVAILABLE",
+              "CODE_SYNTAX_ERROR",
+              "TEST_REGRESSION",
+              "RUNTIME_BOOTSTRAP_FAILURE",
+              "EVIDENCE_GAP",
+              "SECURITY_VULNERABILITY",
+              "DATA_CORRUPTION"
+            ]
+          },
+          "remediation_stage": {
+            "type": "string",
+            "enum": [
+              "discovery",
+              "dependency",
+              "contrib-module",
+              "custom-module",
+              "custom-theme",
+              "configuration",
+              "data-migration",
+              "api-modernization",
+              "integration",
+              "testing",
+              "validation",
+              "orchestrator",
+              "human_decision"
+            ]
+          },
+          "details": { "type": "string" }
+        }
+      }
+    },
+    "decisions_required": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["decision_id", "prompt", "options"],
+        "properties": {
+          "decision_id": { "type": "string" },
+          "prompt": { "type": "string" },
+          "options": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "recommendation": { "type": "string" }
+        }
+      }
+    },
+    "files_changed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "operation"],
+        "properties": {
+          "path": { "type": "string" },
+          "operation": {
+            "type": "string",
+            "enum": ["CREATE", "MODIFY", "DELETE", "RENAME"]
+          },
+          "reason": { "type": "string" },
+          "evidence": { "type": "string" }
+        }
+      }
+    },
+    "tests": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "TEST_PASSED",
+            "TEST_FAILED",
+            "TEST_NOT_APPLICABLE",
+            "TEST_UNAVAILABLE",
+            "TEST_NOT_EXECUTED"
+          ]
+        },
+        "summary": { "type": "string" }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "VALIDATED",
+            "PENDING",
+            "FAILED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "summary": { "type": "string" }
+      }
+    },
+    "next_action": {
+      "type": "object",
+      "required": ["target_agent"],
+      "properties": {
+        "target_agent": {
+          "type": ["string", "null"]
+        },
+        "recommended_payload": { "type": "string" }
+      }
+    }
+  }
+}

@@ -75,9 +75,9 @@ Conducts the comprehensive, exhaustive post-migration audit of the target Drupal
 ## 11. Skill & Reference Dependencies
 - **Primary Skills**: None (Maintains pure lifecycle governance, gate validation, and completion sign-off responsibilities without duplicating domain execution skills).
 - **Technical References**:
-  - [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
-  - [Drupal 10 & 11 Plugin Types & Modern Architecture](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/plugin-types.md)
-  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
+  - [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
+  - [Drupal 10 & 11 Plugin Types & Modern Architecture](../../references/drupal-10/plugin-types.md)
+  - [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
 
 ## 12. Operational Execution Procedure
 1. **Completeness & Inventory Reconciliation (Gate 1)**:

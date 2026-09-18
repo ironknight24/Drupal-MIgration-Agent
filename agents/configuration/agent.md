@@ -93,11 +93,11 @@ Transforms Drupal 7 persistent variables, system settings, field definitions, co
 
 ## 11. Skill & Reference Dependencies
 - **Primary Associated Skill**:
-  - [`skills/configuration-migration`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/configuration-migration/SKILL.md) (Configuration taxonomy, schema mapping, settings translation, secret protection)
+  - [`skills/configuration-migration`](../../skills/configuration-migration/SKILL.md) (Configuration taxonomy, schema mapping, settings translation, secret protection)
 - **Canonical References**:
-  - [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
-  - [Field Type & Data Migration Mapping Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/field-mapping.md)
-  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
+  - [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
+  - [Field Type & Data Migration Mapping Reference](../../references/migration-patterns/field-mapping.md)
+  - [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
 
 ---
 

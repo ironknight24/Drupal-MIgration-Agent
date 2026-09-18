@@ -77,12 +77,12 @@ Discovers, analyzes, and modernizes all external communication boundaries in the
 
 ## 11. Skill & Reference Dependencies
 - **Primary Skills**:
-  - [`skills/integration-modernization`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/integration-modernization/SKILL.md) (Guzzle HTTP clients, inbound webhook controllers, HMAC verification, background QueueWorkers)
-  - [`skills/d10-architecture`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/d10-architecture/SKILL.md) (Constructor Dependency Injection, services, plugin architectures)
+  - [`skills/integration-modernization`](../../skills/integration-modernization/SKILL.md) (Guzzle HTTP clients, inbound webhook controllers, HMAC verification, background QueueWorkers)
+  - [`skills/d10-architecture`](../../skills/d10-architecture/SKILL.md) (Constructor Dependency Injection, services, plugin architectures)
 - **Technical References**:
-  - [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
-  - [Drupal 10 & 11 Plugin Types & Modern Architecture](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/plugin-types.md)
-  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
+  - [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
+  - [Drupal 10 & 11 Plugin Types & Modern Architecture](../../references/drupal-10/plugin-types.md)
+  - [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
 
 ## 12. Operational Execution Procedure
 1. **Endpoint & Protocol Analysis**:

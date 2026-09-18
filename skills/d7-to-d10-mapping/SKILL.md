@@ -16,10 +16,10 @@ This skill provides the architectural mapping rules required to translate Drupal
 
 ## Technical References
 For detailed syntax examples and conversion catalogs, consult:
-- [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
-- [Drupal 7 Hooks to Modern Architecture Catalog](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/hooks.md)
-- [Drupal 10 & 11 Plugin Types & Modern Architecture](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/plugin-types.md)
-- [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
+- [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
+- [Drupal 7 Hooks to Modern Architecture Catalog](../../references/drupal-7/hooks.md)
+- [Drupal 10 & 11 Plugin Types & Modern Architecture](../../references/drupal-10/plugin-types.md)
+- [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
 
 ---
 

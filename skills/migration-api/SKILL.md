@@ -15,8 +15,8 @@ This skill provides the architectural guidelines, plugin pipeline configurations
 ---
 
 ## Technical References
-- [Field Type & Data Migration Mapping Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/field-mapping.md)
-- [Drupal 10 & 11 Plugin Types & Modern Architecture](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/plugin-types.md)
+- [Field Type & Data Migration Mapping Reference](../../references/migration-patterns/field-mapping.md)
+- [Drupal 10 & 11 Plugin Types & Modern Architecture](../../references/drupal-10/plugin-types.md)
 
 ---
 

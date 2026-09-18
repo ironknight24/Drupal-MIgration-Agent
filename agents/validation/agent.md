@@ -70,11 +70,11 @@ Conducts side-by-side behavioral, structural, and data comparisons between the D
 
 ## 11. Skill & Reference Dependencies
 - **Primary Skill**:
-  - [`skills/behavioral-validation`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/behavioral-validation/SKILL.md) (12-dimensional validation matrix heuristics, evidence gathering, verdict criteria)
+  - [`skills/behavioral-validation`](../../skills/behavioral-validation/SKILL.md) (12-dimensional validation matrix heuristics, evidence gathering, verdict criteria)
 - **Technical References**:
-  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
-  - [Field Type & Data Migration Mapping Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/field-mapping.md)
-  - [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
+  - [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
+  - [Field Type & Data Migration Mapping Reference](../../references/migration-patterns/field-mapping.md)
+  - [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
 
 ## 12. Operational Execution Procedure
 1. **Baseline vs Migrated Comparative Review**:

@@ -73,10 +73,10 @@ Defines and executes automated testing strategies for migrated code, including P
 
 ## 11. Skill & Reference Dependencies
 - **Primary Skill**:
-  - [`skills/testing`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/testing/SKILL.md) (PHPUnit Unit/Kernel/Functional execution, PHPStan static analysis levels, PHPCS sniffs, config schema validation)
+  - [`skills/testing`](../../skills/testing/SKILL.md) (PHPUnit Unit/Kernel/Functional execution, PHPStan static analysis levels, PHPCS sniffs, config schema validation)
 - **Technical References**:
-  - [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
-  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
+  - [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
+  - [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
 
 ## 12. Operational Execution Procedure
 1. **Testing Strategy Formulation**:

@@ -16,8 +16,8 @@ This skill provides structured heuristics for non-destructively inspecting Drupa
 
 ## Technical References
 For deep technical catalogs, consult:
-- [Drupal 7 Core APIs Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/apis.md)
-- [Drupal 7 Hooks to Modern Architecture Catalog](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/hooks.md)
+- [Drupal 7 Core APIs Reference](../../references/drupal-7/apis.md)
+- [Drupal 7 Hooks to Modern Architecture Catalog](../../references/drupal-7/hooks.md)
 
 ---
 

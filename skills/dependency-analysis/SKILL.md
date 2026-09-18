@@ -15,8 +15,8 @@ This skill provides the procedural playbook and algorithms for discovering code,
 ---
 
 ## Technical References
-- [Drupal 7 Core APIs Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/apis.md)
-- [Drupal 7 Hooks to Modern Architecture Catalog](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/hooks.md)
+- [Drupal 7 Core APIs Reference](../../references/drupal-7/apis.md)
+- [Drupal 7 Hooks to Modern Architecture Catalog](../../references/drupal-7/hooks.md)
 
 ---
 

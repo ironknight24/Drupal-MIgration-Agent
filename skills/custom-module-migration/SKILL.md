@@ -16,12 +16,12 @@ This skill provides the operational engineering playbook for re-engineering Drup
 
 ## Technical References & Associated Skills
 - Associated Skills:
-  - [`skills/d7-to-d10-mapping`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/d7-to-d10-mapping/SKILL.md)
-  - [`skills/d10-architecture`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/d10-architecture/SKILL.md)
+  - [`skills/d7-to-d10-mapping`](../d7-to-d10-mapping/SKILL.md)
+  - [`skills/d10-architecture`](../d10-architecture/SKILL.md)
 - Canonical References:
-  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
-  - [Drupal 10 & 11 Plugin Types & Modern Architecture](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/plugin-types.md)
-  - [Drupal 7 Hooks to Modern Architecture Catalog](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/hooks.md)
+  - [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
+  - [Drupal 10 & 11 Plugin Types & Modern Architecture](../../references/drupal-10/plugin-types.md)
+  - [Drupal 7 Hooks to Modern Architecture Catalog](../../references/drupal-7/hooks.md)
 
 ---
 
