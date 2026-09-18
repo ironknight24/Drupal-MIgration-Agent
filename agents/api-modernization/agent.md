@@ -13,32 +13,49 @@ model: inherit
 
 ---
 
-## 2. Handoff Contract
+## 2. Standardized Handoff Contract
 
-### Preconditions
-- Custom module code has undergone behavior extraction.
+### 1. Preconditions
+- Custom module code has undergone behavior extraction (`custom-module` analysis step).
 - Target module namespace and service container structure are established.
 - Target path verified and writable.
+- Framework is executing dynamic waves containing API modernization tasks.
+- `state/migration-state.yml` is accessible and unlocked.
 
-### Inputs
-- Extracted D7 code snippets and function definitions
-- Target service definitions (`*.services.yml`)
-- Target core API specifications
+### 2. Required Inputs
+- Extracted D7 code snippets and procedural function definitions.
+- Target service definitions (`*.services.yml`).
+- Target core API specifications.
+- `migration.config.yml`.
 
-### Outputs
-- API Modernization Report: `reports/api-modernization/API-MODERNIZATION-<MODULE>.md`
-- Modernized service classes, traits, and interface implementations in `target.path`
-- Documentation of any retained static calls and their rationale
-- File modification entries in `logs/file-change-log/`
+### 3. Expected Outputs
+- API Modernization Report: `reports/api-modernization/API-MODERNIZATION-<MODULE>.md`.
+- Modernized service classes, traits, and interface implementations in `target.path/web/modules/custom/<MODULE>/src/`.
+- Documentation of any retained static calls and their technical rationale.
+- File modification entries in `logs/file-change-log/`.
 
-### Postconditions
-- All migrated classes utilize constructor Dependency Injection or container factory pattern.
-- Zero blind `\Drupal::*` static calls substituted for legacy procedural functions.
-- Modernized code is fully testable via mock objects in unit tests.
-- Zero writes to `source.path`.
+### 4. State Updates
+- Transitions component modernization state:
+  `READY` -> `PLANNED` -> `SCAFFOLDED` -> `IN_PROGRESS` -> `CODE_COMPLETE`.
+- If unresolvable global state entanglement occurs, registers `BLOCKED`.
+- Updates timestamp in `state/migration-state.yml`.
 
-### Failure & Blocked Conditions
-- Procedural function deeply entangled with non-portable global state that cannot be cleanly refactored without breaking external contracts -> Raise `BLOCKED-API-COMPLEX-GLOBAL.md`.
+### 5. Downstream Handoff
+- **Receiving Agent**: `custom-module` for integration, followed by `testing` for unit and mock object testing.
+- **Handoff Format**: Modernized PHP classes implementing constructor DI and detailed report.
+- **Triggering Condition**: Service classes refactored, DI verified (zero blind `\Drupal::*`), and registered in change log.
+
+### 6. Blocker & Remediation Handling
+- **Blocker Classification**:
+  - `ARCHITECTURAL_DESIGN`: Procedural function deeply entangled with non-portable global state or missing equivalent target subsystem -> Target Remediation Stage: `orchestrator` / architectural redesign.
+  - `CODE_SYNTAX_ERROR`: Type hinting or return type incompatibility with target PHP version -> Target Remediation Stage: `api-modernization` (self-remediation).
+- **Blocker Registration**: Generates `reports/blocked/BLOCKED-API-<MODULE>.md` and registers blocker in `state/migration-state.yml`.
+
+### 7. Evidence Requirements
+- API modernization report documenting each refactored procedural function.
+- Constructor DI verification proof showing zero inline static service calls.
+- Unit test compatibility verification (all dependencies mockable).
+- 100% change log tracking and zero writes to `source.path`.
 
 ---
 

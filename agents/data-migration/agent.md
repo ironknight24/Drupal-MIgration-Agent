@@ -13,22 +13,24 @@ model: inherit
 
 ---
 
-## 2. Handoff Contract
+## 2. Standardized Handoff Contract
 
-### Preconditions
-- Custom entities and field definitions are implemented and enabled in D10/D11.
+### 1. Preconditions
+- Custom entities, field definitions, and taxonomy structures are implemented and enabled in D10/D11 (`configuration` and `custom-module` completed).
 - Source database connection details configured (read-only introspection).
 - Target path verified and writable.
-- Target entities exist to receive migrated data.
+- Framework is executing dynamic waves containing data migration pipelines.
+- `state/migration-state.yml` is accessible and unlocked.
 
-### Inputs
-- Source D7 database schemas and table definitions
-- Target D10/D11 entity and field storage definitions
-- `state/migration-manifest.yml` (`data_migrations` array)
-- `templates/migration-plan.md`
+### 2. Required Inputs
+- Source D7 database schemas and table definitions.
+- Target D10/D11 entity and field storage definitions.
+- `state/migration-manifest.yml` (`data_migrations` array).
+- `templates/migration-plan.md` and `templates/file-change-log.md`.
+- `migration.config.yml`.
 
-### Outputs
-- Detailed Data Mapping Plan: `reports/data/PLAN-DATA-MIGRATION-<DATE>.md`
+### 3. Expected Outputs
+- Detailed Data Mapping Plan: `reports/data/PLAN-DATA-MIGRATION-<DATE>.md`.
 - Migration Configuration YAML files in `target.path/web/modules/custom/<project>_migrate/config/install/`:
   - `migrate_plus.migration.d7_user_role.yml`
   - `migrate_plus.migration.d7_user.yml`
@@ -37,18 +39,31 @@ model: inherit
   - `migrate_plus.migration.d7_file.yml`
   - `migrate_plus.migration.d7_node_*.yml`
   - `migrate_plus.migration.d7_custom_table_*.yml`
-- Implementation & Execution Report: `reports/data/REPORT-DATA-MIGRATION-<DATE>.md`
-- Updated manifest records (`data_migrations`)
+- Implementation & Execution Report: `reports/data/REPORT-DATA-MIGRATION-<DATE>.md`.
+- File change log entries in `logs/file-change-log/`.
 
-### Postconditions
-- Every migrated table/entity has a verified source count vs. destination count.
-- Entity references, term references, and author ownership are preserved using `migration_lookup` process plugins.
-- Data integrity verified with zero data truncation or silent loss.
-- Zero writes to `source.path`.
+### 4. State Updates
+- Transitions data migration pipeline states:
+  `READY` -> `PLANNED` -> `SCAFFOLDED` -> `IN_PROGRESS` -> `CODE_COMPLETE`.
+- If source count mismatches, unmapped fields, or broken references occur, registers `BLOCKED`.
+- Updates timestamp in `state/migration-state.yml`.
 
-### Failure & Blocked Conditions
-- Unmapped custom field data with missing target field -> Raise `BLOCKED-DATA-FIELD-<FIELD>.md`.
-- Foreign key integrity failure in source data -> Raise `BLOCKED-DATA-ORPHANED-RECORDS.md`.
+### 5. Downstream Handoff
+- **Receiving Agent**: `testing` for migration pipeline dry-runs / rollback tests, followed by `validation` for count reconciliation and data fidelity verification.
+- **Handoff Format**: Migration YAML definitions in `target.path` and execution reports with source vs destination counts.
+- **Triggering Condition**: Migration pipelines configured, executed/validated in test environment, and recorded in change log.
+
+### 6. Blocker & Remediation Handling
+- **Blocker Classification**:
+  - `ARCHITECTURAL_DESIGN`: Unmapped custom field data with missing target field schema -> Target Remediation Stage: `configuration` / `custom-module`.
+  - `SOURCE_AMBIGUITY`: Foreign key integrity failure or orphaned records in source database -> Target Remediation Stage: `discovery` / data cleansing.
+- **Blocker Registration**: Generates `reports/blocked/BLOCKED-DATA-<PIPELINE>.md` and registers blocker in `state/migration-state.yml`.
+
+### 7. Evidence Requirements
+- Source-to-target field mapping plan in `reports/data/PLAN-DATA-MIGRATION-<DATE>.md`.
+- Execution and reconciliation report in `reports/data/REPORT-DATA-MIGRATION-<DATE>.md`.
+- Source count vs. destination count table with 100% reconciliation or justified exclusions.
+- Verification of zero writes to `source.path` and 100% change log tracking.
 
 ---
 

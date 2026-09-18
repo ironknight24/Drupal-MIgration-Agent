@@ -13,31 +13,46 @@ model: inherit
 
 ---
 
-## 2. Handoff Contract
+## 2. Standardized Handoff Contract
 
-### Preconditions
-- `state/migration-manifest.yml` contains identified contrib modules with versions.
+### 1. Preconditions
+- `state/migration-manifest.yml` contains discovered contrib modules with versions and usage indicators.
 - `reports/dependencies/` identifies custom module dependencies on contrib modules.
-- Framework is in `phase_3_contrib_strategy`.
+- Framework lifecycle phase is `phase_3_contrib_strategy`.
+- `state/migration-state.yml` is accessible and unlocked.
 
-### Inputs
-- `state/migration-manifest.yml`
-- Contrib module records from Discovery
-- Target Drupal core version specification (D10 vs D11)
+### 2. Required Inputs
+- `state/migration-manifest.yml` (contrib module inventory).
+- Contrib module records from Discovery.
+- Target Drupal core version specification (D10.3+ vs D11).
+- `migration.config.yml`.
 
-### Outputs
-- `reports/contrib/CONTRIB-STRATEGY-<DATE>.md`
-- Per-module audits in `reports/contrib/<MODULE_NAME>.md`
-- Updated `contrib_modules` entries in `state/migration-manifest.yml` (marking `d10_status` and `recommended_replacement`)
-- Updated `state/migration-state.yml` (advancing phase)
+### 3. Expected Outputs
+- `reports/contrib/CONTRIB-STRATEGY-<DATE>.md` (comprehensive audit).
+- Per-module evaluation records in `reports/contrib/<MODULE_NAME>.md`.
+- Updated `contrib_modules` entries in `state/migration-manifest.yml` (marking `d10_status`, `recommended_replacement`, `strategy`).
+- Log entries in `logs/file-change-log/`.
 
-### Postconditions
-- Every required contrib module has a documented evaluation covering the 8 assessment criteria.
-- Zero packages added or installed via Composer in `target.path` during this step.
-- Zero modifications made to `source.path`.
+### 4. State Updates
+- Updates contrib component states in `state/migration-state.yml` to `ANALYZED` (or `BLOCKED` if unported without replacement).
+- Advances `lifecycle_phase` in `state/migration-state.yml` to `phase_4_implementation` upon strategy completion.
+- Records updated timestamp in `state/migration-state.yml`.
 
-### Failure & Blocked Conditions
-- If a custom module strictly depends on an abandoned/unported D7 contrib module with no direct equivalent -> Generate `BLOCKED-CONTRIB-<MODULE>.md` with recommendations for custom port or architectural rewrite.
+### 5. Downstream Handoff
+- **Receiving Agent**: `orchestrator` for wave calculation and dispatching to implementation agents (`custom-module`, `configuration`, `data-migration`).
+- **Handoff Format**: Updated `state/migration-manifest.yml` with clear contrib resolution paths and `reports/contrib/CONTRIB-STRATEGY-<DATE>.md`.
+- **Triggering Condition**: All discovered contrib modules evaluated against 8 criteria and documented in manifest.
+
+### 6. Blocker & Remediation Handling
+- **Blocker Classification**:
+  - `ARCHITECTURAL_DESIGN`: Abandoned/unported D7 contrib module with no core or community equivalent that is strictly required by custom code -> Target Remediation Stage: `orchestrator` / architectural decision (custom port vs feature retirement).
+  - `SOURCE_AMBIGUITY`: Ambiguous or modified D7 contrib module with unknown patches -> Target Remediation Stage: `discovery`.
+- **Blocker Registration**: Generates `reports/blocked/BLOCKED-CONTRIB-<MODULE>.md` and registers blocker in `state/migration-state.yml`.
+
+### 7. Evidence Requirements
+- Documented evaluation of all 8 assessment criteria per contrib module.
+- For D11 core-removed modules (e.g. `book`, `forum`, `action`), 7-step evaluation records.
+- Verification that zero packages were installed or modified via Composer (Rule 7 non-destructive compliance).
 
 ---
 

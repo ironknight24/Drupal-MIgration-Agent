@@ -1,88 +1,132 @@
 # ==============================================================================
-# DRUPAL MIGRATION AGENT FRAMEWORK — STATE TRACKER
+# DRUPAL MIGRATION AGENT FRAMEWORK — RUNTIME STATE TRACKER
 # ==============================================================================
 # Answers: "WHERE are we in the migration?"
 #
-# Tracks high-level lifecycle progress, active phase, completion timestamps,
-# statistics, and active system blockers. This file is inspectable and resumable.
+# Primary single source of truth for runtime lifecycle progress, active wave,
+# component statuses, health monitoring, blockers, and orchestrator action queues.
 # ==============================================================================
 
 version: "1.0"
-last_updated: "2026-09-18T19:00:00Z"
-current_phase: "phase_0_framework_init"
-status: "initialized" # initialized | in_progress | paused | completed | blocked
+last_updated: "2026-09-18T22:30:00Z"
+lifecycle_phase: "INITIALIZED" # INITIALIZED | DISCOVERY | DEPENDENCY_ANALYSIS | MIGRATION_PLANNING | WAVE_EXECUTION | TESTING | BEHAVIORAL_VALIDATION | FINAL_AUDIT | COMPLETED
+current_wave: null # wave_0, wave_1, ... wave_N (dynamically calculated)
+execution_health: "HEALTHY" # HEALTHY | DEGRADED | BLOCKED
 global_block: false
 
-# Phase Progress State
+# ------------------------------------------------------------------------------
+# 1. Lifecycle Phase Tracking
+# ------------------------------------------------------------------------------
 phases:
-  phase_0_framework_init:
-    name: "Framework Initialization"
+  INITIALIZED:
+    name: "Framework Initialization & Specification"
     status: "completed"
     started_at: "2026-09-18T19:00:00Z"
-    completed_at: "2026-09-18T19:00:00Z"
-    notes: "Step 0 complete: Factory specifications, protocols, and templates created."
+    completed_at: "2026-09-18T22:30:00Z"
+    notes: "Step 0-3 complete: Specifications, skills, references, and orchestration contracts formalized."
 
-  phase_1_discovery:
+  DISCOVERY:
     name: "Project Discovery & Baseline Audit"
     status: "not_started"
     started_at: null
     completed_at: null
-    notes: "Pending Step 1 initiation."
 
-  phase_2_dependencies:
-    name: "Dependency Analysis & Dynamic Sequencing"
+  DEPENDENCY_ANALYSIS:
+    name: "Dependency Analysis & Dynamic Wave Scheduling"
     status: "not_started"
     started_at: null
     completed_at: null
 
-  phase_3_contrib_strategy:
-    name: "Contributed Module Strategy"
+  MIGRATION_PLANNING:
+    name: "Component Migration Planning"
     status: "not_started"
     started_at: null
     completed_at: null
 
-  phase_4_planning:
-    name: "Dynamic Migration Planning"
+  WAVE_EXECUTION:
+    name: "Dynamic Wave Modernization & Code Implementation"
     status: "not_started"
     started_at: null
     completed_at: null
 
-  phase_5_execution:
-    name: "Modernization & Code Implementation"
+  TESTING:
+    name: "Automated Quality Assurance & Static Analysis"
     status: "not_started"
     started_at: null
     completed_at: null
 
-  phase_6_testing:
-    name: "Automated Testing & Static Analysis"
+  BEHAVIORAL_VALIDATION:
+    name: "12-Dimensional Comparative Behavioral Validation"
     status: "not_started"
     started_at: null
     completed_at: null
 
-  phase_7_validation:
-    name: "Comparative Behavioral Validation"
+  FINAL_AUDIT:
+    name: "Final Migration Audit & Acceptance Gates"
     status: "not_started"
     started_at: null
     completed_at: null
 
-  phase_8_final_audit:
-    name: "Final Migration Audit & Sign-off"
+  COMPLETED:
+    name: "Migration Sign-off & Delivery"
     status: "not_started"
     started_at: null
     completed_at: null
 
-# Aggregate Component Progress
+# ------------------------------------------------------------------------------
+# 2. Dynamic Wave Progress
+# ------------------------------------------------------------------------------
+# Populated dynamically by Dependency & Orchestrator agents:
+# wave_0: { status: "not_started", total: 0, completed: 0, blocked: 0 }
+waves: {}
+
+# ------------------------------------------------------------------------------
+# 3. Component Runtime States (Single Source of Truth)
+# ------------------------------------------------------------------------------
+# Schema for each tracked component:
+# component_name:
+#   type: "custom_module" # custom_module | contrib_module | theme | configuration | data_migration | integration
+#   status: "NOT_STARTED" # NOT_STARTED | DISCOVERED | ANALYZED | READY | IN_PROGRESS | MIGRATED | TESTING | VALIDATING | VALIDATED | COMPLETE | COMPLETE_WITH_GAPS | BLOCKED | BLOCKED_UPSTREAM | FAILED | REMEDIATION | DEFERRED
+#   wave: null # assigned wave batch
+#   testing_status: "TEST_NOT_EXECUTED" # TEST_NOT_EXECUTED | TEST_PASSED | TEST_FAILED | TEST_NOT_APPLICABLE | TEST_UNAVAILABLE
+#   validation_status: "pending" # pending | PASS | PARTIAL | FAIL | BLOCKED | N/A
+#   blocker_ref: null
+#   evidence_refs: []
+component_states: {}
+
+# ------------------------------------------------------------------------------
+# 4. Aggregate Statistics
+# ------------------------------------------------------------------------------
 statistics:
   total_components: 0
-  completed: 0
+  complete: 0
+  complete_with_gaps: 0
   in_progress: 0
+  ready: 0
+  deferred: 0
   blocked: 0
-  pending: 0
+  blocked_upstream: 0
+  failed: 0
 
-# Active Blockers (Component or Global)
+# ------------------------------------------------------------------------------
+# 5. Active Blockers Registry
+# ------------------------------------------------------------------------------
 active_blockers: []
 # Schema:
-# - ticket_id: "BLOCKED-XXX-001"
+# - ticket_id: "BLOCKED-MOD-001"
 #   type: "COMPONENT" # COMPONENT | GLOBAL
+#   failure_type: "DEPENDENCY_BLOCKER" # DEPENDENCY_BLOCKER | SOURCE_AMBIGUITY | TARGET_API_GAP | IMPLEMENTATION_FAILURE | TEST_FAILURE | VALIDATION_FAILURE | ENVIRONMENT_FAILURE | EVIDENCE_GAP
 #   component: "module_name"
 #   created_at: "..."
+#   remediation_stage: "DEPENDENCY_ANALYSIS"
+
+# ------------------------------------------------------------------------------
+# 6. Action History & Queue
+# ------------------------------------------------------------------------------
+last_action:
+  timestamp: "2026-09-18T22:30:00Z"
+  agent: "orchestrator"
+  summary: "Factory Step 3: Formalized workflow orchestration and coordination contracts."
+next_action:
+  recommended_agent: "discovery"
+  command: "/discover"

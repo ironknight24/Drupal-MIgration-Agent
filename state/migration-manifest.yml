@@ -3,35 +3,33 @@
 # ==============================================================================
 # Answers: "WHAT exactly are we migrating?"
 #
-# This file tracks every component, module, theme, configuration entity,
-# custom database table, and data pipeline to be migrated.
-#
-# NOTE: This manifest schema is initialized during Step 0 and will be
-# fully populated by the Discovery Agent in Step 1.
+# Static inventory, dependency definitions, target version specifications,
+# and architectural scope metadata populated during Discovery & Dependency Analysis.
 # ==============================================================================
 
 version: "1.0"
-generated_at: null # Populated during Step 1 (Discovery)
+generated_at: null # Populated during Discovery
 source_system:
-  drupal_version: "7"
+  drupal_core_version: "7.x"
   php_version: ""
+  database_type: "mysql"
 target_system:
-  drupal_version: "10"
+  drupal_core_version: "10.x" # Or 11.x
   php_version: ""
+  composer_root: "./"
 
 # ------------------------------------------------------------------------------
 # 1. Custom Modules Inventory
 # ------------------------------------------------------------------------------
 # Schema for each custom module:
 # - name: "my_module"
-#   source_path: "drupal7/modules/custom/my_module"
-#   target_path: "drupal/web/modules/custom/my_module"
+#   source_path: "sites/all/modules/custom/my_module"
+#   target_path: "web/modules/custom/my_module"
 #   d7_entry_file: "my_module.module"
-#   dependencies: []
+#   declared_dependencies: [] # from .info
+#   implicit_dependencies: [] # hook alters, shared tables
+#   target_strategy: "OOP_REENGINEERING" # OOP_REENGINEERING | CUSTOM_ENTITY | EXTRACT_SERVICE
 #   requires_custom_schema: false
-#   status: "not_started" # not_started | analyzed | planned | in_progress | completed | blocked
-#   tests_passed: false
-#   validation_status: "pending" # pending | PASS | PARTIAL | FAIL | BLOCKED | N/A
 custom_modules: []
 
 # ------------------------------------------------------------------------------
@@ -40,11 +38,11 @@ custom_modules: []
 # Schema for each contrib module:
 # - name: "views"
 #   d7_version: "7.x-3.24"
-#   d10_status: "core_merged" # core_merged | d10_available | community_replacement | custom_needed | obsolete
+#   d10_evaluation: "CORE_MERGED" # CORE_MERGED | D10_AVAILABLE | D11_READY | COMMUNITY_REPLACEMENT | CUSTOM_REIMPLEMENTATION | OBSOLETE
+#   satisfaction_source: "target_core" # target_core | contrib_module | custom_module | none
 #   recommended_replacement: "drupal/core"
 #   requires_config_migration: true
 #   requires_data_migration: true
-#   status: "not_started"
 contrib_modules: []
 
 # ------------------------------------------------------------------------------
@@ -52,10 +50,10 @@ contrib_modules: []
 # ------------------------------------------------------------------------------
 # Schema for each theme:
 # - name: "my_theme"
-#   source_path: "drupal7/themes/my_theme"
-#   target_path: "drupal/web/themes/custom/my_theme"
-#   base_theme: "olivero"
-#   status: "not_started" # not_started | planned | in_progress | completed | blocked
+#   source_path: "sites/all/themes/my_theme"
+#   target_path: "web/themes/custom/my_theme"
+#   base_theme: "olivero" # olivero | claro | starterkit | false
+#   tier: 1 # 1: Direct | 2: Review | 3: Redesign
 themes: []
 
 # ------------------------------------------------------------------------------
@@ -64,7 +62,8 @@ themes: []
 # Schema for configuration items:
 # - type: "content_type" # content_type | taxonomy_vocabulary | field | view | image_style | role
 #   name: "article"
-#   status: "not_started"
+#   source_reference: "node_type"
+#   target_config_file: "node.type.article.yml"
 configuration: []
 
 # ------------------------------------------------------------------------------
@@ -75,9 +74,8 @@ configuration: []
 #   source_entity: "node:article"
 #   target_entity: "node:article"
 #   dependencies: ["d7_user", "d7_file"]
-#   source_count: null
-#   migrated_count: null
-#   status: "not_started" # not_started | in_progress | completed | blocked
+#   source_table: "node"
+#   target_storage: "node"
 data_migrations: []
 
 # ------------------------------------------------------------------------------
@@ -86,6 +84,6 @@ data_migrations: []
 # Schema for integration endpoints:
 # - name: "payment_gateway"
 #   type: "rest" # rest | soap | webhook | auth | external_db
+#   source_reference: "my_module_payment_call"
 #   target_service: "my_module.payment_client"
-#   status: "not_started"
 integrations: []

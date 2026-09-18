@@ -13,35 +13,50 @@ model: inherit
 
 ---
 
-## 2. Handoff Contract
+## 2. Standardized Handoff Contract
 
-### Preconditions
+### 1. Preconditions
 - Third-party integration points identified during Discovery in `state/migration-manifest.yml`.
-- Target custom module scaffold exists.
+- Target custom module scaffold exists (`custom-module` has initialized container).
 - Target path verified and writable.
+- Framework is executing dynamic waves containing integration tasks.
+- `state/migration-state.yml` is accessible and unlocked.
 
-### Inputs
-- Source D7 integration code (cURL, `drupal_http_request()`, SOAP client, custom DB connections)
-- API endpoint specifications or documentation if available
-- `templates/migration-plan.md`
+### 2. Required Inputs
+- Source D7 integration code (cURL, `drupal_http_request()`, SOAP client, custom DB connections).
+- API endpoint specifications or documentation if available.
+- `templates/migration-plan.md` and `templates/file-change-log.md`.
+- `migration.config.yml`.
 
-### Outputs
-- Integration Modernization Plan: `reports/integrations/PLAN-INTEGRATION-<SYSTEM>.md`
-- Modernized integration services using Guzzle HTTP client or typed plugins in `target.path`
-- Security and credentials handling plan (referencing environment variables, never hardcoded secrets)
-- Implementation Report: `reports/integrations/REPORT-INTEGRATION-<SYSTEM>.md`
-- Manifest updates for integrations
+### 3. Expected Outputs
+- Integration Modernization Plan: `reports/integrations/PLAN-INTEGRATION-<SYSTEM>.md`.
+- Modernized integration services using injected Guzzle HTTP client or typed plugins in `target.path/web/modules/custom/<MODULE>/src/`.
+- Credential management architecture (referencing environment variables or Key module, never hardcoded secrets).
+- Implementation Report: `reports/integrations/REPORT-INTEGRATION-<SYSTEM>.md`.
+- File modification entries in `logs/file-change-log/`.
 
-### Postconditions
-- All HTTP calls utilize injected Guzzle `ClientInterface`.
-- All authentication secrets use environment variables or Key module integrations; zero hardcoded secrets.
-- Inbound webhooks use Symfony `Route` and `ControllerBase` with explicit request validation and CSRF protection.
-- Outbound calls include appropriate timeout handling, retries, and error logging.
-- Zero writes to `source.path`.
+### 4. State Updates
+- Transitions integration component states:
+  `READY` -> `PLANNED` -> `SCAFFOLDED` -> `IN_PROGRESS` -> `CODE_COMPLETE`.
+- If unsupported SOAP/RPC protocols or missing authentication specifications occur, registers `BLOCKED`.
+- Updates timestamp in `state/migration-state.yml`.
 
-### Failure & Blocked Conditions
-- Proprietary SOAP/RPC service with deprecated/unsupported WSDL library -> Raise `BLOCKED-INTEGRATION-SOAP-<SYSTEM>.md`.
-- Undocumented external authentication token mechanism -> Raise `BLOCKED-INTEGRATION-AUTH-<SYSTEM>.md`.
+### 5. Downstream Handoff
+- **Receiving Agent**: `testing` for integration mock testing and endpoint contract verification, followed by `validation` for live/mock communication verification.
+- **Handoff Format**: Modernized integration service classes, webhook controllers, queue workers, and integration reports.
+- **Triggering Condition**: Integration code complete, security/secret isolation verified, and recorded in change log.
+
+### 6. Blocker & Remediation Handling
+- **Blocker Classification**:
+  - `ARCHITECTURAL_DESIGN`: Legacy SOAP/RPC service requiring obsolete PHP extension or unsupported protocol -> Target Remediation Stage: `orchestrator` / architectural adapter design.
+  - `SOURCE_AMBIGUITY`: Undocumented external authentication token format or endpoint payload -> Target Remediation Stage: `discovery`.
+- **Blocker Registration**: Generates `reports/blocked/BLOCKED-INTEGRATION-<SYSTEM>.md` and registers blocker in `state/migration-state.yml`.
+
+### 7. Evidence Requirements
+- Integration modernization plan in `reports/integrations/PLAN-INTEGRATION-<SYSTEM>.md`.
+- Implementation report in `reports/integrations/REPORT-INTEGRATION-<SYSTEM>.md`.
+- Verification of zero hardcoded secrets (Rule 10 compliance).
+- Mock integration test proof and 100% change log tracking.
 
 ---
 

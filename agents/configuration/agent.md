@@ -13,20 +13,22 @@ model: inherit
 
 ---
 
-## 2. Handoff Contract
+## 2. Standardized Handoff Contract
 
-### Preconditions
+### 1. Preconditions
 - Baseline discovery completed (`state/migration-manifest.yml` has configuration elements registered).
 - Target path verified and sync directory exists or can be created in `target.path/config/sync/`.
-- Framework is in configuration migration phase.
+- Framework is in `phase_4_implementation` or executing dynamic wave containing configuration components.
+- `state/migration-state.yml` is accessible and unlocked.
 
-### Inputs
-- Source D7 variables (from DB dump or inspection)
-- Source D7 features / `hook_views_default_views` / `hook_node_info` / `hook_schema`
-- Target core configuration schemas
+### 2. Required Inputs
+- Source D7 variables (from DB dump or inspection).
+- Source D7 features / `hook_views_default_views` / `hook_node_info` / `hook_schema`.
+- Target core configuration schemas (`config/schema/*.schema.yml`).
+- `migration.config.yml`.
 
-### Outputs
-- Configuration migration plan: `reports/configuration/PLAN-CONFIG-<DATE>.md`
+### 3. Expected Outputs
+- Configuration migration plan: `reports/configuration/PLAN-CONFIG-<DATE>.md`.
 - Exported YAML configuration entities in `target.path/config/sync/`:
   - `system.site.yml`
   - `node.type.*.yml`
@@ -35,18 +37,32 @@ model: inherit
   - `image.style.*.yml`
   - `filter.format.*.yml`
   - `user.role.*.yml`
-- Implementation report: `reports/configuration/REPORT-CONFIG-<DATE>.md`
-- Manifest updates for configuration components
+- Implementation report: `reports/configuration/REPORT-CONFIG-<DATE>.md`.
+- File change log entries in `logs/file-change-log/`.
 
-### Postconditions
-- All exported configuration files are valid YAML and validate against Drupal configuration schema (`config/schema/*.schema.yml`).
-- No passwords, tokens, or private keys included in generated config files.
-- File changes recorded in `logs/file-change-log/`.
-- Zero writes to `source.path`.
+### 4. State Updates
+- Transitions configuration component states:
+  `READY` -> `PLANNED` -> `SCAFFOLDED` -> `IN_PROGRESS` -> `CODE_COMPLETE`.
+- If schema validation fails or field types are missing, registers `BLOCKED`.
+- Updates timestamp in `state/migration-state.yml`.
 
-### Failure & Blocked Conditions
-- Missing field type plugin in target environment -> Raise `BLOCKED-CONFIG-FIELD-<TYPE>.md`.
-- Unparseable legacy view with unsupported handler -> Raise `BLOCKED-CONFIG-VIEW-<NAME>.md`.
+### 5. Downstream Handoff
+- **Receiving Agent**: `testing` for schema validation (`kint`, `drush config:inspect`, YAML linting), followed by `data-migration` (which requires target field/bundle configs to exist).
+- **Handoff Format**: Valid YAML files in `target.path/config/sync/` and implementation report.
+- **Triggering Condition**: All required configuration entities generated, schema validated, and logged in change log.
+
+### 6. Blocker & Remediation Handling
+- **Blocker Classification**:
+  - `ARCHITECTURAL_DESIGN`: Missing field type plugin or entity bundle handler in target environment -> Target Remediation Stage: `custom-module` / `contrib-module`.
+  - `SOURCE_AMBIGUITY`: Unparseable legacy view or corrupted serialized variable -> Target Remediation Stage: `discovery`.
+- **Blocker Registration**: Generates `reports/blocked/BLOCKED-CONFIG-<COMPONENT>.md` and registers blocker in `state/migration-state.yml`.
+
+### 7. Evidence Requirements
+- Configuration migration plan in `reports/configuration/PLAN-CONFIG-<DATE>.md`.
+- Implementation report in `reports/configuration/REPORT-CONFIG-<DATE>.md`.
+- Schema compliance check results against core schemas.
+- Verification that zero secrets/tokens were included in exported YAML files (Rule 10 compliance).
+- 100% of files logged in `logs/file-change-log/` and zero writes to `source.path`.
 
 ---
 

@@ -2,100 +2,187 @@
 
 ## 1. Lifecycle Philosophy
 
-The migration from Drupal 7 to Drupal 10 follows a phased, state-driven lifecycle. While a canonical default ordering exists, the framework does **not** assume an immutable linear sequence. 
+The migration from Drupal 7 to Drupal 10/11 follows a state-driven, dynamic execution lifecycle. While canonical phase milestones exist, the framework does **not** assume an immutable linear sequence.
 
-Real-world Drupal codebases have complex, interconnected dependency structures. Therefore, the **Orchestrator** relies on the **Dependency Agent** to dynamically sequence, parallelize, and isolate components.
-
----
-
-## 2. Canonical Phases Overview
-
-| Phase | Identifier | Managing Agent | Primary Deliverable |
-|---|---|---|---|
-| **0** | `framework_init` | Setup (Step 0) | Factory specifications, configuration, templates, state |
-| **1** | `discovery` | Discovery Agent | `reports/discovery/`, populated `migration-manifest.yml` |
-| **2** | `dependencies` | Dependency Agent | `reports/dependencies/`, dependency DAG, execution sequence |
-| **3** | `contrib_strategy`| Contrib Module Agent | `reports/contrib/`, module replacement recommendations |
-| **4** | `planning` | Custom Module/Theme | Per-component migration plans in `reports/*/` |
-| **5** | `execution` | Specialized Agents | Migrated D10 code in `target.path`, file change logs |
-| **6** | `testing` | Testing Agent | `reports/testing/`, PHPUnit/PHPStan/PHPCS outputs |
-| **7** | `validation` | Validation Agent | `reports/validation/`, D7 vs D10 behavioral matrices |
-| **8** | `final_audit` | Final Audit Agent | `reports/final/final-audit-report.md`, sign-off |
+Real-world Drupal codebases have complex, interdependent architectures. Therefore, the **Orchestrator** evaluates the **Dependency Graph (DAG)** at runtime to dynamically calculate execution waves, manage parallel execution, serialize shared file modifications, and isolate blocked components.
 
 ---
 
-## 3. Dynamic Dependency-Aware Execution Engine
+## 2. Canonical Lifecycle Phases
 
-```mermaid
-graph TD
-    Phase0[Phase 0: Framework Initialization] --> Phase1[Phase 1: Project Discovery]
-    Phase1 --> Phase2[Phase 2: Dependency Analysis & DAG]
-    Phase2 --> Phase3[Phase 3: Contrib Strategy]
-    Phase3 --> Phase4[Phase 4: Component Migration Planning]
-    
-    Phase4 --> DynEngine[Dynamic Execution Dispatcher]
-    
-    subgraph DynEngine[Topological Sort & Dependency Execution]
-        direction TB
-        Fnd[Foundation: Core Config, Base Services, Shared APIs]
-        Leaf[Independent Custom Modules: Zero unresolved dependencies]
-        Branch[Dependent Custom Modules: Upstream dependencies fulfilled]
-        Data[Data Migration: Schemas & Entities ready]
-        Theme[Custom Themes: Core components & templates available]
-        
-        Fnd --> Leaf
-        Leaf --> Branch
-        Branch --> Data
-        Data --> Theme
-    end
-    
-    DynEngine --> Phase5[Phase 6: Automated Testing]
-    Phase5 --> Phase6[Phase 7: Behavioral Validation]
-    Phase6 --> Phase7[Phase 8: Final Audit & Sign-off]
+```text
+INITIALIZED
+    ↓
+DISCOVERY
+    ↓
+DEPENDENCY_ANALYSIS
+    ↓
+MIGRATION_PLANNING
+    ↓
+WAVE_EXECUTION (Dynamic Batches: wave_0, wave_1, ... wave_N)
+    ↓
+TESTING (Component-Appropriate QA)
+    ↓
+BEHAVIORAL_VALIDATION (12-Point Comparative Parity)
+    ↓
+FINAL_AUDIT (8 Acceptance Gates)
+    ↓
+COMPLETED
 ```
 
-### Dynamic Sequencing Rules
+### Phase Definitions & Ownership
 
-1. **Topological Ordering**: Custom modules are analyzed as a directed graph. Independent leaf modules (modules with no custom dependencies) migrate first. Dependent modules follow only after their dependencies are validated.
-2. **Dependency Overrides**:
-   - If a custom module defines an entity type required by a data migration, that module's code migration is promoted *ahead* of the data migration phase.
-   - If a configuration import requires a contrib replacement module, the contrib module must be downloaded and enabled in D10 *before* the configuration agent imports that config.
-3. **Parallelism Boundaries**:
-   - **Allowed in Parallel**: Distinct custom modules that share no mutual dependencies; static theme asset conversion; documentation generation.
-   - **Strictly Sequential**:
-     - Schema definition (`hook_schema` -> Entity/Table) *before* data migration.
-     - Module implementation *before* module unit/kernel testing.
-     - Testing execution *before* behavioral validation.
-     - Final audit *only after* all components reach terminal status (`completed` or `blocked`).
-4. **Upstream Block Propagation**:
-   - When Module A fails and is marked `status: blocked`, any Module B depending on Module A is automatically marked `status: blocked_upstream`.
-   - Independent Module C continues execution without interruption.
+| Phase Identifier | Managing Agent | Core Deliverable & Artifact |
+|:---|:---|:---|
+| `INITIALIZED` | Setup | Master configuration, directory structure, initialized state. |
+| `DISCOVERY` | `discovery` | `reports/discovery/`, populated `migration-manifest.yml`. |
+| `DEPENDENCY_ANALYSIS` | `dependency` | `reports/dependencies/`, dependency DAG, wave calculations. |
+| `MIGRATION_PLANNING` | `custom-module` / Specialist | Per-component migration plans in `reports/*/PLAN-*.md`. |
+| `WAVE_EXECUTION` | Specialist Agents | Modernized code in `target.path`, entries in `logs/file-change-log/`. |
+| `TESTING` | `testing` | `reports/testing/`, verified test outputs and sniffs. |
+| `BEHAVIORAL_VALIDATION` | `validation` | `reports/validation/`, 12-dimensional validation matrices. |
+| `FINAL_AUDIT` | `final-audit` | `reports/final/FINAL-AUDIT-REPORT-<DATE>.md`, gap analysis, sign-off. |
+| `COMPLETED` | `orchestrator` | Final migration summary and handoff documentation. |
 
 ---
 
-## 4. Resumption & Re-entrancy Protocol
+## 3. Canonical Component Status Model
 
-The framework is strictly **resumable**. If execution stops due to human intervention, a system reboot, or a blocked task, agents do not start over from scratch.
+A standardized 15-state status vocabulary governs individual component lifecycles in `state/migration-state.yml`:
 
-### Resumption Algorithm
+```text
+                      NOT_STARTED
+                           │  (Discovery Agent)
+                           ▼
+                       DISCOVERED
+                           │  (Dependency Agent)
+                           ▼
+                        ANALYZED
+                           │  (Orchestrator Wave Scheduler)
+               ┌───────────┴───────────┐
+               ▼                       ▼
+             READY                  DEFERRED
+          (Deps met)              (Deps pending)
+               │                       ▲
+               ▼                       │
+          IN_PROGRESS ◄────────────────┼──────── (Dependencies unblocked)
+          (Specialist)                 │
+               │                       │
+               ├───────────────────────┴────────► BLOCKED_UPSTREAM
+               │                                   (Upstream blocked)
+               ▼
+            MIGRATED ◄──────────────────────────┐
+               │                                │
+               ▼                                │
+            TESTING ◄───────────────────┐       │
+               │                        │       │
+               ▼                        │       │
+           VALIDATING                   │       │
+               │                        │       │
+      ┌────────┴────────┐               │       │
+      ▼                 ▼               │       │
+  VALIDATED          FAILED             │       │
+      │                 │               │       │
+      │                 └─────────► REMEDIATION ┤ (Stage-Aware Re-entry)
+      ▼                                 ▲       │
+   COMPLETE                             │       │
+      or                                │       │
+COMPLETE_WITH_GAPS                      │       │
+                                        │       │
+   BLOCKED ─────────────────────────────┘       │
+(Direct failure)                                │
+                                                │
+   BLOCKED_UPSTREAM ────────────────────────────┘ (Upstream remediated)
+```
 
-When the Orchestrator initiates:
-1. Inspect `state/migration-state.yml`:
-   - Check `global_block`. If `true`, abort immediately and point to `reports/blocked/BLOCKED-000-GLOBAL.md`.
-   - Determine `current_phase`.
-2. Inspect `state/migration-manifest.yml`:
-   - Identify all components with status `in_progress`. Revert their transient state, check file change logs, and restart the specific component plan.
-   - Identify components with status `not_started`.
-   - Skip all components with status `completed`.
-   - Skip components with status `blocked` unless explicitly instructed to retry.
-3. Resume execution at the earliest incomplete phase based on the dependency DAG.
+### Component-Aware State Applicability
+- **Custom Modules**: Utilize full lifecycle (`NOT_STARTED` -> `DISCOVERED` -> `ANALYZED` -> `READY` -> `IN_PROGRESS` -> `MIGRATED` -> `TESTING` -> `VALIDATING` -> `VALIDATED` -> `COMPLETE`).
+- **Contrib Modules**: Utilize evaluation lifecycle (`NOT_STARTED` -> `DISCOVERED` -> `ANALYZED` -> `COMPLETE` / `DEFERRED` / `BLOCKED`).
+- **Configuration**: Utilize export lifecycle (`NOT_STARTED` -> `DISCOVERED` -> `READY` -> `IN_PROGRESS` -> `MIGRATED` -> `VALIDATING` -> `VALIDATED` -> `COMPLETE`).
+- **Data Migrations**: Utilize pipeline lifecycle (`NOT_STARTED` -> `DISCOVERED` -> `ANALYZED` -> `READY` -> `IN_PROGRESS` -> `MIGRATED` -> `VALIDATING` -> `VALIDATED` -> `COMPLETE`).
+- **Themes**: Utilize presentation lifecycle (`NOT_STARTED` -> `DISCOVERED` -> `ANALYZED` -> `READY` -> `IN_PROGRESS` -> `MIGRATED` -> `VALIDATING` -> `VALIDATED` -> `COMPLETE`).
 
 ---
 
-## 5. Phase Transition Criteria
+## 4. Dynamic Dependency-Aware Wave Execution
 
-An agent may only advance the phase in `state/migration-state.yml` when all of the following criteria are satisfied:
-- All target deliverables for the phase exist in `reports/` and match their respective schemas.
-- No components remain in `in_progress` status.
-- Any blocked items have corresponding `reports/blocked/BLOCKED-XXX.md` tickets.
-- Phase postconditions defined in `AGENT_PROTOCOL.md` evaluate to `TRUE`.
+Waves are **dynamic execution batches** calculated at runtime from the dependency DAG, readiness state, component constraints, and ordering rules. Wave numbers (`wave_0`, `wave_1`, ... `wave_N`) represent topological tiers, NOT hardcoded global categories.
+
+### Upstream Dependency Satisfaction
+A component's upstream dependency requirement is satisfied if:
+1. The dependency is a custom component whose runtime status is `COMPLETE` or `VALIDATED`.
+2. The dependency is satisfied natively by the target Drupal core version (`satisfaction_source: target_core`).
+3. The dependency is satisfied by an approved, compatible contributed module (`satisfaction_source: contrib_module`).
+4. The dependency is satisfied by an explicitly documented alternative implementation.
+
+### Dynamic Wave Dispatching Algorithm
+1. The Orchestrator queries `state/migration-state.yml` and the manifest dependency graph.
+2. In-degrees are calculated based on unfulfilled dependencies.
+3. Components with 0 unfulfilled dependencies transition to `READY` and are batched into `wave_{N}`.
+4. Specialists execute the wave. When complete:
+   - Orchestrator updates resolved dependencies.
+   - Newly eligible components transition from `DEFERRED` to `READY` and form `wave_{N+1}`.
+5. If a component transitions to `BLOCKED`:
+   - Orchestrator traverses the downstream DAG.
+   - All transitive dependents transition to `BLOCKED_UPSTREAM`.
+   - Independent components continue execution uninterrupted.
+
+---
+
+## 5. Parallelism & Concurrency Serialization Gates
+
+### Safe Parallel Work (Concurrently Executable)
+- Independent components in the same dynamic wave with strictly disjoint target file sets and zero shared configuration keys.
+- Contrib module evaluation alongside custom module discovery.
+- Static theme asset conversion alongside independent custom module migrations.
+
+### Mandatory Serialization Rules
+Parallel execution is strictly **PROHIBITED** and must be serialized whenever agents may concurrently modify:
+1. **Shared Files**: Modifying the same `.services.yml`, `.routing.yml`, `.permissions.yml`, or `.module` file.
+2. **Shared Configuration**: Modifying identical CMI configuration objects (e.g. `system.site.yml` or shared field storage).
+3. **Database Schemas & Data Pipelines**: Running entity schema generation and Migration API pipeline execution concurrently.
+4. **Shared State Records**: Concurrently mutating global `migration-state.yml` without an atomic merge lock.
+
+---
+
+## 6. Idempotency & Safe Resumption Protocol
+
+The framework is strictly **idempotent and resumable**. When an interrupted migration resumes:
+1. **State Audit**: Orchestrator reads `state/migration-state.yml` and verifies `global_block == false`.
+2. **Evidence Reconciliation**:
+   - Components marked `COMPLETE` or `VALIDATED` are checked for backing evidence artifacts. If evidence exists, they are skipped. If evidence is missing, they are flagged as `EVIDENCE_GAP` and scheduled for revalidation.
+   - Components marked `IN_PROGRESS` are inspected against `logs/file-change-log/`. Transient files are assessed, and the component plan is cleanly restarted.
+   - Components marked `BLOCKED` or `BLOCKED_UPSTREAM` remain paused unless explicit remediation is recorded.
+3. **Wave Recalculation**: Orchestrator recalculates dependency readiness from the current evidence baseline and schedules eligible `READY` components into the next dynamic wave.
+
+---
+
+## 7. The 8 Final Acceptance Audit Gates & Outcome Model
+
+### Final Audit Readiness Condition
+The Final Audit Agent executes when **no components remain actively executing**:
+```text
+Zero components remain in:
+- NOT_STARTED
+- READY
+- IN_PROGRESS
+- TESTING
+- VALIDATING
+```
+Remaining components may include `COMPLETE`, `COMPLETE_WITH_GAPS`, `BLOCKED`, `BLOCKED_UPSTREAM`, `DEFERRED`, or `FAILED`.
+
+### The 8 Acceptance Gates
+1. **Gate 1 (Discovery & Scope Integrity)**: 100% of discovered D7 assets registered in manifest.
+2. **Gate 2 (DAG & Wave Integrity)**: Topological order respected; all dependency requirements satisfied.
+3. **Gate 3 (Implementation Accounting)**: Zero components remain in transient or undefined states.
+4. **Gate 4 (Component-Appropriate Testing Evidence)**: All completed components possess an applicable and sufficient testing strategy with results recorded.
+5. **Gate 5 (Behavioral Parity & Validation)**: 12-dimensional validation matrices generated with empirical evidence.
+6. **Gate 6 (Blocker & Exception Accounting)**: All blocked items documented in `reports/blocked/` and consolidated into a post-migration backlog.
+7. **Gate 7 (Evidence Sufficiency & Anti-Hallucination)**: Zero unearned `PASS` claims or synthetic passes; all claims backed by observed facts or verified results.
+8. **Gate 8 (Audit Log & Boundary Completeness)**: Every modified target file registered in `logs/file-change-log/`; zero writes to D7 source path.
+
+### Final Migration Outcomes
+- **`COMPLETE`**: 100% of components reached `COMPLETE`; all 8 gates satisfied with high evidence confidence (`VERIFIED`).
+- **`COMPLETE_WITH_GAPS`**: Core migration succeeded; non-blocking gaps approved and documented (`PARTIALLY_VERIFIED`).
+- **`BLOCKED`**: Critical blocking failure unresolved; actionable blocker report produced.
+- **`INCOMPLETE`**: Migration halted prematurely or required deliverables missing.
