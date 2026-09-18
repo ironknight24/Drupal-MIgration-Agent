@@ -323,10 +323,60 @@ Exhaustively capture and verify default values:
 - **Update Hook Transformations**: Trace `hook_update_N()` variable renames, value migrations, structural splits/merges, and schema updates $\rightarrow$ modern `hook_post_update_NAME()` or `hook_update_N()`.
 - **Uninstall Cleanup**: Trace `hook_uninstall()` `variable_del()` calls $\rightarrow$ modern CMI automatic config deletion or State API cleanup in `hook_uninstall()`.
 
+### 28. Exhaustive Entity & Field Discovery
+Discover all core, contrib, and custom entity types, bundles, properties, and field implementations across `*.module`, `*.inc`, `*.php`, `*.install`, `*.profile`, and `.info` files:
+- **Core Entity Types**: `node`, `user`, `taxonomy_term`, `taxonomy_vocabulary`, `comment`, `file`.
+- **Contrib & Custom Entity Systems**: Entity API implementations (`hook_entity_info()`, `entity_get_info()`), custom entity controllers extending `DrupalDefaultEntityController` or `EntityAPIController`, custom entity tables, entity metadata wrappers (`entity_metadata_wrapper()`), and entity properties (`hook_entity_property_info()`).
+- **Entity Metadata & Keys Extraction**: For every entity type, capture `entity_type`, `bundle`, `label`, `base_table`, `data_table`, `revision_table`, `translation_table`, `controller_class`, `access_callback`, `entity_keys` (`id`, `revision`, `bundle`, `label`, `language`, `uuid`, `status`), fieldability, ownership, and revision support.
+- **Content vs Config Entity Classification**: Determine whether discovered entities classify as a `content_entity` (storing transactional, revisionable, user-generated business data) or a `config_entity` (storing administrative settings, reusable schemas, mappings, exportable configurations, or workflows).
+
+### 29. D7 Entity API & EntityFieldQuery Pattern Discovery
+Trace all procedural and object-oriented entity interactions:
+- **Entity CRUD APIs**: `entity_load()`, `entity_load_multiple()`, `entity_save()`, `entity_delete()`, `entity_extract_ids()`, `entity_id()`, `entity_uri()`, `entity_get_info()`, `entity_view()`, `entity_access()`.
+- **Subsystem APIs**: Node APIs (`node_load`, `node_save`, `node_view`), user APIs (`user_load`, `user_save`), taxonomy APIs (`taxonomy_term_load`, `taxonomy_vocabulary_machine_name_load`), file APIs (`file_load`, `file_save`), comment APIs (`comment_load`, `comment_save`).
+- **EntityFieldQuery (EFQ)**: Detect `new EntityFieldQuery()`, `entityCondition()`, `propertyCondition()`, `fieldCondition()`, `fieldOrderBy()`, `propertyOrderBy()`, `range()`, and `execute()` call patterns across custom code.
+
+### 30. Field & Field Storage Taxonomy
+Exhaustively discover and classify all Drupal 7 fields across `field_info_field()`, `field_info_instance()`, `field_info_fields()`, `field_info_instances()`, `field_create_field()`, `field_create_instance()`, `field_update_field()`, `field_update_instance()`, `field_delete_field()`, `field_delete_instance()`, `field_attach_load()`, `field_attach_presave()`, `field_attach_insert()`, `field_attach_update()`, `field_attach_delete()`, `field_get_items()`, `field_view_field()`, `field_form_field()`, and `.install` schema declarations:
+- **Field Attributes & Storage**: Field name, entity type, bundle, field type, cardinality (single: 1, unlimited: -1, specific: N), required status, translatability, revisionability, storage backend (`SQL_DEFAULT`, `CUSTOM_TABLE`, `COMPUTED`), storage table, schema, indexes, language columns, delta columns, entity id relationship, revision relationship, bundle relationship, formatters, widgets, validation constraints, default values, and allowed values.
+- **Generic Field Taxonomy**: Text (`text`, `long text`, `text_long`, `text_with_summary`), Numeric (`number_integer`, `integer`, `decimal`, `float`, `number_decimal`, `number_float`), Boolean (`list_boolean`, `boolean`), Date/Time (`date`, `datetime`, `datestamp`), Options/List (`list`, `list_text`, `list_integer`), References (`taxonomy reference`, `taxonomy_term_reference`, `entity reference`, `entityreference`, `user reference`, `user_reference`, `node_reference`), Media (`file`, `image`), Links (`link`), Addresses (`addressfield`), and custom/contrib field types.
+
+### 31. Entity References & Relationship Topologies
+Discover and map cross-entity relationship graphs:
+- **Reference Types**: `entityreference`, `taxonomy_term_reference`, `user_reference`, `node_reference`, `taxonomy reference`, `user reference`, `file_usage`, and custom foreign key joins.
+- **Relationship Metadata**: Source entity, source field, target entity type, target bundle, cardinality, dependency direction, cascade delete behavior, orphan cleanup, and reference validation constraints.
+
+### 32. Revision Discovery & Historical Semantics
+Identify entity revisioning mechanisms:
+- **Revision Artifacts & Mechanics**: Revision tables (`{node_revision}`, `{custom_entity_revision}`), revision IDs (`vid`, `revision_id`), revision log fields, timestamps, revision authors (`uid`), revision flags, revision callbacks, revision loading, revision comparison, revision publishing, and `default_revision` flags.
+- **Revision APIs & Operations**: `node_revision_delete()`, `entity_revision_load()`, custom revision compare routines, and revision publishing logic. Determine whether full revision history is business-critical for migration or if latest active revision suffices (`HUMAN_DECISION_REQUIRED`).
+
+### 33. Translation, Language & Multilingual Semantics
+Exhaustively analyze multilingual entity behavior:
+- **Language Identifiers**: `$language`, `$language_content`, `LANGUAGE_NONE` (`'und'`), field-level language keys (`$entity->field_name[LANGUAGE_NONE]`), and language negotiation assumptions.
+- **Entity & Content Translation**: Entity Translation (`entity_translation` module, `entity translations`), Content Translation (`translation` module, `node translations`), translation tables, translatable field columns, and language-specific default values.
+
+### 34. Entity Lifecycle, Access & Security Analysis
+- **Lifecycle Tracing**: `create -> load -> presave -> insert/update -> postsave -> delete -> revision -> translation`. Trace all side effects, database writes, configuration changes, external API calls, cache invalidation, and queues.
+- **Entity Access Control**: `entity_access()`, `node_access()`, `hook_node_access()`, `hook_entity_access()`, custom access callbacks, permission grants (`hook_node_grants`, `hook_node_access_records`), field-level access (`hook_field_access`), and bundle restrictions. Ambiguous security logic must be flagged as `HUMAN_DECISION_REQUIRED`.
+
+### 35. Entity Query & Storage Modernization
+- **Modern Query Mapping**: Map `EntityFieldQuery` and direct entity SQL queries to modern `EntityQuery` (`\Drupal::entityQuery()`) or injected `EntityTypeManagerInterface` / `EntityStorageInterface` query methods.
+- **Storage Handlers**: Map custom entity controllers and storage mechanisms to modern `SqlContentEntityStorage` or custom storage handlers extending `ContentEntityStorageBase`.
+
+### 36. Entity Rendering, Formatters, Widgets & Display Modes
+- **Display Configurations**: Identify `entity_view()`, `field_view_field()`, custom field formatters (`hook_field_formatter_info`), custom field widgets (`hook_field_widget_info`), view modes, and form modes $\rightarrow$ modern `EntityViewBuilder`, Plugin formatters (`@FieldFormatter`), Plugin widgets (`@FieldWidget`), and View Mode configuration entities.
+
+### 37. Target Architecture Taxonomy & Migration Strategies
+- **Target Architecture Classifications**: `CONTENT_ENTITY`, `CONFIG_ENTITY`, `ENTITY_TYPE`, `BUNDLE`, `ENTITY_STORAGE`, `ENTITY_ACCESS_HANDLER`, `ENTITY_QUERY`, `FIELD_STORAGE`, `FIELD_CONFIG`, `FIELD_TYPE`, `FIELD_WIDGET`, `FIELD_FORMATTER`, `ENTITY_REFERENCE`, `REVISIONABLE_ENTITY`, `TRANSLATABLE_ENTITY`, `TRANSLATION_HANDLER`, `PLUGIN`, `SERVICE`, `REPOSITORY`, `CUSTOM_STORAGE`, `CONFIGURATION`, `STATE`, `EXTERNAL_SYSTEM`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Standardized Migration Strategies**: `DIRECT_ENTITY_MIGRATION`, `TRANSFORMED_ENTITY_MIGRATION`, `ENTITY_TYPE_REBUILD`, `BUNDLE_REBUILD`, `FIELD_REBUILD`, `FIELD_TRANSFORMATION`, `REFERENCE_REMAP`, `REVISION_MIGRATION`, `TRANSLATION_MIGRATION`, `CONFIG_ENTITY_MIGRATION`, `CUSTOM_STORAGE_MIGRATION`, `CONTENT_MIGRATION`, `REPLACED`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Approved Terminal Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Forbidden Terminal States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`.
+
 ---
 
 ## Output Reporting Standard
 All discovery outputs must:
-1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, and line numbers (`[OBSERVED FACT]`).
-2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, and `configuration_state_items` in `state/migration-manifest.yml`.
-3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.
+1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, and line numbers (`[OBSERVED FACT]`).
+2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, and `entities_fields_items` in `state/migration-manifest.yml`.
+3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.

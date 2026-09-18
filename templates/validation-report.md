@@ -25,6 +25,10 @@ evidence_summary:
 - **Legacy .inc Files Accounted For**: {{ INC_ACCOUNTED_COUNT }} / {{ INC_TOTAL_COUNT }}
 - **Custom Database Tables Accounted For**: {{ TABLES_ACCOUNTED_COUNT }} / {{ TABLES_TOTAL_COUNT }}
 - **Configuration & State Items Accounted For**: {{ CONFIG_ACCOUNTED_COUNT }} / {{ CONFIG_TOTAL_COUNT }}
+- **Custom Entity Types Accounted For**: {{ ENTITIES_ACCOUNTED_COUNT }} / {{ ENTITIES_TOTAL_COUNT }}
+- **Fields & Instances Accounted For**: {{ FIELDS_ACCOUNTED_COUNT }} / {{ FIELDS_TOTAL_COUNT }}
+- **Revision Tables Accounted For**: {{ REVISIONS_ACCOUNTED_COUNT }} / {{ REVISIONS_TOTAL_COUNT }}
+- **Translation Artifacts Accounted For**: {{ TRANSLATIONS_ACCOUNTED_COUNT }} / {{ TRANSLATIONS_TOTAL_COUNT }}
 
 ---
 
@@ -47,11 +51,14 @@ evidence_summary:
 
 ---
 
-## 3. Custom Class, Hook, Database & Configuration Outcome Verification
+## 3. Custom Class, Hook, Database, Entity & Configuration Outcome Verification
 
-| D7 Source File / Schema / Key | Class / Hook / Table / Variable | Legacy Dependencies / Fallback | D10 Target Implementation | Final Outcome Status | Verification Evidence / Reason |
+| D7 Source File / Schema / Key / Entity | Class / Hook / Table / Variable / Field | Legacy Dependencies / Fallback | D10 Target Implementation | Final Outcome Status | Verification Evidence / Reason |
 |---|---|---|---|---|---|
 | `lib/ExampleProcessor.php` | `class ExampleProcessor` | `ExampleProcessor($db)` | `src/Service/ExampleProcessor.php` | `MIGRATED` | Service construction & Unit test passed |
+| `{{ COMPONENT }}.module:hook_entity_info` | `entity: {{ COMPONENT }}_record` | `hook_entity_info` | `src/Entity/RecordEntity.php` | `MIGRATED` | Entity CRUD & access control test passed |
+| `{{ COMPONENT }}.install:hook_schema` | `table: {{ COMPONENT }}_record_revision` | `revision table` | `src/Entity/RecordEntity.php` (`revision_table`) | `MIGRATED` | Revision creation & history loading verified |
+| `{{ COMPONENT }}.module:hook_field_info` | `field: field_related_item` | `entityreference` | `field.storage.record.field_related_item` | `MIGRATED` | Reference integrity & lookup verified |
 | `{{ COMPONENT }}.install` | `table: {{ COMPONENT }}_records` | `hook_schema: record_id, uid` | `src/Entity/RecordEntity.php` | `MIGRATED` | Entity CRUD & migration test verified |
 | `includes/admin.inc:24` | `variable: {{ COMPONENT }}_endpoint` | `https://api.example.com` | `config/install/{{ COMPONENT }}.settings.yml` | `MIGRATED` | Schema test & ConfigForm submit verified |
 | `{{ COMPONENT }}.module:110` | `variable: {{ COMPONENT }}_last_sync` | `0` (int) | `State API` (`{{ COMPONENT }}.last_sync`) | `MIGRATED` | State persistence kernel test passed |

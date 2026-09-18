@@ -22,6 +22,8 @@ evidence_summary:
 - **Discovered Custom Classes**: [OBSERVED FACT]
 - **Constructors & Initializers**: [OBSERVED FACT]
 - **Discovered Custom Database Tables & Schemas**: [OBSERVED FACT] (`hook_schema`, columns, primary keys, foreign keys)
+- **Discovered Custom Entities & Bundles**: [OBSERVED FACT] (`hook_entity_info`, entity keys, revisions, translations)
+- **Discovered Fields & Instances**: [OBSERVED FACT] (`hook_field_info`, `hook_field_instance_info`, widgets, formatters)
 - **Hooks & Endpoints**: [OBSERVED FACT]
 - **Business Logic Rules**: [OBSERVED FACT]
 - **Autoloading / Include Tree**: [OBSERVED FACT]
@@ -30,24 +32,32 @@ evidence_summary:
 
 ## 2. Target Drupal 10 Architecture (D11-Ready)
 - **Target Namespace**: `Drupal\{{ COMPONENT }}`
+- **Custom Entity & Bundle Architecture**:
+  - Content Entity: `Drupal\{{ COMPONENT }}\Entity\RecordEntity` (`@ContentEntityType`, implements `RecordEntityInterface`, `RevisionableInterface`, `TranslatableInterface`)
+  - Config Entity: `Drupal\{{ COMPONENT }}\Entity\RecordType` (`@ConfigEntityType`)
+  - Entity Access Handler: `Drupal\{{ COMPONENT }}\Access\RecordEntityAccessControlHandler`
+  - Entity View Builder: `Drupal\{{ COMPONENT }}\Entity\RecordEntityViewBuilder`
+  - Entity Storage Handler: `Drupal\{{ COMPONENT }}\Storage\RecordEntityStorage`
 - **Services & Constructor Dependency Injection**:
   - `Drupal\{{ COMPONENT }}\Service\BusinessService` (injected with `Connection`, `EntityTypeManagerInterface`)
 - **Database & Repository Architecture**:
-  - Content Entity: `Drupal\{{ COMPONENT }}\Entity\RecordEntity`
   - Repository Service: `Drupal\{{ COMPONENT }}\Repository\RecordRepository` (injected with `Connection`)
 - **Routing & Controllers**:
   - Route name: `{{ COMPONENT }}.main` -> `Drupal\{{ COMPONENT }}\Controller\MainController::index`
 - **Plugins / Event Subscribers**:
-- **Form Classes**: `Drupal\{{ COMPONENT }}\Form\SettingsForm` (`ConfigFormBase`)
+- **Form Classes**: `Drupal\{{ COMPONENT }}\Form\SettingsForm` (`ConfigFormBase`), `Drupal\{{ COMPONENT }}\Form\RecordEntityForm`
 - **Drush Commands**: `Drupal\{{ COMPONENT }}\Drush\Commands\{{ COMPONENT_CAMEL }}Commands`
 
 ---
 
-## 3. File, Class, Hook, Database & Configuration Accounting & D10 Architectural Mapping
+## 3. File, Class, Hook, Database, Entity & Configuration Accounting & D10 Architectural Mapping
 
-| D7 Source File / Key / Schema | Legacy Artifact / Hook / Table / Variable | Classification / Semantics | Target D10 Class / Storage Destination | Migration Strategy / Injected Services | Planned Outcome Status |
+| D7 Source File / Key / Schema / Entity | Legacy Artifact / Hook / Table / Variable / Field | Classification / Semantics | Target D10 Class / Storage Destination | Migration Strategy / Injected Services | Planned Outcome Status |
 |---|---|---|---|---|---|
 | `lib/ExampleProcessor.php` | `class ExampleProcessor` | `SERVICE_BUSINESS_LOGIC` | `src/Service/ExampleProcessor.php` | `@database`, `@config.factory` | `MIGRATED` |
+| `{{ COMPONENT }}.module:hook_entity_info` | `entity: {{ COMPONENT }}_record` | `CONTENT_ENTITY` | `src/Entity/RecordEntity.php` | `ENTITY_TYPE_REBUILD` | `MIGRATED` |
+| `{{ COMPONENT }}.install:hook_schema` | `table: {{ COMPONENT }}_record_revision` | `REVISIONABLE_ENTITY` | `src/Entity/RecordEntity.php` (`revision_table`) | `REVISION_MIGRATION` | `MIGRATED` |
+| `{{ COMPONENT }}.module:hook_field_info` | `field: field_related_item` | `ENTITY_REFERENCE` | `core.base_field_override` / `field.storage` | `REFERENCE_REMAP` | `MIGRATED` |
 | `{{ COMPONENT }}.install` | `table: {{ COMPONENT }}_records` | `USER_DATA` | `src/Entity/RecordEntity.php` | `ENTITY_MIGRATION` | `MIGRATED` |
 | `includes/admin.inc:24` | `variable: {{ COMPONENT }}_endpoint` | `D7_ADMIN_SETTING` | `config/install/{{ COMPONENT }}.settings.yml` | `DIRECT_CONFIG_MIGRATION` (`@config.factory`) | `MIGRATED` |
 | `{{ COMPONENT }}.module:110` | `variable: {{ COMPONENT }}_last_sync` | `D7_PERSISTENT_STATE` | `State API` (`{{ COMPONENT }}.last_sync`) | `STATE_MIGRATION` (`@state`) | `MIGRATED` |
@@ -71,24 +81,26 @@ evidence_summary:
 
 ---
 
-## 4. File Mapping & Scaffolding Checklist
+## 5. File Mapping & Scaffolding Checklist
 
 | Action | Target D10 File | Source D7 Origin | Architectural Purpose |
 |---|---|---|---|
 | CREATED | `{{ COMPONENT }}.info.yml` | `{{ COMPONENT }}.info` | Module metadata |
 | CREATED | `{{ COMPONENT }}.services.yml` | N/A | Service container definitions |
 | CREATED | `{{ COMPONENT }}.routing.yml` | `hook_menu()` | Route definitions |
+| CREATED | `src/Entity/RecordEntity.php` | `hook_entity_info()` | Modern Content Entity class |
 | CREATED | `src/Service/ExampleProcessor.php` | `lib/ExampleProcessor.php` | Modernized PSR-4 service class with constructor DI |
 
 ---
 
-## 5. Test Strategy
+## 6. Test Strategy
 - **Unit Test**: `tests/src/Unit/ExampleProcessorTest.php`
 - **Kernel Test**: `tests/src/Kernel/IntegrationTest.php`
+- **Entity Test**: `tests/src/Kernel/RecordEntityTest.php`
 
 ---
 
-## 6. Potential Risks, Assumptions & Unverified Results
+## 7. Potential Risks, Assumptions & Unverified Results
 - **[ASSUMPTION]**:
 - **[UNVERIFIED RESULT]**:
 - **Mitigation Strategy**:

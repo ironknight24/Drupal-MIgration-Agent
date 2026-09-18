@@ -1,6 +1,6 @@
 ---
 name: drupal-migration:discovery
-description: Baseline audit and inspection engine. Scans Drupal 7 source and Drupal 10 target read-only to discover modules, PHP classes, constructors, .inc files, and populate migration manifest.
+description: Baseline audit and inspection engine. Scans Drupal 7 source and Drupal 10 target read-only to discover modules, PHP classes, constructors, .inc files, database schemas, configuration, state, entities, bundles, fields, revisions, and translations, and populate migration manifest.
 model: inherit
 ---
 
@@ -15,7 +15,7 @@ model: inherit
 ---
 
 ## 2. Purpose
-Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 codebase, custom PHP source files, OOP classes, constructors, legacy `.inc` files, configuration, and database schemas. Categorizes all assets, extracts hook implementations, discovers classes and methods, identifies global variables, and populates the static project scope in `state/migration-manifest.yml`.
+Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 codebase, custom PHP source files, OOP classes, constructors, legacy `.inc` files, configuration, state, database schemas, custom and core entities, bundles, fields, revisions, and translations. Categorizes all assets, extracts hook implementations, discovers classes and methods, identifies global variables, catalogs entity/field structures, and populates the static project scope in `state/migration-manifest.yml`.
 
 ---
 
@@ -26,7 +26,12 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
 - Analyzing autoloading mechanisms (`files[]`, `include`/`require`, `module_load_include()`, custom autoloaders).
 - Inspecting Drupal 10/11 target structure under `target.path`.
 - Introspecting D7 database schemas (tables, columns, indexes) in read-only mode if DB connection is configured.
-- Populating static component scope in `state/migration-manifest.yml` (including `inc_files` and `custom_php_files`).
+- Discovering custom and extended D7 entity types, bundles, entity keys, base/revision/data/translation tables, and controllers.
+- Discovering field definitions, field instances, field types, widgets, formatters, cardinalities, and custom storage engines.
+- Discovering revision tables, revision flags, log fields, timestamps, and revision tracking logic.
+- Discovering multilingual configuration, `$language`, `LANGUAGE_NONE`, translation tables, and field translation setups.
+- Discovering entity reference topologies (`entityreference`, `taxonomy_term_reference`, `user_reference`, `node_reference`).
+- Populating static component scope in `state/migration-manifest.yml` (including `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, and `entities_fields_items`).
 - Authoring baseline discovery reports in `reports/discovery/`.
 - Classifying observed facts (`[OBSERVED FACT]`) vs inferences (`[INFERENCE]`) vs unverified results (`[UNVERIFIED RESULT]`).
 
@@ -65,7 +70,7 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
 
 ## 8. Conceptual Tool Capabilities
 - **Read**: View D7 files, target configs, and project configuration.
-- **Search / Inspect**: Directory listing, ripgrep searches, AST pattern matching, OOP class and constructor extraction.
+- **Search / Inspect**: Directory listing, ripgrep searches, AST pattern matching, OOP class, entity, field, and constructor extraction.
 - **Write (Manifest & Reports)**: Populate `migration-manifest.yml` and author discovery audit reports.
 - **Forbidden Operations**: File mutation in source, shell commands modifying filesystem, git commands.
 
@@ -90,7 +95,7 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
 
 ## 11. Skill & Reference Dependencies
 - **Primary Associated Skill**:
-  - [`skills/d7-analysis`](../../skills/d7-analysis/SKILL.md) (Procedural and OOP AST inspection, class/constructor analysis, hook cataloging, and global state discovery heuristics)
+  - [`skills/d7-analysis`](../../skills/d7-analysis/SKILL.md) (Procedural and OOP AST inspection, class/constructor analysis, hook cataloging, entity/field/revision/translation discovery, and global state discovery heuristics)
 - **Canonical References**:
   - [Drupal 7 Core APIs Reference](../../references/drupal-7/apis.md)
   - [Drupal 7 Hooks to Modern Architecture Catalog](../../references/drupal-7/hooks.md)
@@ -133,19 +138,26 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
     - Exhaustively discover all configuration, variable, state, and key-value access patterns across `*.module`, `*.inc`, `*.php`, `*.install`: `variable_get()`, `variable_set()`, `variable_del()`, `variable_initialize()`, `system_settings_form()`, `$conf`, `$GLOBALS`, static caches, and environment values.
     - Classify each artifact into the 20-type configuration taxonomy: `D7_VARIABLE`, `D7_VARIABLE_DEFAULT`, `D7_VARIABLE_WRITE`, `D7_VARIABLE_DELETE`, `D7_GLOBAL_CONFIG`, `D7_FORM_SETTING`, `D7_ADMIN_SETTING`, `D7_RUNTIME_SETTING`, `D7_PERSISTENT_STATE`, `D7_CACHE_STATE`, `D7_CUSTOM_TABLE_STATE`, `D7_SERIALIZED_VALUE`, `D7_JSON_VALUE`, `D7_ENVIRONMENT_VALUE`, `D7_INSTALL_CONFIGURATION`, `D7_UPDATE_CONFIGURATION`, `D7_UNINSTALL_CLEANUP`, `D7_DERIVED_CONFIGURATION`, `D7_EXTERNAL_CONFIGURATION`, `D7_UNKNOWN_UNVERIFIED`.
     - Trace complete lifecycle (`CREATE -> READ -> MODIFY -> DELETE`), default values, default types, serialization formats, and security sensitivities (PUBLIC, INTERNAL, SECRET_CREDENTIAL, ENVIRONMENT_SPECIFIC).
-12. **Database API & Static SQL Query Discovery**:
+12. **Custom & Core Entity, Field, Revision & Translation Discovery (Step 16)**:
+    - Exhaustively discover all entity types, bundles, field definitions, and field instances declared via `hook_entity_info()`, `hook_schema()`, `hook_field_info()`, `hook_field_instance_info()`, `field_create_field()`, `field_create_instance()`, and custom entity controller implementations.
+    - Extract entity keys (`id`, `revision`, `bundle`, `label`, `language`, `uuid`), base tables, data tables, revision tables, and translation tables.
+    - Extract field taxonomy: field name, entity type, bundle, field type, cardinality, required/optional, translatable/non-translatable, revisionable/non-revisionable, storage details, widget, formatter, validation, and default value.
+    - Map entity reference hierarchies and relational targets (`entityreference`, `taxonomy_term_reference`, `user_reference`, `node_reference`).
+    - Audit revision mechanisms: revision tables, log fields, timestamps, and revision tracking code.
+    - Audit translation mechanics: `$language`, `LANGUAGE_NONE`, translation tables, and multilingual configuration.
+13. **Database API & Static SQL Query Discovery**:
     - Inventory procedural database calls: `db_query()`, `db_query_range()`, `db_select()`, `db_insert()`, `db_update()`, `db_delete()`, `db_merge()`, `db_transaction()`.
     - Detect dynamically constructed SQL (e.g. `$table = $config['table']; db_query("SELECT ... FROM {$table}")`) and flag as `[UNVERIFIED RESULT]` / `HUMAN_DECISION_REQUIRED`.
     - Perform SQL safety analysis identifying user inputs, missing placeholders, and raw SQL concatenations.
-13. **Data Semantics, Serialization & Entity Relationships**:
+14. **Data Semantics, Serialization & Entity Relationships**:
     - Classify custom tables into the 17 semantic categories: `CONTENT`, `CONFIGURATION`, `STATE`, `USER_DATA`, `ENTITY_DATA`, `FIELD_DATA`, `RELATIONSHIP_DATA`, `TRANSACTION_DATA`, `AUDIT_DATA`, `CACHE_DATA`, `QUEUE_DATA`, `TEMPORARY_DATA`, `INTEGRATION_DATA`, `LOOKUP_DATA`, `REFERENCE_DATA`, `LEGACY_DATA`, `UNKNOWN`.
     - Detect serialized data payloads (PHP serialize/unserialize, JSON, encoded objects, HTML).
     - Detect entity references (`uid`, `nid`, `tid`, `fid`, `entity_id`, `delta`) and cross-table entity relationships.
     - Map complete CRUD call trees (CREATE, READ, UPDATE, DELETE callers) across all services, forms, controllers, queue workers, cron, and Drush.
-14. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
-15. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, and `configuration_state_items` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
-16. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
-17. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
+15. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
+16. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, and `entities_fields_items` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
+17. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
+18. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
 
 ---
 
@@ -187,7 +199,7 @@ agent_result:
       - "reports/discovery/DISCOVERY-AUDIT-20260918.md"
   evidence:
     observed_facts:
-      - "Discovered 14 custom modules, 18 custom PHP classes, 28 .inc files, 32 contrib modules, 2 custom themes"
+      - "Discovered 14 custom modules, 18 custom PHP classes, 28 .inc files, 12 custom entities, 34 custom fields, 32 contrib modules, 2 custom themes"
   blockers: []
   decisions_required: []
   files_changed: []

@@ -222,6 +222,67 @@ target_system:
 #       confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
 #       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
 #       exclusion_reason: null
+#   # Comprehensive Entities, Fields, Revisions & Translations Accounting
+#   entities_fields_items:
+#     - entity_type: "my_custom_entity"
+#       bundle: "my_custom_entity"
+#       entity_id: "id"
+#       field_name: "field_related_reference"
+#       artifact_type: "FIELD_INSTANCE" # ENTITY_TYPE_DEFINITION | BUNDLE_DEFINITION | FIELD_STORAGE | FIELD_INSTANCE | ENTITY_REFERENCE | REVISION_METADATA | TRANSLATION_METADATA | PROPERTY_DEFINITION
+#       source_file: "my_module.install"
+#       function_or_class: "my_module_install"
+#       location_evidence: "my_module.install:L34 field_create_instance(...)"
+#       base_table: "my_custom_entity"
+#       data_table: "my_custom_entity_field_data"
+#       revision_table: "my_custom_entity_revision"
+#       translation_table: "my_custom_entity_field_data"
+#       entity_keys:
+#         id: "id"
+#         revision: "vid"
+#         bundle: "type"
+#         label: "title"
+#         uuid: "uuid"
+#         langcode: "langcode"
+#         status: "status"
+#       field_type: "entity_reference" # text | integer | entity_reference | image | file | list_string | boolean | datetime | address | custom
+#       cardinality: -1 # 1: Single | -1: Unlimited | N: Specific count
+#       required: false
+#       translatable: true
+#       revisionable: true
+#       storage_details: "SQL_DEFAULT" # SQL_DEFAULT | CUSTOM_TABLE | EXTERNAL | COMPUTED
+#       formatter: "entity_reference_label"
+#       widget: "entity_reference_autocomplete"
+#       validation:
+#         constraints: ["ValidReference"]
+#       default_value: null
+#       references: ["node", "user"]
+#       referenced_entity_type: "node"
+#       dependencies: ["node", "user"]
+#       callers: ["my_module_load_referenced()", "EntityFieldQuery"]
+#       consumers: ["MyCustomEntityStorageService", "EntityViewController"]
+#       lifecycle_behavior: "PRESAVE_VALIDATE -> INSERT_RELATION -> UPDATE_DELTA -> DELETE_CASCADE"
+#       access_behavior: "EntityAccessControlHandler with permission 'view my_custom_entity'"
+#       target_architecture: "CONTENT_ENTITY" # 26 Target Architectures:
+#       # CONTENT_ENTITY | CONFIG_ENTITY | ENTITY_TYPE | BUNDLE | ENTITY_STORAGE | ENTITY_ACCESS_HANDLER |
+#       # ENTITY_QUERY | FIELD_STORAGE | FIELD_CONFIG | FIELD_TYPE | FIELD_WIDGET | FIELD_FORMATTER |
+#       # ENTITY_REFERENCE | REVISIONABLE_ENTITY | TRANSLATABLE_ENTITY | TRANSLATION_HANDLER | PLUGIN |
+#       # SERVICE | REPOSITORY | CUSTOM_STORAGE | CONFIGURATION | STATE | EXTERNAL_SYSTEM | OBSOLETE |
+#       # HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       target_artifacts:
+#         - "src/Entity/MyCustomEntity.php"
+#         - "src/Entity/MyCustomEntityInterface.php"
+#         - "src/MyCustomEntityAccessControlHandler.php"
+#         - "config/install/field.storage.my_custom_entity.field_related_reference.yml"
+#         - "config/install/field.field.my_custom_entity.my_custom_entity.field_related_reference.yml"
+#       migration_strategy: "DIRECT_ENTITY_MIGRATION" # 16 Migration Strategies:
+#       # DIRECT_ENTITY_MIGRATION | TRANSFORMED_ENTITY_MIGRATION | ENTITY_TYPE_REBUILD | BUNDLE_REBUILD |
+#       # FIELD_REBUILD | FIELD_TRANSFORMATION | REFERENCE_REMAP | REVISION_MIGRATION | TRANSLATION_MIGRATION |
+#       # CONFIG_ENTITY_MIGRATION | CUSTOM_STORAGE_MIGRATION | CONTENT_MIGRATION | REPLACED | OBSOLETE |
+#       # HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       validation_strategy: "ENTITY_CRUD_AND_FIELD_STORAGE_TEST" # ENTITY_CRUD_AND_FIELD_STORAGE_TEST | ENTITY_REFERENCE_INTEGRITY_TEST | REVISION_DIFF_TEST | TRANSLATION_LOAD_TEST | UNIT_TEST
+#       confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
+#       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       exclusion_reason: null
 custom_modules: []
 
 # ------------------------------------------------------------------------------

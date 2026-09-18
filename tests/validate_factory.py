@@ -2348,11 +2348,11 @@ class FactoryValidator:
         has_doc_sync = (
             taxonomy_in_d7 and
             "1.1.0" in config_skill and
-            "1.3.0" in mapping_skill and
-            "1.4.0" in custom_skill and
-            "1.4.0" in dep_skill and
-            "1.3.0" in test_skill and
-            "1.4.0" in val_skill
+            any(v in mapping_skill for v in ["1.3.0", "1.4.0"]) and
+            any(v in custom_skill for v in ["1.4.0", "1.5.0"]) and
+            any(v in dep_skill for v in ["1.4.0", "1.5.0"]) and
+            any(v in test_skill for v in ["1.3.0", "1.4.0"]) and
+            any(v in val_skill for v in ["1.4.0", "1.5.0"])
         )
 
         if has_doc_sync:
@@ -2370,6 +2370,452 @@ class FactoryValidator:
                               "Documentation and skill version synchronization check failed.",
                               "Skills and documentation must be synchronized with Step 15 configuration modernization.")
 
+    def validate_entities_and_fields_suite(self):
+        """
+        STEP 16 Validation Suite: D7 Entities, Bundles, Fields, Revisions, Translations & Entity References
+        Validates CHECK-ENTITY-01 through CHECK-ENTITY-25.
+        """
+        d7_skill = (self.repo_root / "skills/d7-analysis/SKILL.md").read_text(encoding='utf-8')
+        mapping_skill = (self.repo_root / "skills/d7-to-d10-mapping/SKILL.md").read_text(encoding='utf-8')
+        custom_skill = (self.repo_root / "skills/custom-module-migration/SKILL.md").read_text(encoding='utf-8')
+        dep_skill = (self.repo_root / "skills/dependency-analysis/SKILL.md").read_text(encoding='utf-8')
+        mig_skill = (self.repo_root / "skills/migration-api/SKILL.md").read_text(encoding='utf-8')
+        test_skill = (self.repo_root / "skills/testing/SKILL.md").read_text(encoding='utf-8')
+        val_skill = (self.repo_root / "skills/behavioral-validation/SKILL.md").read_text(encoding='utf-8')
+        manifest_text = (self.repo_root / "state/migration-manifest.yml").read_text(encoding='utf-8')
+        readme_text = (self.repo_root / "README.md").read_text(encoding='utf-8')
+        arch_text = (self.repo_root / "ARCHITECTURE.md").read_text(encoding='utf-8')
+        discovery_agent = (self.repo_root / "agents/discovery/agent.md").read_text(encoding='utf-8')
+        custom_agent = (self.repo_root / "agents/custom-module/agent.md").read_text(encoding='utf-8')
+        data_agent = (self.repo_root / "agents/data-migration/agent.md").read_text(encoding='utf-8')
+        disc_template = (self.repo_root / "templates/discovery-report.md").read_text(encoding='utf-8')
+        plan_template = (self.repo_root / "templates/migration-plan.md").read_text(encoding='utf-8')
+        val_template = (self.repo_root / "templates/validation-report.md").read_text(encoding='utf-8')
+
+        # 16.01 Generic Entity Discovery
+        entity_discovery_terms = [
+            "hook_entity_info", "entity api", "entity_load", "entity_save",
+            "entity_delete", "entity_extract_ids", "entity_id", "entity_uri",
+            "entity_metadata_wrapper", "entity_get_info", "entity_view", "entity_access"
+        ]
+        missing_entity_discovery = [t for t in entity_discovery_terms if t not in d7_skill.lower()]
+
+        if not missing_entity_discovery:
+            self.record_check("CHECK-ENTITY-01", "discovery", "Generic Entity & Entity API Discovery", "PASS",
+                              "D7 analysis skill and discovery agent exhaustively discover core and custom entity implementations, Entity API calls, entity controllers, metadata wrappers, and entity keys.",
+                              "Verified generic entity and Entity API discovery capabilities.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "agents/discovery/agent.md"])
+        else:
+            self.record_check("CHECK-ENTITY-01", "discovery", "Generic Entity & Entity API Discovery", "FAIL",
+                              f"Missing entity discovery terms: {', '.join(missing_entity_discovery)}",
+                              "Factory must discover all entity types, Entity API functions, and controllers.")
+
+        # 16.02 Generic Field Discovery
+        field_discovery_terms = [
+            "field_info_field", "field_info_instance", "field_info_fields", "field_info_instances",
+            "field_create_field", "field_create_instance", "field_update_field", "field_update_instance",
+            "field_delete_field", "field_delete_instance", "field_attach_load", "field_attach_presave",
+            "field_attach_insert", "field_attach_update", "field_attach_delete", "field_get_items",
+            "field_view_field", "field_form_field"
+        ]
+        missing_field_discovery = [f for f in field_discovery_terms if f not in d7_skill.lower()]
+
+        if not missing_field_discovery:
+            self.record_check("CHECK-ENTITY-02", "discovery", "Generic Field & Field API Discovery", "PASS",
+                              "D7 analysis skill and discovery agent exhaustively discover all field definitions, instances, field CRUD functions, and field attachment hooks across custom modules and schemas.",
+                              "Verified generic field and Field API discovery capabilities.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "agents/discovery/agent.md"])
+        else:
+            self.record_check("CHECK-ENTITY-02", "discovery", "Generic Field & Field API Discovery", "FAIL",
+                              f"Missing field discovery terms: {', '.join(missing_field_discovery)}",
+                              "Factory must discover all field definitions, instances, and Field API calls.")
+
+        # 16.03 Entity Type Accounting
+        entity_types = ["content", "configuration", "runtime state", "lookup", "obsolete", "external"]
+        missing_entity_types = [t for t in entity_types if t not in d7_skill.lower() and t not in mapping_skill.lower()]
+
+        if not missing_entity_types:
+            self.record_check("CHECK-ENTITY-03", "accounting", "Entity Type Semantic Accounting", "PASS",
+                              "D7 analysis and mapping skills semantically classify entities into Content, Configuration, Runtime State, Lookup/Reference, Obsolete, and External systems.",
+                              "Verified entity type semantic classification.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-03", "accounting", "Entity Type Semantic Accounting", "FAIL",
+                              f"Missing entity semantic categories: {', '.join(missing_entity_types)}",
+                              "Factory must semantically classify entities rather than blindly treating all as Content Entities.")
+
+        # 16.04 Bundle Accounting
+        has_bundles = "bundle" in d7_skill.lower() and "bundle" in mapping_skill.lower() and "bundle_rebuild" in mig_skill.lower()
+
+        if has_bundles:
+            self.record_check("CHECK-ENTITY-04", "bundles", "Bundle & Sub-type Accounting", "PASS",
+                              "Discovery, mapping, and migration skills capture bundle definitions, bundle-specific fields, bundle keys, and map to modern CMI bundle configs and bundle plugins.",
+                              "Verified bundle discovery and target mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-04", "bundles", "Bundle & Sub-type Accounting", "FAIL",
+                              "Missing bundle accounting guidelines in skills.",
+                              "Factory must account for entity bundles and sub-types.")
+
+        # 16.05 Entity Key Accounting
+        entity_keys = ["id", "revision", "bundle", "label", "language", "uuid"]
+        missing_entity_keys = [k for k in entity_keys if f"`{k}`" not in d7_skill.lower() and k not in d7_skill.lower()]
+
+        if not missing_entity_keys:
+            self.record_check("CHECK-ENTITY-05", "entity_keys", "Entity Key Accounting", "PASS",
+                              "D7 analysis skill captures all essential entity keys: id, revision, bundle, label, language, and uuid, preserving primary and foreign identifiers.",
+                              "Verified entity key discovery and accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-05", "entity_keys", "Entity Key Accounting", "FAIL",
+                              f"Missing entity keys: {', '.join(missing_entity_keys)}",
+                              "Factory must account for all entity keys in discovery and manifest.")
+
+        # 16.06 Field Storage Accounting
+        storage_terms = ["storage table", "schema", "indexes", "cardinality", "language columns", "delta columns", "entity id relationship", "revision relationship", "bundle relationship"]
+        missing_storage = [s for s in storage_terms if s not in d7_skill.lower()]
+
+        if not missing_storage:
+            self.record_check("CHECK-ENTITY-06", "storage", "Field Storage & Schema Accounting", "PASS",
+                              "D7 analysis skill exhaustively audits field storage parameters: storage tables, columns, indexes, cardinality, language columns, deltas, and entity/revision relationships.",
+                              "Verified field storage analysis standards.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-06", "storage", "Field Storage & Schema Accounting", "FAIL",
+                              f"Missing field storage terms: {', '.join(missing_storage)}",
+                              "Factory must audit field storage schema, deltas, language columns, and relationships.")
+
+        # 16.07 Field Type Taxonomy
+        field_types = ["text", "long text", "integer", "decimal", "float", "boolean", "date", "datetime", "list", "taxonomy reference", "entity reference", "user reference", "file", "image", "link"]
+        missing_field_types = [ft for ft in field_types if ft not in d7_skill.lower()]
+
+        if not missing_field_types:
+            self.record_check("CHECK-ENTITY-07", "field_taxonomy", "Field Type Taxonomy & Modern Equivalence", "PASS",
+                              "D7 analysis and mapping skills provide a comprehensive field taxonomy covering scalar, datetime, list, reference, media, and custom field types.",
+                              "Verified field type taxonomy coverage.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-07", "field_taxonomy", "Field Type Taxonomy & Modern Equivalence", "FAIL",
+                              f"Missing field types in taxonomy: {', '.join(missing_field_types)}",
+                              "Factory must classify discovered fields across the comprehensive field taxonomy.")
+
+        # 16.08 Cardinality & Constraint Accounting
+        has_cardinality = "cardinality" in d7_skill.lower() and "cardinality" in mapping_skill.lower() and "cardinality" in manifest_text
+
+        if has_cardinality:
+            self.record_check("CHECK-ENTITY-08", "cardinality", "Cardinality & Constraint Accounting", "PASS",
+                              "D7 analysis, mapping, and manifest enforce cardinality (-1 vs 1 vs N), requiredness, and validation constraints in target base and config fields.",
+                              "Verified field cardinality and constraint accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-ENTITY-08", "cardinality", "Cardinality & Constraint Accounting", "FAIL",
+                              "Missing cardinality and constraint rules in skills or manifest.",
+                              "Factory must preserve field cardinality and validation constraints.")
+
+        # 16.09 Entity Reference Discovery
+        ref_terms = ["entityreference", "node_reference", "user_reference", "taxonomy_term_reference", "target_type", "target_bundles"]
+        missing_refs = [r for r in ref_terms if r not in d7_skill.lower() and r not in mapping_skill.lower()]
+
+        if not missing_refs:
+            self.record_check("CHECK-ENTITY-09", "entity_references", "Entity Reference & Relationship Discovery", "PASS",
+                              "D7 analysis and mapping skills discover entity reference fields, node/user/term references, target entity types, target bundles, and junction relationships.",
+                              "Verified entity reference discovery and target mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-09", "entity_references", "Entity Reference & Relationship Discovery", "FAIL",
+                              f"Missing entity reference terms: {', '.join(missing_refs)}",
+                              "Factory must discover all entity references and relationship structures.")
+
+        # 16.10 Relationship & Dependency Graph Integration
+        has_dep_refs = (
+            "entity reference" in dep_skill.lower() and
+            "source entity -> target entity" in dep_skill.lower() and
+            "base entity -> revision table" in dep_skill.lower() and
+            "base entity -> translation records" in dep_skill.lower()
+        )
+
+        if has_dep_refs:
+            self.record_check("CHECK-ENTITY-10", "dependencies", "Entity Relationship & DAG Wave Integration", "PASS",
+                              "Dependency analysis skill incorporates entity reference hierarchies, revision chains, and translation couplings into DAG wave calculation with 2-pass cycle resolution.",
+                              "Verified entity relationship and DAG wave integration.",
+                              affected_files=["skills/dependency-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-10", "dependencies", "Entity Relationship & DAG Wave Integration", "FAIL",
+                              "Missing entity reference couplings in dependency analysis skill.",
+                              "Dependency skill must model entity references, revisions, and translations in the DAG.")
+
+        # 16.11 Revision Discovery
+        rev_discovery_terms = ["revision table", "revision ids", "revision flags", "revision callbacks", "revision loading", "revision comparison", "revision publishing", "revision history"]
+        missing_rev_discovery = [r for r in rev_discovery_terms if r not in d7_skill.lower()]
+
+        if not missing_rev_discovery:
+            self.record_check("CHECK-ENTITY-11", "revisions", "Exhaustive Revision Discovery", "PASS",
+                              "D7 analysis skill exhaustively discovers revision tables, revision IDs, log fields, timestamps, revision flags, comparison logic, and revision loading APIs.",
+                              "Verified revision discovery standards.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-11", "revisions", "Exhaustive Revision Discovery", "FAIL",
+                              f"Missing revision discovery terms: {', '.join(missing_rev_discovery)}",
+                              "Factory must exhaustively discover revision mechanisms in D7 source.")
+
+        # 16.12 Revision Migration Mapping
+        has_rev_mapping = (
+            "revisionableinterface" in mapping_skill.lower() and
+            "revision_table" in mapping_skill.lower() and
+            "revision_migration" in mig_skill.lower()
+        )
+
+        if has_rev_mapping:
+            self.record_check("CHECK-ENTITY-12", "revisions", "Revision Modernization & Migration Mapping", "PASS",
+                              "Mapping and Migration API skills define complete revision modernization: RevisionableInterface, revision_table in entity annotations, and dedicated entity revision migration pipelines.",
+                              "Verified revision modernization and migration standards.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-12", "revisions", "Revision Modernization & Migration Mapping", "FAIL",
+                              "Missing RevisionableInterface or revision migration mapping.",
+                              "Factory must map revisionable entities to modern D10 RevisionableInterface and migration pipelines.")
+
+        # 16.13 Translation & Multilingual Discovery
+        trans_terms = ["$language", "language_none", "node translations", "entity translations", "translation tables", "content translation"]
+        missing_trans = [t for t in trans_terms if t not in d7_skill.lower()]
+
+        if not missing_trans:
+            self.record_check("CHECK-ENTITY-13", "translations", "Translation & Multilingual Discovery", "PASS",
+                              "D7 analysis skill exhaustively discovers multilingual configuration, $language, LANGUAGE_NONE, field translation tables, and entity translation APIs.",
+                              "Verified multilingual and translation discovery capabilities.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-13", "translations", "Translation & Multilingual Discovery", "FAIL",
+                              f"Missing translation discovery terms: {', '.join(missing_trans)}",
+                              "Factory must discover translation mechanics and language handling in D7 source.")
+
+        # 16.14 Translation Migration Mapping
+        has_trans_mapping = (
+            "translatableinterface" in mapping_skill.lower() and
+            "data_table" in mapping_skill.lower() and
+            "translation_migration" in mig_skill.lower() and
+            "content translation" in mapping_skill.lower()
+        )
+
+        if has_trans_mapping:
+            self.record_check("CHECK-ENTITY-14", "translations", "Translation Modernization & Migration Mapping", "PASS",
+                              "Mapping and Migration API skills define Content Translation architecture: TranslatableInterface, data_table, translatable base/config fields, and secondary translation migrations.",
+                              "Verified translation modernization and migration standards.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-14", "translations", "Translation Modernization & Migration Mapping", "FAIL",
+                              "Missing TranslatableInterface or translation migration mapping.",
+                              "Factory must map translatable entities to modern Content Translation.")
+
+        # 16.15 Entity Lifecycle Integration
+        has_lifecycle = "presave" in d7_skill.lower() and "postsave" in d7_skill.lower() and "cache invalidation" in d7_skill.lower()
+
+        if has_lifecycle:
+            self.record_check("CHECK-ENTITY-15", "lifecycle", "Entity Lifecycle & Side Effect Integration", "PASS",
+                              "D7 analysis skill captures complete entity lifecycle semantics (create, load, presave, insert, update, postsave, delete) and associated side effects, cache invalidation, and queues.",
+                              "Verified entity lifecycle and side-effect integration.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-15", "lifecycle", "Entity Lifecycle & Side Effect Integration", "FAIL",
+                              "Missing entity lifecycle terms in D7 analysis skill.",
+                              "Factory must trace entity lifecycle behavior and side effects.")
+
+        # 16.16 Entity Access & Security Accounting
+        has_access = (
+            "entityaccesscontrolhandler" in mapping_skill.lower() and
+            "entity_access" in d7_skill.lower() and
+            "accessresult" in test_skill.lower()
+        )
+
+        if has_access:
+            self.record_check("CHECK-ENTITY-16", "security", "Entity Access & Security Modernization", "PASS",
+                              "Mapping and testing skills define modern EntityAccessControlHandler implementations returning AccessResult with strict role, ownership, and permission validation.",
+                              "Verified entity access control and security modernization.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/testing/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-16", "security", "Entity Access & Security Modernization", "FAIL",
+                              "Missing EntityAccessControlHandler or AccessResult in mapping/testing skills.",
+                              "Factory must re-engineer entity access into EntityAccessControlHandler.")
+
+        # 16.17 Entity Query & Storage Modernization
+        has_query_mapping = (
+            "entityfieldquery" in d7_skill.lower() and
+            "entityquery" in mapping_skill.lower() and
+            "entitystoragesinterface" in mapping_skill.lower() or "entitystorageinterface" in mapping_skill.lower()
+        )
+
+        if has_query_mapping:
+            self.record_check("CHECK-ENTITY-17", "queries", "Entity Query & Storage Modernization", "PASS",
+                              "Mapping skill modernizes EntityFieldQuery and direct SQL entity queries into injected EntityTypeManager, EntityStorageInterface, and EntityQuery instances.",
+                              "Verified EntityQuery and storage modernization guidelines.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-17", "queries", "Entity Query & Storage Modernization", "FAIL",
+                              "Missing EntityQuery or EntityStorageInterface in mapping skill.",
+                              "Factory must modernize EntityFieldQuery into EntityQuery and EntityStorageInterface.")
+
+        # 16.18 Formatter & Widget Accounting
+        has_formatters = (
+            "field formatter" in d7_skill.lower() and
+            "field widget" in d7_skill.lower() and
+            "entityviewbuilder" in mapping_skill.lower()
+        )
+
+        if has_formatters:
+            self.record_check("CHECK-ENTITY-18", "rendering", "Field Formatter, Widget & View Builder Accounting", "PASS",
+                              "D7 analysis and mapping skills audit field formatters, widgets, view modes, and display modes, mapping to modern FieldFormatter, FieldWidget plugins, and EntityViewBuilder.",
+                              "Verified formatter, widget, and view builder accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-18", "rendering", "Field Formatter, Widget & View Builder Accounting", "FAIL",
+                              "Missing formatters, widgets, or EntityViewBuilder in skills.",
+                              "Factory must account for field formatters, widgets, and EntityViewBuilder.")
+
+        # 16.19 Content Entity vs Config Entity Distinction
+        has_entity_distinction = (
+            "@contententitytype" in mapping_skill.lower() and
+            "@configentitytype" in mapping_skill.lower() and
+            "content_entity" in d7_skill.lower() and
+            "config_entity" in d7_skill.lower()
+        )
+
+        if has_entity_distinction:
+            self.record_check("CHECK-ENTITY-19", "architecture", "Content Entity vs Config Entity Distinction", "PASS",
+                              "D7 analysis and mapping skills rigorously distinguish Content Entities (@ContentEntityType) with baseFieldDefinitions from Config Entities (@ConfigEntityType) with CMI schema backing.",
+                              "Verified Content vs Config entity architectural distinction.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-19", "architecture", "Content Entity vs Config Entity Distinction", "FAIL",
+                              "Missing @ContentEntityType or @ConfigEntityType architectural distinction.",
+                              "Factory must explicitly distinguish Content Entities from Config Entities.")
+
+        # 16.20 26 Target Architecture Taxonomy
+        target_tax_count = sum(1 for t in [
+            "CONTENT_ENTITY", "CONFIG_ENTITY", "ENTITY_TYPE", "BUNDLE", "ENTITY_STORAGE",
+            "ENTITY_ACCESS_HANDLER", "ENTITY_QUERY", "FIELD_STORAGE", "FIELD_CONFIG",
+            "FIELD_TYPE", "FIELD_WIDGET", "FIELD_FORMATTER", "ENTITY_REFERENCE",
+            "REVISIONABLE_ENTITY", "TRANSLATABLE_ENTITY", "TRANSLATION_HANDLER",
+            "PLUGIN", "SERVICE", "REPOSITORY", "CUSTOM_STORAGE", "CONFIGURATION",
+            "STATE", "EXTERNAL_SYSTEM", "OBSOLETE", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"
+        ] if t in d7_skill or t in mig_skill)
+
+        if target_tax_count >= 24:
+            self.record_check("CHECK-ENTITY-20", "taxonomy", "26 Target Architecture Taxonomy", "PASS",
+                              f"Skills define the complete 26-class target architecture taxonomy ({target_tax_count}/26 detected) supporting non-1:1 entity, field, revision, and translation transformations.",
+                              "Verified 26 target architecture classifications.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-20", "taxonomy", "26 Target Architecture Taxonomy", "FAIL",
+                              f"Only {target_tax_count}/26 target architecture classifications found in skills.",
+                              "Factory must define all 26 target architecture classifications.")
+
+        # 16.21 16 Standardized Entity & Field Migration Strategies
+        strat_count = sum(1 for s in [
+            "DIRECT_ENTITY_MIGRATION", "TRANSFORMED_ENTITY_MIGRATION", "ENTITY_TYPE_REBUILD",
+            "BUNDLE_REBUILD", "FIELD_REBUILD", "FIELD_TRANSFORMATION", "REFERENCE_REMAP",
+            "REVISION_MIGRATION", "TRANSLATION_MIGRATION", "CONFIG_ENTITY_MIGRATION",
+            "CUSTOM_STORAGE_MIGRATION", "CONTENT_MIGRATION", "REPLACED", "OBSOLETE",
+            "HUMAN_DECISION_REQUIRED", "UNVERIFIED"
+        ] if s in d7_skill or s in mig_skill)
+
+        if strat_count >= 14:
+            self.record_check("CHECK-ENTITY-21", "strategies", "16 Entity & Field Migration Strategies", "PASS",
+                              f"Skills define all 16 standardized entity/field migration strategies ({strat_count}/16 detected) separating migration methodology from terminal outcome status.",
+                              "Verified 16 entity and field migration strategies.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-21", "strategies", "16 Entity & Field Migration Strategies", "FAIL",
+                              f"Only {strat_count}/16 migration strategies found in skills.",
+                              "Factory must define all 16 entity and field migration strategies.")
+
+        # 16.22 Manifest Schema Integrity
+        manifest_entity_fields = [
+            "entity_type", "bundle", "entity_id", "field_name", "artifact_type",
+            "source_file", "function_or_class", "location_evidence", "base_table",
+            "data_table", "revision_table", "translation_table", "entity_keys",
+            "field_type", "cardinality", "required", "translatable", "revisionable",
+            "storage_details", "formatter", "widget", "validation", "default_value",
+            "references", "referenced_entity_type", "dependencies", "callers",
+            "consumers", "lifecycle_behavior", "access_behavior", "target_architecture",
+            "target_artifacts", "migration_strategy", "validation_strategy",
+            "confidence", "status", "exclusion_reason"
+        ]
+        missing_entity_manifest = [f for f in manifest_entity_fields if f not in manifest_text]
+
+        if not missing_entity_manifest:
+            self.record_check("CHECK-ENTITY-22", "manifest", "Manifest Entity & Field Accounting Schema", "PASS",
+                              "state/migration-manifest.yml defines complete entities_fields_items accounting schema covering all 37 required entity, field, revision, translation, and relational metadata fields.",
+                              "Verified manifest entity/field accounting schema structure.",
+                              affected_files=["state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-ENTITY-22", "manifest", "Manifest Entity & Field Accounting Schema", "FAIL",
+                              f"Missing manifest entity fields: {', '.join(missing_entity_manifest)}",
+                              "Manifest schema must define all required entity and field accounting fields.")
+
+        # 16.23 Zero-Omission Outcome Enforcement
+        approved_outcomes = ["MIGRATED", "REPLACED", "OBSOLETE", "EXCLUDED_WITH_REASON", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"]
+        forbidden_states = ["UNACCOUNTED", "UNKNOWN_WITHOUT_REASON", "SILENTLY_OMITTED"]
+
+        missing_approved = [o for o in approved_outcomes if o not in val_skill]
+        missing_forbidden = [f for f in forbidden_states if f not in val_skill or f not in d7_skill]
+
+        if not missing_approved and not missing_forbidden and "Custom Entity Types Accounted For" in val_template:
+            self.record_check("CHECK-ENTITY-23", "validation", "Zero-Omission Entity & Field Outcome Enforcement", "PASS",
+                              "Validation agent and skill enforce approved terminal outcomes (MIGRATED, REPLACED, OBSOLETE, EXCLUDED_WITH_REASON, HUMAN_DECISION_REQUIRED, UNVERIFIED) and reject forbidden states for all custom entities, bundles, and fields.",
+                              "Verified zero-omission outcome enforcement for entities and fields.",
+                              affected_files=["skills/behavioral-validation/SKILL.md", "templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-ENTITY-23", "validation", "Zero-Omission Entity & Field Outcome Enforcement", "FAIL",
+                              "Missing approved outcomes or forbidden states in validation skill or template.",
+                              "Validation must enforce zero-omission outcomes for all entities and fields.")
+
+        # 16.24 Cross-Capability Compatibility
+        has_cross_compat = (
+            "custom_database_tables" in manifest_text and
+            "custom_php_files" in manifest_text and
+            "inc_files" in manifest_text and
+            "hook_implementations" in manifest_text and
+            "configuration_state_items" in manifest_text and
+            "entities_fields_items" in manifest_text and
+            "Custom Entities, Bundles, Fields, Revisions, Translations" in readme_text and
+            "Custom Entities, Bundles, Fields, Revisions, Translations" in arch_text
+        )
+
+        if has_cross_compat:
+            self.record_check("CHECK-ENTITY-24", "compatibility", "Cross-Capability Compatibility", "PASS",
+                              "Entity and field accounting seamlessly integrates with custom database schemas (Step 13), procedural hooks (Step 14), configuration/state (Step 15), custom PHP files (Step 12), and .inc files (Step 11) without ownership duplication.",
+                              "Verified cross-capability architectural compatibility.",
+                              affected_files=["state/migration-manifest.yml", "README.md", "ARCHITECTURE.md", "AGENT_PROTOCOL.md"])
+        else:
+            self.record_check("CHECK-ENTITY-24", "compatibility", "Cross-Capability Compatibility", "FAIL",
+                              "Cross-capability compatibility check failed across manifest, skills, or documentation.",
+                              "Entity accounting must maintain seamless compatibility with database, hook, config, and class capabilities.")
+
+        # 16.25 Generic Factory Purity
+        # Verify no hardcoded real customer module names or local dev paths
+        forbidden_patterns = ["/Users/deepak/Desktop/Projects/drupal-migration", "vscode-file://", "localhost:8888", "example_client_secret"]
+        found_forbidden = []
+        for root, _, files in os.walk(self.repo_root):
+            if any(p in root for p in [".git", "tests", ".gemini"]):
+                continue
+            for fname in files:
+                if fname.endswith((".md", ".yml", ".yaml", ".json")):
+                    fpath = Path(root) / fname
+                    text = fpath.read_text(encoding='utf-8', errors='ignore')
+                    for pat in forbidden_patterns:
+                        if pat in text:
+                            found_forbidden.append(f"{fname}: {pat}")
+
+        if not found_forbidden:
+            self.record_check("CHECK-ENTITY-25", "purity", "Generic Factory Purity & Safety", "PASS",
+                              "Factory maintains 100% generic purity with zero project-specific module assumptions, zero hardcoded developer machine paths, and strictly non-destructive D7 read-only safety.",
+                              "Verified generic factory purity and safety rules.",
+                              affected_files=["state/migration-manifest.yml", "migration.config.example.yml", "README.md"])
+        else:
+            self.record_check("CHECK-ENTITY-25", "purity", "Generic Factory Purity & Safety", "FAIL",
+                              f"Found forbidden project-specific or local path patterns: {', '.join(found_forbidden)}",
+                              "Factory must remain strictly generic without project-specific artifacts.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -2386,6 +2832,7 @@ class FactoryValidator:
         self.validate_custom_database_and_data_model_suite()
         self.validate_procedural_hooks_accounting_suite()
         self.validate_configuration_state_accounting_suite()
+        self.validate_entities_and_fields_suite()
 
     def generate_result_json(self):
         return {

@@ -1,7 +1,7 @@
 ---
 name: testing
-description: Test Strategy & Automated Quality Assurance Playbook. Configures and validates PHPUnit test suites, custom class autoloading, constructor DI verification, hook replacement testing, event subscriber assertions, config schema validation, state persistence testing, PHPStan static analysis, and PHPCS coding standards.
-version: 1.3.0
+description: Test Strategy & Automated Quality Assurance Playbook. Configures and validates PHPUnit test suites, custom class autoloading, constructor DI verification, hook replacement testing, event subscriber assertions, config schema validation, state persistence testing, entity CRUD/revision/translation testing, entity access handler verification, PHPStan static analysis, and PHPCS coding standards.
+version: 1.4.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Automated Testing & Quality Assurance Playbook Skill
 
 ## Overview
-This skill provides the procedural guidelines and runner configurations for establishing automated testing pipelines, static code analysis, custom PHP class testing, procedural hook replacement testing, event subscriber assertions, configuration schema validation, state API assertions, and coding standards compliance across migrated Drupal 10 and Drupal 11 custom modules and themes.
+This skill provides the procedural guidelines and runner configurations for establishing automated testing pipelines, static code analysis, custom PHP class testing, procedural hook replacement testing, event subscriber assertions, configuration schema validation, state API assertions, entity CRUD / revision / translation testing, entity access control verification, and coding standards compliance across migrated Drupal 10 and Drupal 11 custom modules and themes.
 
 ---
 
@@ -19,9 +19,10 @@ This skill provides the procedural guidelines and runner configurations for esta
 
 ---
 
-## Test Expectations for Migrated Custom PHP Classes, Services, Hooks & Configuration
+## Test Expectations for Modernized Code & Entities (Step 16)
 
-When testing modernized custom OOP classes, services, procedural hook replacements, and configuration/state artifacts, configure tests appropriate to their architectural responsibility:
+When testing modernized custom OOP classes, services, procedural hook replacements, configuration/state artifacts, and custom entities, configure tests appropriate to their architectural responsibility:
+
 1. **Class Autoloading & Container Construction**:
    - Verify class is discoverable via Composer PSR-4 without manual includes.
    - Verify service builds from `<module>.services.yml` container definition without container exceptions.
@@ -38,14 +39,21 @@ When testing modernized custom OOP classes, services, procedural hook replacemen
    - Assert `ConfigFormBase` builds, validates, and persists configuration correctly into CMI.
    - Assert State API persistence (`\Drupal::state()`) stores, retrieves, and deletes runtime state flags and timestamps correctly.
    - Assert Secret Isolation (Rule 10): verify zero credentials/API keys exist in exported CMI YAML files.
-5. **Public API & Business Logic Parity**:
+5. **Entity Architecture & Field Validation (Step 16)**:
+   - **Entity CRUD & Storage**: Test create, load, update, and delete operations via `EntityTypeManager` and custom storage handlers.
+   - **Base & Config Field Definitions**: Assert all `baseFieldDefinitions()` return correct field types, default values, cardinalities, and constraints.
+   - **Entity Access Control**: Assert that `EntityAccessControlHandler` returns expected `AccessResult::allowed()`, `AccessResult::forbidden()`, or `AccessResult::neutral()` across `view`, `update`, `delete`, and `create` operations for different user roles and ownership.
+   - **Revision Management**: Assert that saving entities with `$entity->setNewRevision(TRUE)` creates valid revision records, preserves revision logs, timestamps, and authors, and supports loading specific revision IDs.
+   - **Content Translation**: Assert that adding and updating translations (`$entity->addTranslation('es', ...)->save()`) persists translatable field values while leaving untranslatable fields synchronized.
+   - **Entity Queries**: Test that Entity Queries correctly filter by base fields, bundle, language, access conditions, and reference targets.
+6. **Public API & Business Logic Parity**:
    - Author PHPUnit Unit tests targeting domain calculations, validation algorithms, and state transitions.
-6. **Integration, Custom Database & Repository Operations**:
+7. **Integration, Custom Database & Repository Operations**:
    - Author PHPUnit Kernel tests targeting custom entity CRUD, custom database table repository queries, dynamic SQL filters, and configuration schema adherence.
    - Verify transaction rollback semantics: ensure failed operations rollback completely without leaving orphaned records.
-7. **Data Migration ETL Pipeline Tests**:
-   - Author Kernel migration tests verifying source-to-destination mappings, serialized payload transformations, entity reference lookups, and rollback behavior.
-8. **Error Handling & Edge Cases**:
+8. **Data Migration ETL Pipeline Tests**:
+   - Author Kernel migration tests verifying source-to-destination mappings, serialized payload transformations, entity reference lookups, revision transfers, translation mappings, and rollback behavior.
+9. **Error Handling & Edge Cases**:
    - Assert exception throwing on invalid inputs, missing dependencies, database constraint violations, or failed external requests.
 
 ---
@@ -62,7 +70,7 @@ When testing modernized custom OOP classes, services, procedural hook replacemen
 
 ### 2. PHPUnit Kernel Tests (`tests/src/Kernel/`)
 - **Scope**: Integration testing with a minimal, in-memory virtual Drupal bootstrap.
-- **Usage**: Tests database queries, service container integration, Entity API operations, and CMI schema adherence.
+- **Usage**: Tests database queries, service container integration, Entity API operations, entity revisions, translations, and CMI schema adherence.
 - **Execution Command**:
   ```bash
   vendor/bin/phpunit -c web/core/phpunit.xml web/modules/custom/<MODULE>/tests/src/Kernel/

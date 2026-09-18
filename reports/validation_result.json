@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260918211315",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260918213243",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T21:13:15.329390+00:00",
+  "executed_at": "2026-09-18T21:32:43.528725+00:00",
   "summary": {
-    "checks_total": 162,
-    "passed": 161,
+    "checks_total": 187,
+    "passed": 186,
     "failed": 0,
     "warnings": 0,
     "unverified": 1
@@ -1988,6 +1988,328 @@
         "skills/behavioral-validation/SKILL.md",
         "README.md",
         "ARCHITECTURE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-01",
+      "category": "discovery",
+      "name": "Generic Entity & Entity API Discovery",
+      "status": "PASS",
+      "evidence": "D7 analysis skill and discovery agent exhaustively discover core and custom entity implementations, Entity API calls, entity controllers, metadata wrappers, and entity keys.",
+      "details": "Verified generic entity and Entity API discovery capabilities.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "agents/discovery/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-02",
+      "category": "discovery",
+      "name": "Generic Field & Field API Discovery",
+      "status": "PASS",
+      "evidence": "D7 analysis skill and discovery agent exhaustively discover all field definitions, instances, field CRUD functions, and field attachment hooks across custom modules and schemas.",
+      "details": "Verified generic field and Field API discovery capabilities.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "agents/discovery/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-03",
+      "category": "accounting",
+      "name": "Entity Type Semantic Accounting",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills semantically classify entities into Content, Configuration, Runtime State, Lookup/Reference, Obsolete, and External systems.",
+      "details": "Verified entity type semantic classification.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-04",
+      "category": "bundles",
+      "name": "Bundle & Sub-type Accounting",
+      "status": "PASS",
+      "evidence": "Discovery, mapping, and migration skills capture bundle definitions, bundle-specific fields, bundle keys, and map to modern CMI bundle configs and bundle plugins.",
+      "details": "Verified bundle discovery and target mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-05",
+      "category": "entity_keys",
+      "name": "Entity Key Accounting",
+      "status": "PASS",
+      "evidence": "D7 analysis skill captures all essential entity keys: id, revision, bundle, label, language, and uuid, preserving primary and foreign identifiers.",
+      "details": "Verified entity key discovery and accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-06",
+      "category": "storage",
+      "name": "Field Storage & Schema Accounting",
+      "status": "PASS",
+      "evidence": "D7 analysis skill exhaustively audits field storage parameters: storage tables, columns, indexes, cardinality, language columns, deltas, and entity/revision relationships.",
+      "details": "Verified field storage analysis standards.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-07",
+      "category": "field_taxonomy",
+      "name": "Field Type Taxonomy & Modern Equivalence",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills provide a comprehensive field taxonomy covering scalar, datetime, list, reference, media, and custom field types.",
+      "details": "Verified field type taxonomy coverage.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-08",
+      "category": "cardinality",
+      "name": "Cardinality & Constraint Accounting",
+      "status": "PASS",
+      "evidence": "D7 analysis, mapping, and manifest enforce cardinality (-1 vs 1 vs N), requiredness, and validation constraints in target base and config fields.",
+      "details": "Verified field cardinality and constraint accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-09",
+      "category": "entity_references",
+      "name": "Entity Reference & Relationship Discovery",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills discover entity reference fields, node/user/term references, target entity types, target bundles, and junction relationships.",
+      "details": "Verified entity reference discovery and target mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-10",
+      "category": "dependencies",
+      "name": "Entity Relationship & DAG Wave Integration",
+      "status": "PASS",
+      "evidence": "Dependency analysis skill incorporates entity reference hierarchies, revision chains, and translation couplings into DAG wave calculation with 2-pass cycle resolution.",
+      "details": "Verified entity relationship and DAG wave integration.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-11",
+      "category": "revisions",
+      "name": "Exhaustive Revision Discovery",
+      "status": "PASS",
+      "evidence": "D7 analysis skill exhaustively discovers revision tables, revision IDs, log fields, timestamps, revision flags, comparison logic, and revision loading APIs.",
+      "details": "Verified revision discovery standards.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-12",
+      "category": "revisions",
+      "name": "Revision Modernization & Migration Mapping",
+      "status": "PASS",
+      "evidence": "Mapping and Migration API skills define complete revision modernization: RevisionableInterface, revision_table in entity annotations, and dedicated entity revision migration pipelines.",
+      "details": "Verified revision modernization and migration standards.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-13",
+      "category": "translations",
+      "name": "Translation & Multilingual Discovery",
+      "status": "PASS",
+      "evidence": "D7 analysis skill exhaustively discovers multilingual configuration, $language, LANGUAGE_NONE, field translation tables, and entity translation APIs.",
+      "details": "Verified multilingual and translation discovery capabilities.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-14",
+      "category": "translations",
+      "name": "Translation Modernization & Migration Mapping",
+      "status": "PASS",
+      "evidence": "Mapping and Migration API skills define Content Translation architecture: TranslatableInterface, data_table, translatable base/config fields, and secondary translation migrations.",
+      "details": "Verified translation modernization and migration standards.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-15",
+      "category": "lifecycle",
+      "name": "Entity Lifecycle & Side Effect Integration",
+      "status": "PASS",
+      "evidence": "D7 analysis skill captures complete entity lifecycle semantics (create, load, presave, insert, update, postsave, delete) and associated side effects, cache invalidation, and queues.",
+      "details": "Verified entity lifecycle and side-effect integration.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-16",
+      "category": "security",
+      "name": "Entity Access & Security Modernization",
+      "status": "PASS",
+      "evidence": "Mapping and testing skills define modern EntityAccessControlHandler implementations returning AccessResult with strict role, ownership, and permission validation.",
+      "details": "Verified entity access control and security modernization.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/testing/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-17",
+      "category": "queries",
+      "name": "Entity Query & Storage Modernization",
+      "status": "PASS",
+      "evidence": "Mapping skill modernizes EntityFieldQuery and direct SQL entity queries into injected EntityTypeManager, EntityStorageInterface, and EntityQuery instances.",
+      "details": "Verified EntityQuery and storage modernization guidelines.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-18",
+      "category": "rendering",
+      "name": "Field Formatter, Widget & View Builder Accounting",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills audit field formatters, widgets, view modes, and display modes, mapping to modern FieldFormatter, FieldWidget plugins, and EntityViewBuilder.",
+      "details": "Verified formatter, widget, and view builder accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-19",
+      "category": "architecture",
+      "name": "Content Entity vs Config Entity Distinction",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills rigorously distinguish Content Entities (@ContentEntityType) with baseFieldDefinitions from Config Entities (@ConfigEntityType) with CMI schema backing.",
+      "details": "Verified Content vs Config entity architectural distinction.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-20",
+      "category": "taxonomy",
+      "name": "26 Target Architecture Taxonomy",
+      "status": "PASS",
+      "evidence": "Skills define the complete 26-class target architecture taxonomy (26/26 detected) supporting non-1:1 entity, field, revision, and translation transformations.",
+      "details": "Verified 26 target architecture classifications.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-21",
+      "category": "strategies",
+      "name": "16 Entity & Field Migration Strategies",
+      "status": "PASS",
+      "evidence": "Skills define all 16 standardized entity/field migration strategies (16/16 detected) separating migration methodology from terminal outcome status.",
+      "details": "Verified 16 entity and field migration strategies.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-22",
+      "category": "manifest",
+      "name": "Manifest Entity & Field Accounting Schema",
+      "status": "PASS",
+      "evidence": "state/migration-manifest.yml defines complete entities_fields_items accounting schema covering all 37 required entity, field, revision, translation, and relational metadata fields.",
+      "details": "Verified manifest entity/field accounting schema structure.",
+      "affected_files": [
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-23",
+      "category": "validation",
+      "name": "Zero-Omission Entity & Field Outcome Enforcement",
+      "status": "PASS",
+      "evidence": "Validation agent and skill enforce approved terminal outcomes (MIGRATED, REPLACED, OBSOLETE, EXCLUDED_WITH_REASON, HUMAN_DECISION_REQUIRED, UNVERIFIED) and reject forbidden states for all custom entities, bundles, and fields.",
+      "details": "Verified zero-omission outcome enforcement for entities and fields.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-24",
+      "category": "compatibility",
+      "name": "Cross-Capability Compatibility",
+      "status": "PASS",
+      "evidence": "Entity and field accounting seamlessly integrates with custom database schemas (Step 13), procedural hooks (Step 14), configuration/state (Step 15), custom PHP files (Step 12), and .inc files (Step 11) without ownership duplication.",
+      "details": "Verified cross-capability architectural compatibility.",
+      "affected_files": [
+        "state/migration-manifest.yml",
+        "README.md",
+        "ARCHITECTURE.md",
+        "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ENTITY-25",
+      "category": "purity",
+      "name": "Generic Factory Purity & Safety",
+      "status": "PASS",
+      "evidence": "Factory maintains 100% generic purity with zero project-specific module assumptions, zero hardcoded developer machine paths, and strictly non-destructive D7 read-only safety.",
+      "details": "Verified generic factory purity and safety rules.",
+      "affected_files": [
+        "state/migration-manifest.yml",
+        "migration.config.example.yml",
+        "README.md"
       ],
       "remediation": ""
     }

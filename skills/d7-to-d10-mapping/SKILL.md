@@ -1,7 +1,7 @@
 ---
 name: d7-to-d10-mapping
-description: Behavioral and architectural mapping rules for converting procedural Drupal 7 APIs, hooks, variables, state, and legacy custom PHP classes into modern Drupal 10/11 object-oriented patterns.
-version: 1.3.0
+description: Behavioral and architectural mapping rules for converting procedural Drupal 7 APIs, hooks, variables, custom entities, fields, revisions, translations, and legacy custom PHP classes into modern Drupal 10/11 object-oriented patterns.
+version: 1.4.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep
 # Drupal 7 to Drupal 10/11 Architectural Mapping Skill
 
 ## Overview
-This skill provides the architectural mapping rules required to translate Drupal 7 procedural constructs, hooks (core, contrib, custom, alter, entity, form, theme, install/update), persistent variables, configuration forms, runtime state, legacy custom PHP classes, constructors, interfaces, traits, and `.inc` files into modern Symfony/Drupal 10 and Drupal 11 object-oriented paradigms, prioritizing Dependency Injection, PSR-4 autoloading, service containers, event subscribers, typed configuration, and testability.
+This skill provides the architectural mapping rules required to translate Drupal 7 procedural constructs, hooks (core, contrib, custom, alter, entity, form, theme, install/update), persistent variables, configuration forms, runtime state, custom entities, fields, bundles, revisions, translations, legacy custom PHP classes, constructors, interfaces, traits, and `.inc` files into modern Symfony/Drupal 10 and Drupal 11 object-oriented paradigms, prioritizing Dependency Injection, PSR-4 autoloading, service containers, event subscribers, typed configuration, and testability.
 
 ---
 
@@ -20,6 +20,7 @@ For detailed syntax examples and conversion catalogs, consult:
 - [Drupal 7 Hooks to Modern Architecture Catalog](../../references/drupal-7/hooks.md)
 - [Drupal 10 & 11 Plugin Types & Modern Architecture](../../references/drupal-10/plugin-types.md)
 - [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
+- [Field Type & Data Migration Mapping Reference](../../references/migration-patterns/field-mapping.md)
 
 ---
 
@@ -90,7 +91,23 @@ In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual li
 - **KeyValue API**: Dedicated key-value collections map to `\Drupal::keyValue()` or `keyvalue.expirable`.
 - **14 Migration Strategies Applied**: Explicitly choose from `DIRECT_CONFIG_MIGRATION`, `TRANSFORMED_CONFIG_MIGRATION`, `CONFIG_ENTITY_MIGRATION`, `STATE_MIGRATION`, `SETTINGS_MIGRATION`, `ENVIRONMENT_MIGRATION`, `KEY_VALUE_MIGRATION`, `CONTENT_MIGRATION`, `CACHE_REBUILD`, `CUSTOM_MIGRATION`, `REPLACED`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
 
-### 7. Entity, Custom Database & Repository Abstraction
+### 7. Entities, Fields, Revisions & Translations Modernization
+- **Content Entity vs Config Entity Architectural Distinction**:
+  - *Content Entity (`@ContentEntityType`)*: Domain content and fieldable business objects with database storage (`src/Entity/<EntityName>.php`), extending `ContentEntityBase` or `RevisionableContentEntityBase` and implementing `<EntityName>Interface`.
+  - *Config Entity (`@ConfigEntityType`)*: Administrative, exportable entities (e.g. custom bundle types) map to `@ConfigEntityType` in `src/Entity/` extending `ConfigEntityBase` with CMI schema backing.
+- **Base Fields vs Config Fields**:
+  - Core entity attributes (`id`, `uuid`, `vid`, `langcode`, `title`, `created`, `changed`, `status`, `uid`) defined via `public static function baseFieldDefinitions(EntityTypeInterface $entity_type)` declaring field types, cardinality, requiredness, and constraints.
+  - Dynamic / bundle-attachable fields mapped to CMI field storage (`field.storage.<entity>.<field>.yml`) and field instance (`field.field.<entity>.<bundle>.<field>.yml`) YAML definitions.
+- **Entity References & Target Bundles**: Procedural `entityreference` / `taxonomy_term_reference` fields modernize to `entity_reference` base fields or config fields with typed target entity references (`target_type: node`, `target_bundles: [article]`).
+- **Revisionable & Translatable Entities**:
+  - Implement `RevisionableInterface` and `TranslatableInterface` on the entity class.
+  - Enable Content Translation, declare `revision_table`, `data_table`, and `translatable: true` in the entity definition.
+- **Entity Access Control Handler**: Custom entity access callbacks modernize to dedicated handlers (`src/<EntityName>AccessControlHandler.php`) extending `EntityAccessControlHandler`.
+- **Entity View Builder & View Modes**: Procedural `entity_view()` builders modernize to `EntityViewBuilder` classes with configured view mode displays (`core.entity_view_display.*.yml`).
+- **Entity Query & Storage Modernization**: Procedural `EntityFieldQuery` and direct entity SQL queries modernize to modern `EntityQuery` via `EntityStorageInterface` (`$entity_type_manager->getStorage('<entity>')->getQuery()`) or `\Drupal::entityQuery('<entity>')`.
+
+
+### 8. Custom Database Table & Repository Abstraction
 - **Core Entity Queries**: Direct `db_query()` targeting core tables (`{node}`, `{users}`, `{taxonomy_term_data}`, `{file_managed}`) MUST be replaced by Entity Queries or Entity Storage via `EntityTypeManagerInterface`.
 - **Custom Database Table Target Architecture Mapping**:
   - *Content Entity (`src/Entity/`)*: Appropriate when the table represents domain content, user submissions, or business objects with fieldable requirements, revisioning, or access control.

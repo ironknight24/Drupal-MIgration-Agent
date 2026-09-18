@@ -24,6 +24,10 @@ evidence_summary:
 - **Total Discovered Custom PHP Files**: {{ PHP_FILES_COUNT }}
 - **Total Discovered Custom Classes**: {{ CLASSES_COUNT }}
 - **Total Discovered .inc Files**: {{ INC_FILES_COUNT }}
+- **Total Discovered Custom Entity Types**: {{ CUSTOM_ENTITIES_COUNT }}
+- **Total Discovered Fields & Instances**: {{ FIELDS_COUNT }}
+- **Total Discovered Revision Tables**: {{ REVISION_TABLES_COUNT }}
+- **Total Discovered Multilingual/Translation Artifacts**: {{ TRANSLATIONS_COUNT }}
 - **Total Contributed Modules**: {{ CONTRIB_MODULES_COUNT }}
 - **Total Custom Themes**: {{ CUSTOM_THEMES_COUNT }}
 - **Total Custom Database Tables**: {{ CUSTOM_TABLES_COUNT }}
@@ -92,7 +96,16 @@ evidence_summary:
 
 ---
 
-## 9. Contributed Modules Inventory
+## 9. Custom Entities, Bundles, Fields, Revisions & Translations Inventory (Step 16)
+
+| Module | Entity Type | Bundle | Field Name | Artifact Type | Field Type | Cardinality | Translatable | Revisionable | References / Target | Target Architecture (26 Types) | Migration Strategy (16 Strategies) | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `example_module` | `custom_record` | `custom_record` | N/A | `CUSTOM_ENTITY` | N/A | 1 | Yes | Yes | N/A | `CONTENT_ENTITY` | `ENTITY_TYPE_REBUILD` | `MIGRATED` |
+| `example_module` | `custom_record` | `custom_record` | `field_reference_target` | `FIELD_INSTANCE` | `entityreference` | -1 | No | Yes | `node:article` | `ENTITY_REFERENCE` | `FIELD_REBUILD` | `MIGRATED` |
+
+---
+
+## 10. Contributed Modules Inventory
 
 | Contrib Module | D7 Version | Core in D10? | D10 Available? | Community Replacement | Action Plan |
 |---|---|---|---|---|---|
@@ -101,7 +114,7 @@ evidence_summary:
 
 ---
 
-## 10. Custom Themes Inventory
+## 11. Custom Themes Inventory
 
 | Theme Name | Path | Base Theme | Template Files (.tpl.php) | Preprocess Functions |
 |---|---|---|---|---|
@@ -109,7 +122,7 @@ evidence_summary:
 
 ---
 
-## 11. Custom Database Tables & Data-Model Inventory
+## 12. Custom Database Tables & Data-Model Inventory
 
 | Module | Table Name | Schema Location (`hook_schema`) | Primary Key & Indexes | Entity References (`uid`, `nid`, etc.) | Data Semantics (17 Categories) | Serialization (`PHP_SERIALIZE`, `JSON`, etc.) | CRUD Callers (Create/Read/Update/Delete) | Target Architecture |
 |---|---|---|---|---|---|---|---|---|
@@ -117,7 +130,7 @@ evidence_summary:
 
 ---
 
-## 12. Entity & Data Architecture
+## 13. Entity & Data Architecture
 - **Content Types**:
 - **Taxonomy Vocabularies**:
 - **Custom SQL Tables**:
@@ -125,13 +138,13 @@ evidence_summary:
 
 ---
 
-## 13. Integrations, External Endpoints & Drush Commands
+## 14. Integrations, External Endpoints & Drush Commands
 - **Webhooks & APIs**:
 - **Authentication Protocols**:
 - **Custom Drush Commands**:
 
 ---
 
-## 14. Baseline Audit Findings & Risks
+## 15. Baseline Audit Findings & Risks
 - **Risk Assessment**:
 - **Recommended Sequence Overrides**:

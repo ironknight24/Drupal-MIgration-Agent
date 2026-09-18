@@ -1,7 +1,7 @@
 ---
 name: migration-api
-description: Drupal Core Migration API Architect & ETL Pipeline Playbook. Configures source, process, and destination plugins, relational dependencies, and data integrity verification.
-version: 1.0.0
+description: Drupal Core Migration API Architect & ETL Pipeline Playbook. Configures source, process, and destination plugins, relational dependencies, entity/field/revision/translation pipelines, and data integrity verification.
+version: 1.1.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Drupal Core Migration API Architect Skill
 
 ## Overview
-This skill provides the architectural guidelines, plugin pipeline configurations, and relational sequencing workflows for constructing robust, reproducible data migrations from Drupal 7 to modern Drupal 10 and Drupal 11 using the core Migration API (`migrate`, `migrate_drupal`, `migrate_plus`).
+This skill provides the architectural guidelines, plugin pipeline configurations, relational sequencing workflows, and zero-omission accounting for constructing robust, reproducible data migrations from Drupal 7 to modern Drupal 10 and Drupal 11 using the core Migration API (`migrate`, `migrate_drupal`, `migrate_plus`).
 
 ---
 
@@ -22,26 +22,32 @@ This skill provides the architectural guidelines, plugin pipeline configurations
 
 ## Relational Pipeline Sequencing
 
-To avoid foreign key constraint violations and orphaned references, migrations must execute in strict dependency order:
+To avoid foreign key constraint violations, circular dependencies, and orphaned references, migrations must execute in strict dependency order:
 
 ```text
-1. User Roles (d7_user_role)
+1. Languages & Multilingual Config (d7_language)
    ↓
-2. User Accounts (d7_user)
+2. User Roles & Permissions (d7_user_role)
    ↓
-3. Taxonomy Vocabularies (d7_taxonomy_vocabulary)
+3. User Accounts (d7_user)
    ↓
-4. Taxonomy Terms (d7_taxonomy_term)
+4. Taxonomy Vocabularies (d7_taxonomy_vocabulary)
    ↓
-5. Managed Files & Media (d7_file)
+5. Taxonomy Terms (d7_taxonomy_term)
    ↓
-6. Custom SQL Tables & Independent Entities
+6. Managed Files & Media (d7_file)
    ↓
-7. Nodes & Base Content (d7_node)
+7. Custom Config Entities & Lookup Tables
    ↓
-8. Node Revisions & Historical Moderation (d7_node_revision)
+8. Custom Content Entities (Base & Fieldable)
    ↓
-9. Entity References, Comments & Menu Links (d7_menu_links, d7_comment)
+9. Nodes & Content Types (d7_node)
+   ↓
+10. Entity Revisions & Historical Moderation (d7_node_revision, custom revisions)
+   ↓
+11. Entity Translations & Multilingual Fields (d7_entity_translation, content_translation)
+   ↓
+12. Entity References, Comments & Menu Links (d7_menu_links, d7_comment)
 ```
 
 ---
@@ -57,13 +63,19 @@ source:
   node_type: article
 ```
 
+For custom entities, extend `Drupal\migrate\Plugin\migrate\source\SqlBase`:
+- Define `query()` selecting base, data, revision, and field tables.
+- Define `fields()` declaring all source schema columns and computed properties.
+- Define `getIds()` declaring the unique source identifier schema.
+
 ### 2. Process Plugin Pipeline
 Transforms incoming source fields into target entity properties using chainable plugins:
-- `migration_lookup`: Looks up destination IDs based on prior migration runs.
-- `sub_process`: Iterates over complex multi-property fields (e.g. image, link).
-- `static_map`: Translates discrete status values or format names.
+- `migration_lookup`: Looks up destination IDs based on prior migration runs (essential for `entity_reference`).
+- `sub_process`: Iterates over complex multi-property fields (e.g. image, link, paragraph items).
+- `static_map`: Translates discrete status values, formats, or vocabularies.
 - `default_value`: Sets defaults when source fields are NULL.
 - `callback`: Invokes safe helper functions for data normalization.
+- `d7_field_formatter`: Normalizes legacy field deltas and language keys.
 
 ### 3. Destination Plugin Definition
 Persists mapped data into Drupal 10/11 entities:
@@ -72,11 +84,11 @@ Persists mapped data into Drupal 10/11 entities:
 destination:
   plugin: 'entity:node'
   default_bundle: article
+  translations: true # For translation migrations
 ```
 
 ---
-
-## Custom Database & Data-Model Migration Strategies
+## Custom Database & Data-Model Migration Strategies (Step 13)
 
 For every custom database table and stored data model discovered in legacy D7 custom modules, apply one of the 10 standardized migration strategies:
 
@@ -97,13 +109,91 @@ For every custom database table and stored data model discovered in legacy D7 cu
 
 ---
 
+## Step 16 Entity & Field Target Architecture Taxonomy
+
+Every discovered D7 entity, field, revision, translation, or reference artifact must map to one or more of the 26 target architecture classifications:
+
+| Target Architecture | Description | Implementation Artifact |
+| :--- | :--- | :--- |
+| `CONTENT_ENTITY` | Full fieldable/revisionable/translatable content entity | `src/Entity/<CustomEntity>.php` (`@ContentEntityType`) |
+| `CONFIG_ENTITY` | Schema-backed exportable configuration entity | `src/Entity/<CustomConfig>.php` (`@ConfigEntityType`) |
+| `ENTITY_TYPE` | Entity type declaration and interface | `src/Entity/<CustomEntity>Interface.php` |
+| `BUNDLE` | Entity sub-type or bundle plugin definition | CMI YAML or Bundle Plugin class |
+| `ENTITY_STORAGE` | Custom entity storage handler | `src/Storage/<CustomEntity>Storage.php` |
+| `ENTITY_ACCESS_HANDLER` | Entity access control handler | `src/Access/<CustomEntity>AccessControlHandler.php` |
+| `ENTITY_QUERY` | Modernized EntityQuery usage | `\Drupal::entityTypeManager()->getStorage()->getQuery()` |
+| `FIELD_STORAGE` | Field storage configuration | `config/sync/field.storage.<entity>.<field>.yml` |
+| `FIELD_CONFIG` | Bundle-specific field instance config | `config/sync/field.field.<entity>.<bundle>.<field>.yml` |
+| `FIELD_TYPE` | Custom FieldType plugin | `src/Plugin/Field/FieldType/<FieldType>.php` (`@FieldType`) |
+| `FIELD_WIDGET` | Custom FieldWidget plugin | `src/Plugin/Field/FieldWidget/<Widget>.php` (`@FieldWidget`) |
+| `FIELD_FORMATTER` | Custom FieldFormatter plugin | `src/Plugin/Field/FieldFormatter/<Formatter>.php` (`@FieldFormatter`) |
+| `ENTITY_REFERENCE` | Typed entity reference field/target | `core.base_field_override` or `field.storage` (`entity_reference`) |
+| `REVISIONABLE_ENTITY` | Entity supporting revision history | Implements `RevisionableInterface` with `revision_table` |
+| `TRANSLATABLE_ENTITY` | Entity supporting Content Translation | Implements `TranslatableInterface` with `data_table` |
+| `TRANSLATION_HANDLER` | Content translation UI handler | `Drupal\content_translation\ContentTranslationHandler` |
+| `PLUGIN` | Re-engineered as a typed Drupal Plugin | `src/Plugin/<PluginType>/<Class>.php` |
+| `SERVICE` | Re-engineered as an injected Symfony service | `src/Service/<Service>.php` |
+| `REPOSITORY` | Custom relational data access repository | `src/Repository/<Repository>.php` |
+| `CUSTOM_STORAGE` | Custom backend storage engine | `src/Storage/CustomStorageHandler.php` |
+| `CONFIGURATION` | Static settings in CMI YAML | `config/sync/<module>.settings.yml` |
+| `STATE` | Ephemeral runtime key/value state | `\Drupal::state()` |
+| `EXTERNAL_SYSTEM` | Offloaded to external 3rd-party API/system | Client service / webhook |
+| `OBSOLETE` | Documented legacy dead code/field/entity | Deprecated and excluded |
+| `HUMAN_DECISION_REQUIRED` | Ambiguous semantic or structural pattern | Architectural decision record required |
+| `UNVERIFIED` | Runtime inspection required | Staging validation gate required |
+
+---
+
+## Step 16 Standardized Entity & Field Migration Strategies
+
+Apply one of the 16 explicit strategies to every discovered entity and field item:
+
+1. **`DIRECT_ENTITY_MIGRATION`**: Direct migration into a corresponding D10 entity type using a dedicated Migrate source and destination plugin.
+2. **`TRANSFORMED_ENTITY_MIGRATION`**: Source rows undergo schema normalization, bundle merging/splitting, or complex field restructuring during migration.
+3. **`ENTITY_TYPE_REBUILD`**: Architectural re-engineering of legacy procedural entity definitions into OOP `@ContentEntityType` or `@ConfigEntityType`.
+4. **`BUNDLE_REBUILD`**: Re-engineering legacy node types or custom bundles into D10 CMI bundle definitions or bundle plugins.
+5. **`FIELD_REBUILD`**: Re-engineering legacy D7 field definitions into D10 `field.storage.*` and `field.field.*` CMI configurations or base fields.
+6. **`FIELD_TRANSFORMATION`**: Modernizing legacy field types into modern equivalents (e.g., `text_with_summary` → `text_with_summary`, custom field → typed data plugin).
+7. **`REFERENCE_REMAP`**: Remapping legacy entity/node/user/term references via `migration_lookup` process plugins to new D10 entity IDs.
+8. **`REVISION_MIGRATION`**: Dedicated secondary migration pipeline transferring complete revision history, log messages, and timestamps.
+9. **`TRANSLATION_MIGRATION`**: Dedicated multilingual migration pipeline migrating field translations into D10 entity translation records.
+10. **`CONFIG_ENTITY_MIGRATION`**: Migrating D7 exported arrays or database records into modern D10 Config Entities.
+11. **`CUSTOM_STORAGE_MIGRATION`**: Migrating data stored in custom storage engines or external backends.
+12. **`CONTENT_MIGRATION`**: Migrating raw table records into standard Drupal content entities.
+13. **`REPLACED`**: Legacy custom entity/field functionality replaced by modern Core (Media, Workflows, Layout Builder) or standard Contrib.
+14. **`OBSOLETE`**: Documented legacy dead entities, orphan field tables, or deprecated structures excluded with reasons.
+15. **`HUMAN_DECISION_REQUIRED`**: Unresolved entity architecture, data integrity ambiguity, or manual mapping sign-off needed.
+16. **`UNVERIFIED`**: Dynamic or unverified entity/field structures requiring runtime verification.
+
+
+---
+
+## Revision & Multilingual Migration Guidelines
+
+### Revision Migration Pipeline
+- When entities have active revision tables (`{node_revision}`, `{custom_entity_revision}`):
+  - Configure two migration definitions:
+    1. Base entity migration (`d7_custom_entity`) creating the initial entities.
+    2. Revision migration (`d7_custom_entity_revision`) mapped to destination `plugin: 'entity_revision:<entity_type>'`.
+  - Process plugins must map `vid` (revision ID), `revision_timestamp`, `revision_uid`, and `revision_log`.
+
+### Multilingual & Translation Pipeline
+- Map legacy `LANGUAGE_NONE` (`und`) to target default language (`en`, site default, or `und`/`zxx` for language-neutral items).
+- For sites using Entity Translation / Content Translation:
+  - Base migration imports the default translation.
+  - Secondary translation migration (`d7_custom_entity_translation`) uses `destination: plugin: 'entity:<entity_type>', translations: true`.
+  - Map `langcode` property in source and destination to associate translations with existing entity IDs (`migration_lookup`).
+
+---
+
 ## Data Integrity Verification & Checksums
 
 Before certifying a data migration pipeline as complete:
 1. **Row Count & Semantic Cardinality Reconciliation**: Run comparison queries to verify that total source records match total destination records:
    $$\text{Source Row Count} = \text{Destination Row Count} + \text{Documented Excluded Count}$$
-   Where one-to-many or many-to-one transformations occur, verify semantic relationship cardinality.
 2. **Entity Reference Integrity**: Verify that no `migration_lookup` returned empty or stub IDs where valid parent records existed (`uid`, `nid`, `tid`, `fid`).
-3. **Serialized Payload Verification**: Confirm serialized payloads are cleanly parsed and mapped without data truncation or corruption.
-4. **Character Encoding Verification**: Confirm UTF-8 integrity; verify zero truncated multibyte strings.
-5. **Rollback Verification**: Validate that migration configurations support clean rollback (`drush migrate:rollback <migration_id>`) without database corruption.
+3. **Revision Count Integrity**: Compare source revision count against destination revision count for all revisionable entities.
+4. **Translation Integrity**: Verify translation count matches across all supported language codes.
+5. **Serialized Payload Verification**: Confirm serialized payloads are cleanly parsed and mapped without data truncation or corruption.
+6. **Character Encoding Verification**: Confirm UTF-8 integrity; verify zero truncated multibyte strings.
+7. **Rollback Verification**: Validate that migration configurations support clean rollback (`drush migrate:rollback <migration_id>`) without database corruption.
