@@ -470,10 +470,64 @@ Audit frontend security vulnerabilities, accessibility hooks, and external depen
 - **Approved Terminal Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
 - **Forbidden Terminal States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`.
 
+### 54. Exhaustive Views & View Definition Discovery
+Recursively discover all Drupal 7 Views and executable configurations:
+- **Default Views in Code**: Discovers `hook_views_default_views()` implementations in `*.views_default.inc`, `*.views.inc`, and `*.module` files.
+- **Exported View Definitions**: Parses `$view = new view();` builder scripts, display definitions (`$view->new_display(...)`), handler assignments, and display options.
+- **Programmatic View Dispatches**: Discovers `views_get_view()`, `views_get_all_views()`, `views_embed_view()`, `views_get_view_result()`, `views_execute_display()`, `views_get_handler()`, and runtime view object mutations across controllers, blocks, and menu callbacks.
+
+### 55. Views Displays & Display Plugin Taxonomy
+Categorize every display attached to discovered Views:
+- **Display Types**: Page (`page`), Block (`block`), Feed (`feed`), REST Export (`rest_export`), Attachment (`attachment`), Embed (`embed`), and custom display plugins.
+- **Display Configurations**: Path/routing, menu item links, administrative titles, access control, contextual filters, exposed filter widgets, pager options, caching configuration, and AJAX enablement.
+
+### 56. Views Handlers & `hook_views_data()` Analysis
+Exhaustively inspect handler assignments and schema definitions:
+- **Handler Classifications**:
+  - Field Handlers (`views_handler_field` $\rightarrow$ `@ViewsField`)
+  - Filter Handlers (`views_handler_filter` $\rightarrow$ `@ViewsFilter`)
+  - Contextual Filter / Argument Handlers (`views_handler_argument` $\rightarrow$ `@ViewsArgument`)
+  - Sort Handlers (`views_handler_sort` $\rightarrow$ `@ViewsSort`)
+  - Relationship Handlers (`views_handler_relationship` $\rightarrow$ `@ViewsRelationship`)
+  - Area Handlers (`views_handler_area` $\rightarrow$ `@ViewsArea`)
+  - Pager Plugins (`views_plugin_pager` $\rightarrow$ `@ViewsPager`)
+  - Access Plugins (`views_plugin_access` $\rightarrow$ `@ViewsAccess`)
+  - Query Plugins (`views_plugin_query` $\rightarrow$ `@ViewsQuery`)
+  - Style Plugins (`views_plugin_style` $\rightarrow$ `@ViewsStyle`)
+  - Row Plugins (`views_plugin_row` $\rightarrow$ `@ViewsRow`)
+- **`hook_views_data()` & `hook_views_data_alter()`**: Audits table definitions, joins (`left_table`, `left_field`), field definitions, filters, arguments, and custom relationship chains.
+
+### 57. Custom Views Plugins & OOP Class Hierarchy
+Audit custom plugin classes and procedural registrations:
+- **Plugin Annotations & Class Inheritance**: Traces legacy class extensions (`views_handler_field_custom`, `views_plugin_style_default`) to modern Drupal 10/11 PSR-4 plugin classes under `src/Plugin/views/` annotated with `@ViewsHandler`, `@ViewsPlugin`, or specialized annotations.
+- **Service Dependency Injection**: Refactors procedural global calls in plugin methods into `ContainerFactoryPluginInterface::create()` dependency injection.
+
+### 58. Views Query Analysis & Alteration Lifecycle
+Audit query construction, custom SQL, and Views execution lifecycle hooks:
+- **Query Alterations**: Discovers `hook_views_query_alter()`, analyzing `$query->add_where()`, `$query->add_table()`, `$query->add_field()`, `$query->set_distinct()`, and `$query->add_groupby()`.
+- **Execution Lifecycle Hooks**: Discovers `hook_views_pre_view()`, `hook_views_pre_build()`, `hook_views_post_build()`, `hook_views_pre_execute()`, `hook_views_post_execute()`, `hook_views_pre_render()`, and `hook_views_post_render()`.
+
+### 59. Views Access, Caching, Contexts & Security
+Audit security, authorization, and cache metadata:
+- **Access Control**: Evaluates permission checks, role checks, custom access plugins (`@ViewsAccess`), and contextual filter argument access validations.
+- **Cache Metadata & Invalidation**: Maps D7 time-based caching (`views_plugin_cache_time`) to modern cache tags (`node_list`, `user:uid`), cache contexts (`user.roles`, `url.query_args`, `languages`), and cache max-age.
+
+### 60. Views Exposed Forms, AJAX, Frontend & Programmatic Usage
+Audit interactive frontend components and programmatic executions:
+- **Exposed Forms & AJAX**: Cross-references exposed filter widgets (`#type => select`, `radios`, `bef`) with Step 17 Form API handling and Step 18 client-side AJAX pagination / filtering behavior.
+- **Frontend & Templates**: Identifies Views template suggestions (`views-view.html.twig`, `views-view-unformatted.html.twig`, `views-view-fields.html.twig`) and asset attachments (`#attached['library']`).
+- **Programmatic Usage Modernization**: Maps `views_get_view($name)` to `\Drupal\views\Views::getView($name)` and `views_embed_view($name, $display_id, ...$args)` to `views_embed_view()`.
+
+### 61. 30 Views Target Architecture Taxonomy & 21 Migration Strategies
+- **30 Views Target Architecture Classifications**: `VIEW_CONFIG`, `VIEW_DISPLAY_PAGE`, `VIEW_DISPLAY_BLOCK`, `VIEW_DISPLAY_FEED`, `VIEW_DISPLAY_REST`, `VIEW_DISPLAY_EXPORT`, `VIEW_DISPLAY_ATTACHMENT`, `VIEW_DISPLAY_EMBED`, `VIEW_FIELD_PLUGIN`, `VIEW_FILTER_PLUGIN`, `VIEW_CONTEXTUAL_FILTER_PLUGIN`, `VIEW_SORT_PLUGIN`, `VIEW_RELATIONSHIP_PLUGIN`, `VIEW_AREA_PLUGIN`, `VIEW_PAGER_PLUGIN`, `VIEW_ACCESS_PLUGIN`, `VIEW_QUERY_PLUGIN`, `VIEW_STYLE_PLUGIN`, `VIEW_ROW_PLUGIN`, `VIEW_DISPLAY_PLUGIN`, `VIEW_CACHE_PLUGIN`, `VIEW_EXPOSED_FORM_PLUGIN`, `CUSTOM_VIEWS_PLUGIN`, `VIEWS_DATA_DEFINITION`, `VIEWS_QUERY_ALTER`, `VIEWS_RENDER_ALTER`, `VIEWS_ACCESS_RULE`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Standardized Migration Strategies (21 Strategies)**: `VIEW_CONFIG_REBUILD`, `VIEW_DISPLAY_REBUILD`, `HANDLER_PLUGIN_REWRITE`, `CUSTOM_PLUGIN_REWRITE`, `VIEWS_DATA_REWRITE`, `QUERY_PLUGIN_REWRITE`, `QUERY_ALTER_REWRITE`, `FILTER_REWRITE`, `CONTEXTUAL_FILTER_REWRITE`, `RELATIONSHIP_REWRITE`, `ACCESS_REWRITE`, `CACHE_METADATA_REWRITE`, `EXPOSED_FORM_REWRITE`, `AJAX_VIEW_REWRITE`, `PROGRAMMATIC_VIEW_REWRITE`, `THEME_HANDOFF`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Approved Terminal Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Forbidden Terminal States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`.
+
 ---
 
 ## Output Reporting Standard
 All discovery outputs must:
-1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, JavaScript behavior names, library identifiers, and line numbers (`[OBSERVED FACT]`).
-2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, and `frontend_assets_items` in `state/migration-manifest.yml`.
-3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback / dynamic JS setting as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.
+1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, JavaScript behavior names, library identifiers, view IDs, display IDs, plugin IDs, and line numbers (`[OBSERVED FACT]`).
+2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, and `views_plugins_items` in `state/migration-manifest.yml`.
+3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback / dynamic JS setting / dynamic View ID as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.

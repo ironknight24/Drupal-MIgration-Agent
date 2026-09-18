@@ -1,7 +1,7 @@
 ---
 name: dependency-analysis
-description: Topological sorting, circular dependency detection, and execution wave planning across custom PHP files, classes, procedural hooks, database models, configuration variables, entities, forms, AJAX interactions, and frontend JavaScript/CSS/libraries.
-version: 1.7.0
+description: Topological sorting, circular dependency detection, and execution wave planning across custom PHP files, classes, procedural hooks, database models, configuration variables, entities, forms, AJAX interactions, frontend JavaScript/CSS/libraries, and Views/custom plugins.
+version: 1.8.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Dependency Analysis & Wave Scheduling Skill
 
 ## Overview
-This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, configuration, state, procedural hook execution ordering, module weights (`{system}.weight`), alter sequencing (`hook_module_implements_alter`), custom PHP class instantiations, entity reference graphs, revision/translation hierarchies, form builders, form alters, AJAX callbacks, and legacy `.inc` function couplings across legacy Drupal 7 components. It constructs a Directed Acyclic Graph (DAG), detects circular dependencies, and organizes components into executable topological waves.
+This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, configuration, state, procedural hook execution ordering, module weights (`{system}.weight`), alter sequencing (`hook_module_implements_alter`), custom PHP class instantiations, entity reference graphs, revision/translation hierarchies, form builders, form alters, AJAX callbacks, legacy `.inc` function couplings, and Views / custom plugin dependencies across legacy Drupal 7 components. It constructs a Directed Acyclic Graph (DAG), detects circular dependencies, and organizes components into executable topological waves.
 
 ---
 
@@ -20,9 +20,9 @@ This skill provides the procedural playbook and algorithms for discovering code,
 
 ---
 
-## 8-Dimensional Coupling Detection Heuristics
+## 10-Dimensional Coupling Detection Heuristics
 
-To establish an accurate DAG, inspect source assets across 8 distinct coupling vectors:
+To establish an accurate DAG, inspect source assets across 10 distinct coupling vectors:
 
 ### 1. Declared Dependencies
 - Parse `dependencies[]` declarations in source `.info` files (`[OBSERVED FACT]`).
@@ -78,11 +78,21 @@ To establish an accurate DAG, inspect source assets across 8 distinct coupling v
   - `CSS STYLESHEET -> THEME / TEMPLATE SELECTORS`: Stylesheets dependent on markup classes rendered by custom Twig templates, field formatters, or view modes.
   - `EXTERNAL / THIRD-PARTY ASSET -> CDN / VENDOR ASSET`: Module libraries dependent on external CDN resources or vendor assets.
 
-### 8. Presentation & Theme Couplings (Step 20 Handoff)
+### 8. Views, Plugins & Query Alteration Dependencies (Step 19)
+- Map Views-specific dependencies across entities, queries, handlers, and displays:
+  - `VIEW CONFIG -> BASE ENTITY / TABLE`: View definitions dependent on underlying Content Entities or custom database tables.
+  - `VIEW CONFIG -> CUSTOM HANDLER / PLUGIN`: Views referencing custom field, filter, contextual filter, sort, area, or style plugins.
+  - `VIEW CONFIG -> RELATIONSHIP CHAINS`: Views traversing multiple entity reference relationships (`node -> author -> custom_profile`).
+  - `VIEW CONFIG -> HOOK_VIEWS_QUERY_ALTER`: Views whose query execution is modified by procedural query alteration hooks.
+  - `VIEW EXPOSED FORM -> VIEW / FORM API EXPOSED WRAPPER`: Views exposed filter forms interacting with server-side Form API builder and validation callbacks.
+  - `VIEW AJAX PAGINATION / FILTER -> VIEW / AJAX FRONTEND REFRESH`: Views with AJAX enabled communicating with client-side Drupal.ajax behaviors and response commands.
+  - `PROGRAMMATIC VIEW CALLER -> VIEW DEFINITION`: Controllers, blocks, or services dispatching `views_get_view()` or `views_embed_view()`.
+
+### 9. Presentation & Theme Couplings (Step 20 Handoff)
 - Identify custom theme templates (`.tpl.php`) or preprocess functions invoking custom module APIs.
 - Custom modules that provide default themes or template suggestions via `hook_theme()`.
 
-### 9. Data Migration Hierarchy & Database Ordering Couplings
+### 10. Data Migration Hierarchy & Database Ordering Couplings
 - Relational entity and custom table hierarchies where dependent data cannot be migrated before parent entities:
   - Roles & Permissions $\rightarrow$ Users
   - Users $\rightarrow$ Taxonomy Vocabularies $\rightarrow$ Taxonomy Terms

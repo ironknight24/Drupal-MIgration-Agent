@@ -377,6 +377,57 @@ target_system:
 #       confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
 #       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
 #       exclusion_reason: null
+#   # Comprehensive Views, Displays, Handlers & Custom Plugins Accounting
+#   views_plugins_items:
+#     - item_id: "VIEW-001"
+#       view_id: "custom_content_listing"
+#       display_id: "page_1"
+#       source_file: "my_module.views_default.inc"
+#       source_line: 25
+#       defining_module: "my_module"
+#       display_type: "PAGE" # PAGE | BLOCK | FEED | REST_EXPORT | ATTACHMENT | EMBED | CUSTOM_DISPLAY
+#       base_entity_or_table: "node"
+#       handler_or_plugin: "VIEW_DEFINITION" # VIEW_DEFINITION | FIELD_HANDLER | FILTER_HANDLER | CONTEXTUAL_FILTER | SORT_HANDLER | RELATIONSHIP_HANDLER | AREA_HANDLER | PAGER_PLUGIN | ACCESS_PLUGIN | QUERY_PLUGIN | STYLE_PLUGIN | ROW_PLUGIN | CACHE_PLUGIN | EXPOSED_FORM_PLUGIN | CUSTOM_PLUGIN | VIEWS_DATA | QUERY_ALTER
+#       plugin_id: "page"
+#       plugin_class: "Drupal\\views\\Plugin\\views\\display\\Page"
+#       fields: ["title", "created", "field_custom_data"]
+#       filters: ["status", "type", "field_custom_category"]
+#       contextual_filters: ["uid", "nid"]
+#       sorts: ["created DESC"]
+#       relationships: ["field_referenced_entity"]
+#       arguments: ["arg(1)"]
+#       query_dependencies: ["hook_views_query_alter", "node_access"]
+#       access_behavior: "Permission check 'access content' / custom access plugin"
+#       cache_behavior: "Tag-based invalidation with contexts ['user.roles', 'url.query_args']"
+#       exposed_form:
+#         has_exposed: true
+#         type: "input_required"
+#         ajax: true
+#       ajax_behavior: "PAGINATION_AND_FILTER_AJAX" # NONE | PAGINATION_AND_FILTER_AJAX | CUSTOM_COMMAND_AJAX
+#       frontend_dependencies: ["core/drupal.ajax", "my_module/views_filter_assets"]
+#       theme_dependencies: ["views-view--custom-content-listing.html.twig", "views-view-fields--custom-content-listing.html.twig"]
+#       dependency_edges: ["node", "user", "taxonomy_term", "my_module/views_filter_assets"]
+#       target_architecture: "VIEW_DISPLAY_PAGE" # 30 Target Architectures:
+#       # VIEW_CONFIG | VIEW_DISPLAY_PAGE | VIEW_DISPLAY_BLOCK | VIEW_DISPLAY_FEED | VIEW_DISPLAY_REST |
+#       # VIEW_DISPLAY_EXPORT | VIEW_DISPLAY_ATTACHMENT | VIEW_DISPLAY_EMBED | VIEW_FIELD_PLUGIN |
+#       # VIEW_FILTER_PLUGIN | VIEW_CONTEXTUAL_FILTER_PLUGIN | VIEW_SORT_PLUGIN | VIEW_RELATIONSHIP_PLUGIN |
+#       # VIEW_AREA_PLUGIN | VIEW_PAGER_PLUGIN | VIEW_ACCESS_PLUGIN | VIEW_QUERY_PLUGIN | VIEW_STYLE_PLUGIN |
+#       # VIEW_ROW_PLUGIN | VIEW_DISPLAY_PLUGIN | VIEW_CACHE_PLUGIN | VIEW_EXPOSED_FORM_PLUGIN |
+#       # CUSTOM_VIEWS_PLUGIN | VIEWS_DATA_DEFINITION | VIEWS_QUERY_ALTER | VIEWS_RENDER_ALTER |
+#       # VIEWS_ACCESS_RULE | OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       target_artifacts:
+#         - "config/install/views.view.custom_content_listing.yml"
+#       migration_strategy: "VIEW_CONFIG_REBUILD" # 21 Migration Strategies:
+#       # VIEW_CONFIG_REBUILD | VIEW_DISPLAY_REBUILD | HANDLER_PLUGIN_REWRITE | CUSTOM_PLUGIN_REWRITE |
+#       # VIEWS_DATA_REWRITE | QUERY_PLUGIN_REWRITE | QUERY_ALTER_REWRITE | FILTER_REWRITE |
+#       # CONTEXTUAL_FILTER_REWRITE | RELATIONSHIP_REWRITE | ACCESS_REWRITE | CACHE_METADATA_REWRITE |
+#       # EXPOSED_FORM_REWRITE | AJAX_VIEW_REWRITE | PROGRAMMATIC_VIEW_REWRITE | THEME_HANDOFF |
+#       # REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       validation_strategy: "VIEW_EXECUTION_AND_RESULT_ASSERTION" # VIEW_EXECUTION_AND_RESULT_ASSERTION | DISPLAY_ROUTE_TEST | PLUGIN_UNIT_TEST | QUERY_ALTER_ASSERTION | ACCESS_AND_CACHE_TAG_TEST
+#       confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
+#       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       exclusion_reason: null
+#       evidence: "my_module.views_default.inc:L25 defines custom_content_listing view with page_1 display and exposed filters"
 custom_modules: []
 
 # ------------------------------------------------------------------------------

@@ -2348,11 +2348,11 @@ class FactoryValidator:
         has_doc_sync = (
             taxonomy_in_d7 and
             "1.1.0" in config_skill and
-            any(v in mapping_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0"]) and
-            any(v in custom_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0"]) and
-            any(v in dep_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0"]) and
-            any(v in test_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0"]) and
-            any(v in val_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0"])
+            any(v in mapping_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0"]) and
+            any(v in custom_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0"]) and
+            any(v in dep_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0"]) and
+            any(v in test_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0"]) and
+            any(v in val_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0"])
         )
 
         if has_doc_sync:
@@ -3724,11 +3724,11 @@ class FactoryValidator:
         taxonomy_in_d7 = "21 frontend target architecture" in d7_skill.lower() or "21-class" in d7_skill.lower() or "21 frontend" in d7_skill.lower()
         has_doc_sync = (
             taxonomy_in_d7 and
-            any(v in mapping_skill for v in ["1.6.0", "1.7.0"]) and
-            any(v in custom_skill for v in ["1.7.0"]) and
-            any(v in dep_skill for v in ["1.7.0"]) and
-            any(v in test_skill for v in ["1.6.0", "1.7.0"]) and
-            any(v in val_skill for v in ["1.7.0"])
+            any(v in mapping_skill for v in ["1.6.0", "1.7.0", "1.8.0"]) and
+            any(v in custom_skill for v in ["1.7.0", "1.8.0"]) and
+            any(v in dep_skill for v in ["1.7.0", "1.8.0"]) and
+            any(v in test_skill for v in ["1.6.0", "1.7.0", "1.8.0"]) and
+            any(v in val_skill for v in ["1.7.0", "1.8.0"])
         )
 
         if has_doc_sync:
@@ -3745,6 +3745,567 @@ class FactoryValidator:
             self.record_check("CHECK-FRONTEND-25", "documentation", "Documentation & Contract Synchronization", "FAIL",
                               "Documentation synchronization check failed across skills or core documentation files.",
                               "All documentation must reflect Step 18 capabilities and synchronized version numbers.")
+
+    def validate_views_and_custom_plugins_suite(self):
+        """
+        STEP 19 Validation Suite: D7 Views, Views Plugins & Custom Plugin Exhaustive Discovery, Accounting & D10/D11 Re-engineering
+        Validates CHECK-VIEWS-01 through CHECK-VIEWS-30.
+        """
+        d7_skill = (self.repo_root / "skills/d7-analysis/SKILL.md").read_text(encoding='utf-8')
+        mapping_skill = (self.repo_root / "skills/d7-to-d10-mapping/SKILL.md").read_text(encoding='utf-8')
+        custom_skill = (self.repo_root / "skills/custom-module-migration/SKILL.md").read_text(encoding='utf-8')
+        dep_skill = (self.repo_root / "skills/dependency-analysis/SKILL.md").read_text(encoding='utf-8')
+        mig_skill = (self.repo_root / "skills/migration-api/SKILL.md").read_text(encoding='utf-8')
+        test_skill = (self.repo_root / "skills/testing/SKILL.md").read_text(encoding='utf-8')
+        val_skill = (self.repo_root / "skills/behavioral-validation/SKILL.md").read_text(encoding='utf-8')
+
+        discovery_agent = (self.repo_root / "agents/discovery/agent.md").read_text(encoding='utf-8')
+        custom_agent = (self.repo_root / "agents/custom-module/agent.md").read_text(encoding='utf-8')
+        val_agent = (self.repo_root / "agents/validation/agent.md").read_text(encoding='utf-8')
+        manifest_text = (self.repo_root / "state/migration-manifest.yml").read_text(encoding='utf-8')
+        readme_text = (self.repo_root / "README.md").read_text(encoding='utf-8')
+        arch_text = (self.repo_root / "ARCHITECTURE.md").read_text(encoding='utf-8')
+        val_template = (self.repo_root / "templates/validation-report.md").read_text(encoding='utf-8')
+        disc_template = (self.repo_root / "templates/discovery-report.md").read_text(encoding='utf-8')
+
+        # 19.1 Generic View Discovery Completeness
+        views_disc_patterns = [
+            "hook_views_default_views", "views_get_view", "views_get_all_views",
+            "views_embed_view", "views_execute_display", "views_get_view_result", "views_get_handler"
+        ]
+        missing_views_disc = [p for p in views_disc_patterns if p not in d7_skill]
+        has_views_agent = "views" in discovery_agent.lower() and "views_plugins_items" in discovery_agent
+
+        if not missing_views_disc and has_views_agent:
+            self.record_check("CHECK-VIEWS-01", "discovery", "Generic View Discovery Completeness", "PASS",
+                              "Discovery agent and D7 analysis skill define exhaustive recursive discovery of D7 Views via default views, exported configs, runtime getters, execution callers, and handler loaders.",
+                              "Verified generic View discovery completeness heuristics.",
+                              affected_files=["agents/discovery/agent.md", "skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-01", "discovery", "Generic View Discovery Completeness", "FAIL",
+                              f"Missing View discovery heuristics: {', '.join(missing_views_disc)} or discovery agent contract.",
+                              "Factory must define exhaustive generic View discovery heuristics.")
+
+        # 19.2 View Machine Name & Display ID Accounting
+        has_view_id_acct = (
+            "views_plugins_items" in manifest_text and
+            "view_id" in manifest_text and
+            "display_id" in manifest_text and
+            "base_entity_or_table" in manifest_text and
+            "Views, Displays, Custom Handlers & Plugins Inventory" in disc_template
+        )
+
+        if has_view_id_acct:
+            self.record_check("CHECK-VIEWS-02", "accounting", "View Machine Name & Display ID Accounting", "PASS",
+                              "Manifest schema and discovery report template record View machine name, label, display IDs, defining module, and base entity/table.",
+                              "Verified View machine name and display ID accounting.",
+                              affected_files=["state/migration-manifest.yml", "templates/discovery-report.md"])
+        else:
+            self.record_check("CHECK-VIEWS-02", "accounting", "View Machine Name & Display ID Accounting", "FAIL",
+                              "Missing View ID or display ID accounting fields in manifest or discovery template.",
+                              "Factory must account for View machine names, display IDs, and base entities.")
+
+        # 19.3 Display Discovery Completeness
+        display_types = ["page", "block", "feed", "rest", "attachment", "embed"]
+        has_all_displays = all(dt in d7_skill.lower() for dt in display_types)
+
+        if has_all_displays:
+            self.record_check("CHECK-VIEWS-03", "displays", "Display Discovery Completeness", "PASS",
+                              "D7 analysis skill defines exhaustive display discovery across standard (page, block, feed, rest_export, attachment, embed) and custom display plugins.",
+                              "Verified display discovery completeness heuristics.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-03", "displays", "Display Discovery Completeness", "FAIL",
+                              "Missing display types in D7 analysis skill.",
+                              "Factory must discover all View display types.")
+
+        # 19.4 Display Type & Route/Path Accounting
+        has_display_routes = (
+            "display_type" in manifest_text and
+            ("route" in d7_skill.lower() or "path" in d7_skill.lower()) and
+            "access_behavior" in manifest_text
+        )
+
+        if has_display_routes:
+            self.record_check("CHECK-VIEWS-04", "displays", "Display Type & Route/Path Accounting", "PASS",
+                              "Manifest schema and skills record display type, routes/paths, menu relationships, and access permissions for every display.",
+                              "Verified display type and route/path accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-VIEWS-04", "displays", "Display Type & Route/Path Accounting", "FAIL",
+                              "Missing display type or routing accounting in manifest schema or skills.",
+                              "Factory must account for display types and routes.")
+
+        # 19.5 Field Handler Discovery & @ViewsField Mapping
+        has_field_handlers = (
+            "views_handler_field" in d7_skill and
+            "@ViewsField" in mapping_skill and
+            "FieldPluginBase" in mapping_skill
+        )
+
+        if has_field_handlers:
+            self.record_check("CHECK-VIEWS-05", "handlers", "Field Handler Discovery & @ViewsField Mapping", "PASS",
+                              "Skills discover legacy views_handler_field implementations and map them to modern @ViewsField plugins extending FieldPluginBase with render() and query().",
+                              "Verified field handler discovery and @ViewsField mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-05", "handlers", "Field Handler Discovery & @ViewsField Mapping", "FAIL",
+                              "Missing views_handler_field discovery or @ViewsField plugin mapping.",
+                              "Factory must discover field handlers and map them to @ViewsField plugins.")
+
+        # 19.6 Filter Handler Discovery & @ViewsFilter Mapping
+        has_filter_handlers = (
+            "views_handler_filter" in d7_skill and
+            "@ViewsFilter" in mapping_skill and
+            "FilterPluginBase" in mapping_skill and
+            "exposed_form" in manifest_text
+        )
+
+        if has_filter_handlers:
+            self.record_check("CHECK-VIEWS-06", "handlers", "Filter Handler Discovery & @ViewsFilter Mapping", "PASS",
+                              "Skills and manifest discover normal/exposed filter handlers, operators, grouped filters, OR/AND semantics, and map to @ViewsFilter plugins extending FilterPluginBase.",
+                              "Verified filter handler discovery and @ViewsFilter mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-VIEWS-06", "handlers", "Filter Handler Discovery & @ViewsFilter Mapping", "FAIL",
+                              "Missing views_handler_filter discovery or @ViewsFilter plugin mapping.",
+                              "Factory must discover filter handlers and map them to @ViewsFilter plugins.")
+
+        # 19.7 Contextual Filter / Argument Discovery & @ViewsArgument Mapping
+        has_argument_handlers = (
+            "views_handler_argument" in d7_skill and
+            "@ViewsArgument" in mapping_skill and
+            "ArgumentPluginBase" in mapping_skill
+        )
+
+        if has_argument_handlers:
+            self.record_check("CHECK-VIEWS-07", "handlers", "Contextual Filter / Argument Discovery & @ViewsArgument Mapping", "PASS",
+                              "Skills discover contextual filter handlers, default argument plugins, and validation plugins, mapping to @ViewsArgument plugins extending ArgumentPluginBase.",
+                              "Verified contextual filter discovery and @ViewsArgument mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-07", "handlers", "Contextual Filter / Argument Discovery & @ViewsArgument Mapping", "FAIL",
+                              "Missing views_handler_argument discovery or @ViewsArgument plugin mapping.",
+                              "Factory must discover contextual filters and map them to @ViewsArgument plugins.")
+
+        # 19.8 Sort Handler Discovery & @ViewsSort Mapping
+        has_sort_handlers = (
+            "views_handler_sort" in d7_skill and
+            "@ViewsSort" in mapping_skill and
+            "SortPluginBase" in mapping_skill
+        )
+
+        if has_sort_handlers:
+            self.record_check("CHECK-VIEWS-08", "handlers", "Sort Handler Discovery & @ViewsSort Mapping", "PASS",
+                              "Skills discover legacy views_handler_sort handlers and map them to modern @ViewsSort plugins extending SortPluginBase with query() sorting logic.",
+                              "Verified sort handler discovery and @ViewsSort mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-08", "handlers", "Sort Handler Discovery & @ViewsSort Mapping", "FAIL",
+                              "Missing views_handler_sort discovery or @ViewsSort plugin mapping.",
+                              "Factory must discover sort handlers and map them to @ViewsSort plugins.")
+
+        # 19.9 Relationship Handler Discovery & @ViewsRelationship Mapping
+        has_relationship_handlers = (
+            "views_handler_relationship" in d7_skill and
+            "@ViewsRelationship" in mapping_skill and
+            "RelationshipPluginBase" in mapping_skill
+        )
+
+        if has_relationship_handlers:
+            self.record_check("CHECK-VIEWS-09", "handlers", "Relationship Handler Discovery & @ViewsRelationship Mapping", "PASS",
+                              "Skills discover relationship handlers, joins, and reverse relationships, mapping them to @ViewsRelationship plugins extending RelationshipPluginBase.",
+                              "Verified relationship handler discovery and @ViewsRelationship mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-09", "handlers", "Relationship Handler Discovery & @ViewsRelationship Mapping", "FAIL",
+                              "Missing views_handler_relationship discovery or @ViewsRelationship plugin mapping.",
+                              "Factory must discover relationship handlers and map them to @ViewsRelationship plugins.")
+
+        # 19.10 Area Handler Discovery & @ViewsArea Mapping
+        has_area_handlers = (
+            "views_handler_area" in d7_skill and
+            "@ViewsArea" in mapping_skill and
+            "AreaPluginBase" in mapping_skill
+        )
+
+        if has_area_handlers:
+            self.record_check("CHECK-VIEWS-10", "handlers", "Area Handler Discovery & @ViewsArea Mapping", "PASS",
+                              "Skills discover area handlers across header, footer, and empty text, mapping them to @ViewsArea plugins extending AreaPluginBase.",
+                              "Verified area handler discovery and @ViewsArea mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-10", "handlers", "Area Handler Discovery & @ViewsArea Mapping", "FAIL",
+                              "Missing views_handler_area discovery or @ViewsArea plugin mapping.",
+                              "Factory must discover area handlers and map them to @ViewsArea plugins.")
+
+        # 19.11 Pager Plugin Discovery & @ViewsPager Mapping
+        has_pager_plugins = (
+            "views_plugin_pager" in d7_skill and
+            "@ViewsPager" in mapping_skill and
+            "PagerPluginBase" in mapping_skill
+        )
+
+        if has_pager_plugins:
+            self.record_check("CHECK-VIEWS-11", "plugins", "Pager Plugin Discovery & @ViewsPager Mapping", "PASS",
+                              "Skills discover pager plugins (full, mini, none, some), mapping them to @ViewsPager plugins extending PagerPluginBase.",
+                              "Verified pager plugin discovery and @ViewsPager mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-11", "plugins", "Pager Plugin Discovery & @ViewsPager Mapping", "FAIL",
+                              "Missing views_plugin_pager discovery or @ViewsPager plugin mapping.",
+                              "Factory must discover pager plugins and map them to @ViewsPager plugins.")
+
+        # 19.12 Access Plugin Discovery & @ViewsAccess Mapping
+        has_access_plugins = (
+            "views_plugin_access" in d7_skill and
+            "@ViewsAccess" in mapping_skill and
+            "AccessPluginBase" in mapping_skill
+        )
+
+        if has_access_plugins:
+            self.record_check("CHECK-VIEWS-12", "plugins", "Access Plugin Discovery & @ViewsAccess Mapping", "PASS",
+                              "Skills discover access plugins (permission, role, custom access callbacks), mapping them to @ViewsAccess plugins extending AccessPluginBase.",
+                              "Verified access plugin discovery and @ViewsAccess mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-12", "plugins", "Access Plugin Discovery & @ViewsAccess Mapping", "FAIL",
+                              "Missing views_plugin_access discovery or @ViewsAccess plugin mapping.",
+                              "Factory must discover access plugins and map them to @ViewsAccess plugins.")
+
+        # 19.13 Query Plugin Discovery & @ViewsQuery Mapping
+        has_query_plugins = (
+            "views_plugin_query" in d7_skill and
+            "@ViewsQuery" in mapping_skill and
+            "QueryPluginBase" in mapping_skill
+        )
+
+        if has_query_plugins:
+            self.record_check("CHECK-VIEWS-13", "plugins", "Query Plugin Discovery & @ViewsQuery Mapping", "PASS",
+                              "Skills discover query plugins (views_plugin_query_default, search backend query plugins), mapping them to @ViewsQuery plugins extending QueryPluginBase.",
+                              "Verified query plugin discovery and @ViewsQuery mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-13", "plugins", "Query Plugin Discovery & @ViewsQuery Mapping", "FAIL",
+                              "Missing views_plugin_query discovery or @ViewsQuery plugin mapping.",
+                              "Factory must discover query plugins and map them to @ViewsQuery plugins.")
+
+        # 19.14 Style Plugin Discovery & @ViewsStyle Mapping
+        has_style_plugins = (
+            "views_plugin_style" in d7_skill and
+            "@ViewsStyle" in mapping_skill and
+            "StylePluginBase" in mapping_skill
+        )
+
+        if has_style_plugins:
+            self.record_check("CHECK-VIEWS-14", "plugins", "Style Plugin Discovery & @ViewsStyle Mapping", "PASS",
+                              "Skills discover style plugins (grid, table, list, unformatted, custom styles), mapping them to @ViewsStyle plugins extending StylePluginBase.",
+                              "Verified style plugin discovery and @ViewsStyle mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-14", "plugins", "Style Plugin Discovery & @ViewsStyle Mapping", "FAIL",
+                              "Missing views_plugin_style discovery or @ViewsStyle plugin mapping.",
+                              "Factory must discover style plugins and map them to @ViewsStyle plugins.")
+
+        # 19.15 Row Plugin Discovery & @ViewsRow Mapping
+        has_row_plugins = (
+            "views_plugin_row" in d7_skill and
+            "@ViewsRow" in mapping_skill and
+            "RowPluginBase" in mapping_skill
+        )
+
+        if has_row_plugins:
+            self.record_check("CHECK-VIEWS-15", "plugins", "Row Plugin Discovery & @ViewsRow Mapping", "PASS",
+                              "Skills discover row plugins (fields, entity, rendered entity), mapping them to @ViewsRow plugins extending RowPluginBase.",
+                              "Verified row plugin discovery and @ViewsRow mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-15", "plugins", "Row Plugin Discovery & @ViewsRow Mapping", "FAIL",
+                              "Missing views_plugin_row discovery or @ViewsRow plugin mapping.",
+                              "Factory must discover row plugins and map them to @ViewsRow plugins.")
+
+        # 19.16 Custom Views Plugin Discovery & Annotation Mapping
+        has_custom_plugin_patterns = (
+            "src/Plugin/views/" in mapping_skill and
+            "ContainerFactoryPluginInterface" in mapping_skill and
+            "create(" in mapping_skill and
+            "PluginBase" in mapping_skill
+        )
+
+        if has_custom_plugin_patterns:
+            self.record_check("CHECK-VIEWS-16", "plugins", "Custom Views Plugin Discovery & Annotation Mapping", "PASS",
+                              "Skills and custom module agent enforce PSR-4 plugin discovery under src/Plugin/views/, constructor dependency injection via ContainerFactoryPluginInterface, and annotated metadata.",
+                              "Verified custom Views plugin discovery and annotation mapping.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md", "agents/custom-module/agent.md"])
+        else:
+            self.record_check("CHECK-VIEWS-16", "plugins", "Custom Views Plugin Discovery & Annotation Mapping", "FAIL",
+                              "Missing custom Views plugin PSR-4 rules or ContainerFactoryPluginInterface specs.",
+                              "Factory must discover custom Views plugins and map them with constructor DI.")
+
+        # 19.17 hook_views_data & hook_views_data_alter Accounting
+        has_views_data_hooks = (
+            "hook_views_data" in d7_skill and
+            "hook_views_data_alter" in d7_skill and
+            "VIEWS_DATA_DEFINITION" in mig_skill and
+            "VIEWS_DATA_REWRITE" in mig_skill
+        )
+
+        if has_views_data_hooks:
+            self.record_check("CHECK-VIEWS-17", "views_data", "hook_views_data & hook_views_data_alter Accounting", "PASS",
+                              "Skills and manifest analyze hook_views_data() and hook_views_data_alter(), mapping table definitions, field handlers, filter handlers, joins, and relationships.",
+                              "Verified hook_views_data and hook_views_data_alter accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-17", "views_data", "hook_views_data & hook_views_data_alter Accounting", "FAIL",
+                              "Missing hook_views_data or hook_views_data_alter accounting in skills.",
+                              "Factory must account for hook_views_data and hook_views_data_alter definitions.")
+
+        # 19.18 Views Lifecycle Hook Discovery
+        views_lifecycle_hooks = [
+            "hook_views_pre_view", "hook_views_pre_build", "hook_views_post_build",
+            "hook_views_pre_execute", "hook_views_post_execute", "hook_views_pre_render", "hook_views_post_render"
+        ]
+        has_views_lifecycle = all(h in d7_skill for h in views_lifecycle_hooks)
+
+        if has_views_lifecycle:
+            self.record_check("CHECK-VIEWS-18", "lifecycle", "Views Lifecycle Hook Discovery", "PASS",
+                              "Skills discover all Views lifecycle execution hooks (pre_view, pre_build, post_build, pre_execute, post_execute, pre_render, post_render) and map to modern implementations.",
+                              "Verified Views lifecycle hook discovery heuristics.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-18", "lifecycle", "Views Lifecycle Hook Discovery", "FAIL",
+                              "Missing Views lifecycle hooks in D7 analysis skill.",
+                              "Factory must discover all Views lifecycle hooks.")
+
+        # 19.19 hook_views_query_alter Modernization
+        has_query_alter = (
+            "hook_views_query_alter" in d7_skill and
+            "Plugin\\views\\query\\Sql" in mapping_skill and
+            "addWhere" in mapping_skill and
+            "VIEWS_QUERY_ALTER" in mig_skill
+        )
+
+        if has_query_alter:
+            self.record_check("CHECK-VIEWS-19", "query_alter", "hook_views_query_alter Modernization", "PASS",
+                              "Skills analyze hook_views_query_alter(), operating on Drupal\\views\\Plugin\\views\\query\\Sql with addWhere(), setWhereGroup(), and addTable() while preserving query semantics.",
+                              "Verified hook_views_query_alter modernization specifications.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-19", "query_alter", "hook_views_query_alter Modernization", "FAIL",
+                              "Missing hook_views_query_alter or Sql query object modernization rules.",
+                              "Factory must modernize hook_views_query_alter implementations.")
+
+        # 19.20 Views Access & Security Accounting
+        has_views_security = (
+            "access_behavior" in manifest_text and
+            "HUMAN_DECISION_REQUIRED" in d7_skill and
+            "UNVERIFIED" in d7_skill and
+            "permission" in d7_skill.lower()
+        )
+
+        if has_views_security:
+            self.record_check("CHECK-VIEWS-20", "security", "Views Access & Security Accounting", "PASS",
+                              "Skills and manifest analyze View access plugins, role checks, contextual filter authorization, and flag ambiguous security logic as HUMAN_DECISION_REQUIRED or UNVERIFIED.",
+                              "Verified Views access and security accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-VIEWS-20", "security", "Views Access & Security Accounting", "FAIL",
+                              "Missing Views access security analysis or decision gating.",
+                              "Factory must audit Views access and flag ambiguous security rules.")
+
+        # 19.21 Views Cache Metadata Accounting
+        has_cache_metadata = (
+            "cache_behavior" in manifest_text and
+            "tags" in d7_skill.lower() and
+            "contexts" in d7_skill.lower() and
+            "max-age" in d7_skill.lower() and
+            "CACHE_METADATA_REWRITE" in mig_skill
+        )
+
+        if has_cache_metadata:
+            self.record_check("CHECK-VIEWS-21", "caching", "Views Cache Metadata Accounting", "PASS",
+                              "Skills and manifest map legacy D7 time-based caching to modern cache metadata (cache tags, cache contexts, cache max-age, and custom cache plugins).",
+                              "Verified Views cache metadata accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-VIEWS-21", "caching", "Views Cache Metadata Accounting", "FAIL",
+                              "Missing Views cache metadata mapping in skills or manifest.",
+                              "Factory must map legacy View caching to modern cache metadata.")
+
+        # 19.22 Exposed Filter Form Accounting & Form API Coordination (Step 17)
+        has_exposed_form_coordination = (
+            "exposed_form" in manifest_text and
+            "VIEW / FORM API EXPOSED WRAPPER" in dep_skill and
+            "Step 17" in d7_skill
+        )
+
+        if has_exposed_form_coordination:
+            self.record_check("CHECK-VIEWS-22", "forms", "Exposed Filter Form Accounting & Form API Coordination", "PASS",
+                              "Manifest schema and dependency analysis cross-reference exposed filter forms with server-side Form API definitions (Step 17).",
+                              "Verified exposed filter form accounting and Form API coordination.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/dependency-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-VIEWS-22", "forms", "Exposed Filter Form Accounting & Form API Coordination", "FAIL",
+                              "Missing exposed form coordination in manifest or dependency analysis.",
+                              "Factory must cross-reference exposed filter forms with Step 17 Form API.")
+
+        # 19.23 Views AJAX Pagination & Filtering Client Coordination (Step 18)
+        has_views_ajax_coordination = (
+            "ajax_behavior" in manifest_text and
+            "VIEW / AJAX FRONTEND REFRESH" in dep_skill and
+            "Step 18" in d7_skill
+        )
+
+        if has_views_ajax_coordination:
+            self.record_check("CHECK-VIEWS-23", "ajax", "Views AJAX Pagination & Filtering Client Coordination", "PASS",
+                              "Manifest schema and dependency analysis cross-reference View AJAX pagination and filtering with client-side JavaScript behaviors (Step 18).",
+                              "Verified Views AJAX pagination and filtering client coordination.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/dependency-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-VIEWS-23", "ajax", "Views AJAX Pagination & Filtering Client Coordination", "FAIL",
+                              "Missing Views AJAX coordination in manifest or dependency analysis.",
+                              "Factory must cross-reference View AJAX behaviors with Step 18 frontend.")
+
+        # 19.24 Programmatic Views Dispatches Modernization
+        has_programmatic_views = (
+            "Views::getView" in mapping_skill and
+            "views_embed_view" in d7_skill and
+            "PROGRAMMATIC_VIEW_REWRITE" in mig_skill
+        )
+
+        if has_programmatic_views:
+            self.record_check("CHECK-VIEWS-24", "programmatic", "Programmatic Views Dispatches Modernization", "PASS",
+                              "Skills discover programmatic Views invocations (views_get_view, views_embed_view, views_execute_display) and map to modern \\Drupal\\views\\Views::getView() dispatches.",
+                              "Verified programmatic Views dispatches modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-24", "programmatic", "Programmatic Views Dispatches Modernization", "FAIL",
+                              "Missing programmatic Views modernization rules in skills.",
+                              "Factory must modernize programmatic Views executions.")
+
+        # 19.25 Frontend Template Suggestions & Asset Dependencies
+        has_views_templates = (
+            "views-view.html.twig" in d7_skill and
+            "THEME_HANDOFF" in mig_skill and
+            "Step 20 Handoff" in dep_skill
+        )
+
+        if has_views_templates:
+            self.record_check("CHECK-VIEWS-25", "frontend", "Frontend Template Suggestions & Asset Dependencies", "PASS",
+                              "Skills establish ownership boundaries between module-level Views plugins (Step 19) and theme-level Twig template overrides (Step 20 handoff).",
+                              "Verified frontend template suggestions and asset dependencies.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/dependency-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-25", "frontend", "Frontend Template Suggestions & Asset Dependencies", "FAIL",
+                              "Missing Views template suggestions or theme handoff specifications.",
+                              "Factory must define clear boundaries for Views template overrides.")
+
+        # 19.26 30 Views Target Architecture Classifications
+        views_target_tax = [
+            "VIEW_CONFIG", "VIEW_DISPLAY_PAGE", "VIEW_DISPLAY_BLOCK", "VIEW_DISPLAY_FEED",
+            "VIEW_DISPLAY_REST", "VIEW_DISPLAY_EXPORT", "VIEW_DISPLAY_ATTACHMENT", "VIEW_DISPLAY_EMBED",
+            "VIEW_FIELD_PLUGIN", "VIEW_FILTER_PLUGIN", "VIEW_CONTEXTUAL_FILTER_PLUGIN", "VIEW_SORT_PLUGIN",
+            "VIEW_RELATIONSHIP_PLUGIN", "VIEW_AREA_PLUGIN", "VIEW_PAGER_PLUGIN", "VIEW_ACCESS_PLUGIN",
+            "VIEW_QUERY_PLUGIN", "VIEW_STYLE_PLUGIN", "VIEW_ROW_PLUGIN", "VIEW_DISPLAY_PLUGIN",
+            "VIEW_CACHE_PLUGIN", "VIEW_EXPOSED_FORM_PLUGIN", "CUSTOM_VIEWS_PLUGIN", "VIEWS_DATA_DEFINITION",
+            "VIEWS_QUERY_ALTER", "VIEWS_RENDER_ALTER", "VIEWS_ACCESS_RULE", "OBSOLETE",
+            "HUMAN_DECISION_REQUIRED", "UNVERIFIED"
+        ]
+        found_views_tax = sum(1 for t in views_target_tax if t in d7_skill or t in mig_skill)
+
+        if found_views_tax >= 28:
+            self.record_check("CHECK-VIEWS-26", "taxonomy", "30 Views Target Architecture Classifications", "PASS",
+                              f"Skills define the complete 30-class Views target architecture taxonomy ({found_views_tax}/30 detected) supporting all configuration, display, handler, plugin, and query modernizations.",
+                              "Verified 30 Views target architecture classifications.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-26", "taxonomy", "30 Views Target Architecture Classifications", "FAIL",
+                              f"Only {found_views_tax}/30 Views target architecture classifications found in skills.",
+                              "Factory must define all 30 Views target architecture classifications.")
+
+        # 19.27 21 Views Migration Strategies
+        views_strats = [
+            "VIEW_CONFIG_REBUILD", "VIEW_DISPLAY_REBUILD", "HANDLER_PLUGIN_REWRITE", "CUSTOM_PLUGIN_REWRITE",
+            "VIEWS_DATA_REWRITE", "QUERY_PLUGIN_REWRITE", "QUERY_ALTER_REWRITE", "FILTER_REWRITE",
+            "CONTEXTUAL_FILTER_REWRITE", "RELATIONSHIP_REWRITE", "ACCESS_REWRITE", "CACHE_METADATA_REWRITE",
+            "EXPOSED_FORM_REWRITE", "AJAX_VIEW_REWRITE", "PROGRAMMATIC_VIEW_REWRITE", "THEME_HANDOFF",
+            "REPLACED", "OBSOLETE", "EXCLUDED_WITH_REASON", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"
+        ]
+        found_views_strats = sum(1 for s in views_strats if s in d7_skill or s in mig_skill)
+
+        if found_views_strats >= 19:
+            self.record_check("CHECK-VIEWS-27", "strategies", "21 Views Migration Strategies", "PASS",
+                              f"Skills define all 21 standardized Views migration strategies ({found_views_strats}/21 detected) separating modernization methodology from terminal outcome status.",
+                              "Verified 21 Views migration strategies.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-27", "strategies", "21 Views Migration Strategies", "FAIL",
+                              f"Only {found_views_strats}/21 Views migration strategies found in skills.",
+                              "Factory must define all 21 Views migration strategies.")
+
+        # 19.28 Manifest views_plugins_items 32-Property Schema Structure
+        manifest_views_fields = [
+            "item_id", "view_id", "display_id", "source_file", "source_line", "defining_module",
+            "display_type", "base_entity_or_table", "handler_or_plugin", "plugin_id", "plugin_class",
+            "fields", "filters", "contextual_filters", "sorts", "relationships", "arguments",
+            "query_dependencies", "access_behavior", "cache_behavior", "exposed_form",
+            "ajax_behavior", "frontend_dependencies", "theme_dependencies", "dependency_edges",
+            "target_architecture", "target_artifacts", "migration_strategy", "validation_strategy",
+            "confidence", "status", "exclusion_reason"
+        ]
+        missing_views_manifest = [f for f in manifest_views_fields if f not in manifest_text]
+
+        if not missing_views_manifest:
+            self.record_check("CHECK-VIEWS-28", "manifest", "Manifest views_plugins_items 32-Property Schema Structure", "PASS",
+                              "state/migration-manifest.yml defines complete views_plugins_items accounting schema covering all required View, display, handler, plugin, and query metadata fields.",
+                              "Verified manifest views_plugins_items schema structure.",
+                              affected_files=["state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-VIEWS-28", "manifest", "Manifest views_plugins_items 32-Property Schema Structure", "FAIL",
+                              f"Missing manifest views fields: {', '.join(missing_views_manifest)}",
+                              "Manifest schema must define all required views_plugins_items fields.")
+
+        # 19.29 Zero-Omission Views Outcome Enforcement & Forbidden State Rejection
+        approved_outcomes = ["MIGRATED", "REPLACED", "OBSOLETE", "EXCLUDED_WITH_REASON", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"]
+        forbidden_states = ["UNACCOUNTED", "UNKNOWN_WITHOUT_REASON", "SILENTLY_OMITTED"]
+
+        missing_approved = [o for o in approved_outcomes if o not in val_skill]
+        missing_forbidden = [f for f in forbidden_states if f not in val_skill or f not in d7_skill]
+
+        if not missing_approved and not missing_forbidden and "Views Definitions Accounted For" in val_template:
+            self.record_check("CHECK-VIEWS-29", "validation", "Zero-Omission Views Outcome Enforcement & Forbidden State Rejection", "PASS",
+                              "Validation agent and skill enforce approved terminal outcomes (MIGRATED, REPLACED, OBSOLETE, EXCLUDED_WITH_REASON, HUMAN_DECISION_REQUIRED, UNVERIFIED) and reject forbidden states for all Views definitions, displays, custom handlers, plugins, and query alterations.",
+                              "Verified zero-omission outcome enforcement for Views artifacts.",
+                              affected_files=["skills/behavioral-validation/SKILL.md", "templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-VIEWS-29", "validation", "Zero-Omission Views Outcome Enforcement & Forbidden State Rejection", "FAIL",
+                              "Missing approved outcomes or forbidden states in validation skill or template.",
+                              "Validation must enforce zero-omission outcomes for all Views artifacts.")
+
+        # 19.30 Cross-Capability Compatibility & Purity
+        has_cross_compat = (
+            "custom_database_tables" in manifest_text and
+            "custom_php_files" in manifest_text and
+            "inc_files" in manifest_text and
+            "hook_implementations" in manifest_text and
+            "configuration_state_items" in manifest_text and
+            "entities_fields_items" in manifest_text and
+            "forms_ajax_items" in manifest_text and
+            "frontend_assets_items" in manifest_text and
+            "views_plugins_items" in manifest_text and
+            "Views, Displays, Custom Handlers & Plugins" in readme_text and
+            "Views, Displays, Custom Handlers & Plugins" in arch_text
+        )
+
+        if has_cross_compat:
+            self.record_check("CHECK-VIEWS-30", "compatibility", "Cross-Capability Compatibility & Purity", "PASS",
+                              "Views accounting seamlessly integrates with frontend assets (Step 18), forms (Step 17), custom entities (Step 16), configuration (Step 15), procedural hooks (Step 14), database schemas (Step 13), custom PHP files (Step 12), and .inc files (Step 11) with 100% generic purity.",
+                              "Verified cross-capability architectural compatibility and purity.",
+                              affected_files=["state/migration-manifest.yml", "README.md", "ARCHITECTURE.md", "AGENT_PROTOCOL.md"])
+        else:
+            self.record_check("CHECK-VIEWS-30", "compatibility", "Cross-Capability Compatibility & Purity", "FAIL",
+                              "Cross-capability compatibility check failed across manifest, skills, or documentation.",
+                              "Views capability must maintain seamless compatibility with frontend, form, entity, config, hook, database, and class capabilities.")
 
     def run_all(self):
         self.validate_package_and_portability()
@@ -3765,6 +4326,7 @@ class FactoryValidator:
         self.validate_entities_and_fields_suite()
         self.validate_forms_and_ajax_suite()
         self.validate_frontend_assets_and_libraries_suite()
+        self.validate_views_and_custom_plugins_suite()
 
     def generate_result_json(self):
         return {

@@ -270,6 +270,73 @@ Apply one of the 16 explicit strategies to every discovered entity and field ite
 
 ---
 
+## Step 19 Views, Displays & Custom Plugins Target Architecture Taxonomy
+
+Every discovered D7 View, display, custom handler, plugin, or query alteration must map to one or more of the 30 target architecture classifications:
+
+| Target Architecture | Description | Implementation Artifact |
+| :--- | :--- | :--- |
+| `VIEW_CONFIG` | Full exported View entity configuration | `config/install/views.view.<view_id>.yml` |
+| `VIEW_DISPLAY_PAGE` | Routed page display with path and menu configuration | `display: page_1` in View YAML |
+| `VIEW_DISPLAY_BLOCK` | Block display embeddable in layouts and theme regions | `display: block_1` in View YAML |
+| `VIEW_DISPLAY_FEED` | RSS/Atom feed syndication display | `display: feed_1` in View YAML |
+| `VIEW_DISPLAY_REST` | JSON/HAL/XML REST export display | `display: rest_export_1` in View YAML |
+| `VIEW_DISPLAY_EXPORT` | CSV/Data export display via serializer | `display: data_export_1` in View YAML |
+| `VIEW_DISPLAY_ATTACHMENT` | Secondary display attached before/after primary display | `display: attachment_1` in View YAML |
+| `VIEW_DISPLAY_EMBED` | Programmatically embeddable display | `display: embed_1` in View YAML |
+| `VIEW_FIELD_PLUGIN` | Custom field handler plugin | `src/Plugin/views/field/<Field>.php` (`@ViewsField`) |
+| `VIEW_FILTER_PLUGIN` | Custom filter handler plugin | `src/Plugin/views/filter/<Filter>.php` (`@ViewsFilter`) |
+| `VIEW_CONTEXTUAL_FILTER_PLUGIN` | Custom contextual filter / argument handler plugin | `src/Plugin/views/argument/<Argument>.php` (`@ViewsArgument`) |
+| `VIEW_SORT_PLUGIN` | Custom sort handler plugin | `src/Plugin/views/sort/<Sort>.php` (`@ViewsSort`) |
+| `VIEW_RELATIONSHIP_PLUGIN` | Custom table join/relationship handler plugin | `src/Plugin/views/relationship/<Rel>.php` (`@ViewsRelationship`) |
+| `VIEW_AREA_PLUGIN` | Custom header, footer, or empty-text area handler | `src/Plugin/views/area/<Area>.php` (`@ViewsArea`) |
+| `VIEW_PAGER_PLUGIN` | Custom pagination plugin | `src/Plugin/views/pager/<Pager>.php` (`@ViewsPager`) |
+| `VIEW_ACCESS_PLUGIN` | Custom access control plugin | `src/Plugin/views/access/<Access>.php` (`@ViewsAccess`) |
+| `VIEW_QUERY_PLUGIN` | Custom backend query plugin | `src/Plugin/views/query/<Query>.php` (`@ViewsQuery`) |
+| `VIEW_STYLE_PLUGIN` | Custom format/style plugin | `src/Plugin/views/style/<Style>.php` (`@ViewsStyle`) |
+| `VIEW_ROW_PLUGIN` | Custom row rendering plugin | `src/Plugin/views/row/<Row>.php` (`@ViewsRow`) |
+| `VIEW_DISPLAY_PLUGIN` | Custom display plugin extending DisplayPluginBase | `src/Plugin/views/display/<Display>.php` (`@ViewsDisplay`) |
+| `VIEW_CACHE_PLUGIN` | Custom cache management plugin | `src/Plugin/views/cache/<Cache>.php` (`@ViewsCache`) |
+| `VIEW_EXPOSED_FORM_PLUGIN` | Custom exposed filter form plugin | `src/Plugin/views/exposed_form/<Form>.php` (`@ViewsExposedForm`) |
+| `CUSTOM_VIEWS_PLUGIN` | Generic custom Views plugin class | `src/Plugin/views/<Type>/<Plugin>.php` |
+| `VIEWS_DATA_DEFINITION` | Schema table integration metadata | `<module>.views.inc:hook_views_data()` |
+| `VIEWS_QUERY_ALTER` | Procedural query alteration hook | `<module>.views_execution.inc:hook_views_query_alter()` |
+| `VIEWS_RENDER_ALTER` | Pre/post render alteration hook | `<module>.module:hook_views_pre_render()` |
+| `VIEWS_ACCESS_RULE` | Access check rule or permission configuration | `display_options: access: type: perm` |
+| `OBSOLETE` | Deprecated Views handler/display excluded with reason | Deprecated legacy Views artifact |
+| `HUMAN_DECISION_REQUIRED` | Complex SQL query or dynamic view needing architect review | Architectural decision record required |
+| `UNVERIFIED` | Dynamic view dispatch requiring runtime validation | Runtime staging validation required |
+
+---
+
+## Step 19 Standardized Views & Custom Plugin Migration Strategies
+
+Apply one of the 21 explicit strategies to every discovered Views item:
+
+1. **`VIEW_CONFIG_REBUILD`**: Reconstructing D7 default Views or database export into modern `config/install/views.view.<view_id>.yml`.
+2. **`VIEW_DISPLAY_REBUILD`**: Modernizing individual displays (paths, blocks, feeds, REST export) within the View configuration.
+3. **`HANDLER_PLUGIN_REWRITE`**: Converting legacy procedural handlers (`views_handler_*`) to PSR-4 annotated plugin classes under `src/Plugin/views/`.
+4. **`CUSTOM_PLUGIN_REWRITE`**: Modernizing custom Views plugins with constructor dependency injection (`ContainerFactoryPluginInterface`).
+5. **`VIEWS_DATA_REWRITE`**: Re-engineering `hook_views_data()` and `hook_views_data_alter()` in `<module>.views.inc`.
+6. **`QUERY_PLUGIN_REWRITE`**: Modernizing non-SQL or specialized query backend plugins.
+7. **`QUERY_ALTER_REWRITE`**: Converting procedural SQL alterations to `hook_views_query_alter()` operating on modern `Sql` query objects.
+8. **`FILTER_REWRITE`**: Modernizing complex filter logic, grouped filters, or custom operator handling.
+9. **`CONTEXTUAL_FILTER_REWRITE`**: Modernizing argument validators, default value plugins, and contextual argument handling.
+10. **`RELATIONSHIP_REWRITE`**: Re-engineering table joins and entity reference relationship chains.
+11. **`ACCESS_REWRITE`**: Modernizing access control to modern permissions, roles, or custom `@ViewsAccess` plugins.
+12. **`CACHE_METADATA_REWRITE`**: Converting legacy time-based caching to modern cache tags, cache contexts, and cache max-age.
+13. **`EXPOSED_FORM_REWRITE`**: Modernizing exposed filter forms with Step 17 Form API integration.
+14. **`AJAX_VIEW_REWRITE`**: Modernizing AJAX pagination and filtering with Step 18 client-side event coordination.
+15. **`PROGRAMMATIC_VIEW_REWRITE`**: Modernizing procedural `views_get_view()` / `views_embed_view()` to modern `\Drupal\views\Views` API.
+16. **`THEME_HANDOFF`**: Delegating view row templates (`views-view-*.html.twig`) to Step 20 theme architecture.
+17. **`REPLACED`**: Legacy custom View or handler replaced by core Drupal 10/11 features (Media, Layout Builder, JSON:API).
+18. **`OBSOLETE`**: Deprecated or dead Views excluded with documented technical rationale.
+19. **`EXCLUDED_WITH_REASON`**: Deliberately excluded Views items with explicit architectural justification.
+20. **`HUMAN_DECISION_REQUIRED`**: Dynamic View IDs, unresolvable query alterations, or complex security rules needing architect review.
+21. **`UNVERIFIED`**: Dynamic View dispatches or runtime-dependent query alterations requiring runtime testing.
+
+---
+
 ## Data Integrity Verification & Checksums
 
 Before certifying a data migration pipeline as complete:

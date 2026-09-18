@@ -1,7 +1,7 @@
 ---
 name: testing
 description: Testing standards, PHPUnit test generation, assertion authoring, behavioral validation, and test suite execution guidelines for modern Drupal 10/11 modules.
-version: 1.6.0
+version: 1.7.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Automated Testing & Quality Assurance Playbook Skill
 
 ## Overview
-This skill provides the procedural guidelines and runner configurations for establishing automated testing pipelines, static code analysis, custom PHP class testing, procedural hook replacement testing, event subscriber assertions, configuration schema validation, state API assertions, entity CRUD / revision / translation testing, entity access control verification, form validation & submission testing, AJAX response command verification, and coding standards compliance across migrated Drupal 10 and Drupal 11 custom modules and themes.
+This skill provides the procedural guidelines and runner configurations for establishing automated testing pipelines, static code analysis, custom PHP class testing, procedural hook replacement testing, event subscriber assertions, configuration schema validation, state API assertions, entity CRUD / revision / translation testing, entity access control verification, form validation & submission testing, AJAX response command verification, frontend assets, Views definitions, custom Views plugins, and coding standards compliance across migrated Drupal 10 and Drupal 11 custom modules and themes.
 
 ---
 
@@ -19,9 +19,9 @@ This skill provides the procedural guidelines and runner configurations for esta
 
 ---
 
-## Test Expectations for Modernized Code, Entities & Forms (Step 17)
+## Test Expectations for Modernized Code, Entities, Forms & Views (Step 19)
 
-When testing modernized custom OOP classes, services, procedural hook replacements, configuration/state artifacts, custom entities, and Form API classes, configure tests appropriate to their architectural responsibility:
+When testing modernized custom OOP classes, services, procedural hook replacements, configuration/state artifacts, custom entities, Form API classes, and Views/custom plugins, configure tests appropriate to their architectural responsibility:
 
 1. **Class Autoloading & Container Construction**:
    - Verify class is discoverable via Composer PSR-4 without manual includes.
@@ -58,11 +58,16 @@ When testing modernized custom OOP classes, services, procedural hook replacemen
    - **`once()` Idempotency**: Assert JavaScript behaviors utilize `once()` to guarantee idempotent execution across multiple AJAX reattachments.
    - **`drupalSettings` Injection**: Assert PHP attachment pipelines correctly inject settings under `$form['#attached']['drupalSettings']` and scripts read them without errors.
    - **Accessibility & Focus**: Assert dynamic DOM updates update ARIA attributes (`aria-live`, `aria-expanded`) and manage focus correctly.
-8. **Public API & Business Logic Parity**:
+8. **Views & Custom Plugins Validation (Step 19)**:
+   - **Views Configuration Schema**: Assert all `config/install/views.view.*.yml` files conform to core views schema definitions without schema violations.
+   - **Custom Plugin Execution**: Assert custom `@ViewsField`, `@ViewsFilter`, `@ViewsArgument`, `@ViewsSort`, `@ViewsRelationship`, and `@ViewsArea` plugins execute accurately, render expected output, and properly inject services via `ContainerFactoryPluginInterface`.
+   - **Query Alterations**: Assert `hook_views_query_alter()` implementations correctly modify SQL conditions, joins, and sorting without syntax errors or injection vulnerabilities.
+   - **Access Control & Cache Metadata**: Assert Views enforce access control permissions and bubble correct cache tags (`node_list`, `user:uid`), cache contexts (`user.roles`, `url.query_args`), and cache max-age.
+9. **Public API & Business Logic Parity**:
    - Author PHPUnit Unit tests targeting domain calculations, validation algorithms, and state transitions.
-9. **Integration, Custom Database & Repository Operations**:
-   - Author PHPUnit Kernel tests targeting custom entity CRUD, custom database table repository queries, dynamic SQL filters, and configuration schema adherence.
-   - Verify transaction rollback semantics: ensure failed operations rollback completely without leaving orphaned records.
+10. **Integration, Custom Database & Repository Operations**:
+    - Author PHPUnit Kernel tests targeting custom entity CRUD, custom database table repository queries, dynamic SQL filters, and configuration schema adherence.
+    - Verify transaction rollback semantics: ensure failed operations rollback completely without leaving orphaned records.
 10. **Data Migration ETL Pipeline Tests**:
     - Author Kernel migration tests verifying source-to-destination mappings, serialized payload transformations, entity reference lookups, revision transfers, translation mappings, and rollback behavior.
 11. **Error Handling & Edge Cases**:

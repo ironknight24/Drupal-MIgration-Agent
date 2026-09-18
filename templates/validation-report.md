@@ -35,6 +35,9 @@ evidence_summary:
 - **Frontend Assets & Libraries Accounted For**: {{ FRONTEND_ACCOUNTED_COUNT }} / {{ FRONTEND_TOTAL_COUNT }}
 - **JavaScript Behaviors Accounted For**: {{ BEHAVIORS_ACCOUNTED_COUNT }} / {{ BEHAVIORS_TOTAL_COUNT }}
 - **CSS Stylesheets Accounted For**: {{ STYLESHEETS_ACCOUNTED_COUNT }} / {{ STYLESHEETS_TOTAL_COUNT }}
+- **Views Definitions Accounted For**: {{ VIEWS_ACCOUNTED_COUNT }} / {{ VIEWS_TOTAL_COUNT }}
+- **Views Displays Accounted For**: {{ DISPLAYS_ACCOUNTED_COUNT }} / {{ DISPLAYS_TOTAL_COUNT }}
+- **Custom Views Plugins & Handlers Accounted For**: {{ PLUGINS_ACCOUNTED_COUNT }} / {{ PLUGINS_TOTAL_COUNT }}
 
 ---
 
@@ -67,6 +70,8 @@ evidence_summary:
 | `{{ COMPONENT }}.module:hook_field_info` | `field: field_related_item` | `entityreference` | `field.storage.record.field_related_item` | `MIGRATED` | Reference integrity & lookup verified |
 | `{{ COMPONENT }}.module` | `form: {{ COMPONENT }}_filter_form` | `drupal_get_form` | `src/Form/FilterForm.php` | `MIGRATED` | Form submission & validation test passed |
 | `{{ COMPONENT }}.module` | `ajax: {{ COMPONENT }}_ajax_filter_callback` | `#ajax` callback | `src/Form/FilterForm.php::ajaxFilterCallback` | `MIGRATED` | AjaxResponse command test passed |
+| `{{ COMPONENT }}.views_default.inc` | `view: {{ COMPONENT }}_content_listing` | `hook_views_default_views` | `config/install/views.view.{{ COMPONENT }}_content_listing.yml` | `MIGRATED` | View execution & result assertion verified |
+| `includes/views/field.inc` | `handler: views_handler_field_custom_calc` | `views_handler_field` | `src/Plugin/views/field/CustomCalc.php` | `MIGRATED` | Field plugin render & DI test passed |
 | `js/widget.js` | `behavior: {{ COMPONENT }}Widget` | `jQuery.once` | `js/widget.js` (`core/once`) | `MIGRATED` | `once()` behavior execution verified |
 | `css/widget.css` | `stylesheet: widget.css` | `stylesheets[all][]` | `css/widget.css` (`libraries.yml`) | `MIGRATED` | Library parsing & SMACSS category verified |
 | `{{ COMPONENT }}.install` | `table: {{ COMPONENT }}_records` | `hook_schema: record_id, uid` | `src/Entity/RecordEntity.php` | `MIGRATED` | Entity CRUD & migration test verified |

@@ -1,7 +1,7 @@
 ---
 name: d7-to-d10-mapping
 description: Exhaustive pattern mapping rules for converting Drupal 7 procedural code, inc files, custom database schemas, procedural hooks, configuration variables, entities, forms, and frontend assets into modern Drupal 10/11 object-oriented architecture.
-version: 1.6.0
+version: 1.7.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep
@@ -210,3 +210,32 @@ In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual li
         component:
           https://cdn.example.com/lib.min.css: { type: external, minified: true }
     ```
+
+## 11. Views, Displays, Custom Plugins & Query Re-Engineering
+- **Views Configuration Modernization (`views.view.*.yml`)**:
+  - Exported D7 Views and `hook_views_default_views()` are converted to modern Drupal 10/11 CMI configuration files located in `config/install/views.view.<view_id>.yml`.
+  - Displays are declared under `display:` mapping keys (`default`, `page_1`, `block_1`, `rest_export_1`, `feed_1`, `attachment_1`, `embed_1`).
+- **Custom Views Plugin Architecture**:
+  - Legacy `views_handler_*` and `views_plugin_*` classes are modernized into PSR-4 annotated plugin classes under `src/Plugin/views/`:
+    - Field Handlers $\rightarrow$ `@ViewsField` (`src/Plugin/views/field/`) extending `FieldPluginBase`.
+    - Filter Handlers $\rightarrow$ `@ViewsFilter` (`src/Plugin/views/filter/`) extending `FilterPluginBase`.
+    - Contextual Filter / Argument Handlers $\rightarrow$ `@ViewsArgument` (`src/Plugin/views/argument/`) extending `ArgumentPluginBase`.
+    - Sort Handlers $\rightarrow$ `@ViewsSort` (`src/Plugin/views/sort/`) extending `SortPluginBase`.
+    - Relationship Handlers $\rightarrow$ `@ViewsRelationship` (`src/Plugin/views/relationship/`) extending `RelationshipPluginBase`.
+    - Area Handlers $\rightarrow$ `@ViewsArea` (`src/Plugin/views/area/`) extending `AreaPluginBase`.
+    - Pager Plugins $\rightarrow$ `@ViewsPager` (`src/Plugin/views/pager/`) extending `PagerPluginBase`.
+    - Access Plugins $\rightarrow$ `@ViewsAccess` (`src/Plugin/views/access/`) extending `AccessPluginBase`.
+    - Query Plugins $\rightarrow$ `@ViewsQuery` (`src/Plugin/views/query/`) extending `QueryPluginBase`.
+    - Style Plugins $\rightarrow$ `@ViewsStyle` (`src/Plugin/views/style/`) extending `StylePluginBase`.
+    - Row Plugins $\rightarrow$ `@ViewsRow` (`src/Plugin/views/row/`) extending `RowPluginBase`.
+    - Display Plugins $\rightarrow$ `@ViewsDisplay` (`src/Plugin/views/display/`) extending `DisplayPluginBase`.
+  - Custom Views plugins implement `ContainerFactoryPluginInterface` implementing `create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition)` for typehinted constructor dependency injection.
+- **`hook_views_data()` & `hook_views_data_alter()`**:
+  - Implemented in `<module>.views.inc` providing table metadata, joins, and mapping schema columns to plugin IDs.
+- **`hook_views_query_alter()` Modernization**:
+  - Query alterations operate on `\Drupal\views\Plugin\views\query\Sql` instances, utilizing `$query->addWhere()`, `$query->addTable()`, `$query->addField()`, and `$query->addWhereExpression()`.
+- **Cache Metadata Integration**:
+  - Views caching utilizes modern cache tags (`$view->element['#cache']['tags']`), cache contexts (`$view->element['#cache']['contexts']`), and cache max-age.
+- **Programmatic Dispatches**:
+  - `views_get_view($name)` $\rightarrow$ `\Drupal\views\Views::getView($name)`
+  - `views_embed_view($name, $display_id, ...$args)` $\rightarrow$ `views_embed_view($name, $display_id, ...$args)`

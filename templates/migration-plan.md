@@ -60,6 +60,9 @@ evidence_summary:
 | `{{ COMPONENT }}.module:hook_field_info` | `field: field_related_item` | `ENTITY_REFERENCE` | `core.base_field_override` / `field.storage` | `REFERENCE_REMAP` | `MIGRATED` |
 | `{{ COMPONENT }}.module` | `form: {{ COMPONENT }}_filter_form` | `FORM_BASE` | `src/Form/FilterForm.php` | `FORMBASE_REWRITE` (`@entity_type.manager`) | `MIGRATED` |
 | `{{ COMPONENT }}.module` | `ajax: {{ COMPONENT }}_ajax_filter_callback` | `AJAX_CALLBACK` | `src/Form/FilterForm.php::ajaxFilterCallback` | `AJAX_REWRITE` (returns `AjaxResponse`) | `MIGRATED` |
+| `{{ COMPONENT }}.views_default.inc` | `view: {{ COMPONENT }}_content_listing` | `VIEW_DISPLAY_PAGE` | `config/install/views.view.{{ COMPONENT }}_content_listing.yml` | `VIEW_CONFIG_REBUILD` | `MIGRATED` |
+| `includes/views/handlers/field.inc` | `class views_handler_field_custom_calc` | `VIEW_FIELD_PLUGIN` | `src/Plugin/views/field/CustomCalc.php` | `HANDLER_PLUGIN_REWRITE` (`@ViewsField`) | `MIGRATED` |
+| `{{ COMPONENT }}.module:hook_views_query_alter` | `hook_views_query_alter` | `VIEWS_QUERY_ALTER` | `{{ COMPONENT }}.views_execution.inc:hook_views_query_alter` | `QUERY_ALTER_REWRITE` | `MIGRATED` |
 | `js/widget.js` | `Drupal.behaviors.{{ COMPONENT }}Widget` | `JS_ONCE_BEHAVIOR` | `js/widget.js` (`{{ COMPONENT }}.libraries.yml`) | `ONCE_API_REWRITE` (`core/once`, `core/drupalSettings`) | `MIGRATED` |
 | `css/widget.css` | `stylesheets[all][] = css/widget.css` | `CSS_LIBRARY` | `css/widget.css` (`{{ COMPONENT }}.libraries.yml`) | `CSS_LIBRARY_REWRITE` (SMACSS component) | `MIGRATED` |
 | `{{ COMPONENT }}.install` | `table: {{ COMPONENT }}_records` | `USER_DATA` | `src/Entity/RecordEntity.php` | `ENTITY_MIGRATION` | `MIGRATED` |
@@ -93,6 +96,7 @@ evidence_summary:
 | CREATED | `{{ COMPONENT }}.services.yml` | N/A | Service container definitions |
 | CREATED | `{{ COMPONENT }}.routing.yml` | `hook_menu()` | Route definitions |
 | CREATED | `{{ COMPONENT }}.libraries.yml` | `{{ COMPONENT }}.info` scripts/stylesheets | Library definitions |
+| CREATED | `config/install/views.view.{{ COMPONENT }}_content_listing.yml` | `{{ COMPONENT }}.views_default.inc` | Views configuration |
 | CREATED | `src/Entity/RecordEntity.php` | `hook_entity_info()` | Modern Content Entity class |
 | CREATED | `src/Form/FilterForm.php` | `{{ COMPONENT }}_filter_form` | Modern FormBase class with AJAX handlers |
 | CREATED | `src/Service/ExampleProcessor.php` | `lib/ExampleProcessor.php` | Modernized PSR-4 service class with constructor DI |
@@ -105,6 +109,8 @@ evidence_summary:
 - **Entity Test**: `tests/src/Kernel/RecordEntityTest.php`
 - **Form Test**: `tests/src/Kernel/FilterFormTest.php`
 - **Frontend / Library Test**: `tests/src/Kernel/LibraryRegistrationTest.php`
+- **Views Test**: `tests/src/Kernel/ViewsConfigurationTest.php`
+
 
 ---
 

@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260918220043",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260918221429",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T22:00:43.109503+00:00",
+  "executed_at": "2026-09-18T22:14:29.510233+00:00",
   "summary": {
-    "checks_total": 237,
-    "passed": 236,
+    "checks_total": 267,
+    "passed": 266,
     "failed": 0,
     "warnings": 0,
     "unverified": 1
@@ -2977,6 +2977,404 @@
         "state/migration-manifest.yml",
         "README.md",
         "ARCHITECTURE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-01",
+      "category": "discovery",
+      "name": "Generic View Discovery Completeness",
+      "status": "PASS",
+      "evidence": "Discovery agent and D7 analysis skill define exhaustive recursive discovery of D7 Views via default views, exported configs, runtime getters, execution callers, and handler loaders.",
+      "details": "Verified generic View discovery completeness heuristics.",
+      "affected_files": [
+        "agents/discovery/agent.md",
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-02",
+      "category": "accounting",
+      "name": "View Machine Name & Display ID Accounting",
+      "status": "PASS",
+      "evidence": "Manifest schema and discovery report template record View machine name, label, display IDs, defining module, and base entity/table.",
+      "details": "Verified View machine name and display ID accounting.",
+      "affected_files": [
+        "state/migration-manifest.yml",
+        "templates/discovery-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-03",
+      "category": "displays",
+      "name": "Display Discovery Completeness",
+      "status": "PASS",
+      "evidence": "D7 analysis skill defines exhaustive display discovery across standard (page, block, feed, rest_export, attachment, embed) and custom display plugins.",
+      "details": "Verified display discovery completeness heuristics.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-04",
+      "category": "displays",
+      "name": "Display Type & Route/Path Accounting",
+      "status": "PASS",
+      "evidence": "Manifest schema and skills record display type, routes/paths, menu relationships, and access permissions for every display.",
+      "details": "Verified display type and route/path accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-05",
+      "category": "handlers",
+      "name": "Field Handler Discovery & @ViewsField Mapping",
+      "status": "PASS",
+      "evidence": "Skills discover legacy views_handler_field implementations and map them to modern @ViewsField plugins extending FieldPluginBase with render() and query().",
+      "details": "Verified field handler discovery and @ViewsField mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-06",
+      "category": "handlers",
+      "name": "Filter Handler Discovery & @ViewsFilter Mapping",
+      "status": "PASS",
+      "evidence": "Skills and manifest discover normal/exposed filter handlers, operators, grouped filters, OR/AND semantics, and map to @ViewsFilter plugins extending FilterPluginBase.",
+      "details": "Verified filter handler discovery and @ViewsFilter mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-07",
+      "category": "handlers",
+      "name": "Contextual Filter / Argument Discovery & @ViewsArgument Mapping",
+      "status": "PASS",
+      "evidence": "Skills discover contextual filter handlers, default argument plugins, and validation plugins, mapping to @ViewsArgument plugins extending ArgumentPluginBase.",
+      "details": "Verified contextual filter discovery and @ViewsArgument mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-08",
+      "category": "handlers",
+      "name": "Sort Handler Discovery & @ViewsSort Mapping",
+      "status": "PASS",
+      "evidence": "Skills discover legacy views_handler_sort handlers and map them to modern @ViewsSort plugins extending SortPluginBase with query() sorting logic.",
+      "details": "Verified sort handler discovery and @ViewsSort mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-09",
+      "category": "handlers",
+      "name": "Relationship Handler Discovery & @ViewsRelationship Mapping",
+      "status": "PASS",
+      "evidence": "Skills discover relationship handlers, joins, and reverse relationships, mapping them to @ViewsRelationship plugins extending RelationshipPluginBase.",
+      "details": "Verified relationship handler discovery and @ViewsRelationship mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-10",
+      "category": "handlers",
+      "name": "Area Handler Discovery & @ViewsArea Mapping",
+      "status": "PASS",
+      "evidence": "Skills discover area handlers across header, footer, and empty text, mapping them to @ViewsArea plugins extending AreaPluginBase.",
+      "details": "Verified area handler discovery and @ViewsArea mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-11",
+      "category": "plugins",
+      "name": "Pager Plugin Discovery & @ViewsPager Mapping",
+      "status": "PASS",
+      "evidence": "Skills discover pager plugins (full, mini, none, some), mapping them to @ViewsPager plugins extending PagerPluginBase.",
+      "details": "Verified pager plugin discovery and @ViewsPager mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-12",
+      "category": "plugins",
+      "name": "Access Plugin Discovery & @ViewsAccess Mapping",
+      "status": "PASS",
+      "evidence": "Skills discover access plugins (permission, role, custom access callbacks), mapping them to @ViewsAccess plugins extending AccessPluginBase.",
+      "details": "Verified access plugin discovery and @ViewsAccess mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-13",
+      "category": "plugins",
+      "name": "Query Plugin Discovery & @ViewsQuery Mapping",
+      "status": "PASS",
+      "evidence": "Skills discover query plugins (views_plugin_query_default, search backend query plugins), mapping them to @ViewsQuery plugins extending QueryPluginBase.",
+      "details": "Verified query plugin discovery and @ViewsQuery mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-14",
+      "category": "plugins",
+      "name": "Style Plugin Discovery & @ViewsStyle Mapping",
+      "status": "PASS",
+      "evidence": "Skills discover style plugins (grid, table, list, unformatted, custom styles), mapping them to @ViewsStyle plugins extending StylePluginBase.",
+      "details": "Verified style plugin discovery and @ViewsStyle mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-15",
+      "category": "plugins",
+      "name": "Row Plugin Discovery & @ViewsRow Mapping",
+      "status": "PASS",
+      "evidence": "Skills discover row plugins (fields, entity, rendered entity), mapping them to @ViewsRow plugins extending RowPluginBase.",
+      "details": "Verified row plugin discovery and @ViewsRow mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-16",
+      "category": "plugins",
+      "name": "Custom Views Plugin Discovery & Annotation Mapping",
+      "status": "PASS",
+      "evidence": "Skills and custom module agent enforce PSR-4 plugin discovery under src/Plugin/views/, constructor dependency injection via ContainerFactoryPluginInterface, and annotated metadata.",
+      "details": "Verified custom Views plugin discovery and annotation mapping.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "agents/custom-module/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-17",
+      "category": "views_data",
+      "name": "hook_views_data & hook_views_data_alter Accounting",
+      "status": "PASS",
+      "evidence": "Skills and manifest analyze hook_views_data() and hook_views_data_alter(), mapping table definitions, field handlers, filter handlers, joins, and relationships.",
+      "details": "Verified hook_views_data and hook_views_data_alter accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-18",
+      "category": "lifecycle",
+      "name": "Views Lifecycle Hook Discovery",
+      "status": "PASS",
+      "evidence": "Skills discover all Views lifecycle execution hooks (pre_view, pre_build, post_build, pre_execute, post_execute, pre_render, post_render) and map to modern implementations.",
+      "details": "Verified Views lifecycle hook discovery heuristics.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-19",
+      "category": "query_alter",
+      "name": "hook_views_query_alter Modernization",
+      "status": "PASS",
+      "evidence": "Skills analyze hook_views_query_alter(), operating on Drupal\\views\\Plugin\\views\\query\\Sql with addWhere(), setWhereGroup(), and addTable() while preserving query semantics.",
+      "details": "Verified hook_views_query_alter modernization specifications.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-20",
+      "category": "security",
+      "name": "Views Access & Security Accounting",
+      "status": "PASS",
+      "evidence": "Skills and manifest analyze View access plugins, role checks, contextual filter authorization, and flag ambiguous security logic as HUMAN_DECISION_REQUIRED or UNVERIFIED.",
+      "details": "Verified Views access and security accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-21",
+      "category": "caching",
+      "name": "Views Cache Metadata Accounting",
+      "status": "PASS",
+      "evidence": "Skills and manifest map legacy D7 time-based caching to modern cache metadata (cache tags, cache contexts, cache max-age, and custom cache plugins).",
+      "details": "Verified Views cache metadata accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-22",
+      "category": "forms",
+      "name": "Exposed Filter Form Accounting & Form API Coordination",
+      "status": "PASS",
+      "evidence": "Manifest schema and dependency analysis cross-reference exposed filter forms with server-side Form API definitions (Step 17).",
+      "details": "Verified exposed filter form accounting and Form API coordination.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/dependency-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-23",
+      "category": "ajax",
+      "name": "Views AJAX Pagination & Filtering Client Coordination",
+      "status": "PASS",
+      "evidence": "Manifest schema and dependency analysis cross-reference View AJAX pagination and filtering with client-side JavaScript behaviors (Step 18).",
+      "details": "Verified Views AJAX pagination and filtering client coordination.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/dependency-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-24",
+      "category": "programmatic",
+      "name": "Programmatic Views Dispatches Modernization",
+      "status": "PASS",
+      "evidence": "Skills discover programmatic Views invocations (views_get_view, views_embed_view, views_execute_display) and map to modern \\Drupal\\views\\Views::getView() dispatches.",
+      "details": "Verified programmatic Views dispatches modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-25",
+      "category": "frontend",
+      "name": "Frontend Template Suggestions & Asset Dependencies",
+      "status": "PASS",
+      "evidence": "Skills establish ownership boundaries between module-level Views plugins (Step 19) and theme-level Twig template overrides (Step 20 handoff).",
+      "details": "Verified frontend template suggestions and asset dependencies.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/dependency-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-26",
+      "category": "taxonomy",
+      "name": "30 Views Target Architecture Classifications",
+      "status": "PASS",
+      "evidence": "Skills define the complete 30-class Views target architecture taxonomy (30/30 detected) supporting all configuration, display, handler, plugin, and query modernizations.",
+      "details": "Verified 30 Views target architecture classifications.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-27",
+      "category": "strategies",
+      "name": "21 Views Migration Strategies",
+      "status": "PASS",
+      "evidence": "Skills define all 21 standardized Views migration strategies (21/21 detected) separating modernization methodology from terminal outcome status.",
+      "details": "Verified 21 Views migration strategies.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-28",
+      "category": "manifest",
+      "name": "Manifest views_plugins_items 32-Property Schema Structure",
+      "status": "PASS",
+      "evidence": "state/migration-manifest.yml defines complete views_plugins_items accounting schema covering all required View, display, handler, plugin, and query metadata fields.",
+      "details": "Verified manifest views_plugins_items schema structure.",
+      "affected_files": [
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-29",
+      "category": "validation",
+      "name": "Zero-Omission Views Outcome Enforcement & Forbidden State Rejection",
+      "status": "PASS",
+      "evidence": "Validation agent and skill enforce approved terminal outcomes (MIGRATED, REPLACED, OBSOLETE, EXCLUDED_WITH_REASON, HUMAN_DECISION_REQUIRED, UNVERIFIED) and reject forbidden states for all Views definitions, displays, custom handlers, plugins, and query alterations.",
+      "details": "Verified zero-omission outcome enforcement for Views artifacts.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-VIEWS-30",
+      "category": "compatibility",
+      "name": "Cross-Capability Compatibility & Purity",
+      "status": "PASS",
+      "evidence": "Views accounting seamlessly integrates with frontend assets (Step 18), forms (Step 17), custom entities (Step 16), configuration (Step 15), procedural hooks (Step 14), database schemas (Step 13), custom PHP files (Step 12), and .inc files (Step 11) with 100% generic purity.",
+      "details": "Verified cross-capability architectural compatibility and purity.",
+      "affected_files": [
+        "state/migration-manifest.yml",
+        "README.md",
+        "ARCHITECTURE.md",
+        "AGENT_PROTOCOL.md"
       ],
       "remediation": ""
     }
