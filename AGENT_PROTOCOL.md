@@ -429,6 +429,9 @@ When resuming an interrupted or failed migration, the Orchestrator evaluates the
 | **Safety** | Live OS filesystem write blocking | `RUNTIME_REQUIRED` | `[RUNTIME UNVERIFIED]` |
 | **Full Migration**| End-to-end AST parsing & database replatforming | `CONSUMER_ENVIRONMENT_REQUIRED` | `[RUNTIME UNVERIFIED]` |
 
+> [!NOTE]
+> All runtime-required operations remain: `[RUNTIME UNVERIFIED — CLAUDE CODE CLI/ACCESS NOT AVAILABLE]`.
+
 ---
 
 ## 12. Canonical Failure Taxonomy & Severity Model
