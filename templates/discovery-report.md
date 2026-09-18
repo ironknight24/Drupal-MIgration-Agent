@@ -151,7 +151,16 @@ evidence_summary:
 
 ---
 
-## 15. Contributed Modules Inventory
+## 15. External Integrations, APIs, Web Services & Third-Party Systems Inventory (Step 22)
+
+| Module | Integration ID | Source Location | Integration Type (27 Types) | Protocol & Method | Endpoint / Host | Auth & Secret Source | Sensitive Data Categories | Target Architecture (35 Types) | Migration Strategy (20 Strategies) | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `example_module` | `EXT-001` | `example.inc:184` | `OUTBOUND_HTTP` | `HTTPS POST` | `https://api.gateway.example/v1/charge` | `BEARER_TOKEN` (`KEY_MODULE`) | `PAYMENT_DATA`, `USER_IDENTIFIERS` | `PAYMENT_INTEGRATION` | `PAYMENT_INTEGRATION_REFACTOR` | `MIGRATED` |
+| `example_module` | `EXT-002` | `example.module:92` | `WEBHOOK_RECEIVER` | `HTTPS POST` | `/api/v1/webhook/events` | `HMAC_SIGNATURE` (`ENVIRONMENT_SECRET`) | `NONE` | `WEBHOOK_RECEIVER` | `WEBHOOK_CONTROLLER_MIGRATION` | `MIGRATED` |
+
+---
+
+## 16. Contributed Modules Inventory
 
 | Contrib Module | D7 Version | Core in D10? | D10 Available? | Community Replacement | Action Plan |
 |---|---|---|---|---|---|
@@ -160,7 +169,7 @@ evidence_summary:
 
 ---
 
-## 15. Custom Themes Summary
+## 17. Custom Themes Summary
 
 | Theme Name | Path | Base Theme | Template Files (.tpl.php) | Preprocess Functions | Theme Functions | Theme Settings |
 |---|---|---|---|---|---|---|
@@ -168,7 +177,7 @@ evidence_summary:
 
 ---
 
-## 16. Custom Database Tables & Data-Model Inventory
+## 18. Custom Database Tables & Data-Model Inventory
 
 | Module | Table Name | Schema Location (`hook_schema`) | Primary Key & Indexes | Entity References (`uid`, `nid`, etc.) | Data Semantics (17 Categories) | Serialization (`PHP_SERIALIZE`, `JSON`, etc.) | CRUD Callers (Create/Read/Update/Delete) | Target Architecture |
 |---|---|---|---|---|---|---|---|---|
@@ -176,7 +185,7 @@ evidence_summary:
 
 ---
 
-## 17. Entity & Data Architecture
+## 19. Entity & Data Architecture
 - **Content Types**:
 - **Taxonomy Vocabularies**:
 - **Custom SQL Tables**:
@@ -184,13 +193,13 @@ evidence_summary:
 
 ---
 
-## 18. Integrations, External Endpoints & Drush Commands
+## 20. Integrations, External Endpoints & Drush Commands
 - **Webhooks & APIs**:
 - **Authentication Protocols**:
 - **Custom Drush Commands**:
 
 ---
 
-## 19. Baseline Audit Findings & Risks
+## 21. Baseline Audit Findings & Risks
 - **Risk Assessment**:
 - **Recommended Sequence Overrides**:

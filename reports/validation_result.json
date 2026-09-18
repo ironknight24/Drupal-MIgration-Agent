@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260918224226",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260918230005",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T22:42:26.631109+00:00",
+  "executed_at": "2026-09-18T23:00:05.907817+00:00",
   "summary": {
-    "checks_total": 327,
-    "passed": 326,
+    "checks_total": 361,
+    "passed": 359,
     "failed": 0,
     "warnings": 0,
-    "unverified": 1
+    "unverified": 2
   },
   "checks": [
     {
@@ -4159,6 +4159,467 @@
         "state/migration-manifest.yml",
         "README.md",
         "ARCHITECTURE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-01",
+      "category": "discovery",
+      "name": "External Integration Recursive Discovery",
+      "status": "PASS",
+      "evidence": "Factory recursively scans all module/theme roots, detecting external integration touchpoints across all PHP, inc, module, and install files without directory or naming assumptions.",
+      "details": "Verified external integration recursive discovery in d7-analysis skill, manifest, and discovery agent.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "agents/discovery/agent.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-02",
+      "category": "outbound",
+      "name": "Outbound HTTP & API Discovery",
+      "status": "PASS",
+      "evidence": "Skills detect all outbound calls (drupal_http_request, curl_exec, stream contexts, Guzzle wrappers, socket calls), mapping to Drupal 10/11 Guzzle http_client services.",
+      "details": "Verified outbound HTTP and API discovery and Guzzle client modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-03",
+      "category": "inbound",
+      "name": "Inbound API Endpoint Discovery",
+      "status": "PASS",
+      "evidence": "Skills discover custom API endpoints, hook_menu delivery callbacks, and REST/JSON endpoints, modernizing them to modern Symfony Controllers with JsonResponse and access controls.",
+      "details": "Verified inbound API endpoint discovery and Controller modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-04",
+      "category": "webhooks",
+      "name": "Webhook Discovery & Handling",
+      "status": "PASS",
+      "evidence": "Skills detect inbound/outbound webhooks, HMAC signature verification, header parsing, replay protection, and modernize to dedicated Webhook Controllers with CSRF bypass exemptions.",
+      "details": "Verified webhook discovery, HMAC signature verification, and Controller modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-05",
+      "category": "authentication",
+      "name": "Authentication & Authorization Discovery",
+      "status": "PASS",
+      "evidence": "Skills exhaustively identify integration authentication schemes (API keys, OAuth2, Bearer tokens, HMAC, client certificates, Basic Auth, LDAP/SSO) and lifecycle token handling.",
+      "details": "Verified integration authentication and authorization discovery.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-06",
+      "category": "credentials",
+      "name": "Credential-Source Classification",
+      "status": "PASS",
+      "evidence": "Skills classify credential origins into standard categories (KEY_MODULE, ENVIRONMENT_SECRET, SETTINGS_PHP, RUNTIME_SECRET) without copying raw values.",
+      "details": "Verified credential-source taxonomy and classification.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-07",
+      "category": "security",
+      "name": "Secret Protection & Rule 10 Compliance",
+      "status": "PASS",
+      "evidence": "Enforces strict Rule 10 secret protection across manifests, skills, reports, and CMI YAMLs, using abstract classifications and delegating secret retrieval to Key module / getenv().",
+      "details": "Verified Rule 10 secret isolation and abstract classification.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml",
+        "skills/configuration-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-08",
+      "category": "data_flow",
+      "name": "Data-Flow Pipeline Accounting",
+      "status": "PASS",
+      "evidence": "Skills model complete end-to-end integration data pipelines: Source -> Transformation -> Outbound Request -> External System -> Response -> Transformation -> Destination.",
+      "details": "Verified end-to-end integration data flow modeling.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-09",
+      "category": "sensitive_data",
+      "name": "Sensitive-Data Classification",
+      "status": "PASS",
+      "evidence": "Skills classify sensitive data categories (PII, credentials, payment data, tokens, session IDs) without persisting sensitive values in reports or manifests.",
+      "details": "Verified sensitive data classification standards.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-10",
+      "category": "payments",
+      "name": "Payment Integration Discovery & Resilience",
+      "status": "PASS",
+      "evidence": "Skills discover generic payment API calls, callbacks, webhooks, transaction verification, refund APIs, and idempotency mechanisms without hard-coded vendor assumptions.",
+      "details": "Verified payment integration discovery and resilience modeling.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-11",
+      "category": "messaging",
+      "name": "Email, SMS & Notification Discovery",
+      "status": "PASS",
+      "evidence": "Skills discover external email APIs, SMTP dependencies, SMS gateways, and push notification services, modernizing them to Symfony Mailer or dedicated services.",
+      "details": "Verified email, SMS, and notification service discovery and modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-12",
+      "category": "storage",
+      "name": "External Storage & File Transfer Discovery",
+      "status": "PASS",
+      "evidence": "Skills detect SFTP, FTP, cloud object storage, and remote file synchronization, modernizing them to Drupal 10/11 Flysystem stream wrappers or adapter services.",
+      "details": "Verified external storage and file transfer discovery and Flysystem mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-13",
+      "category": "database",
+      "name": "External Database Connection Discovery",
+      "status": "PASS",
+      "evidence": "Skills detect secondary database connections outside default DB, mapping to Database service connections with Step 13 cross-referencing.",
+      "details": "Verified external database connection discovery and connection modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-14",
+      "category": "queues",
+      "name": "Queue, Batch & Cron Integration Discovery",
+      "status": "PASS",
+      "evidence": "Skills discover external integrations triggered by cron, queue workers, and batch processing, preserving asynchronous execution via modern @QueueWorker plugins.",
+      "details": "Verified queue, batch, and cron integration discovery and QueueWorker modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-15",
+      "category": "sdks",
+      "name": "Third-Party Library & SDK Discovery",
+      "status": "PASS",
+      "evidence": "Skills analyze third-party SDKs and Composer libraries based on actual source usage, formulating modern Composer dependency and adapter replacement strategies.",
+      "details": "Verified third-party SDK discovery and modernization strategy.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-16",
+      "category": "binaries",
+      "name": "External Binary & CLI Execution Discovery",
+      "status": "PASS",
+      "evidence": "Skills discover external binary invocations (exec, shell_exec, system, proc_open) and re-engineer them to Symfony Process with strict argument escaping.",
+      "details": "Verified external binary execution discovery and Symfony Process modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-17",
+      "category": "resilience",
+      "name": "Retry, Timeout & Exponential Backoff Discovery",
+      "status": "PASS",
+      "evidence": "Skills detect timeout parameters, retry loops, exponential backoff, retry limits, and circuit-breaker patterns, classifying behavior as PRESENT, ABSENT, or UNKNOWN.",
+      "details": "Verified resilience, retry, and timeout modeling.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-18",
+      "category": "idempotency",
+      "name": "Idempotency & Concurrency Accounting",
+      "status": "PASS",
+      "evidence": "Skills analyze duplicate request prevention, idempotency headers, transaction boundaries, and compensating actions across integration workflows.",
+      "details": "Verified idempotency and concurrency accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-19",
+      "category": "errors",
+      "name": "Error, Failure & Exception Accounting",
+      "status": "PASS",
+      "evidence": "Skills model HTTP error code parsing, exception hierarchies, fallback execution, administrative alerts, and dead-letter queue routing.",
+      "details": "Verified error, failure, and exception modeling.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-20",
+      "category": "configuration",
+      "name": "Configuration & State Handoff",
+      "status": "PASS",
+      "evidence": "Establishes clean handoff between Step 22 (owning integration dependency on config) and Step 15 (authoritative owner of CMI configuration and State API migration).",
+      "details": "Verified configuration and state handoff contracts.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "ARCHITECTURE.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-21",
+      "category": "dynamic",
+      "name": "Dynamic Integration Resolution & Handoff",
+      "status": "PASS",
+      "evidence": "Establishes clear cross-referencing between Step 22 and Step 21 for dynamically selected endpoints, hosts, providers, and plugins without duplicating dynamic logic.",
+      "details": "Verified dynamic integration handoff and Step 21 cross-referencing.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "ARCHITECTURE.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-22",
+      "category": "security",
+      "name": "Security, Transport & TLS Accounting",
+      "status": "PASS",
+      "evidence": "Skills analyze TLS verification, certificate validation, SSRF risk prevention, signature verification, and secure header propagation.",
+      "details": "Verified security, transport, and TLS accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-23",
+      "category": "runtime",
+      "name": "Cache, Session & Runtime Handoff",
+      "status": "PASS",
+      "evidence": "Establishes clean handoff between Step 22 and Step 23 for cache, session, cookie, and request-state dependencies.",
+      "details": "Verified cache, session, and runtime handoff contracts.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "ARCHITECTURE.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-24",
+      "category": "taxonomy",
+      "name": "35 Standardized Integration Target Architectures",
+      "status": "PASS",
+      "evidence": "All 35 External Integration Target Architecture classifications are exhaustively defined and synchronized across d7-analysis, migration-api, and ARCHITECTURE.md.",
+      "details": "Verified complete 35-type external integration target architecture taxonomy.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md",
+        "ARCHITECTURE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-25",
+      "category": "strategies",
+      "name": "20 Standardized Integration Migration Strategies",
+      "status": "PASS",
+      "evidence": "All 20 External Integration Migration Strategies are exhaustively defined and synchronized across d7-analysis, migration-api, and ARCHITECTURE.md.",
+      "details": "Verified complete 20-strategy external integration migration taxonomy.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md",
+        "ARCHITECTURE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-26",
+      "category": "manifest",
+      "name": "Manifest external_integrations_items Completeness",
+      "status": "PASS",
+      "evidence": "Manifest schema defines the exhaustive external_integrations_items collection with 35+ metadata properties for all integration protocols, auth schemes, data flows, resilience, and strategies.",
+      "details": "Verified external_integrations_items collection schema in migration-manifest.yml.",
+      "affected_files": [
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-27",
+      "category": "zero_omission",
+      "name": "Zero-Omission Integration Outcome Enforcement",
+      "status": "PASS",
+      "evidence": "Behavioral validation skill enforces strict zero-omission rules for all external integrations, rejecting forbidden states (UNACCOUNTED, UNKNOWN_WITHOUT_REASON, SILENTLY_OMITTED).",
+      "details": "Verified zero-omission outcome enforcement for external integrations.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "state/migration-manifest.yml",
+        "README.md",
+        "ARCHITECTURE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-28",
+      "category": "dag",
+      "name": "Integration Dependency Graph & Wave Scheduling",
+      "status": "PASS",
+      "evidence": "Dependency analysis skill and agent model integration DAG edges and schedule Gateway Services and Webhook Controllers in Wave 4 after schema, entities, and services.",
+      "details": "Verified integration DAG edges and Wave 4 execution scheduling.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md",
+        "agents/dependency/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-29",
+      "category": "compatibility",
+      "name": "Cross-Capability Architectural Compatibility",
+      "status": "PASS",
+      "evidence": "Step 22 maintains clean architectural boundaries and explicit cross-referencing across database (Step 13), hooks (Step 14), config (Step 15), entities (Step 16), forms (Step 17), frontend (Step 18), Views (Step 19), themes (Step 20), dynamic (Step 21), and runtime (Step 23).",
+      "details": "Verified cross-capability architectural compatibility.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "ARCHITECTURE.md",
+        "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-30",
+      "category": "purity",
+      "name": "Generic Factory Purity & Zero Assumptions",
+      "status": "PASS",
+      "evidence": "The factory operates 100% generically against arbitrary Drupal 7 source without hard-coded vendor names, endpoints, real credentials, or project assumptions.",
+      "details": "Verified generic factory purity and zero-assumption design.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "README.md",
+        "ARCHITECTURE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-31",
+      "category": "testing",
+      "name": "Integration Testing & MockHandler Verification",
+      "status": "PASS",
+      "evidence": "Testing skill specifies comprehensive integration testing patterns using Guzzle MockHandler, Webhook HMAC signature verification, Key module mocking, and backoff retries.",
+      "details": "Verified integration testing methodologies and mock patterns.",
+      "affected_files": [
+        "skills/testing/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-32",
+      "category": "documentation",
+      "name": "Documentation & Contract Synchronization",
+      "status": "PASS",
+      "evidence": "All skills, agents, manifests, templates, and core documentation files are fully synchronized with Step 22 external integrations modernization standards.",
+      "details": "Verified documentation and contract synchronization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/custom-module-migration/SKILL.md",
+        "skills/dependency-analysis/SKILL.md",
+        "skills/testing/SKILL.md",
+        "skills/behavioral-validation/SKILL.md",
+        "skills/migration-api/SKILL.md",
+        "state/migration-manifest.yml",
+        "README.md",
+        "ARCHITECTURE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-33",
+      "category": "hygiene",
+      "name": "Git Hygiene & Safe File Management",
+      "status": "PASS",
+      "evidence": "All Step 22 updates adhere to strict Git hygiene: D7 source remains read-only, no git commits/tags/pushes made, and no transient files created.",
+      "details": "Verified Git hygiene and non-destructive file operations.",
+      "affected_files": [
+        "state/migration-manifest.yml",
+        "ARCHITECTURE.md",
+        "README.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INTEGRATION-34",
+      "category": "runtime_boundary",
+      "name": "Runtime Verification Boundary",
+      "status": "UNVERIFIED",
+      "evidence": "Static contract and simulation validation completed. Live runtime execution across external HTTP endpoints, webhooks, and authentication servers requires an active Drupal 10/11 environment.",
+      "details": "Retained explicit status: [RUNTIME UNVERIFIED \u2014 CLAUDE CODE CLI/ACCESS NOT AVAILABLE].",
+      "affected_files": [
+        "state/migration-manifest.yml",
+        "reports/validation_result.json"
       ],
       "remediation": ""
     }

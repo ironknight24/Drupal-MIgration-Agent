@@ -465,6 +465,71 @@ Every discovered dynamic dependency is categorized into one of 35 standard targe
 
 ---
 
+## 35 External Integration Target Architecture Taxonomy (Step 22)
+
+1. **`EXTERNAL_HTTP_CLIENT`**: Dedicated Guzzle HTTP client gateway service (`src/Service/`).
+2. **`REST_CLIENT`**: Structured REST API client service with JSON parsing and error handling.
+3. **`SOAP_CLIENT`**: Typed SOAP client service wrapper (`SoapClient`).
+4. **`XMLRPC_CLIENT`**: Modernized XML-RPC client gateway service.
+5. **`WEBHOOK_RECEIVER`**: Inbound webhook controller with signature verification (`src/Controller/WebhookController.php`).
+6. **`WEBHOOK_SENDER`**: Outbound webhook dispatcher service.
+7. **`API_ENDPOINT`**: Custom inbound REST/JSON API endpoint route.
+8. **`OAUTH_INTEGRATION`**: OAuth 1.0a / OAuth 2.0 client integration service.
+9. **`TOKEN_AUTH_INTEGRATION`**: Bearer token / API token authentication integration.
+10. **`API_KEY_INTEGRATION`**: API key authentication with Drupal Key module integration.
+11. **`SIGNED_REQUEST_INTEGRATION`**: HMAC / cryptographic signature request signing service.
+12. **`EXTERNAL_AUTHENTICATION`**: External identity provider integration service.
+13. **`LDAP_INTEGRATION`**: LDAP / Active Directory directory authentication service.
+14. **`SSO_INTEGRATION`**: SAML 2.0 / OpenID Connect single sign-on integration.
+15. **`PAYMENT_INTEGRATION`**: Payment gateway plugin or service (`@CommercePaymentGateway`).
+16. **`EMAIL_INTEGRATION`**: Transactional email service integration (Symfony Mailer transport).
+17. **`SMS_INTEGRATION`**: SMS gateway notification client service.
+18. **`NOTIFICATION_INTEGRATION`**: Push notification / alert dispatcher service.
+19. **`EXTERNAL_STORAGE`**: Cloud object storage stream wrapper (Flysystem).
+20. **`FILE_TRANSFER`**: Automated SFTP/FTP file transfer client service.
+21. **`EXTERNAL_DATABASE`**: Secondary database connection repository service.
+22. **`QUEUE_INTEGRATION`**: Message broker / queue worker plugin (`@QueueWorker`).
+23. **`THIRD_PARTY_SDK`**: Modernized third-party PHP SDK service wrapper.
+24. **`EXTERNAL_BINARY`**: CLI binary execution service using Symfony Process.
+25. **`ANALYTICS_INTEGRATION`**: External telemetry / analytics integration service.
+26. **`SEARCH_INTEGRATION`**: External search engine client (Solr / Elasticsearch).
+27. **`CRM_INTEGRATION`**: Customer relationship management API synchronization service.
+28. **`ERP_INTEGRATION`**: Enterprise resource planning system data sync service.
+29. **`CDN_INTEGRATION`**: Content delivery network cache purge / asset integration.
+30. **`CONFIG_DRIVEN_INTEGRATION`**: Integration configured via CMI schema.
+31. **`DYNAMIC_INTEGRATION`**: Dynamically resolved external endpoint/provider.
+32. **`RUNTIME_ONLY_INTEGRATION`**: Integration requiring runtime probe verification.
+33. **`OBSOLETE`**: Deprecated external integration excluded with rationale.
+34. **`HUMAN_DECISION_REQUIRED`**: Unresolved vendor protocol or licensing decision.
+35. **`UNVERIFIED`**: Integration awaiting runtime staging validation.
+
+---
+
+## 20 Standardized External Integration Migration Strategies (Step 22)
+
+1. **`DIRECT_HTTP_CLIENT_MIGRATION`**: Re-engineering `drupal_http_request()` to Guzzle `http_client` service.
+2. **`GATEWAY_SERVICE_MIGRATION`**: Wrapping external system calls inside an injectable Gateway Service.
+3. **`SERVICE_CONTAINER_INTEGRATION`**: Registering API client in `.services.yml` with dependency injection.
+4. **`REST_CLIENT_REFACTOR`**: Modernizing procedural REST calls into typed response objects.
+5. **`WEBHOOK_CONTROLLER_MIGRATION`**: Migrating webhook callback routes to Symfony Controllers with HMAC validation.
+6. **`OAUTH_SERVICE_MIGRATION`**: Migrating OAuth authentication to modern league/oauth2 or core OAuth services.
+7. **`AUTHENTICATION_REFACTOR`**: Re-engineering custom auth mechanisms to Drupal Key module or `settings.php`.
+8. **`PAYMENT_INTEGRATION_REFACTOR`**: Modernizing payment APIs into Commerce Payment Gateway plugins.
+9. **`EMAIL_SERVICE_MIGRATION`**: Modernizing custom mail calls to Symfony Mailer transport plugins.
+10. **`STORAGE_ADAPTER_MIGRATION`**: Migrating remote file transfers to Flysystem stream wrappers.
+11. **`EXTERNAL_DATABASE_REFACTOR`**: Refactoring external database queries into Database API connections.
+12. **`QUEUE_WORKER_MIGRATION`**: Wrapping synchronous external calls into asynchronous `@QueueWorker` plugins.
+13. **`THIRD_PARTY_LIBRARY_REPLACEMENT`**: Upgrading legacy vendor SDKs to Composer-managed modern packages.
+14. **`EXTERNAL_BINARY_REFACTOR`**: Refactoring `exec()` / `shell_exec()` to Symfony `Process` component.
+15. **`CONFIGURATION_DRIVEN_PROVIDER`**: Abstracting multi-vendor providers via CMI plugin configuration.
+16. **`DYNAMIC_PROVIDER_RESOLUTION`**: Modernizing dynamic endpoints via Plugin Manager pattern.
+17. **`RUNTIME_VERIFICATION_REQUIRED`**: External integration requiring staging endpoint verification.
+18. **`HUMAN_DECISION_REQUIRED`**: Integration requiring human architectural/vendor review.
+19. **`UNVERIFIED`**: Integration retained in unverified state pending external system access.
+20. **`OBSOLETE`**: Deprecated external integration safely decommissioned.
+
+---
+
 ## Data Integrity Verification & Checksums
 
 Before certifying a data migration pipeline as complete:

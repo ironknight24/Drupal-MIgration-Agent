@@ -1,10 +1,10 @@
 ---
 name: d7-to-d10-mapping
-description: Exhaustive pattern mapping rules for converting Drupal 7 procedural code, inc files, custom database schemas, procedural hooks, configuration variables, entities, forms, frontend assets, Views/plugins, theme layers, and dynamic runtime dependencies into modern Drupal 10/11 object-oriented architecture.
-version: 1.10.0
-user-invocable: true
+description: Definitive mapping patterns, API conversions, and structural transformations from Drupal 7 to Drupal 10/11.
+version: 1.11.0
+user-invocable: false
 disable-model-invocation: false
-allowed-tools: Read, Grep
+allowed-tools: Read, Grep, Find
 ---
 
 # Drupal 7 to Drupal 10/11 Architectural Mapping Skill
@@ -327,3 +327,46 @@ In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual li
   - Legacy `serialize()` payloads stored in databases are normalized into structured columns or typed JSON schema fields.
 - **Dynamic Include Paths $\rightarrow$ PSR-4 Autoloading / Plugin Discovery**:
   - Manual include loops (`module_load_include()`) are eliminated in favor of Composer PSR-4 class loading and Drupal plugin discovery mechanisms.
+
+## 14. External Integrations, APIs, Web Services & Third-Party Systems Modernization (Step 22)
+- **Procedural HTTP Calls (`drupal_http_request()`, cURL) $\rightarrow$ Guzzle `http_client` & Gateway Services**:
+  - Legacy `drupal_http_request($url, $options)` is modernized to an injectable Gateway Service (`src/Service/<System>Client.php`) utilizing `\GuzzleHttp\ClientInterface` via dependency injection:
+    ```php
+    namespace Drupal\my_module\Service;
+
+    use GuzzleHttp\ClientInterface;
+    use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+    use Drupal\key\KeyRepositoryInterface;
+
+    class ExternalApiClient {
+      public function __construct(
+        protected ClientInterface $httpClient,
+        protected LoggerChannelFactoryInterface $loggerFactory,
+        protected KeyRepositoryInterface $keyRepository,
+      ) {}
+
+      public function postPayload(string $endpoint, array $data): array {
+        $apiKey = $this->keyRepository->getKey('my_api_key')?->getKeyValue();
+        $response = $this->httpClient->post($endpoint, [
+          'headers' => ['Authorization' => 'Bearer ' . $apiKey, 'Accept' => 'application/json'],
+          'json' => $data,
+          'timeout' => 30,
+        ]);
+        return json_decode((string) $response->getBody(), TRUE) ?? [];
+      }
+    }
+    ```
+- **Inbound Webhook Callbacks $\rightarrow$ Symfony Webhook Controller**:
+  - Legacy `hook_menu()` callbacks handling webhooks or payment IPNs are modernized to Symfony Controller classes (`src/Controller/WebhookController.php`) with cryptographic HMAC signature verification and `JsonResponse`.
+- **Inbound REST/JSON Endpoints $\rightarrow$ REST Resource Plugins / JSON:API**:
+  - Legacy custom endpoint routers are migrated to `@RestResource` plugins (`src/Plugin/rest/resource/<Resource>.php`) or core JSON:API resources.
+- **SOAP & XML-RPC $\rightarrow$ Modern Typed Service Wrappers**:
+  - Legacy `SoapClient` and `xmlrpc()` calls are refactored into typed PHP 8.1+ SOAP service clients or modernized to REST/JSON gateway services.
+- **Secret & API Key Handling $\rightarrow$ Drupal Key Module / Environment Variables**:
+  - Legacy hardcoded keys or `variable_get()` secrets are migrated to Key module integrations (`key` module) or `getenv()` with `settings.php` overrides (Rule 10: zero secrets in CMI).
+- **Remote Storage & SFTP/FTP $\rightarrow$ Flysystem Stream Wrappers**:
+  - Legacy `ftp_*()` and `ssh2_sftp()` calls are modernized to Flysystem stream wrappers (`@FlysystemStreamWrapper`).
+- **External CLI Binaries $\rightarrow$ Symfony Process Component**:
+  - Legacy `exec()` / `shell_exec()` calls are modernized to `Symfony\Component\Process\Process` with strict argument escaping.
+- **Asynchronous External Operations $\rightarrow$ Drupal Queue API (`@QueueWorker`)**:
+  - Heavy external API syncs or batch requests are refactored into Queue Worker plugins (`src/Plugin/QueueWorker/<Worker>.php`) for non-blocking execution.

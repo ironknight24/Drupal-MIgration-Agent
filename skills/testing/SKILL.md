@@ -1,8 +1,8 @@
 ---
 name: testing
-description: Testing standards, PHPUnit test generation, assertion authoring, behavioral validation, and test suite execution guidelines for modern Drupal 10/11 modules.
-version: 1.10.0
-user-invocable: true
+description: Automated test execution, validation standards, and quality gating across Drupal 7 and modern Drupal 10/11 architectures.
+version: 1.11.0
+user-invocable: false
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
 ---
@@ -73,14 +73,19 @@ When testing modernized custom OOP classes, services, procedural hook replacemen
     - **Plugin Manager Discovery**: Assert custom Plugin Managers discover all registered `@Handler` or custom plugin classes without exceptions.
     - **Dynamic Callables & Factories**: Test factory services resolving dynamic handler strings to concrete typed service instances.
     - **Runtime Probe Safety**: Assert all runtime probe specifications are non-destructive and read-only; where runtime CLI is absent, verify explicit `[RUNTIME UNVERIFIED — CLAUDE CODE CLI/ACCESS NOT AVAILABLE]` status.
-11. **Public API & Business Logic Parity**:
+11. **External Integrations, APIs, Webhooks & Secret Testing (Step 22)**:
+    - **Guzzle MockHandler & HTTP Client Testing**: Assert API client services handle 200 OK, 4xx client errors, 5xx server errors, network timeouts, and JSON serialization using Guzzle `MockHandler` and `HandlerStack`.
+    - **Webhook Signature & Payload Verification**: Assert webhook controllers reject invalid HMAC signatures, validate CSRF tokens, and process incoming JSON/XML payloads safely.
+    - **Secret Protection & Key Module Mocking**: Assert API keys and credentials are retrieved via `KeyRepositoryInterface` or environment variables with zero hardcoded secrets.
+    - **Resilience & Idempotency Testing**: Assert exponential backoff retry loops, idempotency headers, and dead-letter queue routing execute correctly under simulated failure conditions.
+12. **Public API & Business Logic Parity**:
     - Author PHPUnit Unit tests targeting domain calculations, validation algorithms, and state transitions.
-12. **Integration, Custom Database & Repository Operations**:
+13. **Integration, Custom Database & Repository Operations**:
     - Author PHPUnit Kernel tests targeting custom entity CRUD, custom database table repository queries, dynamic SQL filters, and configuration schema adherence.
     - Verify transaction rollback semantics: ensure failed operations rollback completely without leaving orphaned records.
-13. **Data Migration ETL Pipeline Tests**:
+14. **Data Migration ETL Pipeline Tests**:
     - Author Kernel migration tests verifying source-to-destination mappings, serialized payload transformations, entity reference lookups, revision transfers, translation mappings, and rollback behavior.
-14. **Error Handling & Edge Cases**:
+15. **Error Handling & Edge Cases**:
     - Assert exception throwing on invalid inputs, missing dependencies, database constraint violations, or failed external requests.
 
 ---

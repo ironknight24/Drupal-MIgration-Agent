@@ -44,6 +44,7 @@ evidence_summary:
 - **Theme Functions & Registry Hooks Accounted For**: {{ THEME_HOOKS_ACCOUNTED_COUNT }} / {{ THEME_HOOKS_TOTAL_COUNT }}
 - **Theme Settings Forms Accounted For**: {{ THEME_SETTINGS_ACCOUNTED_COUNT }} / {{ THEME_SETTINGS_TOTAL_COUNT }}
 - **Dynamic & Runtime Dependencies Accounted For**: {{ DYNAMIC_ACCOUNTED_COUNT }} / {{ DYNAMIC_TOTAL_COUNT }}
+- **External Integrations & APIs Accounted For**: {{ INTEGRATIONS_ACCOUNTED_COUNT }} / {{ INTEGRATIONS_TOTAL_COUNT }}
 
 ---
 
@@ -66,17 +67,17 @@ evidence_summary:
 
 ---
 
-## 3. Custom Class, Hook, Database, Entity, Form, Frontend, Views & Theme Outcome Verification
+## 3. Mandatory Custom PHP, Hook, Database, Entity, Form, Frontend, Views, Theme, Dynamic & Integration Outcome Accounting
 
-| D7 Source File / Schema / Key / Entity / Form | Class / Hook / Table / Variable / Field / Form ID | Legacy Dependencies / Fallback | D10 Target Implementation | Final Outcome Status | Verification Evidence / Reason |
+| Source Artifact / File | Identifier / Hook / Class / Table / Form ID | D7 Location / Context | Modern Target Destination / Class | Outcome Status | Verification Evidence / Rationale |
 |---|---|---|---|---|---|
-| `lib/ExampleProcessor.php` | `class ExampleProcessor` | `ExampleProcessor($db)` | `src/Service/ExampleProcessor.php` | `MIGRATED` | Service construction & Unit test passed |
-| `{{ COMPONENT }}.module:L142` | `call_user_func($handler_func)` | `variable function` | `src/Plugin/HandlerManager.php` | `MIGRATED` | Plugin discovery and Kernel probe test passed |
-| `{{ COMPONENT }}.module:hook_entity_info` | `entity: {{ COMPONENT }}_record` | `hook_entity_info` | `src/Entity/RecordEntity.php` | `MIGRATED` | Entity CRUD & access control test passed |
-| `{{ COMPONENT }}.install:hook_schema` | `table: {{ COMPONENT }}_record_revision` | `revision table` | `src/Entity/RecordEntity.php` (`revision_table`) | `MIGRATED` | Revision creation & history loading verified |
-| `{{ COMPONENT }}.module:hook_field_info` | `field: field_related_item` | `entityreference` | `field.storage.record.field_related_item` | `MIGRATED` | Reference integrity & lookup verified |
-| `{{ COMPONENT }}.module` | `form: {{ COMPONENT }}_filter_form` | `drupal_get_form` | `src/Form/FilterForm.php` | `MIGRATED` | Form submission & validation test passed |
-| `{{ COMPONENT }}.module` | `ajax: {{ COMPONENT }}_ajax_filter_callback` | `#ajax` callback | `src/Form/FilterForm.php::ajaxFilterCallback` | `MIGRATED` | AjaxResponse command test passed |
+| `{{ COMPONENT }}.inc:184` | `ext_payment_gateway` | `drupal_http_request()` | `src/Service/PaymentGatewayClient.php` | `MIGRATED` | Guzzle MockHandler & Key module test passed |
+| `{{ COMPONENT }}.module:L142` | `DYN-001` | `call_user_func($handler)` | `src/Plugin/HandlerManager.php` | `MIGRATED` | Dynamic Plugin Manager discovery test passed |
+| `{{ COMPONENT }}.module:80` | `entity: {{ COMPONENT }}_record` | `hook_entity_info` | `src/Entity/RecordEntity.php` | `MIGRATED` | Entity CRUD & access kernel test passed |
+| `{{ COMPONENT }}.install:24` | `table: {{ COMPONENT }}_record_revision` | `hook_schema` | `src/Entity/RecordEntity.php` | `MIGRATED` | Revision integrity test passed |
+| `{{ COMPONENT }}.module:120` | `field: field_related_item` | `hook_field_info` | `core.base_field_override` | `MIGRATED` | Entity reference cardinality verified |
+| `{{ COMPONENT }}.module:200` | `form: {{ COMPONENT }}_filter_form` | `drupal_get_form` | `src/Form/FilterForm.php` | `MIGRATED` | FormState submission test passed |
+| `{{ COMPONENT }}.module:240` | `ajax: {{ COMPONENT }}_ajax_callback` | `ajax_deliver` | `src/Form/FilterForm.php::ajaxCallback` | `MIGRATED` | AjaxResponse command execution verified |
 | `templates/node--article.tpl.php` | `template: node--article` | `theme_render_template` | `templates/node/node--article.html.twig` | `MIGRATED` | Twig rendering & auto-escaping verified |
 | `template.php:example_theme_preprocess_page` | `hook_preprocess_page` | `template.php` | `{{ COMPONENT }}.theme:{{ COMPONENT }}_preprocess_page` | `MIGRATED` | Preprocess variable injection verified |
 | `template.php:example_theme_breadcrumb` | `theme_breadcrumb()` | `theme()` | `templates/navigation/breadcrumb.html.twig` | `MIGRATED` | Twig template override verified |

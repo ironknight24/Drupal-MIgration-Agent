@@ -190,9 +190,13 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
     - Classify custom tables into the 17 semantic categories: `CONTENT`, `CONFIGURATION`, `STATE`, `USER_DATA`, `ENTITY_DATA`, `FIELD_DATA`, `RELATIONSHIP_DATA`, `TRANSACTION_DATA`, `AUDIT_DATA`, `CACHE_DATA`, `QUEUE_DATA`, `TEMPORARY_DATA`, `INTEGRATION_DATA`, `LOOKUP_DATA`, `REFERENCE_DATA`, `LEGACY_DATA`, `UNKNOWN`.
     - Detect serialized data payloads (PHP serialize/unserialize, JSON, encoded objects, HTML).
     - Detect entity references (`uid`, `nid`, `tid`, `fid`, `entity_id`, `delta`) and cross-table entity relationships.
-    - Map complete CRUD call trees (CREATE, READ, UPDATE, DELETE callers) across all services, forms, controllers, queue workers, cron, and Drush.
-20. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
-21. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, and `dynamic_dependency_items` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
+20. **External Integrations, APIs, Web Services & Third-Party Systems Discovery (Step 22)**:
+    - Recursively scan for outbound HTTP calls (`drupal_http_request()`, `curl_exec()`, stream contexts, sockets), REST/SOAP/XML-RPC/JSON/GraphQL clients.
+    - Discover inbound REST/JSON endpoints, `hook_menu()` API routes, and webhook callback receivers with CSRF/HMAC signature verification.
+    - Analyze authentication schemes (OAuth 1.0/2.0, API keys, Bearer tokens, Basic auth, client certs, LDAP, SSO/SAML) and enforce Rule 10 secret protection (zero secrets in CMI/manifest, abstract secret sources: `CONFIGURATION_SECRET`, `ENVIRONMENT_SECRET`, `KEY_MODULE`).
+    - Map end-to-end data flows, payload transformations, sensitive data classifications (`PAYMENT_DATA`, `USER_IDENTIFIERS`, `PERSONAL_INFO`, `CREDENTIALS`), payment gateways, transactional email/SMS, remote storage/SFTP, external databases, queue workers, third-party SDKs, and CLI binaries (`exec()`, `shell_exec()`).
+    - Catalog resilience settings (timeouts, exponential backoff retries, idempotency headers, error handling, masked audit logging).
+21. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, `dynamic_dependency_items`, and `external_integrations_items` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
 22. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
 23. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
 

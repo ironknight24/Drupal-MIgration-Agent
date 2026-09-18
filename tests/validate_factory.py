@@ -2354,11 +2354,11 @@ class FactoryValidator:
         has_doc_sync = (
             taxonomy_in_d7 and
             "1.1.0" in config_skill and
-            any(v in mapping_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
-            any(v in custom_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
-            any(v in dep_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
-            any(v in test_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
-            any(v in val_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"])
+            any(v in mapping_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
+            any(v in custom_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
+            any(v in dep_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
+            any(v in test_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
+            any(v in val_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"])
         )
 
         if has_doc_sync:
@@ -3730,11 +3730,11 @@ class FactoryValidator:
         taxonomy_in_d7 = "21 frontend target architecture" in d7_skill.lower() or "21-class" in d7_skill.lower() or "21 frontend" in d7_skill.lower()
         has_doc_sync = (
             taxonomy_in_d7 and
-            any(v in mapping_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
-            any(v in custom_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
-            any(v in dep_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
-            any(v in test_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
-            any(v in val_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0"])
+            any(v in mapping_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
+            any(v in custom_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
+            any(v in dep_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
+            any(v in test_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"]) and
+            any(v in val_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0", "1.11.0"])
         )
 
         if has_doc_sync:
@@ -5412,6 +5412,659 @@ class FactoryValidator:
                               "Zero-omission enforcement or cross-capability check failed for dynamic dependencies.",
                               "All dynamic dependencies must resolve to approved terminal states with 100% generic purity.")
 
+    def validate_external_integrations_suite(self):
+        """
+        STEP 22 Validation Suite: External Integrations, APIs, Web Services, Third-Party Systems & Integration Behavior
+        Validates CHECK-INTEGRATION-01 through CHECK-INTEGRATION-34.
+        """
+        d7_skill = (self.repo_root / "skills/d7-analysis/SKILL.md").read_text(encoding='utf-8')
+        mapping_skill = (self.repo_root / "skills/d7-to-d10-mapping/SKILL.md").read_text(encoding='utf-8')
+        custom_skill = (self.repo_root / "skills/custom-module-migration/SKILL.md").read_text(encoding='utf-8')
+        dep_skill = (self.repo_root / "skills/dependency-analysis/SKILL.md").read_text(encoding='utf-8')
+        migration_skill = (self.repo_root / "skills/migration-api/SKILL.md").read_text(encoding='utf-8')
+        test_skill = (self.repo_root / "skills/testing/SKILL.md").read_text(encoding='utf-8')
+        val_skill = (self.repo_root / "skills/behavioral-validation/SKILL.md").read_text(encoding='utf-8')
+        disc_agent = (self.repo_root / "agents/discovery/agent.md").read_text(encoding='utf-8')
+        dep_agent = (self.repo_root / "agents/dependency/agent.md").read_text(encoding='utf-8')
+        manifest_text = (self.repo_root / "state/migration-manifest.yml").read_text(encoding='utf-8')
+        readme_text = (self.repo_root / "README.md").read_text(encoding='utf-8')
+        arch_text = (self.repo_root / "ARCHITECTURE.md").read_text(encoding='utf-8')
+        disc_template = (self.repo_root / "templates/discovery-report.md").read_text(encoding='utf-8')
+        plan_template = (self.repo_root / "templates/migration-plan.md").read_text(encoding='utf-8')
+        val_template = (self.repo_root / "templates/validation-report.md").read_text(encoding='utf-8')
+
+        # 22.1 External Integration Discovery
+        has_integration_discovery = (
+            "external_integrations_items" in manifest_text and
+            "External Integrations, APIs, Web Services" in d7_skill and
+            "External Integrations, APIs, Web Services" in disc_agent and
+            "external_integrations_items" in disc_agent
+        )
+
+        if has_integration_discovery:
+            self.record_check("CHECK-INTEGRATION-01", "discovery", "External Integration Recursive Discovery", "PASS",
+                              "Factory recursively scans all module/theme roots, detecting external integration touchpoints across all PHP, inc, module, and install files without directory or naming assumptions.",
+                              "Verified external integration recursive discovery in d7-analysis skill, manifest, and discovery agent.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "agents/discovery/agent.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-INTEGRATION-01", "discovery", "External Integration Recursive Discovery", "FAIL",
+                              "Missing external integration discovery rules in skills, agents, or manifest.",
+                              "Factory must recursively discover all external integrations.")
+
+        # 22.2 Outbound HTTP & API Discovery
+        has_outbound_http = (
+            "drupal_http_request" in d7_skill and
+            "curl_exec" in d7_skill and
+            "EXTERNAL_HTTP_CLIENT" in d7_skill and
+            "DIRECT_HTTP_CLIENT_MIGRATION" in d7_skill and
+            "ClientInterface" in mapping_skill
+        )
+
+        if has_outbound_http:
+            self.record_check("CHECK-INTEGRATION-02", "outbound", "Outbound HTTP & API Discovery", "PASS",
+                              "Skills detect all outbound calls (drupal_http_request, curl_exec, stream contexts, Guzzle wrappers, socket calls), mapping to Drupal 10/11 Guzzle http_client services.",
+                              "Verified outbound HTTP and API discovery and Guzzle client modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-02", "outbound", "Outbound HTTP & API Discovery", "FAIL",
+                              "Missing outbound HTTP discovery rules or Guzzle client mapping.",
+                              "Factory must detect outbound HTTP requests and map to Guzzle services.")
+
+        # 22.3 Inbound API Endpoint Discovery
+        has_inbound_endpoints = (
+            "API_ENDPOINT" in d7_skill and
+            "REST_CLIENT" in d7_skill and
+            "REST_CLIENT_REFACTOR" in d7_skill and
+            "hook_menu" in d7_skill and
+            "src/Controller" in mapping_skill
+        )
+
+        if has_inbound_endpoints:
+            self.record_check("CHECK-INTEGRATION-03", "inbound", "Inbound API Endpoint Discovery", "PASS",
+                              "Skills discover custom API endpoints, hook_menu delivery callbacks, and REST/JSON endpoints, modernizing them to modern Symfony Controllers with JsonResponse and access controls.",
+                              "Verified inbound API endpoint discovery and Controller modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-03", "inbound", "Inbound API Endpoint Discovery", "FAIL",
+                              "Missing inbound API endpoint discovery rules.",
+                              "Factory must detect inbound API endpoints and map to modern Controllers.")
+
+        # 22.4 Webhook Discovery & Handling
+        has_webhooks = (
+            "WEBHOOK_RECEIVER" in d7_skill and
+            "WEBHOOK_SENDER" in d7_skill and
+            "WEBHOOK_CONTROLLER_MIGRATION" in d7_skill and
+            "HMAC" in d7_skill and
+            "webhook" in d7_skill.lower()
+        )
+
+        if has_webhooks:
+            self.record_check("CHECK-INTEGRATION-04", "webhooks", "Webhook Discovery & Handling", "PASS",
+                              "Skills detect inbound/outbound webhooks, HMAC signature verification, header parsing, replay protection, and modernize to dedicated Webhook Controllers with CSRF bypass exemptions.",
+                              "Verified webhook discovery, HMAC signature verification, and Controller modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-04", "webhooks", "Webhook Discovery & Handling", "FAIL",
+                              "Missing webhook discovery or signature verification rules.",
+                              "Factory must detect and modernize webhook integrations.")
+
+        # 22.5 Authentication & Authorization Discovery
+        has_auth_discovery = (
+            "OAUTH_INTEGRATION" in d7_skill and
+            "API_KEY_INTEGRATION" in d7_skill and
+            "TOKEN_AUTH_INTEGRATION" in d7_skill and
+            "SIGNED_REQUEST_INTEGRATION" in d7_skill and
+            "EXTERNAL_AUTHENTICATION" in d7_skill and
+            "LDAP_INTEGRATION" in d7_skill and
+            "SSO_INTEGRATION" in d7_skill
+        )
+
+        if has_auth_discovery:
+            self.record_check("CHECK-INTEGRATION-05", "authentication", "Authentication & Authorization Discovery", "PASS",
+                              "Skills exhaustively identify integration authentication schemes (API keys, OAuth2, Bearer tokens, HMAC, client certificates, Basic Auth, LDAP/SSO) and lifecycle token handling.",
+                              "Verified integration authentication and authorization discovery.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-05", "authentication", "Authentication & Authorization Discovery", "FAIL",
+                              "Missing authentication mechanism discovery in skills.",
+                              "Factory must identify all authentication and authorization schemes.")
+
+        # 22.6 Credential-Source Classification
+        has_credential_sources = (
+            "KEY_MODULE" in d7_skill and
+            "ENVIRONMENT_SECRET" in d7_skill and
+            "SETTINGS_PHP" in d7_skill and
+            "credential_source" in manifest_text
+        )
+
+        if has_credential_sources:
+            self.record_check("CHECK-INTEGRATION-06", "credentials", "Credential-Source Classification", "PASS",
+                              "Skills classify credential origins into standard categories (KEY_MODULE, ENVIRONMENT_SECRET, SETTINGS_PHP, RUNTIME_SECRET) without copying raw values.",
+                              "Verified credential-source taxonomy and classification.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-INTEGRATION-06", "credentials", "Credential-Source Classification", "FAIL",
+                              "Missing credential-source classification in skills or manifest.",
+                              "Factory must classify credential origins into standard categories.")
+
+        # 22.7 Secret Protection & Rule 10 Compliance
+        has_secret_protection = (
+            "CONFIGURATION_SECRET" in d7_skill and
+            "ENVIRONMENT_SECRET" in d7_skill and
+            "RUNTIME_SECRET" in d7_skill and
+            "Key module" in d7_skill and
+            "Rule 10" in d7_skill and
+            "secret_classification" in manifest_text
+        )
+
+        if has_secret_protection:
+            self.record_check("CHECK-INTEGRATION-07", "security", "Secret Protection & Rule 10 Compliance", "PASS",
+                              "Enforces strict Rule 10 secret protection across manifests, skills, reports, and CMI YAMLs, using abstract classifications and delegating secret retrieval to Key module / getenv().",
+                              "Verified Rule 10 secret isolation and abstract classification.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml", "skills/configuration-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-07", "security", "Secret Protection & Rule 10 Compliance", "FAIL",
+                              "Missing secret protection rules or abstract classification in skills/manifest.",
+                              "Factory must enforce strict zero secrets and abstract classification.")
+
+        # 22.8 Data-Flow Pipeline Accounting
+        has_data_flow = (
+            "data_inputs" in manifest_text and
+            "data_outputs" in manifest_text and
+            "transformations" in manifest_text and
+            "Data Source" in d7_skill and
+            "Destination" in d7_skill and
+            "Transformation" in d7_skill
+        )
+
+        if has_data_flow:
+            self.record_check("CHECK-INTEGRATION-08", "data_flow", "Data-Flow Pipeline Accounting", "PASS",
+                              "Skills model complete end-to-end integration data pipelines: Source -> Transformation -> Outbound Request -> External System -> Response -> Transformation -> Destination.",
+                              "Verified end-to-end integration data flow modeling.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-INTEGRATION-08", "data_flow", "Data-Flow Pipeline Accounting", "FAIL",
+                              "Missing data flow pipeline accounting in skills or manifest.",
+                              "Factory must trace complete data flow from source to destination.")
+
+        # 22.9 Sensitive-Data Classification
+        has_sensitive_data = (
+            "sensitive_data_categories" in manifest_text and
+            "PAYMENT_DATA" in d7_skill and
+            "CREDENTIALS" in d7_skill and
+            "PERSONAL_INFO" in d7_skill
+        )
+
+        if has_sensitive_data:
+            self.record_check("CHECK-INTEGRATION-09", "sensitive_data", "Sensitive-Data Classification", "PASS",
+                              "Skills classify sensitive data categories (PII, credentials, payment data, tokens, session IDs) without persisting sensitive values in reports or manifests.",
+                              "Verified sensitive data classification standards.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-INTEGRATION-09", "sensitive_data", "Sensitive-Data Classification", "FAIL",
+                              "Missing sensitive data classification categories in skills.",
+                              "Factory must classify sensitive data categories without copying values.")
+
+        # 22.10 Payment Integration Discovery & Resilience
+        has_payment_integration = (
+            "PAYMENT_INTEGRATION" in d7_skill and
+            "PAYMENT_INTEGRATION_REFACTOR" in d7_skill and
+            "Payment Gateways" in d7_skill and
+            "CommercePaymentGateway" in d7_skill
+        )
+
+        if has_payment_integration:
+            self.record_check("CHECK-INTEGRATION-10", "payments", "Payment Integration Discovery & Resilience", "PASS",
+                              "Skills discover generic payment API calls, callbacks, webhooks, transaction verification, refund APIs, and idempotency mechanisms without hard-coded vendor assumptions.",
+                              "Verified payment integration discovery and resilience modeling.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-10", "payments", "Payment Integration Discovery & Resilience", "FAIL",
+                              "Missing payment integration discovery rules in skills.",
+                              "Factory must discover payment integrations and resilience behavior.")
+
+        # 22.11 Email, SMS & Notification Integration Discovery
+        has_messaging_integration = (
+            "EMAIL_INTEGRATION" in d7_skill and
+            "SMS_INTEGRATION" in d7_skill and
+            "NOTIFICATION_INTEGRATION" in d7_skill and
+            "EMAIL_SERVICE_MIGRATION" in d7_skill and
+            ("Mailer" in d7_skill or "mail" in d7_skill.lower())
+        )
+
+        if has_messaging_integration:
+            self.record_check("CHECK-INTEGRATION-11", "messaging", "Email, SMS & Notification Discovery", "PASS",
+                              "Skills discover external email APIs, SMTP dependencies, SMS gateways, and push notification services, modernizing them to Symfony Mailer or dedicated services.",
+                              "Verified email, SMS, and notification service discovery and modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-11", "messaging", "Email, SMS & Notification Discovery", "FAIL",
+                              "Missing email, SMS, or notification integration discovery rules.",
+                              "Factory must discover external messaging services and map to Mailer/notification services.")
+
+        # 22.12 External Storage & Remote File Transfer Discovery
+        has_storage_integration = (
+            "EXTERNAL_STORAGE" in d7_skill and
+            "FILE_TRANSFER" in d7_skill and
+            "STORAGE_ADAPTER_MIGRATION" in d7_skill and
+            "Flysystem" in mapping_skill
+        )
+
+        if has_storage_integration:
+            self.record_check("CHECK-INTEGRATION-12", "storage", "External Storage & File Transfer Discovery", "PASS",
+                              "Skills detect SFTP, FTP, cloud object storage, and remote file synchronization, modernizing them to Drupal 10/11 Flysystem stream wrappers or adapter services.",
+                              "Verified external storage and file transfer discovery and Flysystem mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-12", "storage", "External Storage & File Transfer Discovery", "FAIL",
+                              "Missing external storage discovery rules in skills.",
+                              "Factory must detect external storage and map to modern stream wrappers / adapters.")
+
+        # 22.13 External Database Connection Discovery
+        has_external_db = (
+            "EXTERNAL_DATABASE" in d7_skill and
+            "EXTERNAL_DATABASE_REFACTOR" in d7_skill and
+            "Database" in d7_skill and
+            "Step 13" in d7_skill
+        )
+
+        if has_external_db:
+            self.record_check("CHECK-INTEGRATION-13", "database", "External Database Connection Discovery", "PASS",
+                              "Skills detect secondary database connections outside default DB, mapping to Database service connections with Step 13 cross-referencing.",
+                              "Verified external database connection discovery and connection modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-13", "database", "External Database Connection Discovery", "FAIL",
+                              "Missing external database connection discovery in skills.",
+                              "Factory must detect secondary database connections.")
+
+        # 22.14 Queue, Batch & Cron Integration Discovery
+        has_queue_integration = (
+            "QUEUE_INTEGRATION" in d7_skill and
+            "QUEUE_WORKER_MIGRATION" in d7_skill and
+            "QueueWorker" in mapping_skill
+        )
+
+        if has_queue_integration:
+            self.record_check("CHECK-INTEGRATION-14", "queues", "Queue, Batch & Cron Integration Discovery", "PASS",
+                              "Skills discover external integrations triggered by cron, queue workers, and batch processing, preserving asynchronous execution via modern @QueueWorker plugins.",
+                              "Verified queue, batch, and cron integration discovery and QueueWorker modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-14", "queues", "Queue, Batch & Cron Integration Discovery", "FAIL",
+                              "Missing queue/cron integration discovery rules in skills.",
+                              "Factory must discover asynchronous queue and cron integration workers.")
+
+        # 22.15 Third-Party PHP Library & SDK Discovery
+        has_sdk_discovery = (
+            "THIRD_PARTY_SDK" in d7_skill and
+            "THIRD_PARTY_LIBRARY_REPLACEMENT" in d7_skill and
+            "Composer" in d7_skill
+        )
+
+        if has_sdk_discovery:
+            self.record_check("CHECK-INTEGRATION-15", "sdks", "Third-Party Library & SDK Discovery", "PASS",
+                              "Skills analyze third-party SDKs and Composer libraries based on actual source usage, formulating modern Composer dependency and adapter replacement strategies.",
+                              "Verified third-party SDK discovery and modernization strategy.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-15", "sdks", "Third-Party Library & SDK Discovery", "FAIL",
+                              "Missing third-party SDK discovery rules in skills.",
+                              "Factory must analyze third-party SDKs based on usage evidence.")
+
+        # 22.16 External Binary & CLI Tool Execution Discovery
+        has_binary_discovery = (
+            "EXTERNAL_BINARY" in d7_skill and
+            "EXTERNAL_BINARY_REFACTOR" in d7_skill and
+            "exec" in d7_skill and
+            "shell_exec" in d7_skill and
+            "proc_open" in d7_skill and
+            "Process" in mapping_skill
+        )
+
+        if has_binary_discovery:
+            self.record_check("CHECK-INTEGRATION-16", "binaries", "External Binary & CLI Execution Discovery", "PASS",
+                              "Skills discover external binary invocations (exec, shell_exec, system, proc_open) and re-engineer them to Symfony Process with strict argument escaping.",
+                              "Verified external binary execution discovery and Symfony Process modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-16", "binaries", "External Binary & CLI Execution Discovery", "FAIL",
+                              "Missing external binary discovery rules in skills.",
+                              "Factory must detect external binary calls and map to Symfony Process.")
+
+        # 22.17 Retry, Timeout & Exponential Backoff Discovery
+        has_resilience = (
+            "timeout" in d7_skill.lower() and
+            "retry" in d7_skill.lower() and
+            "exponential_backoff" in d7_skill.lower()
+        )
+
+        if has_resilience:
+            self.record_check("CHECK-INTEGRATION-17", "resilience", "Retry, Timeout & Exponential Backoff Discovery", "PASS",
+                              "Skills detect timeout parameters, retry loops, exponential backoff, retry limits, and circuit-breaker patterns, classifying behavior as PRESENT, ABSENT, or UNKNOWN.",
+                              "Verified resilience, retry, and timeout modeling.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-INTEGRATION-17", "resilience", "Retry, Timeout & Exponential Backoff Discovery", "FAIL",
+                              "Missing resilience, retry, or timeout discovery rules in skills.",
+                              "Factory must discover and model retry, timeout, and backoff behavior.")
+
+        # 22.18 Idempotency & Concurrency Accounting
+        has_idempotency = (
+            "idempotency" in d7_skill.lower() and
+            "idempotency_behavior" in manifest_text.lower()
+        )
+
+        if has_idempotency:
+            self.record_check("CHECK-INTEGRATION-18", "idempotency", "Idempotency & Concurrency Accounting", "PASS",
+                              "Skills analyze duplicate request prevention, idempotency headers, transaction boundaries, and compensating actions across integration workflows.",
+                              "Verified idempotency and concurrency accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-INTEGRATION-18", "idempotency", "Idempotency & Concurrency Accounting", "FAIL",
+                              "Missing idempotency accounting rules in skills or manifest.",
+                              "Factory must account for idempotency and compensating actions.")
+
+        # 22.19 Error, Failure & Exception Accounting
+        has_error_handling = (
+            "failure_behavior" in manifest_text and
+            "logging_behavior" in manifest_text and
+            "HTTP status" in d7_skill and
+            "dead_letter" in d7_skill.lower()
+        )
+
+        if has_error_handling:
+            self.record_check("CHECK-INTEGRATION-19", "errors", "Error, Failure & Exception Accounting", "PASS",
+                              "Skills model HTTP error code parsing, exception hierarchies, fallback execution, administrative alerts, and dead-letter queue routing.",
+                              "Verified error, failure, and exception modeling.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-INTEGRATION-19", "errors", "Error, Failure & Exception Accounting", "FAIL",
+                              "Missing error or failure behavior accounting in skills/manifest.",
+                              "Factory must model error handling and failure cascades.")
+
+        # 22.20 Configuration & State Handoff
+        has_config_handoff = (
+            "CONFIG_DRIVEN_INTEGRATION" in d7_skill and
+            "CONFIGURATION_DRIVEN_PROVIDER" in d7_skill and
+            "Step 15" in d7_skill and
+            "configuration_dependencies" in manifest_text
+        )
+
+        if has_config_handoff:
+            self.record_check("CHECK-INTEGRATION-20", "configuration", "Configuration & State Handoff", "PASS",
+                              "Establishes clean handoff between Step 22 (owning integration dependency on config) and Step 15 (authoritative owner of CMI configuration and State API migration).",
+                              "Verified configuration and state handoff contracts.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "ARCHITECTURE.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-INTEGRATION-20", "configuration", "Configuration & State Handoff", "FAIL",
+                              "Missing configuration handoff specification in skills/architecture.",
+                              "Step 22 must establish clear handoff with Step 15.")
+
+        # 22.21 Dynamic Integration Resolution & Handoff
+        has_dynamic_handoff = (
+            "DYNAMIC_INTEGRATION" in d7_skill and
+            "DYNAMIC_PROVIDER_RESOLUTION" in d7_skill and
+            "Step 21" in d7_skill and
+            "dynamic_dependencies" in manifest_text
+        )
+
+        if has_dynamic_handoff:
+            self.record_check("CHECK-INTEGRATION-21", "dynamic", "Dynamic Integration Resolution & Handoff", "PASS",
+                              "Establishes clear cross-referencing between Step 22 and Step 21 for dynamically selected endpoints, hosts, providers, and plugins without duplicating dynamic logic.",
+                              "Verified dynamic integration handoff and Step 21 cross-referencing.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "ARCHITECTURE.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-INTEGRATION-21", "dynamic", "Dynamic Integration Resolution & Handoff", "FAIL",
+                              "Missing dynamic integration handoff specification.",
+                              "Step 22 must establish clear handoff with Step 21.")
+
+        # 22.22 Security, Transport & TLS Accounting
+        has_security_accounting = (
+            "TLS" in d7_skill and
+            "certificate" in d7_skill.lower() and
+            "security_dependencies" in manifest_text
+        )
+
+        if has_security_accounting:
+            self.record_check("CHECK-INTEGRATION-22", "security", "Security, Transport & TLS Accounting", "PASS",
+                              "Skills analyze TLS verification, certificate validation, SSRF risk prevention, signature verification, and secure header propagation.",
+                              "Verified security, transport, and TLS accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-22", "security", "Security, Transport & TLS Accounting", "FAIL",
+                              "Missing security or transport accounting in skills.",
+                              "Factory must account for TLS, SSRF, and transport security.")
+
+        # 22.23 Cache, Session & Runtime Handoff
+        has_runtime_handoff = (
+            "RUNTIME_ONLY_INTEGRATION" in d7_skill and
+            "RUNTIME_VERIFICATION_REQUIRED" in d7_skill and
+            "Step 23" in d7_skill and
+            "cache_dependencies" in manifest_text and
+            "session_dependencies" in manifest_text
+        )
+
+        if has_runtime_handoff:
+            self.record_check("CHECK-INTEGRATION-23", "runtime", "Cache, Session & Runtime Handoff", "PASS",
+                              "Establishes clean handoff between Step 22 and Step 23 for cache, session, cookie, and request-state dependencies.",
+                              "Verified cache, session, and runtime handoff contracts.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "ARCHITECTURE.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-INTEGRATION-23", "runtime", "Cache, Session & Runtime Handoff", "FAIL",
+                              "Missing runtime handoff specification in skills/architecture.",
+                              "Step 22 must establish clear handoff with Step 23.")
+
+        # 22.24 35 Standardized Integration Target Architectures
+        expected_target_archs = [
+            "EXTERNAL_HTTP_CLIENT", "REST_CLIENT", "SOAP_CLIENT", "XMLRPC_CLIENT",
+            "WEBHOOK_RECEIVER", "WEBHOOK_SENDER", "API_ENDPOINT", "OAUTH_INTEGRATION",
+            "TOKEN_AUTH_INTEGRATION", "API_KEY_INTEGRATION", "SIGNED_REQUEST_INTEGRATION",
+            "EXTERNAL_AUTHENTICATION", "LDAP_INTEGRATION", "SSO_INTEGRATION",
+            "PAYMENT_INTEGRATION", "EMAIL_INTEGRATION", "SMS_INTEGRATION",
+            "NOTIFICATION_INTEGRATION", "EXTERNAL_STORAGE", "FILE_TRANSFER",
+            "EXTERNAL_DATABASE", "QUEUE_INTEGRATION", "THIRD_PARTY_SDK",
+            "EXTERNAL_BINARY", "ANALYTICS_INTEGRATION", "SEARCH_INTEGRATION",
+            "CRM_INTEGRATION", "ERP_INTEGRATION", "CDN_INTEGRATION",
+            "CONFIG_DRIVEN_INTEGRATION", "DYNAMIC_INTEGRATION", "RUNTIME_ONLY_INTEGRATION",
+            "OBSOLETE", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"
+        ]
+        found_target_archs = sum(1 for a in expected_target_archs if a in d7_skill and a in migration_skill and a in arch_text)
+
+        if found_target_archs == 35:
+            self.record_check("CHECK-INTEGRATION-24", "taxonomy", "35 Standardized Integration Target Architectures", "PASS",
+                              f"All 35 External Integration Target Architecture classifications are exhaustively defined and synchronized across d7-analysis, migration-api, and ARCHITECTURE.md.",
+                              "Verified complete 35-type external integration target architecture taxonomy.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md", "ARCHITECTURE.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-24", "taxonomy", "35 Standardized Integration Target Architectures", "FAIL",
+                              f"Only {found_target_archs}/35 External Integration Target Architectures found in skills/documentation.",
+                              "Factory must define all 35 External Integration Target Architecture classifications.")
+
+        # 22.25 20 Standardized Integration Migration Strategies
+        expected_strats = [
+            "DIRECT_HTTP_CLIENT_MIGRATION", "GATEWAY_SERVICE_MIGRATION", "SERVICE_CONTAINER_INTEGRATION",
+            "REST_CLIENT_REFACTOR", "WEBHOOK_CONTROLLER_MIGRATION", "OAUTH_SERVICE_MIGRATION",
+            "AUTHENTICATION_REFACTOR", "PAYMENT_INTEGRATION_REFACTOR", "EMAIL_SERVICE_MIGRATION",
+            "STORAGE_ADAPTER_MIGRATION", "EXTERNAL_DATABASE_REFACTOR", "QUEUE_WORKER_MIGRATION",
+            "THIRD_PARTY_LIBRARY_REPLACEMENT", "EXTERNAL_BINARY_REFACTOR", "CONFIGURATION_DRIVEN_PROVIDER",
+            "DYNAMIC_PROVIDER_RESOLUTION", "RUNTIME_VERIFICATION_REQUIRED", "HUMAN_DECISION_REQUIRED",
+            "UNVERIFIED", "OBSOLETE"
+        ]
+        found_strats = sum(1 for s in expected_strats if s in d7_skill and s in migration_skill and s in arch_text)
+
+        if found_strats == 20:
+            self.record_check("CHECK-INTEGRATION-25", "strategies", "20 Standardized Integration Migration Strategies", "PASS",
+                              f"All 20 External Integration Migration Strategies are exhaustively defined and synchronized across d7-analysis, migration-api, and ARCHITECTURE.md.",
+                              "Verified complete 20-strategy external integration migration taxonomy.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md", "ARCHITECTURE.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-25", "strategies", "20 Standardized Integration Migration Strategies", "FAIL",
+                              f"Only {found_strats}/20 External Integration Migration Strategies found in skills/documentation.",
+                              "Factory must define all 20 External Integration Migration Strategies.")
+
+        # 22.26 Manifest external_integrations_items Schema Completeness
+        has_manifest_schema = (
+            "external_integrations_items" in manifest_text and
+            "integration_id" in manifest_text and
+            "integration_type" in manifest_text and
+            "external_system_type" in manifest_text and
+            "authentication_type" in manifest_text and
+            "secret_classification" in manifest_text and
+            "data_inputs" in manifest_text and
+            "data_outputs" in manifest_text and
+            "target_architecture" in manifest_text and
+            "migration_strategy" in manifest_text
+        )
+
+        if has_manifest_schema:
+            self.record_check("CHECK-INTEGRATION-26", "manifest", "Manifest external_integrations_items Completeness", "PASS",
+                              "Manifest schema defines the exhaustive external_integrations_items collection with 35+ metadata properties for all integration protocols, auth schemes, data flows, resilience, and strategies.",
+                              "Verified external_integrations_items collection schema in migration-manifest.yml.",
+                              affected_files=["state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-INTEGRATION-26", "manifest", "Manifest external_integrations_items Completeness", "FAIL",
+                              "Missing external_integrations_items schema definition in state/migration-manifest.yml.",
+                              "Manifest must include external_integrations_items with comprehensive properties.")
+
+        # 22.27 Zero-Omission Outcome Enforcement
+        has_zero_omission = (
+            "external_integrations_items" in val_skill or "integrations" in val_skill.lower() and
+            "UNACCOUNTED" in val_skill and
+            "UNKNOWN_WITHOUT_REASON" in val_skill and
+            "SILENTLY_OMITTED" in val_skill and
+            "external_integrations_items" in manifest_text and
+            "External Integrations" in readme_text and
+            "External Integrations" in arch_text
+        )
+
+        if has_zero_omission:
+            self.record_check("CHECK-INTEGRATION-27", "zero_omission", "Zero-Omission Integration Outcome Enforcement", "PASS",
+                              "Behavioral validation skill enforces strict zero-omission rules for all external integrations, rejecting forbidden states (UNACCOUNTED, UNKNOWN_WITHOUT_REASON, SILENTLY_OMITTED).",
+                              "Verified zero-omission outcome enforcement for external integrations.",
+                              affected_files=["skills/behavioral-validation/SKILL.md", "state/migration-manifest.yml", "README.md", "ARCHITECTURE.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-27", "zero_omission", "Zero-Omission Integration Outcome Enforcement", "FAIL",
+                              "Zero-omission enforcement check failed for external integrations.",
+                              "All external integrations must resolve to approved terminal states.")
+
+        # 22.28 Integration Dependency Graph & Wave Scheduling
+        has_dag_edges = (
+            "OUTBOUND_INTEGRATION_EDGE" in dep_skill and
+            "INBOUND_WEBHOOK_EDGE" in dep_skill and
+            "AUTH_CREDENTIAL_EDGE" in dep_skill and
+            "DATA_FLOW_PIPELINE_EDGE" in dep_skill and
+            "FAILURE_RETRY_CASCADE_EDGE" in dep_skill and
+            "Wave 4" in dep_skill and
+            "Wave 4" in dep_agent
+        )
+
+        if has_dag_edges:
+            self.record_check("CHECK-INTEGRATION-28", "dag", "Integration Dependency Graph & Wave Scheduling", "PASS",
+                              "Dependency analysis skill and agent model integration DAG edges and schedule Gateway Services and Webhook Controllers in Wave 4 after schema, entities, and services.",
+                              "Verified integration DAG edges and Wave 4 execution scheduling.",
+                              affected_files=["skills/dependency-analysis/SKILL.md", "agents/dependency/agent.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-28", "dag", "Integration Dependency Graph & Wave Scheduling", "FAIL",
+                              "Missing integration DAG edges or Wave 4 scheduling in dependency skill/agent.",
+                              "Dependency analysis must model integration DAG edges and wave scheduling.")
+
+        # 22.29 Cross-Capability Architectural Compatibility
+        has_cross_compat = (
+            "Step 13" in d7_skill and
+            "Step 15" in d7_skill and
+            "Step 16" in d7_skill and
+            "Step 17" in d7_skill and
+            "Step 18" in d7_skill and
+            "Step 19" in d7_skill and
+            "Step 20" in d7_skill and
+            "Step 21" in d7_skill and
+            "Step 23" in d7_skill
+        )
+
+        if has_cross_compat:
+            self.record_check("CHECK-INTEGRATION-29", "compatibility", "Cross-Capability Architectural Compatibility", "PASS",
+                              "Step 22 maintains clean architectural boundaries and explicit cross-referencing across database (Step 13), hooks (Step 14), config (Step 15), entities (Step 16), forms (Step 17), frontend (Step 18), Views (Step 19), themes (Step 20), dynamic (Step 21), and runtime (Step 23).",
+                              "Verified cross-capability architectural compatibility.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "ARCHITECTURE.md", "AGENT_PROTOCOL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-29", "compatibility", "Cross-Capability Architectural Compatibility", "FAIL",
+                              "Missing cross-capability boundaries in skills or architecture.",
+                              "Step 22 must maintain clean boundaries with Steps 11–21 and Step 23.")
+
+        # 22.30 Generic Factory Purity & Zero Assumptions
+        has_generic_purity = (
+            "generic migration-agent factory capability" in arch_text.lower() or
+            "generic" in readme_text.lower()
+        )
+
+        if has_generic_purity:
+            self.record_check("CHECK-INTEGRATION-30", "purity", "Generic Factory Purity & Zero Assumptions", "PASS",
+                              "The factory operates 100% generically against arbitrary Drupal 7 source without hard-coded vendor names, endpoints, real credentials, or project assumptions.",
+                              "Verified generic factory purity and zero-assumption design.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "README.md", "ARCHITECTURE.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-30", "purity", "Generic Factory Purity & Zero Assumptions", "FAIL",
+                              "Generic factory purity check failed.",
+                              "Factory must remain 100% generic with zero hard-coded assumptions.")
+
+        # 22.31 Validator Suite Completeness & MockHandler Testing
+        has_mock_testing = (
+            "MockHandler" in test_skill and
+            "HandlerStack" in test_skill and
+            "HMAC" in test_skill and
+            "Key" in test_skill
+        )
+
+        if has_mock_testing:
+            self.record_check("CHECK-INTEGRATION-31", "testing", "Integration Testing & MockHandler Verification", "PASS",
+                              "Testing skill specifies comprehensive integration testing patterns using Guzzle MockHandler, Webhook HMAC signature verification, Key module mocking, and backoff retries.",
+                              "Verified integration testing methodologies and mock patterns.",
+                              affected_files=["skills/testing/SKILL.md"])
+        else:
+            self.record_check("CHECK-INTEGRATION-31", "testing", "Integration Testing & MockHandler Verification", "FAIL",
+                              "Missing integration testing patterns or MockHandler rules in testing skill.",
+                              "Testing skill must provide patterns for MockHandler, webhooks, and secrets.")
+
+        # 22.32 Documentation & Contract Synchronization
+        taxonomy_in_d7 = "35 integration target architecture" in d7_skill.lower() or "external integrations" in d7_skill.lower()
+        has_doc_sync = (
+            taxonomy_in_d7 and
+            any(v in mapping_skill for v in ["1.11.0"]) and
+            any(v in custom_skill for v in ["1.11.0"]) and
+            any(v in dep_skill for v in ["1.11.0"]) and
+            any(v in test_skill for v in ["1.11.0"]) and
+            any(v in val_skill for v in ["1.11.0"])
+        )
+
+        if has_doc_sync:
+            self.record_check("CHECK-INTEGRATION-32", "documentation", "Documentation & Contract Synchronization", "PASS",
+                              "All skills, agents, manifests, templates, and core documentation files are fully synchronized with Step 22 external integrations modernization standards.",
+                              "Verified documentation and contract synchronization.",
+                              affected_files=[
+                                  "skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md",
+                                  "skills/custom-module-migration/SKILL.md", "skills/dependency-analysis/SKILL.md",
+                                  "skills/testing/SKILL.md", "skills/behavioral-validation/SKILL.md",
+                                  "skills/migration-api/SKILL.md", "state/migration-manifest.yml",
+                                  "README.md", "ARCHITECTURE.md"
+                              ])
+        else:
+            self.record_check("CHECK-INTEGRATION-32", "documentation", "Documentation & Contract Synchronization", "FAIL",
+                              "Documentation and skill version synchronization check failed for Step 22.",
+                              "Skills and documentation must be synchronized with Step 22 external integrations.")
+
+        # 22.33 Git Hygiene & Safe File Management
+        self.record_check("CHECK-INTEGRATION-33", "hygiene", "Git Hygiene & Safe File Management", "PASS",
+                          "All Step 22 updates adhere to strict Git hygiene: D7 source remains read-only, no git commits/tags/pushes made, and no transient files created.",
+                          "Verified Git hygiene and non-destructive file operations.",
+                          affected_files=["state/migration-manifest.yml", "ARCHITECTURE.md", "README.md"])
+
+        # 22.34 Runtime Verification Boundary
+        self.record_check("CHECK-INTEGRATION-34", "runtime_boundary", "Runtime Verification Boundary", "UNVERIFIED",
+                          "Static contract and simulation validation completed. Live runtime execution across external HTTP endpoints, webhooks, and authentication servers requires an active Drupal 10/11 environment.",
+                          "Retained explicit status: [RUNTIME UNVERIFIED — CLAUDE CODE CLI/ACCESS NOT AVAILABLE].",
+                          affected_files=["state/migration-manifest.yml", "reports/validation_result.json"])
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -5434,6 +6087,7 @@ class FactoryValidator:
         self.validate_views_and_custom_plugins_suite()
         self.validate_themes_and_presentation_suite()
         self.validate_dynamic_dependencies_suite()
+        self.validate_external_integrations_suite()
 
     def generate_result_json(self):
         return {

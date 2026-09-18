@@ -667,8 +667,79 @@ Apply an explicit, deterministic resolution model to every discovered dynamic de
 
 ---
 
+## External Integrations, APIs, Web Services & Third-Party Systems Analysis (Step 22)
+
+### 81. Exhaustive Generic External Integration Discovery
+Recursively scan all D7 custom modules, `.module`, `.inc`, `.install`, `.php`, `.drush.inc`, `.info`, and Composer metadata for external system integrations:
+- **HTTP Client Mechanisms**: `drupal_http_request()`, `curl_init()`, `curl_exec()`, `file_get_contents()` with HTTP URLs, PHP stream wrappers (`stream_context_create()`), socket connections (`fsockopen()`), Guzzle wrappers.
+- **Protocol & API Patterns**: REST, SOAP (`SoapClient`), XML-RPC (`xmlrpc()`), JSON-RPC, GraphQL, custom TCP/IP sockets, SFTP/FTP stream wrappers (`ssh2_sftp()`, `ftp_connect()`), external databases (`Database::getConnection('external')`), external CLI binaries (`exec()`, `shell_exec()`, `proc_open()`).
+- **Discovery Independence**: Never assume integrations reside in specific directories. Extract endpoint URLs, hostnames, protocols, HTTP methods, headers, and authentication logic directly from source evidence.
+
+### 82. Outbound HTTP/API Discovery & Inbound Webhook/Endpoint Resolution
+Analyze both egress and ingress communication channels:
+- **Outbound HTTP / API Calls**: Catalog destination URL, HTTP verb (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`), payload format (JSON, XML, Form-URLencoded, Multipart), timeout settings, headers, query parameters, and caller functions.
+- **Inbound Endpoints & Webhooks**: Discover custom API routes in `hook_menu()` exposing REST/JSON/XML endpoints, webhook listener callbacks, payment IPN handlers, and OAuth callback endpoints. Extract authorization mechanisms, CSRF protection, signature verification, and input sanitation.
+
+### 83. Authentication, Authorization & Secret Protection (Rule 10)
+Exhaustively identify authentication mechanisms and enforce strict secret protection:
+- **Authentication Schemes**: API Keys, Basic Auth, Bearer Tokens, OAuth 1.0a / OAuth 2.0 (Authorization Code, Client Credentials, Refresh Tokens), HMAC Request Signing, Client TLS/SSL Certificates, LDAP Bind, SAML 2.0 / OpenID Connect.
+- **Secret Protection Standards (Rule 10)**:
+  - **Zero Secrets in Manifests/Reports/CMI**: Never copy, persist, or commit real API keys, passwords, bearer tokens, private certificates, or client secrets.
+  - **Abstract Credential Sources**: Classify secret locations as `CONFIGURATION_SECRET`, `ENVIRONMENT_SECRET`, `RUNTIME_SECRET`, `KEY_MODULE`, `SETTINGS_PHP`, or `HARDCODED_IN_SOURCE`.
+  - Flag any hardcoded secret found in source code as a critical security vulnerability requiring immediate extraction to environment variables or the Drupal Key module (`key` module integration).
+
+### 84. Data Flow Analysis, Transformations & Sensitive Data Classification
+Trace the end-to-end data pipeline for every integration:
+- **Lineage**:
+  $$\text{Data Source (Entity / Form / DB / Session)} \longrightarrow \text{Transformation} \longrightarrow \text{Outbound Payload} \longrightarrow \text{External System} \longrightarrow \text{Response} \longrightarrow \text{Response Parsing} \longrightarrow \text{Destination}$$
+- **Sensitive Data Categorization**: Classify payload elements into sensitivity categories (`NONE`, `USER_IDENTIFIERS`, `PERSONAL_INFO`, `PAYMENT_DATA`, `CREDENTIALS`, `HEALTH_DATA`, `BUSINESS_CONFIDENTIAL`) without storing actual values.
+- **Transformations**: Document mapping arrays, field normalization, currency/date conversions, and schema translations.
+
+### 85. Payment, Email, SMS & Notification Integrations
+Account for specialized external service providers:
+- **Payment Gateways**: Discover payment API calls, authorization/capture requests, refund endpoints, checkout form integrations, webhook/IPN verification, and transaction status persistence. Modernize to Drupal Commerce Payment Gateway plugins (`@CommercePaymentGateway`) or custom gateway services.
+- **Email, SMS & Push Notifications**: Trace custom mail handlers delegating to external transactional email APIs (SendGrid, Mailgun, AWS SES), SMS APIs (Twilio), or mobile push notification gateways. Modernize to Symfony Mailer plugins or dedicated notification services.
+
+### 86. Storage, File Transfer (SFTP), External Databases & Queues
+Catalog non-HTTP external connections:
+- **Remote Filesystems & SFTP/FTP**: Discover automated file transfers, remote asset synchronization, cloud/object storage integrations (AWS S3, Google Cloud Storage, Azure Blob). Modernize to Drupal 10/11 Flysystem stream wrappers (`@FlysystemStreamWrapper`).
+- **External Databases**: Identify connections to secondary/external database instances (`$databases['external']`). Modernize to Drupal Database API service connections or custom repository services with Step 13 coordination.
+- **Message Brokers & Queues**: Detect integrations with RabbitMQ, Kafka, AWS SQS, or Redis queues. Modernize to Drupal Queue API (`@QueueWorker`) or Symfony Messenger handlers.
+
+### 87. Third-Party SDKs, Composer Packages & External CLI Binaries
+Audit external code libraries and system command execution:
+- **Third-Party PHP Libraries & SDKs**: Identify vendor SDKs included manually or via Composer. Verify D10/D11 compatibility, PHP 8.1–8.3 support, and PSR-4 modernization requirements.
+- **External CLI Binaries**: Detect `exec()`, `shell_exec()`, `system()`, `passthru()`, `proc_open()`, and `popen()`. Audit for command injection risks, sanitize arguments via `escapeshellarg()`, and modernize to Symfony `Process` component.
+
+### 88. Retry, Timeout, Idempotency, Error & Failure Behavior
+Inspect resilience and error handling semantics:
+- **Resilience Characteristics**:
+  - `timeout`: Explicit network timeout in seconds (flag missing timeouts as reliability risks).
+  - `retry_behavior`: `NONE`, `FIXED_RETRY`, `EXPONENTIAL_BACKOFF`, `QUEUE_RETRY`, `DEAD_LETTER`.
+  - `idempotency_behavior`: `NONE`, `IDEMPOTENCY_KEY_HEADER`, `TRANSACTION_TOKEN`, `DATABASE_LOCK`.
+- **Failure Semantics**: Analyze HTTP status code parsing, exception catching, fallback data providers, admin alerts, queue retries, and masked audit logging.
+
+### 89. Cross-Capability Coordination & Dynamic/Security/Runtime Handoffs
+Ensure clean architectural boundaries across the migration factory:
+- **Step 13 (Database)**: External database connections and data mapping.
+- **Step 15 (Configuration)**: API endpoint URLs, timeouts, and non-sensitive options migrated to CMI (`config/schema/*.schema.yml`).
+- **Step 17 (Forms & AJAX)**: Form submit triggers, AJAX callback responses, and checkout handlers.
+- **Step 18 (Frontend)**: Client-side tracking scripts, analytics libraries, and third-party widgets.
+- **Step 21 (Dynamic Resolution)**: Dynamically computed endpoint URLs, variable API versions, and runtime plugin lookups.
+- **Step 23 (Security & Runtime)**: Transport security (TLS 1.2+), webhook HMAC validation, session storage, and cache tags.
+
+### 90. 35 Integration Target Architecture Taxonomy & 20 Migration Strategies
+- **35 Integration Target Architecture Classifications**:
+  `EXTERNAL_HTTP_CLIENT`, `REST_CLIENT`, `SOAP_CLIENT`, `XMLRPC_CLIENT`, `WEBHOOK_RECEIVER`, `WEBHOOK_SENDER`, `API_ENDPOINT`, `OAUTH_INTEGRATION`, `TOKEN_AUTH_INTEGRATION`, `API_KEY_INTEGRATION`, `SIGNED_REQUEST_INTEGRATION`, `EXTERNAL_AUTHENTICATION`, `LDAP_INTEGRATION`, `SSO_INTEGRATION`, `PAYMENT_INTEGRATION`, `EMAIL_INTEGRATION`, `SMS_INTEGRATION`, `NOTIFICATION_INTEGRATION`, `EXTERNAL_STORAGE`, `FILE_TRANSFER`, `EXTERNAL_DATABASE`, `QUEUE_INTEGRATION`, `THIRD_PARTY_SDK`, `EXTERNAL_BINARY`, `ANALYTICS_INTEGRATION`, `SEARCH_INTEGRATION`, `CRM_INTEGRATION`, `ERP_INTEGRATION`, `CDN_INTEGRATION`, `CONFIG_DRIVEN_INTEGRATION`, `DYNAMIC_INTEGRATION`, `RUNTIME_ONLY_INTEGRATION`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **20 Standardized Integration Migration Strategies**:
+  `DIRECT_HTTP_CLIENT_MIGRATION`, `GATEWAY_SERVICE_MIGRATION`, `SERVICE_CONTAINER_INTEGRATION`, `REST_CLIENT_REFACTOR`, `WEBHOOK_CONTROLLER_MIGRATION`, `OAUTH_SERVICE_MIGRATION`, `AUTHENTICATION_REFACTOR`, `PAYMENT_INTEGRATION_REFACTOR`, `EMAIL_SERVICE_MIGRATION`, `STORAGE_ADAPTER_MIGRATION`, `EXTERNAL_DATABASE_REFACTOR`, `QUEUE_WORKER_MIGRATION`, `THIRD_PARTY_LIBRARY_REPLACEMENT`, `EXTERNAL_BINARY_REFACTOR`, `CONFIGURATION_DRIVEN_PROVIDER`, `DYNAMIC_PROVIDER_RESOLUTION`, `RUNTIME_VERIFICATION_REQUIRED`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`, `OBSOLETE`.
+- **Approved Terminal Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Forbidden Terminal States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`.
+
+---
+
 ## Output Reporting Standard
 All discovery outputs must:
-1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, JavaScript behavior names, library identifiers, view IDs, display IDs, plugin IDs, theme names, template names, dynamic expressions, probe targets, and line numbers (`[OBSERVED FACT]`).
-2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, and `dynamic_dependency_items` in `state/migration-manifest.yml`.
-3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback / dynamic JS setting / dynamic View ID / dynamic template suggestion / dynamic callable as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.
+1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, JavaScript behavior names, library identifiers, view IDs, display IDs, plugin IDs, theme names, template names, dynamic expressions, probe targets, external endpoints, and line numbers (`[OBSERVED FACT]`).
+2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, `dynamic_dependency_items`, and `external_integrations_items` in `state/migration-manifest.yml`.
+3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback / dynamic JS setting / dynamic View ID / dynamic template suggestion / dynamic callable / external endpoint as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.

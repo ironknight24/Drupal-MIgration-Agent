@@ -1,8 +1,8 @@
 ---
 name: dependency-analysis
-description: Topological sorting, circular dependency detection, dynamic DAG edge modeling, and execution wave planning across custom PHP files, classes, procedural hooks, database models, configuration variables, entities, forms, AJAX interactions, frontend JavaScript/CSS/libraries, Views/custom plugins, theme presentation layers, and dynamic runtime dependencies.
-version: 1.10.0
-user-invocable: true
+description: Exhaustive dependency graph analysis, coupling detection, execution wave computation, and topological sorting across Drupal 7 and modern Drupal 10/11 architectures.
+version: 1.11.0
+user-invocable: false
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
 ---
@@ -117,6 +117,18 @@ To establish an accurate DAG, inspect source assets across 11 distinct coupling 
   - **Dynamic Fan-Out & Cycle Breaking**:
     - Where dynamic callables or plugins produce many possible consumer edges, create an intermediate abstraction node (Plugin Manager / Service Container / Event Dispatcher) to prevent artificial DAG cycles.
     - Unresolved dynamic dependencies do NOT halt DAG creation; they are scheduled with `RUNTIME_DISCOVERY_REQUIRED` or `HUMAN_DECISION_REQUIRED` gates.
+
+### 12. External System Integration DAG Edge Modeling (Step 22)
+- Explicitly model external dependencies and integration flows in the DAG:
+  - **Integration Edge Types**:
+    - `OUTBOUND_INTEGRATION_EDGE`: Custom Drupal code triggering external API/HTTP client or cloud service.
+    - `INBOUND_WEBHOOK_EDGE`: External systems posting payloads to Drupal routes/webhooks.
+    - `AUTH_CREDENTIAL_EDGE`: Integrations dependent on Key module / Environment variables / CMI configuration.
+    - `DATA_FLOW_PIPELINE_EDGE`: Entity / DB state transformed to external payloads and vice-versa.
+    - `FAILURE_RETRY_CASCADE_EDGE`: Dead-letter queue / Exponential backoff dependency flows.
+  - **Cross-System Dependency & Cascade Mitigation**:
+    - External system failures must not block internal dependency resolution; wrap external integrations in resilient Gateway Services or Queue Workers.
+    - Schedule external integrations and complex webhook pipelines into **Wave 4** (Complex Integrations & AJAX Endpoints).
 
 ---
 

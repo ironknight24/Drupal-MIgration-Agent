@@ -530,6 +530,74 @@ target_system:
 #       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
 #       exclusion_reason: null
 #       notes: "Modernized dynamic function dispatch to Drupal 10/11 Plugin Manager pattern with @MyModuleHandler plugins"
+#     # Comprehensive External Integrations, APIs, Web Services & Third-Party Systems Accounting (Step 22)
+#     external_integrations_items:
+#       - integration_id: "ext_payment_gateway_charge"
+#         source_module: "my_module"
+#         source_file: "my_module.inc"
+#         line_number: 184
+#         function_or_class: "my_module_process_payment"
+#         location_evidence: "my_module.inc:L184 drupal_http_request() call to payment gateway"
+#         integration_type: "OUTBOUND_HTTP" # OUTBOUND_HTTP | INBOUND_ENDPOINT | REST_API | SOAP_CLIENT | XMLRPC_CLIENT | JSON_API | GRAPHQL | WEBHOOK_RECEIVER | WEBHOOK_SENDER | EXTERNAL_AUTH | LDAP_AD | SSO_IDP | PAYMENT_GATEWAY | EMAIL_SERVICE | SMS_SERVICE | NOTIFICATION_SERVICE | SEARCH_SERVICE | ANALYTICS_SERVICE | CRM_SERVICE | ERP_SERVICE | OBJECT_STORAGE | CDN_SERVICE | QUEUE_BROKER | EXTERNAL_DATABASE | FILE_TRANSFER_SFTP | EXTERNAL_BINARY | THIRD_PARTY_SDK
+#         external_system_type: "PAYMENT_GATEWAY"
+#         endpoint: "https://api.gateway.example/v1/charges"
+#         hostname_domain: "api.gateway.example"
+#         protocol: "HTTPS" # HTTPS | HTTP | SFTP | FTP | SOAP | CUSTOM_SOCKET | CLI_BINARY
+#         method: "POST" # GET | POST | PUT | PATCH | DELETE | CLI | DB_QUERY
+#         request_format: "JSON" # JSON | XML | FORM_URLENCODED | MULTIPART | RAW | CLI_ARGS
+#         response_format: "JSON" # JSON | XML | HTML | RAW_BINARY | CLI_STDOUT
+#         authentication_type: "BEARER_TOKEN" # NONE | API_KEY | BEARER_TOKEN | BASIC_AUTH | OAUTH1 | OAUTH2 | HMAC_SIGNATURE | CERTIFICATE_TLS | SHARED_SECRET | LDAP_BIND | SSO_SAML
+#         credential_source: "KEY_MODULE" # CONFIGURATION_SECRET | ENVIRONMENT_SECRET | RUNTIME_SECRET | KEY_MODULE | SETTINGS_PHP | HARDCODED_IN_SOURCE
+#         secret_classification: "CONFIDENTIAL_API_KEY" # PUBLIC | INTERNAL | CONFIDENTIAL_API_KEY | USER_CREDENTIAL | OAUTH_SECRET | SENSITIVE_TOKEN
+#         data_inputs: ["order_id", "amount", "currency", "customer_token"]
+#         data_outputs: ["transaction_id", "charge_status", "authorization_code"]
+#         transformations: "Transforms Commerce Order entity into payment payload array with ISO-4217 currency"
+#         triggers: ["form_submit:checkout_payment_form", "cron:process_pending_charges"]
+#         callers: ["my_module_checkout_form_submit()", "my_module_cron()"]
+#         consumers: ["my_module_payment_callback()", "order_status_update_handler()"]
+#         data_source: "Commerce Order Entity & User Profile"
+#         data_destination: "Payment Gateway API & Order Transaction Record"
+#         sensitive_data_categories: ["PAYMENT_DATA", "USER_IDENTIFIERS"] # NONE | USER_IDENTIFIERS | PERSONAL_INFO | PAYMENT_DATA | CREDENTIALS | HEALTH_DATA | BUSINESS_CONFIDENTIAL
+#         configuration_dependencies: ["my_module.settings:api_endpoint", "my_module.settings:timeout"]
+#         dynamic_dependencies: ["dynamic_endpoint_resolution"]
+#         security_dependencies: ["TLS_1_2_OR_HIGHER", "WEBHOOK_HMAC_VERIFICATION"]
+#         cache_dependencies: ["NONE"]
+#         session_dependencies: ["user_session_token"]
+#         timeout: 30 # Seconds
+#         retry_behavior: "EXPONENTIAL_BACKOFF" # NONE | FIXED_RETRY | EXPONENTIAL_BACKOFF | QUEUE_RETRY | DEAD_LETTER
+#         idempotency_behavior: "IDEMPOTENCY_KEY_HEADER" # NONE | IDEMPOTENCY_KEY_HEADER | TRANSACTION_TOKEN | DATABASE_LOCK
+#         failure_behavior: "LOG_AND_EXCEPTION" # LOG_AND_FALLBACK | LOG_AND_EXCEPTION | SILENT_FAIL | QUEUE_RETRY | ADMIN_ALERT
+#         logging_behavior: "MASKED_AUDIT_LOG" # NONE | ERROR_LOG_ONLY | FULL_DEBUG_LOG | MASKED_AUDIT_LOG
+#         target_architecture: "PAYMENT_INTEGRATION" # 35 Target Architectures:
+#         # EXTERNAL_HTTP_CLIENT | REST_CLIENT | SOAP_CLIENT | XMLRPC_CLIENT | WEBHOOK_RECEIVER |
+#         # WEBHOOK_SENDER | API_ENDPOINT | OAUTH_INTEGRATION | TOKEN_AUTH_INTEGRATION | API_KEY_INTEGRATION |
+#         # SIGNED_REQUEST_INTEGRATION | EXTERNAL_AUTHENTICATION | LDAP_INTEGRATION | SSO_INTEGRATION |
+#         # PAYMENT_INTEGRATION | EMAIL_INTEGRATION | SMS_INTEGRATION | NOTIFICATION_INTEGRATION |
+#         # EXTERNAL_STORAGE | FILE_TRANSFER | EXTERNAL_DATABASE | QUEUE_INTEGRATION | THIRD_PARTY_SDK |
+#         # EXTERNAL_BINARY | ANALYTICS_INTEGRATION | SEARCH_INTEGRATION | CRM_INTEGRATION | ERP_INTEGRATION |
+#         # CDN_INTEGRATION | CONFIG_DRIVEN_INTEGRATION | DYNAMIC_INTEGRATION | RUNTIME_ONLY_INTEGRATION |
+#         # OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#         target_artifacts:
+#           - "src/Service/PaymentGatewayClient.php"
+#           - "src/Plugin/Commerce/PaymentGateway/CustomPaymentGateway.php"
+#           - "config/install/my_module.payment_gateway.settings.yml"
+#         migration_strategy: "PAYMENT_INTEGRATION_REFACTOR" # 20 Migration Strategies:
+#         # DIRECT_HTTP_CLIENT_MIGRATION | GATEWAY_SERVICE_MIGRATION | SERVICE_CONTAINER_INTEGRATION |
+#         # REST_CLIENT_REFACTOR | WEBHOOK_CONTROLLER_MIGRATION | OAUTH_SERVICE_MIGRATION |
+#         # AUTHENTICATION_REFACTOR | PAYMENT_INTEGRATION_REFACTOR | EMAIL_SERVICE_MIGRATION |
+#         # STORAGE_ADAPTER_MIGRATION | EXTERNAL_DATABASE_REFACTOR | QUEUE_WORKER_MIGRATION |
+#         # THIRD_PARTY_LIBRARY_REPLACEMENT | EXTERNAL_BINARY_REFACTOR | CONFIGURATION_DRIVEN_PROVIDER |
+#         # DYNAMIC_PROVIDER_RESOLUTION | RUNTIME_VERIFICATION_REQUIRED | HUMAN_DECISION_REQUIRED |
+#         # UNVERIFIED | OBSOLETE
+#         confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
+#         dynamic_status: "STATIC_ENDPOINT" # STATIC_ENDPOINT | DYNAMIC_ENDPOINT | RUNTIME_CONFIGURED
+#         runtime_required: true
+#         human_decision_required: false
+#         owning_step: "STEP_22_EXTERNAL_INTEGRATIONS"
+#         cross_references: ["STEP_12_PHP_OOP", "STEP_15_CONFIGURATION", "STEP_17_FORMS", "STEP_21_DYNAMIC_DEPENDENCIES", "STEP_23_SECURITY_RUNTIME"]
+#         status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#         exclusion_reason: null
+#         notes: "Re-engineered procedural drupal_http_request() to Guzzle-backed PaymentGatewayClient service with Key module secret management"
 custom_modules: []
 
 # ------------------------------------------------------------------------------
@@ -579,10 +647,15 @@ configuration: []
 data_migrations: []
 
 # ------------------------------------------------------------------------------
-# 6. Third-Party Integrations Inventory
+# 6. Third-Party & External Integrations Inventory (Step 22)
 # ------------------------------------------------------------------------------
-# Schema for integration endpoints:
-# - name: "payment_gateway"
-#   type: "rest" # rest | soap | webhook | auth | external_db
+# Schema for integration endpoints & services:
+# - integration_id: "ext_payment_gateway"
+#   name: "payment_gateway"
+#   type: "rest" # rest | soap | webhook | auth | external_db | sftp | binary | sdk
 #   source_reference: "my_module_payment_call"
+#   target_architecture: "PAYMENT_INTEGRATION"
+#   migration_strategy: "PAYMENT_INTEGRATION_REFACTOR"
+#   secret_classification: "CONFIDENTIAL_API_KEY"
+#   status: "MIGRATED"
 integrations: []
