@@ -1,3 +1,9 @@
+---
+name: drupal-migration:configuration
+description: Configuration Management Interface (CMI) Modernization Specialist. Translates variables, field configs, content types, and views into CMI YAML.
+model: inherit
+---
+
 # Agent Specification: Configuration Agent
 
 ## 1. Identity & Scope

@@ -2,19 +2,58 @@
 
 ## 1. Architectural Philosophy
 
-The Drupal Migration Agent Framework is engineered around three fundamental tenets:
+The Drupal Migration Agent Framework is engineered around four fundamental tenets:
 
-1. **Reusability Across Projects**: Generic migration intelligence (discovery heuristics, architectural patterns, dependency solvers, modernization mappings) is decoupled from project-specific state, configuration, and code.
+1. **Decoupled Factory vs. Execution Architecture**: Generic migration intelligence (discovery heuristics, architectural patterns, dependency solvers, modernization mappings, skills) is packaged as a distributable Claude Code plugin, completely separate from customer migration projects and environments.
 2. **Behavioral Replatforming over Syntax Translation**: Drupal 7 procedural constructs (`hook_menu`, `variable_get`, global `$user`, direct `db_query`) cannot be mechanically converted to Drupal 10. The framework extracts business intent and re-engineers it into modern Object-Oriented Programming (OOP) paradigms.
-3. **Drupal 10 Target with Drupal 11 Readiness**: While Drupal 10 is the official target, implementations must avoid deprecated D10 APIs that would fail in Drupal 11. Specifically:
+3. **Drupal 10 Target with Drupal 11 Readiness**: While Drupal 10 is the official target, implementations avoid deprecated D10 APIs that would fail in Drupal 11:
    - Prefer **PHP 8 attributes** for plugins where supported (or standard annotations without deprecated sub-keys).
    - Enforce **Dependency Injection (DI)** over static `\Drupal::*` calls.
    - Use `EntityTypeManagerInterface`, `Connection`, and modern event subscribers rather than procedural hooks where events exist.
    - Eliminate deprecated Twig filters and jQuery dependencies in favor of modern JavaScript (ES6+) and Twig components.
+4. **Agent vs. Skill Separation**: Agents represent autonomous execution roles (workflow, preconditions, postconditions, safety), while Skills represent reusable contextual knowledge playbooks (`SKILL.md`) that agents query on demand.
 
 ---
 
-## 2. Multi-Agent System Topology
+## 2. Factory Architecture vs. Migration Execution Architecture
+
+```text
+=============================================================================
+1. AGENT FACTORY ARCHITECTURE (This Package)
+=============================================================================
+- Repository: ironknight24/Drupal-MIgration-Agent
+- Standard: Claude Code Plugin (.claude-plugin/plugin.json) + Agent Skills
+- Components:
+  ├── .claude-plugin/ (plugin.json, marketplace.json)
+  ├── commands/ (orchestrate, discover, status)
+  ├── agents/ (13 specialized worker specifications)
+  ├── skills/ (d7-analysis, d7-to-d10-mapping, d10-architecture, custom-module-migration)
+  ├── references/ (D7 APIs, D10 Architecture, Migration Patterns)
+  └── templates/ (Deterministic report schemas)
+- Lifecycle: Factory Step 0 (Framework) -> Factory Step 1 (Packaging) -> Factory Step 2 (Skills)...
+
+                                    │
+                        Installed via Claude Code
+                  (/plugin install or --plugin-dir)
+                                    │
+                                    ▼
+
+=============================================================================
+2. MIGRATION EXECUTION ARCHITECTURE (Runtime Project)
+=============================================================================
+- Workspace: Customer Drupal Migration Project
+- Components:
+  ├── source.path (Drupal 7 Codebase - strictly READ-ONLY)
+  ├── target.path (Drupal 10 Codebase - WRITE-ALLOWED)
+  ├── migration.config.yml (Project-specific paths and flags)
+  ├── state/ (migration-state.yml, migration-manifest.yml)
+  └── reports/ (Generated audit and validation reports)
+- Lifecycle: Migration Step 0 (Init) -> Migration Step 1 (Discovery) -> ... -> Validation
+```
+
+---
+
+## 3. Multi-Agent System Topology
 
 The framework utilizes a hub-and-spoke agent model coordinated by an **Orchestrator Agent**. Agents communicate exclusively through structured, deterministic filesystem artifacts.
 
@@ -65,76 +104,35 @@ graph TD
 
 ---
 
-## 3. The 13 Specialized Agents
+## 4. The 13 Specialized Agents & Associated Skills
 
-### 1. Orchestrator Agent (`agents/orchestrator/agent.md`)
-- Central director. Reads `migration.config.yml`, maintains `migration-state.yml`, and evaluates the dynamic dependency graph.
-- Handles workflow escalation: resolves whether an issue constitutes a **Component Block** or a **Global Migration Block**.
-
-### 2. Discovery Agent (`agents/discovery/agent.md`)
-- Non-destructive inspector. Scans Drupal 7 codebase, database schema, file directories, and existing Drupal 10 project structure.
-- Populates `state/migration-manifest.yml` with the exhaustive inventory of components to migrate.
-
-### 3. Dependency Agent (`agents/dependency/agent.md`)
-- Analyzes module-to-module dependencies, third-party libraries, database foreign keys, and hidden couplings.
-- Builds a Directed Acyclic Graph (DAG) and outputs topological sort recommendations to guide Orchestrator dispatching.
-
-### 4. Contrib Module Agent (`agents/contrib-module/agent.md`)
-- Analyzes required D7 contrib modules against the Drupal 10 ecosystem.
-- Identifies: (a) modules moved to core (Views, CKEditor, Date), (b) official D10 ports, (c) modern replacement modules, or (d) functionality requiring custom implementation. Never selects replacements silently.
-
-### 5. Custom Module Agent (`agents/custom-module/agent.md`)
-- First-class migration engine executing a disciplined 12-step modernization lifecycle.
-- Refactors custom hooks, schema, forms, entities, routes, and business rules into clean D10/D11 modules.
-
-### 6. Custom Theme Agent (`agents/custom-theme/agent.md`)
-- Modernizes presentation layer: converts `.info` to `.info.yml`, PHPTemplate `.tpl.php` to Twig `.html.twig`, registers asset libraries in `libraries.yml`, and ports preprocess logic.
-
-### 7. Configuration Agent (`agents/configuration/agent.md`)
-- Migrates D7 variables, field configurations, content types, vocabularies, image styles, text formats, and views into Drupal 10 CMI (Configuration Management Interface) YAML files.
-
-### 8. Data Migration Agent (`agents/data-migration/agent.md`)
-- Generates and executes Drupal Migration API pipelines (`migrate_plus`, `migrate_drupal`, `migrate_upgrade`).
-- Maps users, roles, taxonomies, nodes, revisions, files, media, comments, and custom SQL tables.
-
-### 9. API Modernization Agent (`agents/api-modernization/agent.md`)
-- Re-engineers legacy procedural API usage to modern Symfony/Drupal OOP.
-- Enforces Dependency Injection; strictly forbids blind substitution with static `\Drupal::*` calls.
-
-### 10. Integration Agent (`agents/integration/agent.md`)
-- Modernizes third-party REST/SOAP consumers, outbound webhooks, external DB connections, SSO providers, and scheduled synchronization jobs into Guzzle-based services.
-
-### 11. Testing Agent (`agents/testing/agent.md`)
-- Manages test strategy: generates PHPUnit tests (Unit, Kernel, Functional), verifies code standards (PHPCS), and runs static analysis (PHPStan). Adapts dynamically to project tooling.
-
-### 12. Validation Agent (`agents/validation/agent.md`)
-- Rigorous comparative auditor. Compares D7 observed behavior against D10 implemented behavior across 12 dimensions. Assigns evidence-backed verdicts (`PASS`, `PARTIAL`, `FAIL`, `BLOCKED`, `N/A`).
-
-### 13. Final Audit Agent (`agents/final-audit/agent.md`)
-- Performs comprehensive post-migration inspection: checks for leftover deprecated APIs, verifies data integrity metrics, validates permissions, and compiles the final sign-off report.
+| # | Agent | Primary Role | Associated Skills & References |
+|---|---|---|---|
+| 1 | **`orchestrator`** | Master workflow coordinator and wave scheduler. | `skills/d7-to-d10-mapping`, `references/migration-patterns/` |
+| 2 | **`discovery`** | Deep read-only inspection of D7 and D10 environments. | `skills/d7-analysis`, `references/drupal-7/apis.md` |
+| 3 | **`dependency`** | Builds dependency DAG and wave planning. | `skills/dependency-analysis` (planned) |
+| 4 | **`contrib-module`** | Evaluates contrib compatibility, core merges, and ports. | `skills/contrib-evaluation` (planned) |
+| 5 | **`custom-module`** | Executes 12-step modernization of custom modules. | `skills/custom-module-migration`, `skills/d10-architecture` |
+| 6 | **`custom-theme`** | Converts PHPTemplate to Twig and modern asset libraries. | `skills/theme-modernization` (planned) |
+| 7 | **`configuration`** | Translates variables and settings into CMI YAML. | `skills/configuration-migration` (planned) |
+| 8 | **`data-migration`** | Architects core Migration API pipelines and table ETL. | `skills/migration-api` (planned) |
+| 9 | **`api-modernization`** | Enforces Dependency Injection; forbids blind `\Drupal::*`. | `skills/d10-architecture`, `references/drupal-10/` |
+| 10 | **`integration`** | Modernizes REST, SOAP, webhooks, and external DB connections. | `skills/d10-architecture` |
+| 11 | **`testing`** | Configures and validates PHPUnit, PHPStan, and PHPCS. | `skills/testing` (planned) |
+| 12 | **`validation`** | Conducts 12-point comparative behavioral audits. | `skills/behavioral-validation` (planned) |
+| 13 | **`final-audit`** | Verifies D11 readiness, security posture, and sign-off. | All references and validation matrices |
 
 ---
 
-## 4. Dual State Management Architecture
+## 5. Dual State Management Architecture
 
-To ensure total transparency, reproducibility, and crash resumption, the framework separates state into two complementary files:
-
-```
-state/
-├── migration-state.yml      # Answers: "WHERE are we in the migration process?"
-└── migration-manifest.yml   # Answers: "WHAT exactly are we migrating?"
-```
-
-- **`migration-state.yml`**:
-  Tracks system-level progress, phase transitions, current active agent, active blockers, completion timestamps, and operational health.
-- **`migration-manifest.yml`**:
-  Created during Step 1 (Discovery). Serves as the complete registry of every custom module, contrib module, theme, content type, custom table, and data pipeline. Tracks per-component status (`not_started`, `analyzed`, `planned`, `in_progress`, `completed`, `blocked`).
+The framework strictly separates state into two complementary files:
+- **`migration-state.yml`** ("WHERE are we in the migration process?"): Tracks lifecycle progress, active phase, completion timestamps, and active blockers.
+- **`migration-manifest.yml`** ("WHAT exactly are we migrating?"): The itemized registry of every discovered custom module, contrib module, theme, content type, and data pipeline.
 
 ---
 
-## 5. File System & Path Protection Model
-
-The framework enforces strict filesystem boundaries to prevent data loss or project corruption:
+## 6. File System & Path Protection Model
 
 ```
 +-------------------------------------------------------------------+
@@ -150,12 +148,14 @@ The framework enforces strict filesystem boundaries to prevent data loss or proj
 |                                                                   |
 |  [migration-agent-framework]  STATE & AUDIT                       |
 |  ├── agents/                                                      |
+|  ├── skills/                                                      |
+|  ├── commands/                                                    |
 |  ├── reports/                                                     |
 |  ├── state/                                                       |
 |  └── logs/file-change-log/                                        |
 +-------------------------------------------------------------------+
 ```
 
-- Every write operation is pre-validated against `source.path` and `target.path`.
+- Every write operation is pre-validated: writes to `source.path` are rejected immediately.
 - Overlapping source and target paths trigger an immediate **Global Migration Block**.
 - Every modified, created, or deleted file in `target.path` must generate an entry in `logs/file-change-log/`.

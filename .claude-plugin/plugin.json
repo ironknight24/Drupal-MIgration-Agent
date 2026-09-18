@@ -1,0 +1,29 @@
+{
+  "name": "drupal-migration-agent",
+  "version": "1.0.0",
+  "description": "AI-assisted Drupal 7 to Drupal 10/11 migration agent framework. Orchestrates 13 specialized workers for discovery, dependency analysis, custom module re-engineering, theme modernization, configuration, data pipelines, testing, and behavioral validation.",
+  "author": {
+    "name": "Drupal Migration Agent Team"
+  },
+  "repository": "https://github.com/ironknight24/Drupal-MIgration-Agent",
+  "license": "MIT",
+  "keywords": [
+    "drupal",
+    "drupal7",
+    "drupal10",
+    "drupal11",
+    "migration",
+    "replatforming",
+    "upgrade",
+    "code-modernization"
+  ],
+  "commands": [
+    "./commands/"
+  ],
+  "agents": [
+    "./agents/"
+  ],
+  "skills": [
+    "./skills/"
+  ]
+}

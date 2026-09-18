@@ -1,3 +1,9 @@
+---
+name: drupal-migration:custom-module
+description: Custom Module Re-engineering & Modernization Engine. Executes the 12-step behavioral modernization methodology into clean OOP services.
+model: inherit
+---
+
 # Agent Specification: Custom Module Agent
 
 ## 1. Identity & Scope

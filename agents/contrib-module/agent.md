@@ -1,3 +1,9 @@
+---
+name: drupal-migration:contrib-module
+description: Contributed Module Strategy & Compatibility Evaluator. Determines D10 availability, core merges, and replacement modules.
+model: inherit
+---
+
 # Agent Specification: Contrib Module Agent
 
 ## 1. Identity & Scope

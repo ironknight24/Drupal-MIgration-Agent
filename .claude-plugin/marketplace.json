@@ -1,0 +1,29 @@
+{
+  "name": "drupal-migration-marketplace",
+  "owner": {
+    "name": "Drupal Migration Agent Team"
+  },
+  "metadata": {
+    "description": "Marketplace catalog for Drupal 7 to Drupal 10/11 migration plugins and skills",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "drupal-migration-agent",
+      "source": "./",
+      "description": "Comprehensive Drupal 7 to Drupal 10/11 migration framework orchestrating 13 specialized agents, skills, and validation suites.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Drupal Migration Agent Team"
+      },
+      "license": "MIT",
+      "keywords": [
+        "drupal",
+        "drupal7",
+        "drupal10",
+        "drupal11",
+        "migration"
+      ]
+    }
+  ]
+}

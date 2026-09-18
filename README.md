@@ -1,6 +1,6 @@
-# AI-Assisted Drupal Migration Agent Framework
+# Drupal Migration Agent (`drupal-migration-agent`)
 
-A modular, reusable, and deterministic AI-assisted agent framework designed to orchestrate the migration of Drupal 7 projects to Drupal 10, while establishing a modern, Drupal 11-ready software architecture.
+An AI-assisted, distributable Claude Code plugin package designed to orchestrate the migration of Drupal 7 projects to Drupal 10 (with Drupal 11-ready architecture).
 
 ---
 
@@ -8,89 +8,111 @@ A modular, reusable, and deterministic AI-assisted agent framework designed to o
 
 Migrating from Drupal 7 to Drupal 10 is not a mechanical syntax translation; it is an architectural replatforming. Procedural hook implementations, global variables, and unstructured arrays must transition into object-oriented services, plugins, dependency injection, and Twig templating.
 
-This framework decouples **generic migration intelligence** from **project-specific configuration**. It orchestrates 13 specialized AI agents through structured lifecycle phases, strict evidence-backed validation, and non-destructive safety guardrails.
+This repository serves as a **distributable Claude Code plugin package** that decouples **generic migration intelligence** from **project-specific configuration**. It provides:
+- **13 Specialized Autonomous Agents** managing discrete migration phases.
+- **Modular Migration Skills** adhering to the Agent Skills standard (`agentskills.io`).
+- **Deep Technical References** for legacy D7 and modern D10/D11 architectures.
+- **Interactive Slash Commands** for streamlined user execution.
+- **Strict Non-Destructive Guardrails** treating Drupal 7 source code as strictly read-only.
+
+---
+
+## Claude Code Installation & Usage
+
+### 1. Local Development / Testing
+To test or use this package locally in Claude Code:
+```bash
+claude --plugin-dir /path/to/Drupal-MIgration-Agent
+```
+Within your active Claude Code session, reload plugins with:
+```text
+/reload-plugins
+```
+
+### 2. Direct GitHub Installation
+Install the package directly from GitHub:
+```text
+/plugin install ironknight24/Drupal-MIgration-Agent
+```
+
+### 3. Marketplace Installation (Optional)
+If registering as a marketplace catalog:
+```text
+/plugin marketplace add ironknight24/Drupal-MIgration-Agent
+/plugin install drupal-migration-agent@drupal-migration-marketplace
+```
+
+---
+
+## User Experience & Slash Commands
+
+Users do not need to invoke 13 individual subagents manually. Use the provided slash commands:
+
+| Command | Full Plugin Namespace | Purpose |
+|:---|:---|:---|
+| `/orchestrate` | `/drupal-migration-agent:orchestrate` | Guides setup and initiates the full end-to-end migration lifecycle. |
+| `/discover` | `/drupal-migration-agent:discover` | Runs a standalone, read-only baseline audit on D7/D10 environments. |
+| `/status` | `/drupal-migration-agent:status` | Displays real-time phase progress, manifest statistics, and blockers. |
+
+*Advanced Mode*: Individual agents can still be directly invoked by advanced users (e.g. `drupal-migration:custom-module`).
 
 ---
 
 ## Architecture & Directory Structure
 
 ```
-drupal-migration/
+Drupal-MIgration-Agent/
 │
-├── migration.config.yml             # Project source/target paths, flags, and test commands
+├── .claude-plugin/                  # Plugin metadata & marketplace catalog
+│   ├── plugin.json                  # Primary Claude Code plugin manifest
+│   └── marketplace.json             # Optional marketplace catalog definition
 │
-├── README.md                        # Framework overview and user guide
-├── ARCHITECTURE.md                  # System architecture, agent responsibilities, D10/D11 patterns
-├── AGENT_PROTOCOL.md                # Inter-agent handoff contracts and evidence taxonomy
-├── MIGRATION_LIFECYCLE.md           # Default lifecycle, dynamic sequencing, resumption
-├── SAFETY_RULES.md                  # 15 cardinal safety rules and path isolation mandates
-├── REPORTING_STANDARD.md            # Deterministic report schemas and blocked item format
+├── commands/                        # User-facing slash commands
+│   ├── orchestrate.md               # /orchestrate entry point
+│   ├── discover.md                  # /discover baseline audit
+│   └── status.md                    # /status dashboard
 │
-├── agents/                          # 13 Specialized Agent Specifications
-│   ├── orchestrator/agent.md        # Master orchestration and dependency dispatch
-│   ├── discovery/agent.md           # Read-only project inspection and baseline auditing
-│   ├── dependency/agent.md          # Dependency DAG builder and dynamic sequence optimizer
-│   ├── contrib-module/agent.md      # Contrib compatibility analysis and replacement strategy
-│   ├── custom-module/agent.md       # 12-step custom module behavioral modernization
-│   ├── custom-theme/agent.md        # PHPTemplate to Twig and asset library migration
-│   ├── configuration/agent.md       # Variables, config entities, Views, and schema migration
-│   ├── data-migration/agent.md      # Drupal Migration API pipelines and custom table ETL
-│   ├── api-modernization/agent.md   # DI-first modernization; forbids blind \Drupal::* calls
-│   ├── integration/agent.md         # External REST/SOAP/API endpoints and authentication
-│   ├── testing/agent.md             # Configurable testing strategies (PHPUnit, PHPStan, PHPCS)
-│   ├── validation/agent.md          # 12-category D7 vs D10 behavioral comparison matrix
-│   └── final-audit/agent.md         # Post-migration gap analysis, security audit, sign-off
+├── agents/                          # 13 Specialized Migration Workers
+│   ├── orchestrator.md              # Master orchestration & dynamic sequencing
+│   ├── discovery.md                 # Read-only environment & code auditing
+│   ├── dependency.md                # Dependency DAG solver & execution wave sequencing
+│   ├── contrib-module.md            # Contrib module compatibility & core merge analysis
+│   ├── custom-module.md             # 12-step behavioral modernization engine
+│   ├── custom-theme.md              # PHPTemplate to Twig, libraries.yml, modern CSS/JS
+│   ├── configuration.md             # Variables, views, and settings to CMI YAML exporter
+│   ├── data-migration.md            # Drupal Migration API pipeline architect
+│   ├── api-modernization.md         # Dependency Injection first; forbids blind \Drupal::*
+│   ├── integration.md               # REST/SOAP/API endpoints, webhooks, auth modernization
+│   ├── testing.md                   # Configurable test strategies (PHPUnit, PHPStan, PHPCS)
+│   ├── validation.md                # 12-dimensional comparative behavioral auditor
+│   └── final-audit.md               # Gap analysis, security review, and final sign-off
 │
-├── reports/                         # Deterministic markdown and YAML report outputs
-│   ├── discovery/                   # D7 & D10 baseline audit reports
-│   ├── dependencies/                # Dependency graphs and sequencing plans
-│   ├── contrib/                     # Contrib module compatibility recommendations
-│   ├── custom-modules/              # Per-module migration plans and implementation reports
-│   ├── themes/                      # Theme migration and template audit reports
-│   ├── configuration/               # CMI and variable export reports
-│   ├── data/                        # Migration API pipeline definitions and logs
-│   ├── api-modernization/           # API modernization diffs and service mappings
-│   ├── testing/                     # Test execution outputs and static analysis reports
-│   ├── validation/                  # Side-by-side behavioral validation matrices
-│   ├── blocked/                     # BLOCKED-XXX tickets for unresolvable issues
-│   └── final/                       # Comprehensive final audit and sign-off
+├── skills/                          # Reusable Domain Capabilities (Agent Skills Standard)
+│   ├── d7-analysis/SKILL.md         # [IMPLEMENTED] Read-only D7 code/AST inspection heuristics
+│   ├── d7-to-d10-mapping/SKILL.md   # [IMPLEMENTED] Procedural-to-OOP transformation rules
+│   ├── d10-architecture/SKILL.md    # [IMPLEMENTED] Modern D10/D11 standards (PHP 8 attributes, DI)
+│   ├── custom-module-migration/SKILL.md # [IMPLEMENTED] 12-step module modernization playbook
+│   └── ...                          # Other skills explicitly designated as PLANNED
 │
-├── state/                           # Dual State Management
-│   ├── migration-state.yml          # "WHERE are we?" (phases, progress, active blockers)
-│   └── migration-manifest.yml       # "WHAT are we migrating?" (component inventory & status)
+├── references/                      # Deep Technical Knowledge Bases
+│   ├── drupal-7/apis.md             # D7 core APIs, hooks, database, globals
+│   ├── drupal-10/architecture.md    # D10/D11 services, plugins, CMI, routing
+│   └── migration-patterns/common-conversions.md # Canonical conversion patterns
 │
-├── logs/
-│   └── file-change-log/             # Detailed audit trail of all modified/created files
+├── templates/                       # Standardized report & ticket templates
+├── reports/                         # Deterministic report output directories
+├── state/                           # Dual state management templates (state & manifest)
+├── logs/                            # Audit logs (file change tracking)
 │
-└── templates/                       # Standardized report and ticket templates
-    ├── discovery-report.md
-    ├── dependency-report.md
-    ├── migration-plan.md
-    ├── file-change-log.md
-    ├── validation-report.md
-    ├── blocked-item.md
-    └── final-audit.md
+├── migration.config.yml             # Master configuration template & defaults
+├── README.md                        # Package documentation & usage guide
+├── ARCHITECTURE.md                  # Factory vs Migration execution architecture
+├── AGENT_PROTOCOL.md                # Inter-agent handoff contracts & evidence taxonomy
+├── MIGRATION_LIFECYCLE.md           # Dynamic execution lifecycle & wave formation
+├── SAFETY_RULES.md                  # 15 cardinal safety rules & path protection
+├── REPORTING_STANDARD.md            # Deterministic report schemas & blocked tickets
+└── CLAUDE_CODE_PACKAGING.md         # Authoritative Claude Code packaging manual
 ```
-
----
-
-## The 13 Specialized Agents
-
-| # | Agent | Primary Responsibility |
-|---|---|---|
-| 1 | **Orchestrator** | Master coordinator: reads config, schedules agents, monitors progress, handles blockers. |
-| 2 | **Discovery** | Deep inspection of D7 and D10 environments; populates `migration-manifest.yml`. |
-| 3 | **Dependency** | Builds dependency DAG; recommends dynamic execution order across all components. |
-| 4 | **Contrib Module** | Evaluates D7 contrib against D10 core/ecosystem; proposes replacements or custom ports. |
-| 5 | **Custom Module** | Executes 12-step behavioral modernization (Inventory -> Plan -> DI OOP -> Validation). |
-| 6 | **Custom Theme** | Converts PHPTemplate to Twig, builds `libraries.yml`, ports CSS/JS and theme settings. |
-| 7 | **Configuration** | Translates variables and system settings into D10 Configuration Management (CMI). |
-| 8 | **Data Migration** | Designs Drupal Migration API pipelines; handles entity mapping and custom DB tables. |
-| 9 | **API Modernization** | Refactors procedural APIs to modern OOP; enforces Dependency Injection first. |
-| 10 | **Integration** | Modernizes external APIs, webhooks, authentication, and third-party services. |
-| 11 | **Testing** | Defines test execution strategies; validates PHPUnit, PHPStan, and PHPCS. |
-| 12 | **Validation** | Conducts D7 vs D10 behavioral comparison across 12 dimensions; requires proof. |
-| 13 | **Final Audit** | Executes final code quality, security, deprecation scan, and generates sign-off. |
 
 ---
 
@@ -98,32 +120,30 @@ drupal-migration/
 
 1. **Source Immutability**: The Drupal 7 source codebase (`source.path`) is treated as strictly **READ-ONLY**. The framework never alters, deletes, or writes to D7 files.
 2. **Target Isolation**: Write operations are restricted strictly to the configured `target.path`. Any attempted write targeting D7 is immediately rejected.
-3. **Path Overlap Prevention**: The framework verifies that `source.path` and `target.path` do not overlap; any collision aborts the migration immediately.
+3. **Path Overlap Prevention**: The framework verifies that `source.path` and `target.path` do not overlap; any collision aborts the migration immediately (`GLOBAL MIGRATION BLOCKED`).
 4. **No Git Commits by Default**: `allow_commits: false` and `allow_branch_creation: false` ensure all changes are tracked via file change logs and explicit diffs.
-5. **No Blind Syntax Translation**: Code is migrated through behavior extraction, OOP service design, and modern Drupal 10/11 conventions.
+5. **No Blind Syntax Translation**: Code is migrated through behavior extraction, OOP service design, and modern Drupal 10/11 conventions (constructor Dependency Injection).
 6. **No PASS Without Evidence**: Agents are strictly forbidden from claiming a test passed, a feature works, or data migrated without citing empirical proof.
 
 ---
 
-## Getting Started & Execution Workflow
+## Factory Development Lifecycle vs. Migration Execution Lifecycle
 
-### Step 0: Framework Setup (Current State)
-The agent factory and specifications are authored. No project files are inspected or modified.
+- **Factory Development Lifecycle (Building this Package)**:
+  - Factory Step 0: Framework & Specification Definition [COMPLETE]
+  - Factory Step 1: Claude Code Package & Architecture Transformation [CURRENT]
+  - Factory Step 2: Migration Skills & Knowledge Codification [NEXT]
+  - Factory Step 3: Agent Execution Logic Implementation [PLANNED]
+  - Factory Step 4: End-to-End Package Testing & Verification [PLANNED]
+  - Factory Step 5: Distribution & Release [PLANNED]
 
-### Step 1: Project Discovery & Baseline Audit
-Configure source and target paths in `migration.config.yml`:
-```yaml
-source:
-  drupal_version: "7"
-  path: "/path/to/drupal7"
-target:
-  drupal_version: "10"
-  path: "/path/to/drupal10"
-```
-Run the Discovery Agent to inspect the environments and populate `state/migration-manifest.yml`.
-
-### Step 2: Dependency Analysis & Execution Sequencing
-The Dependency Agent evaluates components, resolves the DAG, and establishes the dynamic migration order.
-
-### Step 3+: Phased Execution & Validation
-The Orchestrator dispatches specialized agents according to the dependency graph, tracking progress in `state/migration-state.yml`.
+- **Migration Execution Lifecycle (When running against a real project)**:
+  - Migration Step 0: Setup & Path Verification
+  - Migration Step 1: Project Discovery & Baseline Audit
+  - Migration Step 2: Dependency Graph & Wave Scheduling
+  - Migration Step 3: Contrib Compatibility Strategy
+  - Migration Step 4: Component Migration Planning
+  - Migration Step 5: Execution & Modernization (Modules, Themes, Config, Data)
+  - Migration Step 6: Automated Testing & Static Analysis
+  - Migration Step 7: Behavioral Validation
+  - Migration Step 8: Final Audit & Sign-off

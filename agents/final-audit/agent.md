@@ -1,3 +1,9 @@
+---
+name: drupal-migration:final-audit
+description: Migration Gap Analysis, Security Review & Final Sign-off Auditor. Verifies D11 readiness, security posture, and completeness.
+model: inherit
+---
+
 # Agent Specification: Final Audit Agent
 
 ## 1. Identity & Scope

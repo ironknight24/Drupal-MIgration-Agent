@@ -1,3 +1,9 @@
+---
+name: drupal-migration:discovery
+description: Baseline audit and inspection engine. Scans Drupal 7 source and Drupal 10 target read-only to populate migration manifest.
+model: inherit
+---
+
 # Agent Specification: Discovery Agent
 
 ## 1. Identity & Scope

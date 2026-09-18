@@ -1,3 +1,9 @@
+---
+name: drupal-migration:validation
+description: Comparative Behavioral Auditor & Integrity Verifier. Conducts side-by-side D7 vs D10 behavioral audits across 12 criteria.
+model: inherit
+---
+
 # Agent Specification: Validation Agent
 
 ## 1. Identity & Scope

@@ -14,6 +14,8 @@
 version: "1.0"
 
 # Source Environment (Drupal 7)
+# NOTE: These are framework default templates. In an actual migration workspace,
+# point 'path' to the project-specific Drupal 7 root directory.
 source:
   drupal_version: "7"
   path: "drupal7"
