@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Drupal-MIgration-Agent Factory Self-Validation Suite (Step 6)
+Drupal-MIgration-Agent Factory Self-Validation Suite (Step 7)
 
 Standard Library Only (Zero third-party dependencies: json, re, pathlib, os, sys).
 Validates structural integrity, agent execution contracts, skills, references, commands,
 state/manifest schemas, canonical agent_result (v1.0), artifact ownership, packaging,
-consumer configuration templates, preflight contracts, and gating.
+consumer configuration templates, preflight contracts, gating, artifact freshness,
+human decision gates, safe resume recovery, and runtime readiness boundaries.
 
 Exit Codes:
   0: All checks PASS (warnings/unverified do not trigger failure)
@@ -545,7 +546,7 @@ class FactoryValidator:
             self.record_check("CHECK-RES-01", "contracts", "agent_result v1.0 JSON Schema", "FAIL",
                               f"JSON parse error: {str(e)}", "Invalid JSON syntax.", [rel_file])
 
-    # Suite 7: Artifact Ownership, Templates & Safety Rules
+    # Suite 7: Artifact Ownership, Protocols & Safety Rules
     def validate_ownership_and_safety(self):
         # 7.1 Preflight Report Template
         tpl_preflight = self.repo_root / "templates" / "preflight-report.md"
@@ -596,6 +597,52 @@ class FactoryValidator:
                           "[RUNTIME UNVERIFIED — CLAUDE CODE CLI/ACCESS NOT AVAILABLE]",
                           "Runtime execution, tool sandboxing, and autonomous turns cannot be tested without Claude Code CLI.")
 
+        # 7.4 Protocol Validation (Step 7 Runtime Hardening)
+        proto_file = self.repo_root / "AGENT_PROTOCOL.md"
+        if proto_file.exists():
+            with open(proto_file, 'r', encoding='utf-8') as f:
+                p_text = f.read()
+
+            has_freshness = "Artifact Freshness" in p_text and all(s in p_text for s in ["CURRENT", "STALE", "INVALID", "SUPERSEDED"])
+            if has_freshness:
+                self.record_check("CHECK-PRT-01", "contracts", "Artifact Freshness & Metadata Protocol", "PASS",
+                                  "AGENT_PROTOCOL.md codifies artifact lifecycle states (CURRENT, STALE, INVALID, SUPERSEDED) and metadata.",
+                                  "Verified artifact freshness protocol.", ["AGENT_PROTOCOL.md"])
+            else:
+                self.record_check("CHECK-PRT-01", "contracts", "Artifact Freshness & Metadata Protocol", "FAIL",
+                                  "AGENT_PROTOCOL.md missing artifact freshness lifecycle definitions.",
+                                  "Protocol must define artifact freshness states.", ["AGENT_PROTOCOL.md"])
+
+            has_gates = "Human Decision Gate" in p_text and all(s in p_text for s in ["PENDING", "APPROVED", "REJECTED", "CHANGES_REQUESTED"])
+            if has_gates:
+                self.record_check("CHECK-PRT-02", "contracts", "Human Decision Gate Protocol", "PASS",
+                                  "AGENT_PROTOCOL.md codifies human decision states (PENDING, APPROVED, REJECTED, CHANGES_REQUESTED) and approval gates.",
+                                  "Verified human decision gate protocol.", ["AGENT_PROTOCOL.md"])
+            else:
+                self.record_check("CHECK-PRT-02", "contracts", "Human Decision Gate Protocol", "FAIL",
+                                  "AGENT_PROTOCOL.md missing human decision states.",
+                                  "Protocol must define human approval gate states.", ["AGENT_PROTOCOL.md"])
+
+            has_recovery = "Safe Resume & Idempotent Re-entry" in p_text and all(f"Case {c}" in p_text for c in ["A", "B", "C", "D", "E", "F"])
+            if has_recovery:
+                self.record_check("CHECK-PRT-03", "contracts", "Safe Resume & Recovery Protocol", "PASS",
+                                  "AGENT_PROTOCOL.md codifies recovery cases A through F (retry, blocked deps, global block, crash, resume, stale artifacts).",
+                                  "Verified recovery protocol.", ["AGENT_PROTOCOL.md"])
+            else:
+                self.record_check("CHECK-PRT-03", "contracts", "Safe Resume & Recovery Protocol", "FAIL",
+                                  "AGENT_PROTOCOL.md missing safe resume recovery cases.",
+                                  "Protocol must define recovery cases A-F.", ["AGENT_PROTOCOL.md"])
+
+            has_matrix = "Runtime Capability & Readiness Matrix" in p_text and all(s in p_text for s in ["STATIC_VERIFIED", "RUNTIME_REQUIRED", "CONSUMER_ENVIRONMENT_REQUIRED"])
+            if has_matrix:
+                self.record_check("CHECK-PRT-04", "contracts", "Runtime Capability & Readiness Matrix", "PASS",
+                                  "AGENT_PROTOCOL.md codifies runtime capability classifications across packaging, config, commands, agents, state, safety.",
+                                  "Verified runtime capability matrix.", ["AGENT_PROTOCOL.md"])
+            else:
+                self.record_check("CHECK-PRT-04", "contracts", "Runtime Capability & Readiness Matrix", "FAIL",
+                                  "AGENT_PROTOCOL.md missing runtime capability classifications.",
+                                  "Protocol must define runtime readiness matrix.", ["AGENT_PROTOCOL.md"])
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -608,7 +655,7 @@ class FactoryValidator:
     def generate_result_json(self):
         return {
             "schema_version": "1.0",
-            "validation_id": f"VAL-FACTORY-STEP6-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
+            "validation_id": f"VAL-FACTORY-STEP7-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
             "validator": "drupal-migration:factory-self-validation",
             "executed_at": datetime.now(timezone.utc).isoformat(),
             "summary": self.summary,
@@ -617,7 +664,7 @@ class FactoryValidator:
 
     def print_summary(self):
         print("=" * 80)
-        print(" DRUPAL-MIGRATION-AGENT FACTORY SELF-VALIDATION SUMMARY (STEP 6)")
+        print(" DRUPAL-MIGRATION-AGENT FACTORY SELF-VALIDATION SUMMARY (STEP 7)")
         print("=" * 80)
         print(f" Total Checks Evaluated : {self.summary['checks_total']}")
         print(f"   [PASS]        Passed : {self.summary['passed']}")
@@ -653,8 +700,8 @@ def main():
 
         result_json = validator.generate_result_json()
 
-        # Write to step-6 reports directory
-        reports_dir = repo_root / "reports" / "step-6"
+        # Write to step-7 reports directory
+        reports_dir = repo_root / "reports" / "step-7"
         reports_dir.mkdir(parents=True, exist_ok=True)
         with open(reports_dir / "validation_result.json", 'w', encoding='utf-8') as f:
             json.dump(result_json, f, indent=2)

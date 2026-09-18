@@ -345,3 +345,86 @@ Before an agent writes, modifies, or deletes any file:
 2. Reject if destination matches or resides within `source.path`.
 3. Perform the file modification.
 4. Record the entry in `logs/file-change-log/LOG-<TIMESTAMP>.md` using `templates/file-change-log.md`.
+
+---
+
+## 8. Artifact Freshness & Metadata Protocol
+
+Runtime artifacts record explicit lifecycle metadata in their frontmatter or header to enable deterministic freshness validation without external database state:
+
+```yaml
+metadata:
+  schema_version: "1.0"
+  generated_at: "2026-09-18T22:30:00Z"
+  source_context_hash: "sha256-..." # Hash of input D7 code or config state
+  component_id: "custom_booking"
+  producer_agent: "drupal-migration:custom-module"
+  artifact_status: "CURRENT" # CURRENT | STALE | INVALID | SUPERSEDED
+```
+
+### Artifact State Lifecycle
+- **`CURRENT`**: Backing evidence is fresh, inputs are unchanged, and downstream agents may rely on it.
+- **`STALE`**: Underlying source code, dependencies, or migration configuration have changed since generation. Orchestrator triggers re-evaluation before downstream consumption.
+- **`INVALID`**: Schema validation failed, required sections are missing, or checksum mismatch detected. Agent result is rejected.
+- **`SUPERSEDED`**: Replaced by a newer execution attempt (e.g. attempt 2 after remediation).
+
+---
+
+## 9. Human Decision Gate Protocol
+
+The framework strictly distinguishes an AI **System Recommendation** from an authoritative **Human Decision**:
+
+```text
+[Specialist Agent] ──(Generates Proposal)──► [MIGRATION-PLAN-*.md]
+                                                     │
+                                                     ▼
+                                     [Human Decision Gate]
+                                                     │
+               ┌───────────────────────┬─────────────┴─────────────┬───────────────────────┐
+               ▼                       ▼                           ▼                       ▼
+          [APPROVED]          [CHANGES_REQUESTED]             [REJECTED]               [PENDING]
+               │                       │                           │                       │
+               ▼                       ▼                           ▼                       ▼
+       Orchestrator enters    Agent re-plans with         Component marked        Orchestrator pauses
+       Implementation Wave    human feedback              SKIPPED / BLOCKED       component & halts wave
+```
+
+### Decision States
+- **`PENDING`**: Default state upon plan generation. The Orchestrator **HALTS** downstream code execution for this component until human review is provided.
+- **`APPROVED`**: Explicit sign-off by technical lead. Unlocks wave dispatching and code writing.
+- **`CHANGES_REQUESTED`**: Plan returned to specialist with human notes for re-planning.
+- **`REJECTED`**: Component will not be migrated; marked `SKIPPED` in runtime state.
+- **`NOT_APPLICABLE`**: Automated/deterministic transformation requiring no architectural branching.
+
+---
+
+## 10. Safe Resume & Idempotent Re-entry Protocol
+
+When resuming an interrupted or failed migration, the Orchestrator evaluates the recovery scenario deterministically:
+
+- **Case A (Transient Failure / Retryable Component)**: If `attempt_number < max_retries`, re-enters at the component's designated remediation stage without re-running earlier completed phases.
+- **Case B (Blocked Dependency)**: Dependent component is placed in `BLOCKED_UPSTREAM`. When upstream is unblocked and reaches `COMPLETE`, Orchestrator transitions dependent to `READY` for the next dynamic wave.
+- **Case C (Global Safety Blocker)**: System-wide halt (`global_block: true`). Execution cannot proceed until developer resolves environment/path issue and resets `global_block`.
+- **Case D (Unexpected Process Termination)**: Orchestrator inspects `state/migration-state.yml` against `logs/file-change-log/`. Incomplete components in `IN_PROGRESS` are rolled back to `READY` or `PLANNED` based on verified on-disk artifacts.
+- **Case E (Resume After Interruption)**: Running `/orchestrate` inspects completed phases and existing valid artifacts, automatically resuming from the lowest incomplete wave without re-executing verified milestones.
+- **Case F (Stale Artifact Encountered)**: If input source hash differs from artifact metadata, Orchestrator marks artifact `STALE` and schedules re-execution of the producing agent.
+
+---
+
+## 11. Runtime Capability & Readiness Matrix
+
+| Functional Area | Capability | Verification Level | Runtime Status |
+| :--- | :--- | :---: | :---: |
+| **Packaging** | Plugin metadata (`plugin.json`, `marketplace.json`) | `STATIC_VERIFIED` | Verified statically |
+| **Packaging** | Claude Code runtime loading (`/plugin install`) | `RUNTIME_REQUIRED` | `[RUNTIME UNVERIFIED]` |
+| **Commands** | Slash command definition (`/preflight`, `/discover`, `/orchestrate`, `/status`) | `STATIC_VERIFIED` | Verified statically |
+| **Commands** | Claude Code command discovery & execution | `RUNTIME_REQUIRED` | `[RUNTIME UNVERIFIED]` |
+| **Configuration** | Canonical template & structure (`migration.config.example.yml`) | `STATIC_VERIFIED` | Verified statically |
+| **Configuration** | Dynamic consumer path resolution & env variable loading | `CONSUMER_ENVIRONMENT_REQUIRED` | `[RUNTIME UNVERIFIED]` |
+| **Agents** | 18-part operational contracts & scope definitions | `STATIC_VERIFIED` | Verified statically |
+| **Agents** | Autonomous turn execution & tool sandboxing | `RUNTIME_REQUIRED` | `[RUNTIME UNVERIFIED]` |
+| **State Machine** | Single-writer authority & transition matrix | `STATIC_VERIFIED` | Verified statically |
+| **State Machine** | Live atomic state updates during dynamic waves | `RUNTIME_REQUIRED` | `[RUNTIME UNVERIFIED]` |
+| **Safety** | D7 read-only policy & non-overlap validation | `STATIC_VERIFIED` | Verified statically |
+| **Safety** | Live OS filesystem write blocking | `RUNTIME_REQUIRED` | `[RUNTIME UNVERIFIED]` |
+| **Full Migration**| End-to-end AST parsing & database replatforming | `CONSUMER_ENVIRONMENT_REQUIRED` | `[RUNTIME UNVERIFIED]` |

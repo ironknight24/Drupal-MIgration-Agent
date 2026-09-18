@@ -254,6 +254,7 @@ Drupal-MIgration-Agent/
   - Factory Step 4: Agent Operationalization & Execution Contracts [COMPLETE]
   - Factory Step 5: Self-Validation, Contract Testing & Runtime Readiness [COMPLETE]
   - Factory Step 6: Consumer Onboarding, Configuration Boundary & Preflight [COMPLETE]
+  - Factory Step 7: Runtime Execution & Integration Hardening [COMPLETE]
 
 - **Migration Execution Lifecycle (When running against a real project)**:
   - Migration Step 0: Setup & Path Verification (Preflight Gate)
@@ -265,3 +266,34 @@ Drupal-MIgration-Agent/
   - Migration Step 6: Automated Testing & Static Analysis
   - Migration Step 7: Behavioral Validation
   - Migration Step 8: Final Audit & Sign-off
+
+---
+
+## Runtime Execution Hardening & Operational Model
+
+Step 7 hardens the factory for execution against real consumer projects while preserving strict static/runtime boundaries:
+
+### 1. Single-Writer State Authority & Command Routing
+Commands (`/preflight`, `/discover`, `/orchestrate`, `/status`) act as entry points that dispatch work to the master `orchestrator` and specialist agents. All state mutations to `state/migration-state.yml` are serialized through the Orchestrator, which validates `agent_result` (v1.0) payloads before committing transitions.
+
+### 2. Artifact Freshness & Metadata Lifecycle
+Every generated report and plan contains metadata tracking its freshness state:
+- `CURRENT`: Verified fresh; downstream agents may consume.
+- `STALE`: Upstream configuration or source changed; re-evaluation scheduled.
+- `INVALID`: Schema failure or corrupted output; rejected.
+- `SUPERSEDED`: Replaced by a newer execution attempt.
+
+### 3. Human Decision Gates
+The framework distinguishes system recommendations from authoritative human approvals. Gates for custom module architecture, contrib replacements, and schema changes remain in `PENDING` status until explicitly approved by an engineering lead, preventing unapproved code mutations.
+
+### 4. Recovery & Idempotent Resumption
+- **Case A (Component Retry)**: Re-runs only the failed stage within `max_retries`.
+- **Case B (Blocked Upstream)**: Pauses dependents until upstream component completes.
+- **Case C (Global Blocker)**: Halts immediately on safety/isolation violations.
+- **Case D (Interrupted Process)**: Reconciles state against on-disk change logs.
+- **Case E (Resume)**: Automatically resumes from the lowest incomplete wave.
+- **Case F (Stale Artifact)**: Re-runs producing agent upon input hash changes.
+
+### 5. Runtime Capability Status
+All static structures, schemas, and contracts are verified. Claude Code live execution and live subagent sandboxing remain explicitly marked:
+`[RUNTIME UNVERIFIED — CLAUDE CODE CLI/ACCESS NOT AVAILABLE]`.
