@@ -1,6 +1,6 @@
 ---
 name: drupal-migration:discovery
-description: Baseline audit and inspection engine. Scans Drupal 7 source and Drupal 10 target read-only to populate migration manifest.
+description: Baseline audit and inspection engine. Scans Drupal 7 source and Drupal 10 target read-only to discover modules, PHP classes, constructors, .inc files, and populate migration manifest.
 model: inherit
 ---
 
@@ -15,17 +15,20 @@ model: inherit
 ---
 
 ## 2. Purpose
-Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 codebase, configuration, and database schemas. Categorizes all assets, extracts hook implementations, identifies global variables, and populates the static project scope in `state/migration-manifest.yml`.
+Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 codebase, custom PHP source files, OOP classes, constructors, legacy `.inc` files, configuration, and database schemas. Categorizes all assets, extracts hook implementations, discovers classes and methods, identifies global variables, and populates the static project scope in `state/migration-manifest.yml`.
 
 ---
 
 ## 3. Allowed Scope
-- Inspecting Drupal 7 codebase under `source.path` (.info, .module, .inc, .install, .php, JS, CSS, template files).
+- Inspecting Drupal 7 codebase under `source.path` (`*.info`, `*.module`, `*.inc`, `*.install`, `*.profile`, `*.php`, JS, CSS, template files).
+- Recursively discovering custom PHP files, OOP classes, interfaces, traits, and abstract classes across custom modules.
+- Analyzing class constructors (`__construct()` and legacy `ClassName()`), parameter dependencies, global state usage, and side effects.
+- Analyzing autoloading mechanisms (`files[]`, `include`/`require`, `module_load_include()`, custom autoloaders).
 - Inspecting Drupal 10/11 target structure under `target.path`.
 - Introspecting D7 database schemas (tables, columns, indexes) in read-only mode if DB connection is configured.
-- Populating static component scope in `state/migration-manifest.yml`.
+- Populating static component scope in `state/migration-manifest.yml` (including `inc_files` and `custom_php_files`).
 - Authoring baseline discovery reports in `reports/discovery/`.
-- Classifying observed facts (`[OBSERVED FACT]`) vs inferences (`[INFERENCE]`).
+- Classifying observed facts (`[OBSERVED FACT]`) vs inferences (`[INFERENCE]`) vs unverified results (`[UNVERIFIED RESULT]`).
 
 ---
 
@@ -62,7 +65,7 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
 
 ## 8. Conceptual Tool Capabilities
 - **Read**: View D7 files, target configs, and project configuration.
-- **Search / Inspect**: Directory listing, ripgrep searches, AST pattern matching.
+- **Search / Inspect**: Directory listing, ripgrep searches, AST pattern matching, OOP class and constructor extraction.
 - **Write (Manifest & Reports)**: Populate `migration-manifest.yml` and author discovery audit reports.
 - **Forbidden Operations**: File mutation in source, shell commands modifying filesystem, git commands.
 
@@ -87,7 +90,7 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
 
 ## 11. Skill & Reference Dependencies
 - **Primary Associated Skill**:
-  - [`skills/d7-analysis`](../../skills/d7-analysis/SKILL.md) (Procedural AST inspection, hook cataloging, and global state discovery heuristics)
+  - [`skills/d7-analysis`](../../skills/d7-analysis/SKILL.md) (Procedural and OOP AST inspection, class/constructor analysis, hook cataloging, and global state discovery heuristics)
 - **Canonical References**:
   - [Drupal 7 Core APIs Reference](../../references/drupal-7/apis.md)
   - [Drupal 7 Hooks to Modern Architecture Catalog](../../references/drupal-7/hooks.md)
@@ -100,27 +103,32 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
 3. **Module & Feature Inventory**:
    - Locate all `.info` files across `sites/all/modules/`, `sites/default/modules/`, `profiles/`.
    - Categorize modules into custom modules, contributed modules, and features.
-4. **Recursive Source & `.inc` File Inventory**:
-   - For every custom module, recursively inventory all source files (`*.module`, `*.inc`, `*.install`, `*.info`, `*.php`, `includes/**/*.inc`, `*.drush.inc`, and arbitrary `.inc` files in any subdirectory).
-   - Never assume `.inc` files follow fixed naming conventions; discover strictly by file type and code structure.
-5. **Include & Dependency Relationship Analysis**:
-   - Trace all include patterns: `include`, `include_once`, `require`, `require_once`, `module_load_include()`, `form_load_include()`, `ctools_include()`, and menu file declarations.
-   - Map direct and transitive include hierarchies (e.g., `my_module.module` -> `includes/admin.inc` -> `includes/helper.inc`).
-   - Mark unresolved or dynamic includes as `[UNVERIFIED RESULT]`.
-6. **`.inc` Content & Caller Analysis**:
-   - Dissect every `.inc` file into individual functions, classes, constants, callbacks, hooks, Drush commands, batch/queue workers, and external API calls.
-   - Scan the codebase to identify callers and usage contexts for every discovered callable.
-   - Classify each functional unit into one of 18 standard categories (`CONTROLLER_PAGE`, `FORM_HANDLER`, `SERVICE_BUSINESS_LOGIC`, `PLUGIN_CANDIDATE`, `EVENT_SUBSCRIBER`, `ACCESS_CHECKER`, `ENTITY_FIELD_LOGIC`, `QUEUE_WORKER`, `BATCH_PROCESSOR`, `CRON_HANDLER`, `DRUSH_COMMAND`, `CONFIGURATION_HANDLER`, `THEME_RENDERER`, `UTILITY_HELPER`, `DATABASE_DATA_ACCESS`, `INTEGRATION_CLIENT`, `TEST_SUPPORT`, `LEGACY_OBSOLETE`).
-7. **Drush Command Extraction**:
-   - Extract legacy Drush commands from `*.drush.inc` and arbitrary `.inc` files, cataloging command names, arguments, options, aliases, and side effects.
-8. **Theme Inventory**: Locate all `.info` files across `sites/all/themes/`, `sites/default/themes/`; categorize base themes, subthemes, and `.tpl.php` templates.
-9. **Hook & Architecture Extraction**:
-   - Grep for `hook_menu()`, `hook_schema()`, `hook_node_info()`, `hook_form_alter()`, `hook_views_api()`.
-   - Catalog custom database tables defined in `.install` files.
-10. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
-11. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (including complete `inc_files` and function accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
-12. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
-13. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
+4. **Recursive Source File Discovery (`*.php`, `*.inc`, `*.module`, `*.install`, `*.profile`)**:
+   - For every custom module, recursively inventory all source files across root and subdirectories (`includes/`, `lib/`, `classes/`, `src/`, `admin/`, `commands/`, etc.).
+   - Never assume files follow fixed naming conventions (`filename != architecture`); discover strictly by file type and code structure.
+5. **Custom OOP PHP Class & Constructor Discovery**:
+   - For every discovered PHP source file, extract classes, abstract classes, interfaces, traits, parent classes, used traits, and constants.
+   - Inspect all constructors: recognize modern `__construct()` and legacy PHP4/D7 `ClassName()` constructors.
+   - Audit constructor parameters, typehints, default values, instantiated objects, global variable dependencies (`$user`, `$language`, `$conf`), and procedural D7 API calls (`variable_get()`, `db_query()`).
+   - Classify initialization role (DI candidate, service locator, global state dependency, hidden dependency, runtime side effect).
+6. **Class Instantiation, Callers & Autoloading Analysis**:
+   - Trace class instantiations (`new ClassName()`), static calls (`ClassName::method()`), callbacks, and cross-module consumers.
+   - Analyze loading mechanisms: `.info` `files[]` declarations, `include`/`require`, `module_load_include()`, or custom autoloaders.
+7. **Include & Relationship Graph Analysis**:
+   - Trace direct and transitive include hierarchies across `.module`, `.inc`, and `.php` files.
+   - Mark unresolved dynamic includes or polymorphic instantiations as `[UNVERIFIED RESULT]`.
+8. **Standardized 22-Class Architectural Taxonomy**:
+   - Classify each discovered class and callable into the 22-class taxonomy: `SERVICE_BUSINESS_LOGIC`, `CONTROLLER`, `FORM`, `PLUGIN`, `EVENT_SUBSCRIBER`, `ACCESS_CHECKER`, `ENTITY_LOGIC`, `FIELD_LOGIC`, `QUEUE_WORKER`, `BATCH_PROCESSOR`, `CRON_HANDLER`, `DRUSH_COMMAND`, `CONFIGURATION_HANDLER`, `INTEGRATION_CLIENT`, `DATA_ACCESS`, `VALUE_OBJECT`, `DOMAIN_OBJECT`, `UTILITY_HELPER`, `TEST_SUPPORT`, `LIBRARY_EXTERNAL_DEPENDENCY`, `LEGACY_OBSOLETE`, `HUMAN_DECISION_REQUIRED` / `UNVERIFIED`.
+9. **Drush Command Extraction**:
+   - Extract legacy Drush commands from `*.drush.inc` and arbitrary `.inc`/`.php` files, cataloging command names, arguments, options, aliases, and side effects.
+10. **Theme, Hook & Database Inventory**:
+    - Locate themes, base themes, and `.tpl.php` templates.
+    - Grep for `hook_menu()`, `hook_schema()`, `hook_node_info()`, `hook_form_alter()`, `hook_views_api()`.
+    - Catalog custom database tables defined in `.install` files.
+11. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
+12. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files` and `custom_php_files` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
+13. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
+14. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
 
 ---
 
@@ -162,7 +170,7 @@ agent_result:
       - "reports/discovery/DISCOVERY-AUDIT-20260918.md"
   evidence:
     observed_facts:
-      - "Discovered 14 custom modules, 32 contrib modules, 2 custom themes"
+      - "Discovered 14 custom modules, 18 custom PHP classes, 28 .inc files, 32 contrib modules, 2 custom themes"
   blockers: []
   decisions_required: []
   files_changed: []
@@ -181,4 +189,3 @@ agent_result:
 
 ## 18. Downstream Handoff
 - Hands off populated `state/migration-manifest.yml` and discovery audit report to the **Dependency Agent** (`dependency`) for DAG computation and coupling analysis.
-

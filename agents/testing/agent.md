@@ -19,6 +19,7 @@ Defines and executes automated testing strategies for migrated code, including P
 
 ## 3. Allowed Scope
 - Authoring unit and kernel test classes under `<target_module_dir>/<module>/tests/src/{Unit,Kernel}/`.
+- Testing migrated custom PHP classes, PSR-4 autoloading, constructor dependency injection, and public APIs.
 - Formulating component-specific test strategies (Unit/Kernel for custom modules, Schema validation for config, Twig/CSS linting for themes, Count reconciliation for data migrations).
 - Executing test runners, linters, and static analyzers dynamically based on tools available in target environment.
 - Generating structured test reports, raw CLI execution logs, and static analysis summaries in `reports/testing/`.

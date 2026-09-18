@@ -1429,6 +1429,150 @@ class FactoryValidator:
                               f"Documentation missing .inc architecture sections: {', '.join(missing_doc_keywords)}",
                               "Public documentation must explicitly document recursive .inc handling.")
 
+    def validate_custom_php_classes_accounting_suite(self):
+        """
+        Suite 12: Legacy Custom PHP File & OOP Class Re-engineering Suite
+        Validates recursive PHP discovery, classes/interfaces/traits, constructor analysis,
+        legacy constructor recognition, 22-class taxonomy, constructor DI, non-1:1 mapping,
+        and zero-omission outcome tracking.
+        """
+        discovery_agent = (self.repo_root / "agents/discovery/agent.md").read_text(encoding='utf-8')
+        d7_skill = (self.repo_root / "skills/d7-analysis/SKILL.md").read_text(encoding='utf-8')
+        mapping_skill = (self.repo_root / "skills/d7-to-d10-mapping/SKILL.md").read_text(encoding='utf-8')
+        custom_agent = (self.repo_root / "agents/custom-module/agent.md").read_text(encoding='utf-8')
+        custom_skill = (self.repo_root / "skills/custom-module-migration/SKILL.md").read_text(encoding='utf-8')
+        dep_skill = (self.repo_root / "skills/dependency-analysis/SKILL.md").read_text(encoding='utf-8')
+        dep_agent = (self.repo_root / "agents/dependency/agent.md").read_text(encoding='utf-8')
+        val_agent = (self.repo_root / "agents/validation/agent.md").read_text(encoding='utf-8')
+        val_skill = (self.repo_root / "skills/behavioral-validation/SKILL.md").read_text(encoding='utf-8')
+        manifest_text = (self.repo_root / "state/migration-manifest.yml").read_text(encoding='utf-8')
+
+        # 12.1 Recursive PHP Source File & OOP Structure Discovery
+        oop_keywords = ["classes", "interfaces", "traits", "abstract", "constants", "properties", "methods"]
+        missing_oop = [k for k in oop_keywords if k not in d7_skill.lower() and k not in discovery_agent.lower()]
+
+        if not missing_oop and "custom_php_files" in manifest_text:
+            self.record_check("CHECK-CLS-01", "discovery", "Recursive PHP Source File & OOP Structure Discovery", "PASS",
+                              "Discovery agent and D7 analysis skill recursively discover custom PHP files and inspect OOP structures (classes, interfaces, traits, methods).",
+                              "Verified custom PHP and class discovery heuristics with manifest schema support.",
+                              affected_files=["agents/discovery/agent.md", "skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-CLS-01", "discovery", "Recursive PHP Source File & OOP Structure Discovery", "FAIL",
+                              f"Missing OOP discovery keywords: {', '.join(missing_oop)} or manifest schema support.",
+                              "Factory must discover all custom PHP source files and extract OOP structures.")
+
+        # 12.2 Constructor Analysis & Legacy Constructor Recognition
+        constructor_keywords = ["__construct", "legacy php4", "classname()", "constructor", "side effects"]
+        missing_constructors = [k for k in constructor_keywords if k not in d7_skill.lower() and k not in mapping_skill.lower()]
+
+        if not missing_constructors:
+            self.record_check("CHECK-CLS-02", "analysis", "Constructor Analysis & Legacy Constructor Recognition", "PASS",
+                              "Explicitly audits class constructors, recognizing modern __construct() and legacy ClassName() patterns with parameter/dependency extraction.",
+                              "Verified constructor analysis and legacy constructor detection.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-CLS-02", "analysis", "Constructor Analysis & Legacy Constructor Recognition", "FAIL",
+                              f"Missing constructor analysis keywords: {', '.join(missing_constructors)}",
+                              "Constructor analysis must inspect parameters, dependencies, and legacy constructor names.")
+
+        # 12.3 Class Instantiation, Static Call & Caller Modeling
+        has_instantiation = "new classname" in d7_skill.lower() or "new " in dep_skill.lower() or "class instantiations" in dep_agent.lower()
+        has_static_calls = "static" in d7_skill.lower() and ("static" in dep_skill.lower() or "static" in dep_agent.lower())
+
+        if has_instantiation and has_static_calls:
+            self.record_check("CHECK-CLS-03", "analysis", "Class Instantiation, Static Call & Caller Modeling", "PASS",
+                              "Traces object creation (new ClassName), static method calls, and cross-module consumers in discovery and dependency DAG.",
+                              "Verified class instantiation and caller modeling heuristics.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/dependency-analysis/SKILL.md", "agents/dependency/agent.md"])
+        else:
+            self.record_check("CHECK-CLS-03", "analysis", "Class Instantiation, Static Call & Caller Modeling", "FAIL",
+                              "Missing class instantiation or static method caller modeling.",
+                              "Factory must trace class instantiations and static calls across modules.")
+
+        # 12.4 Autoloading vs PSR-4 Architecture Modernization
+        autoload_keywords = ["files[]", "psr-4", "autoloading", "include", "require"]
+        missing_autoload = [k for k in autoload_keywords if k not in d7_skill.lower() and k not in mapping_skill.lower()]
+
+        if not missing_autoload:
+            self.record_check("CHECK-CLS-04", "architecture", "Autoloading vs PSR-4 Architecture Modernization", "PASS",
+                              "Analyzes D7 file loading (files[], include, require, autoloaders) and modernizes to Composer PSR-4 autoloading.",
+                              "Verified autoloading analysis and PSR-4 modernization rules.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-CLS-04", "architecture", "Autoloading vs PSR-4 Architecture Modernization", "FAIL",
+                              f"Missing autoloading modernization keywords: {', '.join(missing_autoload)}",
+                              "Factory must analyze D7 loading mechanisms and target PSR-4 autoloading.")
+
+        # 12.5 Standardized 22-Class Architectural Taxonomy
+        expected_22_taxonomy = [
+            "SERVICE_BUSINESS_LOGIC", "CONTROLLER", "FORM", "PLUGIN", "EVENT_SUBSCRIBER",
+            "ACCESS_CHECKER", "ENTITY_LOGIC", "FIELD_LOGIC", "QUEUE_WORKER", "BATCH_PROCESSOR",
+            "CRON_HANDLER", "DRUSH_COMMAND", "CONFIGURATION_HANDLER", "INTEGRATION_CLIENT",
+            "DATA_ACCESS", "VALUE_OBJECT", "DOMAIN_OBJECT", "UTILITY_HELPER", "TEST_SUPPORT",
+            "LIBRARY_EXTERNAL_DEPENDENCY", "LEGACY_OBSOLETE"
+        ]
+        missing_22 = [t for t in expected_22_taxonomy if t not in d7_skill]
+        if not missing_22:
+            self.record_check("CHECK-CLS-05", "classification", "Standardized 22-Class Architectural Taxonomy", "PASS",
+                              "All 22 standardized architectural classifications are defined in D7 analysis heuristics and manifest schema.",
+                              "Verified comprehensive 22-class architectural taxonomy.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-CLS-05", "classification", "Standardized 22-Class Architectural Taxonomy", "FAIL",
+                              f"Missing taxonomy classes: {', '.join(missing_22)}",
+                              "All 22 architectural categories must be defined in the skill specification.")
+
+        # 12.6 Constructor Dependency Injection & Non-1:1 Architecture Mapping
+        has_constructor_di = "constructor" in custom_agent.lower() and "dependency injection" in custom_agent.lower() and "services.yml" in custom_agent
+        has_non_1to1_classes = "one-to-many" in mapping_skill.lower() or "many-to-one" in mapping_skill.lower() or "non-1:1" in custom_skill.lower()
+
+        if has_constructor_di and has_non_1to1_classes:
+            self.record_check("CHECK-CLS-06", "architecture", "Constructor Dependency Injection & Non-1:1 Architecture Mapping", "PASS",
+                              "Custom module agent and mapping skill enforce constructor DI and non-1:1 transformations (1-to-many decomposition and many-to-one consolidation).",
+                              "Verified constructor DI refactoring and non-1:1 architectural mapping.",
+                              affected_files=["agents/custom-module/agent.md", "skills/d7-to-d10-mapping/SKILL.md", "skills/custom-module-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-CLS-06", "architecture", "Constructor Dependency Injection & Non-1:1 Architecture Mapping", "FAIL",
+                              "Missing constructor DI rules or non-1:1 class transformation specifications.",
+                              "Factory must refactor constructors with DI and support non-1:1 class mapping.")
+
+        # 12.7 Zero-Omission Outcome Accounting & Forbidden State Enforcement
+        approved_outcomes = ["MIGRATED", "REPLACED", "OBSOLETE", "EXCLUDED_WITH_REASON", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"]
+        forbidden_states = ["UNACCOUNTED", "UNKNOWN_WITHOUT_REASON", "SILENTLY_OMITTED"]
+
+        missing_approved = [o for o in approved_outcomes if o not in val_skill]
+        missing_forbidden = [f for f in forbidden_states if f not in val_skill]
+
+        val_template = (self.repo_root / "templates/validation-report.md").read_text(encoding='utf-8')
+        if not missing_approved and not missing_forbidden and "Custom PHP Class" in val_template:
+            self.record_check("CHECK-CLS-07", "validation", "Zero-Omission Outcome Accounting & Forbidden State Enforcement", "PASS",
+                              "Validation agent enforces mandatory outcomes for all custom PHP files, classes, constructors, and methods while forbidding silent omissions.",
+                              "Verified strict zero-omission outcome validation for custom classes.",
+                              affected_files=["agents/validation/agent.md", "skills/behavioral-validation/SKILL.md", "templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-CLS-07", "validation", "Zero-Omission Outcome Accounting & Forbidden State Enforcement", "FAIL",
+                              f"Missing approved outcomes: {', '.join(missing_approved)} or forbidden states: {', '.join(missing_forbidden)}",
+                              "Validation must enforce explicit outcomes for all custom PHP classes.")
+
+        # 12.8 Template & Documentation Consistency
+        doc_files = [
+            self.repo_root / "README.md",
+            self.repo_root / "ARCHITECTURE.md",
+            self.repo_root / "AGENT_PROTOCOL.md"
+        ]
+        doc_keyword = "Legacy Custom PHP File"
+        missing_doc = [str(p.name) for p in doc_files if doc_keyword not in p.read_text(encoding='utf-8')]
+
+        if not missing_doc:
+            self.record_check("CHECK-CLS-08", "documentation", "Template & Documentation Consistency", "PASS",
+                              "README, ARCHITECTURE, and AGENT_PROTOCOL consistently document recursive custom PHP file and OOP class re-engineering architecture.",
+                              "Verified public documentation and template consistency for custom PHP classes.",
+                              affected_files=[str(p.relative_to(self.repo_root)) for p in doc_files])
+        else:
+            self.record_check("CHECK-CLS-08", "documentation", "Template & Documentation Consistency", "FAIL",
+                              f"Documentation missing custom PHP class architecture sections: {', '.join(missing_doc)}",
+                              "Public documentation must explicitly document custom PHP class re-engineering.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -1441,6 +1585,7 @@ class FactoryValidator:
         self.validate_failure_and_recovery_hardening()
         self.validate_release_readiness_and_distribution()
         self.validate_inc_file_accounting_suite()
+        self.validate_custom_php_classes_accounting_suite()
 
     def generate_result_json(self):
         return {

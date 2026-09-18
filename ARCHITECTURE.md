@@ -91,16 +91,16 @@ The architecture decouples **workflow coordination** (Agents) from **reusable do
 
 ---
 
-## 4. Legacy `.inc` File Re-engineering & Accounting Architecture
+## 4. Legacy Custom PHP File, OOP Class & `.inc` Re-engineering Architecture
 
-The factory recursively analyzes `.inc` files within Drupal 7 custom modules and migrates the functionality they contain into appropriate Drupal 10 architecture.
+The factory recursively analyzes `.inc` files within Drupal 7 custom modules and recursively analyzes custom PHP files, OOP classes, constructors, interfaces, traits, and functions to migrate the functionality they contain into appropriate Drupal 10/11 architecture.
 
-- **Recursive Scanning & Zero Naming Assumptions**: Scans module roots and nested subdirectories discovering all `.inc` and `.php` files (e.g. `module.inc`, `admin.inc`, `includes/foo.inc`, `commands/*.inc`).
-- **Include / Require Graph Resolution**: Inspects `include`, `require`, `module_load_include()`, `form_load_include()`, `ctools_include()`, and `hook_menu()` `'file'` declarations. Marks unverified dynamic includes as `[UNVERIFIED RESULT]`.
-- **Fine-Grained Callable Dissection**: Extracts functions, classes, callbacks, form builders, access checkers, batch/queue workers, and Drush commands.
-- **18-Class Functional Taxonomy**: Classifies every functional piece into standard architectural roles.
-- **Non-1:1 Architectural Mapping**: `.inc` files are not copied blindly or mapped 1:1 to target files. Functionality is re-engineered into modern Symfony/Drupal OOP services, controllers, forms, plugins, and Drush command classes.
-- **Strict Zero-Omission Outcome Accounting**: Every `.inc` file and function must resolve to `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, or `UNVERIFIED`. The states `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, and `SILENTLY_OMITTED` are forbidden.
+- **Recursive Scanning & Zero Naming Assumptions**: Scans module roots and nested subdirectories discovering all `*.php`, `*.inc`, `*.module`, `*.install`, `*.profile`, and `*.drush.inc` files (e.g. `lib/Processor.php`, `admin.inc`, `includes/foo.inc`, `commands/*.inc`).
+- **Class, Interface, Trait & Constructor Discovery**: Extracts classes, interfaces, traits, abstract classes, constants, properties, and methods. Analyzes constructors (`__construct()` and legacy `ClassName()`), parameter dependencies, global state usage (`$user`, `$language`, `variable_get()`), and side effects.
+- **Autoloading & Include / Require Resolution**: Inspects `require`, `include`, `module_load_include()`, `.info` `files[]`, and custom autoloaders, replacing manual loading with Composer PSR-4 autoloading. Marks unverified dynamic includes/calls as `[UNVERIFIED RESULT]`.
+- **22-Class Architectural Taxonomy**: Classifies every functional unit into standard architectural roles (`SERVICE_BUSINESS_LOGIC`, `CONTROLLER`, `FORM`, `PLUGIN`, `EVENT_SUBSCRIBER`, `ACCESS_CHECKER`, etc.).
+- **Constructor Dependency Injection & Non-1:1 Mapping**: Refactors constructors to modern `__construct(...)` with injected services (`database`, `entity_type.manager`, `config.factory`, `current_user`) avoiding service proliferation. Supports 1-to-many class decomposition and many-to-one service consolidation.
+- **Strict Zero-Omission Outcome Accounting**: Every custom PHP file, class, constructor, method, and `.inc` file must resolve to `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, or `UNVERIFIED`. The states `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, and `SILENTLY_OMITTED` are strictly forbidden.
 
 ---
 

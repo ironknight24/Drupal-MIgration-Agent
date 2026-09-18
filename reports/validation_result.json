@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260918200141",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260918201853",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T20:01:41.310554+00:00",
+  "executed_at": "2026-09-18T20:18:53.661059+00:00",
   "summary": {
-    "checks_total": 104,
-    "passed": 103,
+    "checks_total": 112,
+    "passed": 111,
     "failed": 0,
     "warnings": 0,
     "unverified": 1
@@ -1211,6 +1211,115 @@
       "status": "PASS",
       "evidence": "README, ARCHITECTURE, and AGENT_PROTOCOL consistently document recursive .inc handling and accounting rules.",
       "details": "Verified public documentation and template consistency.",
+      "affected_files": [
+        "README.md",
+        "ARCHITECTURE.md",
+        "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CLS-01",
+      "category": "discovery",
+      "name": "Recursive PHP Source File & OOP Structure Discovery",
+      "status": "PASS",
+      "evidence": "Discovery agent and D7 analysis skill recursively discover custom PHP files and inspect OOP structures (classes, interfaces, traits, methods).",
+      "details": "Verified custom PHP and class discovery heuristics with manifest schema support.",
+      "affected_files": [
+        "agents/discovery/agent.md",
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CLS-02",
+      "category": "analysis",
+      "name": "Constructor Analysis & Legacy Constructor Recognition",
+      "status": "PASS",
+      "evidence": "Explicitly audits class constructors, recognizing modern __construct() and legacy ClassName() patterns with parameter/dependency extraction.",
+      "details": "Verified constructor analysis and legacy constructor detection.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CLS-03",
+      "category": "analysis",
+      "name": "Class Instantiation, Static Call & Caller Modeling",
+      "status": "PASS",
+      "evidence": "Traces object creation (new ClassName), static method calls, and cross-module consumers in discovery and dependency DAG.",
+      "details": "Verified class instantiation and caller modeling heuristics.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/dependency-analysis/SKILL.md",
+        "agents/dependency/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CLS-04",
+      "category": "architecture",
+      "name": "Autoloading vs PSR-4 Architecture Modernization",
+      "status": "PASS",
+      "evidence": "Analyzes D7 file loading (files[], include, require, autoloaders) and modernizes to Composer PSR-4 autoloading.",
+      "details": "Verified autoloading analysis and PSR-4 modernization rules.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CLS-05",
+      "category": "classification",
+      "name": "Standardized 22-Class Architectural Taxonomy",
+      "status": "PASS",
+      "evidence": "All 22 standardized architectural classifications are defined in D7 analysis heuristics and manifest schema.",
+      "details": "Verified comprehensive 22-class architectural taxonomy.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CLS-06",
+      "category": "architecture",
+      "name": "Constructor Dependency Injection & Non-1:1 Architecture Mapping",
+      "status": "PASS",
+      "evidence": "Custom module agent and mapping skill enforce constructor DI and non-1:1 transformations (1-to-many decomposition and many-to-one consolidation).",
+      "details": "Verified constructor DI refactoring and non-1:1 architectural mapping.",
+      "affected_files": [
+        "agents/custom-module/agent.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/custom-module-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CLS-07",
+      "category": "validation",
+      "name": "Zero-Omission Outcome Accounting & Forbidden State Enforcement",
+      "status": "PASS",
+      "evidence": "Validation agent enforces mandatory outcomes for all custom PHP files, classes, constructors, and methods while forbidding silent omissions.",
+      "details": "Verified strict zero-omission outcome validation for custom classes.",
+      "affected_files": [
+        "agents/validation/agent.md",
+        "skills/behavioral-validation/SKILL.md",
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CLS-08",
+      "category": "documentation",
+      "name": "Template & Documentation Consistency",
+      "status": "PASS",
+      "evidence": "README, ARCHITECTURE, and AGENT_PROTOCOL consistently document recursive custom PHP file and OOP class re-engineering architecture.",
+      "details": "Verified public documentation and template consistency for custom PHP classes.",
       "affected_files": [
         "README.md",
         "ARCHITECTURE.md",

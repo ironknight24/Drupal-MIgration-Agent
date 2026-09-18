@@ -21,6 +21,8 @@ evidence_summary:
 - **Source PHP Version Compatibility**: {{ PHP_VERSION }}
 - **Target Drupal Version**: {{ D10_VERSION }}
 - **Total Custom Modules**: {{ CUSTOM_MODULES_COUNT }}
+- **Total Discovered Custom PHP Files**: {{ PHP_FILES_COUNT }}
+- **Total Discovered Custom Classes**: {{ CLASSES_COUNT }}
 - **Total Discovered .inc Files**: {{ INC_FILES_COUNT }}
 - **Total Contributed Modules**: {{ CONTRIB_MODULES_COUNT }}
 - **Total Custom Themes**: {{ CUSTOM_THEMES_COUNT }}
@@ -39,20 +41,29 @@ evidence_summary:
 
 | Module Name | Path | Discovered Source Files (.module, .inc, .install, .php) | Lines of Code | Hooks Implemented | Custom Schema | Status |
 |---|---|---|---|---|---|---|
-| `example_module` | `modules/custom/example` | `example.module`, `includes/admin.inc`, `includes/helper.inc` | 420 | `hook_menu`, `hook_form_alter` | Yes | `not_started` |
+| `example_module` | `modules/custom/example` | `example.module`, `lib/ExampleProcessor.php`, `includes/admin.inc` | 420 | `hook_menu`, `hook_form_alter` | Yes | `not_started` |
 
 ---
 
-## 4. Legacy .inc File & Inclusion Graph Inventory
+## 4. Custom PHP Classes & Source Files Inventory
+
+| Module | Source File Path | Class / Interface / Trait Name | Constructor Type (`__construct` / `ClassName` / `none`) | Constructor Dependencies & Globals | Autoloading Mechanism (`files[]`, `include`, `custom`) | Architectural Classification | Target D10 Class / Service |
+|---|---|---|---|---|---|---|---|
+| `example_module` | `lib/ExampleProcessor.php` | `ExampleProcessor` | `ExampleProcessor($db)` | `$db`, `global $user` | `files[] = lib/ExampleProcessor.php` | `SERVICE_BUSINESS_LOGIC` | `src/Service/ExampleProcessor.php` |
+| `example_module` | `src/ExampleHelper.php` | `ExampleHelper` | `none` | None | `spl_autoload_register` | `UTILITY_HELPER` | `src/Utility/ExampleHelper.php` |
+
+---
+
+## 5. Legacy .inc File & Inclusion Graph Inventory
 
 | Module | Relative Path | Inclusion Mechanism (`include`, `module_load_include`, `hook_menu`) | Extracted Functions & Callables | Functional Classification | Drush Commands |
 |---|---|---|---|---|---|
-| `example_module` | `includes/admin.inc` | `module_load_include('inc', 'example_module', 'includes/admin')` | `example_admin_settings_form()`, `example_admin_validate()` | `FORM_HANDLER` | None |
+| `example_module` | `includes/admin.inc` | `module_load_include('inc', 'example_module', 'includes/admin')` | `example_admin_settings_form()`, `example_admin_validate()` | `FORM` | None |
 | `example_module` | `includes/drush.inc` | `hook_drush_command()` | `drush_example_sync()` | `DRUSH_COMMAND` | `example-sync` |
 
 ---
 
-## 5. Contributed Modules Inventory
+## 6. Contributed Modules Inventory
 
 | Contrib Module | D7 Version | Core in D10? | D10 Available? | Community Replacement | Action Plan |
 |---|---|---|---|---|---|
@@ -61,7 +72,7 @@ evidence_summary:
 
 ---
 
-## 6. Custom Themes Inventory
+## 7. Custom Themes Inventory
 
 | Theme Name | Path | Base Theme | Template Files (.tpl.php) | Preprocess Functions |
 |---|---|---|---|---|
@@ -69,7 +80,7 @@ evidence_summary:
 
 ---
 
-## 7. Entity & Data Architecture
+## 8. Entity & Data Architecture
 - **Content Types**:
 - **Taxonomy Vocabularies**:
 - **Custom SQL Tables**:
@@ -77,13 +88,13 @@ evidence_summary:
 
 ---
 
-## 8. Integrations, External Endpoints & Drush Commands
+## 9. Integrations, External Endpoints & Drush Commands
 - **Webhooks & APIs**:
 - **Authentication Protocols**:
 - **Custom Drush Commands**:
 
 ---
 
-## 9. Baseline Audit Findings & Risks
+## 10. Baseline Audit Findings & Risks
 - **Risk Assessment**:
 - **Recommended Sequence Overrides**:

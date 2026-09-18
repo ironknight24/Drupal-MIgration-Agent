@@ -1,7 +1,7 @@
 ---
 name: dependency-analysis
-description: Dependency Graph Solver & Wave Scheduling Playbook. Analyzes inter-module couplings, .inc function call trees, constructs migration DAGs, detects cycles, and generates dynamic execution waves.
-version: 1.1.0
+description: Dependency Graph Solver & Wave Scheduling Playbook. Analyzes inter-module couplings, custom PHP class instantiations, .inc function call trees, constructs migration DAGs, detects cycles, and generates dynamic execution waves.
+version: 1.2.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Dependency Analysis & Wave Scheduling Skill
 
 ## Overview
-This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, and legacy `.inc` function couplings across legacy Drupal 7 components. It constructs a Directed Acyclic Graph (DAG), detects circular dependencies, and organizes components into executable topological waves.
+This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, custom PHP class instantiations, and legacy `.inc` function couplings across legacy Drupal 7 components. It constructs a Directed Acyclic Graph (DAG), detects circular dependencies, and organizes components into executable topological waves.
 
 ---
 
@@ -28,13 +28,14 @@ To establish an accurate DAG, inspect source assets across 5 distinct coupling v
 - Parse `dependencies[]` declarations in source `.info` files (`[OBSERVED FACT]`).
 - Distinguish core module dependencies (`dependencies[] = taxonomy`) from contrib/custom dependencies.
 
-### 2. Implicit Hook & Function Couplings (Including `.inc` Call Trees)
-- Search for inter-module function calls and hook invocations across `.module` and `.inc` files:
+### 2. Implicit Hook, Function & Class Couplings
+- Search for inter-module function calls, class instantiations, and hook invocations across `.module`, `.php`, and `.inc` files:
   - `module_invoke('{target_module}', ...)`
   - `module_invoke_all('{hook}')`
   - `drupal_alter('{hook}', ...)`
   - Direct calls to functions defined in another custom module's `.inc` or `.module` files.
-  - Trace whether the called function represents a public service candidate or an internal private helper to avoid creating false dependency edges.
+  - Cross-module class instantiations (`new OtherModuleClass()`, `new \Namespace\OtherClass()`) and static calls (`OtherModuleClass::method()`).
+  - Trace whether the called function/class represents a public service candidate or an internal private helper to avoid creating false dependency edges.
 
 ### 3. Database & Schema Couplings
 - Inspect `hook_schema()` declarations in `.install` files:
@@ -64,7 +65,7 @@ To establish an accurate DAG, inspect source assets across 5 distinct coupling v
 
 ### Circular Dependency Resolution Strategy
 When a cycle is detected ($A \to B \to A$):
-1. **Analyze Interface Coupling**: Determine if the cycle is caused by an implicit hook alter or utility function in an `.inc` file.
+1. **Analyze Interface Coupling**: Determine if the cycle is caused by an implicit hook alter, utility function, or circular class instantiation.
 2. **Refactor / Extract Shared Service**: Propose extracting the shared functionality into a standalone Wave 0 utility service.
 3. **Escalate Blocker**: If the cycle cannot be decoupled without modifying source code, raise a `BLOCKED-DEP-CYCLIC-<MODULES>.md` ticket.
 

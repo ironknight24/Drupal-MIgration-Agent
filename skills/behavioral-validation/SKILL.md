@@ -1,7 +1,7 @@
 ---
 name: behavioral-validation
-description: 12-Dimensional Comparative Behavioral Validation Playbook with exhaustive .inc file outcome auditing. Audits side-by-side behavioral, structural, and data parity between D7 baseline and modern D10/D11 targets.
-version: 1.1.0
+description: 12-Dimensional Comparative Behavioral Validation Playbook with exhaustive custom PHP file, class, constructor, and .inc file outcome auditing.
+version: 1.2.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # 12-Dimensional Comparative Behavioral Validation Skill
 
 ## Overview
-This skill provides the operational audit methodology and evidence standards for conducting rigorous side-by-side behavioral comparisons between the Drupal 7 baseline and the migrated Drupal 10/11 implementation across 12 distinct functional dimensions, including exhaustive accounting and outcome verification for legacy `.inc` files and functions.
+This skill provides the operational audit methodology and evidence standards for conducting rigorous side-by-side behavioral comparisons between the Drupal 7 baseline and the migrated Drupal 10/11 implementation across 12 distinct functional dimensions, including exhaustive accounting and outcome verification for legacy custom PHP files, OOP classes, constructors, methods, and `.inc` files.
 
 ---
 
@@ -26,7 +26,7 @@ Every evaluated component must be audited across the following 12 dimensions:
 
 | # | Dimension | Audit Criteria | Empirical Proof Required |
 | :-: | :--- | :--- | :--- |
-| 1 | **Functionality** | Do core module features and UI actions produce equivalent outcomes? | Execution test output or automated assertion. |
+| 1 | **Functionality** | Do core module features, custom classes, and UI actions produce equivalent outcomes? | Execution test output or automated assertion. |
 | 2 | **Business Rules** | Are calculations, state transitions, constraints, and validation rules preserved? | Unit test result or verified calculation comparison. |
 | 3 | **Permissions & Access** | Are route requirements, entity access checks, and role permissions correctly enforced? | Access check log / automated kernel test asserting 403 vs 200. |
 | 4 | **Data Integrity** | Are record counts, UTF-8 character sets, and timestamps preserved without truncation? | Database count query output comparing D7 to D10. |
@@ -41,20 +41,20 @@ Every evaluated component must be audited across the following 12 dimensions:
 
 ---
 
-## Mandatory `.inc` File & Function Outcome Accounting
+## Mandatory Custom PHP File, Class & `.inc` Outcome Accounting
 
-In addition to the 12 functional dimensions, validate that every `.inc` file and function discovered in the D7 source has reached an approved, certified outcome:
+In addition to the 12 functional dimensions, validate that every custom PHP source file, class, interface, trait, constructor, method, and `.inc` file discovered in the D7 source has reached an approved, certified outcome:
 
 ### Approved Outcome States
-- **`MIGRATED`**: The function/behavior has been re-engineered into a target D10 class/service with verified tests.
-- **`REPLACED`**: The legacy behavior is superseded by a modern Drupal 10 core API or contrib module with documented mapping.
+- **`MIGRATED`**: The class/function/behavior has been re-engineered into a target D10 PSR-4 class/service with verified tests.
+- **`REPLACED`**: The legacy behavior is superseded by a modern Drupal 10 core API, contrib module, or service with documented mapping.
 - **`OBSOLETE`**: The functionality is dead code or deprecated API with documented evidence.
-- **`EXCLUDED_WITH_REASON`**: Explicitly excluded from migration scope with documented business rationale.
+- **`EXCLUDED_WITH_REASON`**: Explicitly excluded from migration scope with documented business/architectural rationale.
 - **`HUMAN_DECISION_REQUIRED`**: Unresolved business logic or ambiguity flagged for human decision in `reports/blocked/`.
 - **`UNVERIFIED`**: Dynamic behavior that cannot be statically verified, explicitly marked with `[UNVERIFIED RESULT]`.
 
 ### Forbidden States (Immediate Validation `FAIL`)
-- **`UNACCOUNTED`**: Any `.inc` file or callable function present in discovery but missing from the migration plan or report.
+- **`UNACCOUNTED`**: Any custom PHP file, class, constructor, method, or `.inc` file present in discovery but missing from the migration plan or report.
 - **`UNKNOWN_WITHOUT_REASON`**: Any excluded or omitted code lacking documented technical or business rationale.
 - **`SILENTLY_OMITTED`**: Any code dropped during refactoring without an explicit record.
 
@@ -64,8 +64,8 @@ In addition to the 12 functional dimensions, validate that every `.inc` file and
 
 Assign strictly one verdict per dimension:
 
-- **`PASS`**: Feature is fully equivalent to the D7 baseline and all `.inc` files are accounted for. **Mandatory**: Must cite an empirical terminal log, test result, or code diff.
+- **`PASS`**: Feature is fully equivalent to the D7 baseline and all custom PHP files and classes are accounted for. **Mandatory**: Must cite an empirical terminal log, test result, or code diff.
 - **`PARTIAL`**: Core behavior works, but minor non-blocking divergence is noted. **Mandatory**: Discrepancy must be documented with impact assessed as low.
-- **`FAIL`**: Functional divergence, data corruption, broken calculation, access vulnerability, or unaccounted `.inc` code detected. **Mandatory**: Detailed reproduction steps and failing output must be documented.
+- **`FAIL`**: Functional divergence, data corruption, broken calculation, access vulnerability, or unaccounted custom code detected. **Mandatory**: Detailed reproduction steps and failing output must be documented.
 - **`BLOCKED`**: An upstream missing dependency or environmental failure prevented verification. **Mandatory**: Upstream ticket reference must be cited.
 - **`N/A`**: Dimension does not apply to this specific component. **Mandatory**: Architectural rationale must be stated.

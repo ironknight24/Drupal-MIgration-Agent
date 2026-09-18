@@ -1,7 +1,7 @@
 ---
 name: testing
-description: Test Strategy & Automated Quality Assurance Playbook. Configures and validates PHPUnit test suites, PHPStan static analysis, PHPCS coding standards, and config schema validation.
-version: 1.0.0
+description: Test Strategy & Automated Quality Assurance Playbook. Configures and validates PHPUnit test suites, custom class autoloading, constructor DI verification, PHPStan static analysis, and PHPCS coding standards.
+version: 1.1.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,12 +10,30 @@ allowed-tools: Read, Grep, Find
 # Automated Testing & Quality Assurance Playbook Skill
 
 ## Overview
-This skill provides the procedural guidelines and runner configurations for establishing automated testing pipelines, static code analysis, and coding standards compliance across migrated Drupal 10 and Drupal 11 custom modules and themes.
+This skill provides the procedural guidelines and runner configurations for establishing automated testing pipelines, static code analysis, custom PHP class testing, and coding standards compliance across migrated Drupal 10 and Drupal 11 custom modules and themes.
 
 ---
 
 ## Technical References
 - [Drupal 10 Architecture Reference](../../references/drupal-10/architecture.md)
+
+---
+
+## Test Expectations for Migrated Custom PHP Classes & Services
+
+When testing modernized custom OOP classes and services, configure tests appropriate to their architectural responsibility:
+1. **Class Autoloading & Container Construction**:
+   - Verify class is discoverable via Composer PSR-4 without manual includes.
+   - Verify service builds from `<module>.services.yml` container definition without container exceptions.
+2. **Constructor & Dependency Injection Validation**:
+   - Test constructor parameter handling, type assertions, and default values.
+   - Assert all required services are properly injected rather than accessed statically.
+3. **Public API & Business Logic Parity**:
+   - Author PHPUnit Unit tests targeting domain calculations, validation algorithms, and state transitions.
+4. **Integration & Storage Operations**:
+   - Author PHPUnit Kernel tests targeting entity CRUD, dynamic SQL queries, and configuration schema adherence.
+5. **Error Handling & Edge Cases**:
+   - Assert exception throwing on invalid inputs, missing dependencies, or failed external requests.
 
 ---
 

@@ -20,6 +20,7 @@ evidence_summary:
 - **Overall Verdict**: `{{ OVERALL_VERDICT }}`
 - **Automated Tests Executed**: {{ TESTS_COUNT }}
 - **Manual Verification Checks**: {{ CHECKS_COUNT }}
+- **Custom PHP Classes Accounted For**: {{ CLASSES_ACCOUNTED_COUNT }} / {{ CLASSES_TOTAL_COUNT }}
 - **Legacy .inc Files Accounted For**: {{ INC_ACCOUNTED_COUNT }} / {{ INC_TOTAL_COUNT }}
 
 ---
@@ -43,14 +44,15 @@ evidence_summary:
 
 ---
 
-## 3. Legacy .inc File & Callable Outcome Verification
+## 3. Custom PHP Class, Constructor & Callable Outcome Verification
 
-| D7 Source File | Function / Callable | D10 Target Implementation | Final Outcome Status | Verification Evidence / Reason |
-|---|---|---|---|---|
-| `includes/admin.inc` | `{{ COMPONENT }}_admin_settings()` | `src/Form/SettingsForm.php` | `MIGRATED` | Form submission unit test passed |
-| `includes/helper.inc` | `{{ COMPONENT }}_calc()` | `src/Service/CalcService.php` | `MIGRATED` | Kernel test verified math parity |
-| `includes/drush.inc` | `drush_{{ COMPONENT }}_sync()` | `src/Drush/Commands/SyncCommands.php` | `MIGRATED` | CLI execution verified |
-| `includes/legacy.inc` | `{{ COMPONENT }}_d6_compat()` | N/A | `OBSOLETE` | Deprecated D6 compatibility shim |
+| D7 Source File | Class / Method / Function | Legacy Constructor / Dependencies | D10 Target Implementation | Final Outcome Status | Verification Evidence / Reason |
+|---|---|---|---|---|---|
+| `lib/ExampleProcessor.php` | `class ExampleProcessor` | `ExampleProcessor($db)` | `src/Service/ExampleProcessor.php` | `MIGRATED` | Service construction & Unit test passed |
+| `includes/admin.inc` | `{{ COMPONENT }}_admin_settings()` | N/A | `src/Form/SettingsForm.php` | `MIGRATED` | Form submission unit test passed |
+| `includes/helper.inc` | `{{ COMPONENT }}_calc()` | N/A | `src/Service/CalcService.php` | `MIGRATED` | Kernel test verified math parity |
+| `includes/drush.inc` | `drush_{{ COMPONENT }}_sync()` | N/A | `src/Drush/Commands/SyncCommands.php` | `MIGRATED` | CLI execution verified |
+| `lib/LegacyCompat.php` | `class LegacyCompat` | `none` | N/A | `OBSOLETE` | Deprecated D6 compatibility shim |
 
 ---
 

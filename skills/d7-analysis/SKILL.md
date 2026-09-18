@@ -1,7 +1,7 @@
 ---
 name: d7-analysis
-description: Procedural inspection heuristics for Drupal 7 modules, hooks, database schemas, legacy .inc files, and variables without mutating source files. Use when analyzing legacy Drupal 7 codebases.
-version: 1.1.0
+description: Procedural and object-oriented inspection heuristics for Drupal 7 modules, PHP classes, constructors, interfaces, traits, legacy .inc files, database schemas, and variables without mutating source files.
+version: 1.2.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Drupal 7 Codebase Analysis Skill
 
 ## Overview
-This skill provides structured, non-destructive heuristics for inspecting Drupal 7 codebases, modules, themes, and database schemas. It explicitly discovers, dissects, and accounts for all source files—with exhaustive treatment of legacy `.inc` files—extracting business logic, callbacks, hook implementations, Drush commands, and dependencies to prepare for modern Drupal 10/11 re-engineering.
+This skill provides structured, non-destructive heuristics for inspecting Drupal 7 codebases, custom modules, PHP classes, interfaces, traits, legacy `.inc` files, themes, and database schemas. It explicitly discovers, dissects, and accounts for all custom PHP source files and OOP classes—analyzing constructors, dependencies, caller trees, autoloading mechanisms, and legacy APIs to prepare for modern Drupal 10/11 PSR-4 re-engineering.
 
 ---
 
@@ -18,65 +18,79 @@ This skill provides structured, non-destructive heuristics for inspecting Drupal
 For deep technical catalogs, consult:
 - [Drupal 7 Core APIs Reference](../../references/drupal-7/apis.md)
 - [Drupal 7 Hooks to Modern Architecture Catalog](../../references/drupal-7/hooks.md)
+- [Drupal 10 & 11 Architecture Reference](../../references/drupal-10/architecture.md)
 
 ---
 
 ## Analysis Workflow & Heuristics
 
 ### 1. Recursive Source File Discovery & Inventory
-For every custom module in scope, recursively discover all source files regardless of directory nesting:
-- **Target File Extensions**: `*.module`, `*.inc`, `*.install`, `*.info`, `*.php`, `*.drush.inc`, `*.admin.inc`, `*.pages.inc`, `*.forms.inc`.
-- **Zero Naming Assumptions**: Never assume `.inc` files follow fixed naming conventions. Discover files at the module root, in `includes/`, `admin/`, `forms/`, `pages/`, `plugins/`, `handlers/`, `commands/`, or arbitrary subdirectories (e.g., `module.inc`, `admin.inc`, `pages.inc`, `forms.inc`, `functions.inc`, `includes/foo.inc`, `includes/bar.inc`, `custom-command.inc`, `arbitrary-name.inc`).
-- **Discovery Output**: Record relative path, file type, line count, and byte size in the module file manifest.
+For every custom module in scope, recursively discover all PHP source files regardless of directory nesting:
+- **Target File Extensions**: `*.php`, `*.inc`, `*.module`, `*.install`, `*.profile`, `*.drush.inc`, `*.admin.inc`, `*.pages.inc`, `*.forms.inc`.
+- **Zero Naming Assumptions**: Never assume PHP or `.inc` files follow fixed naming conventions (`filename != architecture`). Discover files at the module root, in `includes/`, `lib/`, `classes/`, `src/`, `admin/`, `commands/`, or arbitrary subdirectories (e.g., `module.inc`, `admin.inc`, `pages.inc`, `forms.inc`, `functions.inc`, `includes/foo.inc`, `includes/bar.inc`, `custom-command.inc`, `arbitrary-name.inc`, `MyProcessor.php`, `LegacyClass.php`, `arbitrary-name.php`).
+- **Discovery Output**: Record relative path, file type, line count, byte size, and detected constructs in the manifest.
 
-### 2. Include / Require & Relationship Graph Analysis
-Trace how every discovered `.inc` and `.php` file is included, loaded, or referenced:
-- **Include Mechanisms to Detect**:
+### 2. Custom OOP PHP Class Discovery
+For every discovered PHP source file, inspect and extract all OOP structures:
+- **Structures Identified**:
+  - Concrete classes, abstract classes, interfaces, traits, and anonymous classes.
+  - Namespaces (if present in D7/PSR-0 code) and aliases (`use` statements).
+  - Class inheritance (`extends ParentClass`) and interface implementations (`implements InterfaceA, InterfaceB`).
+  - Trait usage (`use TraitName;`).
+  - Class constants (`const CONST_NAME = ...;`).
+  - Class properties: visibility (`public`, `protected`, `private`), typehints (if modern PHP), default values, static properties (`static $property`).
+  - Methods: visibility (`public`, `protected`, `private`), static methods (`public static function ...`), abstract methods, final methods, return types.
+  - Destructors (`__destruct()`) and magic methods (`__get`, `__set`, `__call`, `__toString`).
+- **Unverified Constructs**: If complex dynamic code generation or `eval()` prevents static AST resolution, mark as `[UNVERIFIED RESULT]`.
+
+### 3. Constructor & Initialization Analysis
+Explicitly analyze every class constructor:
+- **Constructor Types Recognized**:
+  - Modern PHP constructor: `public function __construct(...)` or `__construct()`.
+  - Legacy PHP4 / Drupal 7 constructor pattern: `public function ClassName(...)` or `ClassName()` matching the enclosing class name.
+  - Static factory initialization: `public static function create(...)` or `public static function getInstance(...)`.
+- **Constructor Inspection Matrix**:
+  - Constructor parameters, parameter typehints, and default values.
+  - Instantiations inside constructor (`new ExternalHelper()`).
+  - Global variable references (`global $user, $language, $conf;`, `$GLOBALS['...']`).
+  - Procedural Drupal 7 API calls (`variable_get()`, `db_query()`, `drupal_set_message()`, `module_load_include()`).
+  - Direct database / storage calls, configuration access, current user access, and entity loads.
+  - External network / filesystem calls (`drupal_http_request()`, `file_get_contents()`).
+  - Side effects executed during construction.
+- **Architectural Constructor Role**:
+  - Classify initialization role: *Dependency Injection candidate*, *Service Locator pattern*, *Global State Dependency*, *Hidden Dependency*, *Configuration Dependency*, *Runtime Side Effect*, or *Legacy Procedural Wrapper*.
+
+### 4. Class Instantiation & Caller Analysis
+Identify where custom classes and functions are instantiated and consumed:
+- **Search Patterns**:
+  - Object creation: `new ClassName(...)`, `new ClassName()`, `new \Namespace\ClassName(...)`.
+  - Static method calls: `ClassName::staticMethod(...)`.
+  - Static property access: `ClassName::$staticProp`.
+  - Polymorphic / dynamic creation: `new $class_var(...)` (flagged as `[UNVERIFIED RESULT]`).
+  - Callbacks: `[$object, 'methodName']`, `['ClassName', 'staticMethod']`.
+  - Cross-module consumers across all in-scope custom modules.
+
+### 5. Autoloading & Include / Require Analysis
+Analyze how each custom PHP file and class becomes available in the D7 runtime:
+- **Loading Mechanisms Detected**:
   - Direct PHP includes: `include`, `include_once`, `require`, `require_once`.
-  - Drupal module include helpers: `module_load_include('inc', '{module}', '{name}')`, `module_load_include('php', ...)`.
+  - Drupal info autoloading: `files[] = lib/MyClass.php` in `{module}.info`.
+  - Drupal include helpers: `module_load_include('inc', '{module}', '{name}')`, `module_load_include('php', ...)`.
   - Form state includes: `form_load_include($form_state, 'inc', '{module}', '{name}')`.
-  - CTools/Plugin include helpers: `ctools_include(...)`, `ctools_plugin_load_includes(...)`.
-  - Menu routing declarations: `hook_menu()` items with `'file' => '...'` and optional `'file path' => '...'`.
-  - Info file autoloading: `files[] = ...` in `{module}.info`.
-- **Graph Construction**: Map direct and transitive inclusion chains (e.g., `module.module` $\rightarrow$ `includes/admin.inc` $\rightarrow$ `includes/helper.inc`).
-- **Unverified Inclusions**: If an include target uses dynamic/computed string expressions that cannot be resolved statically, flag the link as `[UNVERIFIED RESULT]` with the source location.
+  - CTools / Plugin loading: `ctools_include(...)`, `ctools_plugin_load_includes(...)`.
+  - Custom registry / SPL autoloaders (`spl_autoload_register(...)`).
+  - Menu routing declarations: `hook_menu()` items with `'file' => '...'`.
+- **Modernization Target**: Do NOT preserve manual include calls in D10/D11; migrate classes to PSR-4 (`src/`) with Composer/Drupal autoloading.
 
-### 3. Callable & Functional Dissection (Content Analysis)
-Analyze the actual code contents inside each `.inc` and `.module` file. Dissect every item into discrete functional units:
-- **Identified Constructs**:
-  - Procedural functions, OOP classes, interfaces, traits, and constants (`define()`, `const`).
-  - Menu / Router callbacks (`page callback`, `access callback`, `delivery callback`).
-  - Form builders, validation handlers (`_validate`), and submission handlers (`_submit`).
-  - AJAX callbacks (`'#ajax' => ['callback' => '...']`).
-  - Batch operation callbacks and finished handlers (`'operations' => [...]`, `'finished' => '...'`).
-  - Queue worker worker callbacks (`hook_cron_queue_info()`).
-  - Cron workers and scheduled tasks.
-  - Drush commands (`hook_drush_command()`, `drush_{command}()`).
-  - Entity/Field CRUD hooks and callbacks.
-  - Theme preprocess, process, and theme engine functions (`template_preprocess_...`, `theme_...`).
-  - Database access routines (`db_query`, `db_select`, `db_insert`, `db_update`, `db_delete`).
-  - Configuration/Variable operations (`variable_get`, `variable_set`, `variable_del`).
-  - External HTTP/API clients (`drupal_http_request`, cURL, Guzzle wrappers).
-  - Business logic, validation rules, and permission checks.
-  - Procedural helper / utility algorithms.
-
-### 4. Caller & Reference Analysis
-For every function and class identified in an `.inc` file:
-- Trace references from the owning `.module` file.
-- Trace references from other `.inc` files in the same module.
-- Trace references from other custom modules across the codebase.
-- Trace references from contributed/core modules where applicable.
-- Determine if the function is a callback, a public API consumed by other modules, or an internal private helper.
-
-### 5. Standardized 18-Class Functional Taxonomy
-Classify every piece of `.inc` functionality into exactly one of the standardized functional categories:
-1. `CONTROLLER_PAGE`: Page routing, rendering callbacks, REST/JSON output endpoints.
-2. `FORM_HANDLER`: Form definition, validation, submission, and AJAX handling.
+### 6. Standardized Architectural Taxonomy
+Classify every custom PHP class, interface, trait, and standalone function into exactly one of the standardized architectural categories:
+1. `CONTROLLER_PAGE` / `CONTROLLER`: Page routing, rendering callbacks, REST/JSON output endpoints.
+2. `FORM_HANDLER` / `FORM`: Form definition, validation, submission, and AJAX handling.
 3. `SERVICE_BUSINESS_LOGIC`: Reusable business logic, calculations, domain workflows.
-4. `PLUGIN_CANDIDATE`: Block, field formatter, field widget, views handler, or CTools plugin behavior.
+4. `PLUGIN_CANDIDATE` / `PLUGIN`: Block, field formatter, field widget, views handler, or CTools plugin behavior.
 5. `EVENT_SUBSCRIBER`: Lifecycle hooks, state change reactions, event-driven triggers.
 6. `ACCESS_CHECKER`: Custom permission checks, route access callbacks, entity access logic.
-7. `ENTITY_FIELD_LOGIC`: Entity operations, bundle definitions, custom field storage/formatting.
+7. `ENTITY_FIELD_LOGIC` / `ENTITY_LOGIC` / `FIELD_LOGIC`: Entity operations, bundle definitions, custom field storage/formatting.
 8. `QUEUE_WORKER`: Asynchronous job processors, queue processing logic.
 9. `BATCH_PROCESSOR`: Step-by-step batch operations and completion callbacks.
 10. `CRON_HANDLER`: Scheduled recurring tasks, periodic maintenance jobs.
@@ -84,29 +98,32 @@ Classify every piece of `.inc` functionality into exactly one of the standardize
 12. `CONFIGURATION_HANDLER`: Settings forms, configuration read/write schemas.
 13. `THEME_RENDERER`: Twig/theme preprocessors, render array builders, template logic.
 14. `UTILITY_HELPER`: Generic string, array, date, or math manipulation helpers.
-15. `DATABASE_DATA_ACCESS`: Direct SQL queries, custom schema definitions, complex joins.
+15. `DATABASE_DATA_ACCESS` / `DATA_ACCESS`: Direct SQL queries, custom schema definitions, complex joins.
 16. `INTEGRATION_CLIENT`: External web services, REST/SOAP/GraphQL clients, webhook receivers.
-17. `TEST_SUPPORT`: SimpleTest cases, mock fixtures, test helpers.
-18. `LEGACY_OBSOLETE`: Dead code, deprecated D6-era wrappers, obsolete workarounds.
+17. `VALUE_OBJECT`: Immutable data structures, DTOs, typed parameter bags.
+18. `DOMAIN_OBJECT`: Domain entities, models, state machine objects.
+19. `TEST_SUPPORT`: SimpleTest cases, mock fixtures, test helpers.
+20. `LIBRARY_EXTERNAL_DEPENDENCY`: Bundled third-party libraries, vendor SDK shims.
+21. `LEGACY_OBSOLETE`: Dead code, deprecated D6-era wrappers, obsolete workarounds.
+22. `HUMAN_DECISION_REQUIRED` / `UNVERIFIED`: Ambiguous intent, unresolved dynamic behavior, or unverified results.
 
-### 6. Legacy D7 API Pattern Detection
-Detect legacy patterns requiring architectural modernization:
-- **Global State**: `$GLOBALS['user']`, `global $user, $conf;`, `$_GET`, `$_POST`, `$_SESSION`.
-- **Variables**: `variable_get()`, `variable_set()`, `variable_del()`.
-- **Database**: Direct SQL `db_query()`, deprecated procedural helpers.
-- **Messages & Output**: `drupal_set_message()`, `drupal_goto()`, `drupal_add_js()`, `drupal_add_css()`.
-- **File System**: `file_load()`, `file_save()`, `file_unmanaged_copy()`, `drupal_realpath()`.
+### 7. Non-1:1 Architectural Re-engineering & Dependency Injection
+- **Non-1:1 Transformations**:
+  - *One-to-Many*: A single legacy PHP file containing mixed duties (e.g. data processing, form building, page rendering) must be decomposed into distinct PSR-4 classes (e.g., `src/Service/DataProcessor.php`, `src/Form/SettingsForm.php`, `src/Controller/ViewController.php`).
+  - *Many-to-One*: Multiple related procedural helper files or procedural shims can be consolidated into a cohesive modern service.
+- **Dependency Injection Modernization**:
+  - Extract global references (`$user`, `$language`, `variable_get()`, `db_query()`) and convert to constructor DI (`EntityTypeManagerInterface`, `Connection`, `ConfigFactoryInterface`, `AccountProxyInterface`).
+  - Avoid service proliferation; only inject dependencies genuinely utilized by the modernized class.
 
-### 7. Drush Command Recognition & Cataloging
-Explicitly inspect all files (`*.drush.inc`, `includes/*.inc`, etc.) for CLI commands:
-- Extract command name, description, arguments, options, aliases, and examples.
-- Map business logic invoked by the command.
-- Classify survival requirement: `REQUIRED`, `REPLACED` (core Drush provides equivalent), `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+### 8. Approved Outcome States vs Forbidden Silent States
+Every custom PHP file, class, interface, trait, function, and constructor must reach an explicit outcome:
+- **Approved Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Forbidden Silent States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`. (Any presence of forbidden states triggers a fatal validation failure).
 
 ---
 
 ## Output Reporting Standard
 All discovery outputs must:
-1. Provide verifiable file paths and line number ranges (`[OBSERVED FACT]`).
-2. Maintain explicit file-to-functionality accounting tables in discovery artifacts.
-3. Flag any dynamic or unresolvable include / callback as `[UNVERIFIED RESULT]`.
+1. Provide verifiable file paths, class names, method signatures, and line numbers (`[OBSERVED FACT]`).
+2. Populate `custom_php_files` and `inc_files` in `state/migration-manifest.yml`.
+3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation as `[UNVERIFIED RESULT]`.

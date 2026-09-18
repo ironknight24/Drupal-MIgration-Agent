@@ -15,13 +15,14 @@ model: inherit
 - **Model**: Inherits from host environment / orchestration context
 
 ## 2. Purpose
-Identifies legacy Drupal 7 procedural functions, global variable accesses (`$GLOBALS`, `global $user`), static database queries (`db_query`, `db_select`), and procedural APIs. Modernizes them into clean, testable, object-oriented Symfony and Drupal 10/11 services, plugins, and event subscribers. Strictly enforces **Dependency Injection (DI) first** architecture and prohibits blind conversion to static `\Drupal::*` calls.
+Identifies legacy Drupal 7 procedural functions, legacy custom PHP classes, legacy constructors (`ClassName()`), global variable accesses (`$GLOBALS`, `global $user`), static database queries (`db_query`, `db_select`), and procedural APIs. Modernizes them into clean, testable, object-oriented Symfony and Drupal 10/11 services, plugins, and event subscribers under scoped delegation from `custom-module`. Strictly enforces **Dependency Injection (DI) first** architecture and prohibits blind conversion to static `\Drupal::*` calls.
 
 ## 3. Allowed Scope
-- Refactoring procedural D7 logic into OOP service classes, interfaces, and traits under `<target_module_dir>/<module>/src/`.
+- Refactoring procedural D7 logic and legacy custom PHP classes into OOP service classes, interfaces, and traits under `<target_module_dir>/<module>/src/`.
+- Modernizing constructors: refactoring legacy `ClassName()` and `__construct()` methods to constructor injection.
 - Implementing constructor injection and `ContainerInjectionInterface` / `create(ContainerInterface $container)` factories.
 - Modernizing legacy database operations into injected `\Drupal\Core\Database\Connection` services and dynamic queries.
-- Transforming legacy procedural hooks into Symfony Event Subscribers or modern Plugin instances where appropriate.
+- Transforming legacy procedural hooks and classes into Symfony Event Subscribers or modern Plugin instances where appropriate.
 - Authoring service definitions in `<target_module_dir>/<module>/<module>.services.yml`.
 - Documenting all refactoring decisions, DI graphs, and retained static calls in `reports/api-modernization/`.
 

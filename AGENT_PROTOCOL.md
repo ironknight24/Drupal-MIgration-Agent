@@ -130,19 +130,20 @@ Before committing any proposed state transition to `state/migration-state.yml`, 
 8. **Evidence Citation**: `evidence` cites empirical facts (`[OBSERVED FACT]`, `[VERIFIED RESULT]`, test logs).
 9. **Blocker Classification**: If `execution_status` is `BLOCKED` or `STOPPED`, blocker record exists with valid `remediation_stage`.
 10. **Target Version Consistency**: Modern code patterns conform to configured `target.core_version`.
-11. **`.inc` File Accounting Integrity**: For custom module components, all `.inc` files and callables cataloged in discovery must have an explicit outcome status (`MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`) with zero unaccounted or silently omitted functionality.
+11. **Custom PHP File, Class & `.inc` Accounting Integrity**: For custom module components, all custom PHP source files, OOP classes, interfaces, traits, constructors, methods, and `.inc` files cataloged in discovery must have an explicit outcome status (`MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`) with zero unaccounted or silently omitted functionality.
 
 *On Validation Failure*: The Orchestrator rejects the result, generates an `EVIDENCE_GAP` or `STATE_INCONSISTENCY` blocker, and does NOT commit the proposed state change.
 
 ---
 
-## 5. Legacy `.inc` File Re-engineering & Accounting Architecture
+## 5. Legacy Custom PHP File, OOP Class & `.inc` Re-engineering Architecture
 
-The factory recursively analyzes `.inc` files within Drupal 7 custom modules and migrates the functionality they contain into appropriate Drupal 10 architecture.
+The factory recursively analyzes `.inc` files within Drupal 7 custom modules and recursively analyzes custom PHP files, OOP classes, constructors, interfaces, traits, and functions to migrate the functionality they contain into appropriate Drupal 10/11 architecture.
 
-- **Discovery & Include Graph**: Discovery recursively inventories all `.inc` files without naming assumptions and builds inclusion trees.
-- **Non-1:1 Mapping**: Functionality is analyzed per callable unit and mapped to modern D10 controllers, form classes, services, plugins, or Drush commands rather than blind file copying.
-- **Zero Omission**: Every `.inc` function must be accounted for with verified outcomes before validation sign-off.
+- **Discovery & Class Analysis**: Discovery recursively inventories all `*.php`, `*.inc`, and `*.module` files, extracting classes, interfaces, traits, and constructors (`__construct()` and legacy `ClassName()`).
+- **Include & Autoloading Graphs**: Analyzes loading mechanisms (`files[]`, `include`/`require`, custom autoloaders) and converts them to standard PSR-4 autoloading.
+- **Non-1:1 Mapping & Constructor DI**: Functionality is analyzed per class/method/callable and mapped to modern PSR-4 services, controllers, form classes, plugins, or Drush commands with constructor Dependency Injection.
+- **Zero Omission**: Every custom PHP file, class, constructor, method, and `.inc` file must be accounted for with verified outcomes before validation sign-off.
 
 ---
 

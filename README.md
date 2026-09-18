@@ -17,20 +17,21 @@ This repository serves as a **distributable Claude Code plugin package** that de
 
 ---
 
-## Legacy `.inc` File Re-engineering & Accounting Architecture
+## Legacy Custom PHP File, OOP Class & `.inc` Re-engineering Architecture
 
-The factory recursively analyzes `.inc` files within Drupal 7 custom modules and migrates the functionality they contain into appropriate Drupal 10 architecture.
+The factory recursively analyzes `.inc` files within Drupal 7 custom modules and recursively analyzes custom PHP files, OOP classes, constructors, interfaces, traits, and functions to migrate the functionality they contain into appropriate Drupal 10/11 architecture.
 
-- **Recursive Discovery Without Naming Assumptions**: Scans all custom module roots and nested subdirectories (`includes/`, `admin/`, `forms/`, `pages/`, `commands/`, etc.) discovering all `.inc` and `.php` files regardless of naming patterns (`module.inc`, `admin.inc`, `pages.inc`, `forms.inc`, `functions.inc`, `includes/foo.inc`, `includes/bar.inc`, `custom-command.inc`, `arbitrary-name.inc`).
-- **Include & Require Dependency Graphs**: Inspects direct and transitive inclusion mechanisms (`include`, `include_once`, `require`, `require_once`, `module_load_include()`, `form_load_include()`, `ctools_include()`, `hook_menu()` `'file'` declarations, and `.info` `files[]` entries). Dynamic or unresolved inclusion expressions are explicitly flagged as `[UNVERIFIED RESULT]`.
-- **Callable & Functional Dissection**: Analyzes the actual code inside each `.inc` file—functions, classes, callbacks, hooks, form builders, access checkers, batch operations, queue workers, cron handlers, theme preprocessors, and Drush commands.
-- **Caller & Reference Analysis**: Traces callers across the owning module and other custom modules to inform architectural target selection.
-- **18-Class Functional Taxonomy**: Classifies every functional piece into standard categories (`CONTROLLER_PAGE`, `FORM_HANDLER`, `SERVICE_BUSINESS_LOGIC`, `PLUGIN_CANDIDATE`, `EVENT_SUBSCRIBER`, `ACCESS_CHECKER`, `ENTITY_FIELD_LOGIC`, `QUEUE_WORKER`, `BATCH_PROCESSOR`, `CRON_HANDLER`, `DRUSH_COMMAND`, `CONFIGURATION_HANDLER`, `THEME_RENDERER`, `UTILITY_HELPER`, `DATABASE_DATA_ACCESS`, `INTEGRATION_CLIENT`, `TEST_SUPPORT`, `LEGACY_OBSOLETE`).
-- **Non-1:1 Architectural Re-engineering**:
-  - `.inc` files are not copied blindly.
-  - `.inc` files are not necessarily migrated one-to-one into single D10 files. One `.inc` file may produce multiple D10 classes/services (e.g., page callback $\rightarrow$ Controller, form callback $\rightarrow$ Form class, business logic $\rightarrow$ Service), and multiple `.inc` files may merge into one modern service.
-- **Drush Command Modernization**: Discovered Drush commands in `.inc` files are cataloged and re-engineered into modern Drush 12+ command classes and services (`drush.services.yml`).
-- **Zero-Omission Accounting**: Every `.inc` file and function must end in an approved state: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, or `UNVERIFIED`. The states `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, and `SILENTLY_OMITTED` are strictly forbidden and trigger validation failure.
+- **Recursive Discovery Without Naming Assumptions**: Scans all custom module roots and nested subdirectories (`includes/`, `lib/`, `classes/`, `src/`, `admin/`, `forms/`, `pages/`, `commands/`, etc.) discovering all `*.php`, `*.inc`, `*.module`, `*.install`, `*.profile`, and `*.drush.inc` files.
+- **Custom OOP PHP Class & Constructor Discovery**: Extracts classes, abstract classes, interfaces, traits, parent classes, used traits, constants, properties, and methods. Analyzes constructors (modern `__construct()` and legacy PHP4/D7 `ClassName()` constructors), parameter dependencies, global state usage (`$user`, `$language`, `variable_get()`), direct SQL queries, and side effects.
+- **Include, Require & Autoloading Analysis**: Analyzes how custom classes become available in D7 (direct `require`, `module_load_include()`, `.info` `files[]`, custom autoloaders) and modernizes them into PSR-4 compliant autoloading without preserving legacy manual includes.
+- **Caller & Reference Analysis**: Traces callers, class instantiations (`new ClassName()`), and static method calls across the owning module and other custom modules.
+- **22-Class Architectural Taxonomy**: Classifies every functional piece into standard categories (`SERVICE_BUSINESS_LOGIC`, `CONTROLLER`, `FORM`, `PLUGIN`, `EVENT_SUBSCRIBER`, `ACCESS_CHECKER`, `ENTITY_LOGIC`, `FIELD_LOGIC`, `QUEUE_WORKER`, `BATCH_PROCESSOR`, `CRON_HANDLER`, `DRUSH_COMMAND`, `CONFIGURATION_HANDLER`, `INTEGRATION_CLIENT`, `DATA_ACCESS`, `VALUE_OBJECT`, `DOMAIN_OBJECT`, `UTILITY_HELPER`, `TEST_SUPPORT`, `LIBRARY_EXTERNAL_DEPENDENCY`, `LEGACY_OBSOLETE`, `HUMAN_DECISION_REQUIRED` / `UNVERIFIED`).
+- **Constructor Dependency Injection Modernization**: Refactors legacy constructors to modern `__construct(...)` with explicit typehints and constructor-injected services (`database`, `entity_type.manager`, `config.factory`, `current_user`) avoiding service proliferation.
+- **Non-1:1 Architectural Re-engineering (1-to-Many & Many-to-One)**:
+  - Custom PHP files and `.inc` files are not copied blindly.
+  - One legacy PHP file may produce multiple modern PSR-4 classes (e.g. `src/Service/`, `src/Form/`, `src/Controller/`), and multiple legacy files may merge into one modern service.
+- **Drush Command Modernization**: Discovered Drush commands in `.inc` and `.php` files are cataloged and re-engineered into modern Drush 12+ command classes and services (`drush.services.yml`).
+- **Zero-Omission Accounting**: Every custom PHP file, class, constructor, method, and `.inc` file must end in an approved state: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, or `UNVERIFIED`. The states `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, and `SILENTLY_OMITTED` are strictly forbidden and trigger validation failure.
 - **Human Decision Gates & Verifiable Boundaries**: Where business intent or dynamic behavior cannot be established statically, human decisions are required (`reports/blocked/`) rather than making assumptions.
 
 ---

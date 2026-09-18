@@ -15,15 +15,15 @@ model: inherit
 ---
 
 ## 2. Purpose
-Analyzes inter-module couplings, core requirements, contributed module dependencies, database schema couplings, legacy `.inc` file call trees, and implicit procedural relationships across all discovered assets. Constructs the Directed Acyclic Graph (DAG), calculates topological in-degrees, and authors the canonical dependency report.
+Analyzes inter-module couplings, core requirements, contributed module dependencies, database schema couplings, legacy custom PHP class instantiations, `.inc` file call trees, and implicit procedural relationships across all discovered assets. Constructs the Directed Acyclic Graph (DAG), calculates topological in-degrees, and authors the canonical dependency report.
 
 ---
 
 ## 3. Allowed Scope
 - Analyzing declared dependencies in `.info` files (`dependencies[]`).
-- Analyzing implicit code couplings across `.module` and `.inc` files (`module_invoke`, `module_exists`, `drupal_alter`, direct cross-module `.inc` function calls).
+- Analyzing implicit code couplings across `.module`, `.php`, and `.inc` files (`module_invoke`, `module_exists`, `drupal_alter`, direct cross-module `.inc` function calls, cross-module class instantiations `new ClassName()`, static method calls).
 - Analyzing database schema couplings (foreign keys, shared tables).
-- Constructing the project dependency DAG and detecting cycles across all module assets (including `.inc` inclusion trees).
+- Constructing the project dependency DAG and detecting cycles across all module assets (including `.inc` inclusion trees and class dependencies).
 - Calculating topological in-degrees and authoring the canonical dependency report in `reports/dependencies/`.
 - Classifying dependency evidence strictly (`[OBSERVED FACT]` for declared vs `[INFERENCE]` for dynamic hook/include calls).
 

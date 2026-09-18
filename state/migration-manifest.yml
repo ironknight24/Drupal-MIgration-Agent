@@ -27,22 +27,55 @@ target_system:
 #   target_path: "web/modules/custom/my_module"
 #   d7_entry_file: "my_module.module"
 #   declared_dependencies: [] # from .info
-#   implicit_dependencies: [] # hook alters, shared tables, .inc cross-calls
+#   implicit_dependencies: [] # hook alters, shared tables, .inc cross-calls, class instantiations
 #   target_strategy: "OOP_REENGINEERING" # OOP_REENGINEERING | CUSTOM_ENTITY | EXTRACT_SERVICE
 #   requires_custom_schema: false
-#   # Comprehensive .inc Source File & Functionality Accounting
+#   # Comprehensive Source Files & .inc Accounting
 #   inc_files:
 #     - path: "includes/my_module.admin.inc"
 #       include_type: "MODULE_LOAD_INCLUDE" # DIRECT_REQUIRE | MODULE_LOAD_INCLUDE | MENU_ROUTER_INCLUDE | AUTOLOAD_FILES | DYNAMIC_INCLUDE | UNVERIFIED
 #       parent_callers: ["my_module.module"]
 #       functions:
 #         - name: "my_module_admin_settings_form"
-#           classification: "FORM_HANDLER" # CONTROLLER_PAGE | FORM_HANDLER | SERVICE_BUSINESS_LOGIC | PLUGIN_CANDIDATE | EVENT_SUBSCRIBER | ACCESS_CHECKER | ENTITY_FIELD_LOGIC | QUEUE_WORKER | BATCH_PROCESSOR | CRON_HANDLER | DRUSH_COMMAND | CONFIGURATION_HANDLER | THEME_RENDERER | UTILITY_HELPER | DATABASE_DATA_ACCESS | INTEGRATION_CLIENT | TEST_SUPPORT | LEGACY_OBSOLETE
+#           classification: "FORM_HANDLER" # See 22-class taxonomy below
 #           callers: ["my_module_menu()"]
 #           target_d10: "src/Form/SettingsForm.php"
 #           status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
 #           exclusion_reason: null
 #       drush_commands: [] # Discovered Drush command implementations
+#   # Comprehensive Custom PHP Source Files & OOP Classes Accounting
+#   custom_php_files:
+#     - path: "includes/MyProcessor.php" # Path to *.php, *.inc, *.module containing classes/functions
+#       autoloading: "FILES_ARRAY" # FILES_ARRAY | DIRECT_REQUIRE | MODULE_LOAD_INCLUDE | CUSTOM_AUTOLOADER | UNVERIFIED
+#       classes:
+#         - name: "MyProcessor"
+#           namespace: null # Legacy or PSR-0 namespace
+#           type: "CLASS" # CLASS | ABSTRACT_CLASS | INTERFACE | TRAIT
+#           parent_class: null
+#           interfaces: []
+#           traits: []
+#           constructor:
+#             type: "LEGACY_CLASSNAME" # MODERN_CONSTRUCT | LEGACY_CLASSNAME | NONE
+#             parameters: ["$db_connection", "$config = []"]
+#             dependencies: ["database", "global_user"]
+#             side_effects: ["variable_get", "drupal_set_message"]
+#           methods:
+#             - name: "process"
+#               visibility: "public"
+#               is_static: false
+#               d7_api_calls: ["db_query", "variable_get"]
+#           callers: ["my_module_cron()", "OtherModule::run()"]
+#           instantiations: ["new MyProcessor()", "MyProcessor::getInstance()"]
+#           classification: "SERVICE_BUSINESS_LOGIC" # 22-Class Taxonomy:
+#           # SERVICE_BUSINESS_LOGIC | CONTROLLER | FORM | PLUGIN | EVENT_SUBSCRIBER | ACCESS_CHECKER |
+#           # ENTITY_LOGIC | FIELD_LOGIC | QUEUE_WORKER | BATCH_PROCESSOR | CRON_HANDLER | DRUSH_COMMAND |
+#           # CONFIGURATION_HANDLER | INTEGRATION_CLIENT | DATA_ACCESS | VALUE_OBJECT | DOMAIN_OBJECT |
+#           # UTILITY_HELPER | TEST_SUPPORT | LIBRARY_EXTERNAL_DEPENDENCY | LEGACY_OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#           target_d10: "src/Service/MyProcessor.php"
+#           target_architecture: "SERVICE_CONTAINER" # SERVICE_CONTAINER | CONTROLLER | FORM_CLASS | PLUGIN_CLASS | EVENT_SUBSCRIBER | DRUSH_COMMAND | VALUE_OBJECT
+#           injected_services: ["database", "config.factory", "current_user"]
+#           status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#           exclusion_reason: null
 custom_modules: []
 
 # ------------------------------------------------------------------------------
@@ -98,5 +131,4 @@ data_migrations: []
 # - name: "payment_gateway"
 #   type: "rest" # rest | soap | webhook | auth | external_db
 #   source_reference: "my_module_payment_call"
-#   target_service: "my_module.payment_client"
 integrations: []
