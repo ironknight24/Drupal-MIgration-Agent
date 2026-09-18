@@ -63,6 +63,25 @@ evidence_summary:
 
 ---
 
+## 6. Procedural Hook Implementations & Custom Hooks Inventory
+
+| Module | Hook Name | Hook Type (9 Types) | Source File:Line | Signature / Arguments | Callers / Invocations (`module_invoke_all`) | Target D10 Architecture (23 Targets) | Target Artifacts |
+|---|---|---|---|---|---|---|---|
+| `example_module` | `example_module_menu` | `CORE_HOOK` | `example_module.module:12` | `()` | Core Menu Router | `ROUTE`, `CONTROLLER`, `FORM_CLASS` | `example_module.routing.yml`, `src/Controller/ExampleController.php` |
+| `example_module` | `example_module_form_alter` | `ALTER_HOOK` | `example_module.module:48` | `(&$form, &$form_state, $form_id)` | `drupal_alter('form', ...)` | `SERVICE` | `src/Service/ExampleFormAlterService.php` |
+| `example_module` | `example_module_custom_event` | `CUSTOM_HOOK` | `includes/events.inc:15` | `($data, $account)` | `module_invoke_all('example_module_custom_event', ...)` | `EVENT_SUBSCRIBER` | `src/Event/CustomEvent.php`, `src/EventSubscriber/CustomSubscriber.php` |
+
+---
+
+## 7. hook_menu() Decomposition Inventory
+
+| Module | Path | Page / Form Callback | Access Callback / Arguments | Title | Menu Type (`MENU_NORMAL_ITEM`, `MENU_LOCAL_TASK`, etc.) | D10 Route Name | D10 Target Class / YAML |
+|---|---|---|---|---|---|---|---|
+| `example_module` | `admin/config/example` | `drupal_get_form('example_admin_form')` | `user_access('administer example')` | Example Settings | `MENU_NORMAL_ITEM` | `example_module.admin_settings` | `src/Form/ExampleAdminForm.php`, `.links.menu.yml` |
+| `example_module` | `example/%/view` | `example_view_page` | `example_access_callback` | View Record | `MENU_CALLBACK` | `example_module.record_view` | `src/Controller/ExampleController.php`, `src/Access/RecordAccessCheck.php` |
+
+---
+
 ## 6. Contributed Modules Inventory
 
 | Contrib Module | D7 Version | Core in D10? | D10 Available? | Community Replacement | Action Plan |

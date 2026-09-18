@@ -20,18 +20,20 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 ---
 
 ## 3. Allowed Scope
-- Extracting and accounting for business rules and logic from all D7 module source files (`.info`, `.module`, `.inc`, `.install`, `.admin.inc`, `.pages.inc`, `.drush.inc`, `*.php`, and all nested custom classes/traits/interfaces).
-- Consuming the custom PHP class, constructor, `.inc` discovery analysis, include graphs, custom database schemas (`hook_schema`), and caller references produced by `discovery`.
+- Extracting and accounting for business rules, procedural hook implementations, and logic from all D7 module source files (`.info`, `.module`, `.inc`, `.install`, `.admin.inc`, `.pages.inc`, `.drush.inc`, `*.php`, and all nested custom classes/traits/interfaces).
+- Consuming the custom PHP class, constructor, procedural hook, alter hook, `.inc` discovery analysis, include graphs, custom database schemas (`hook_schema`), and caller references produced by `discovery`.
+- Re-engineering procedural hook implementations (core, contrib, custom, alter, entity, form, theme, install/update) into modern PSR-4 classes, Symfony event subscribers, plugins, and services.
+- Decomposing `hook_menu()` into modern routing (`.routing.yml`), Controllers (`src/Controller/`), Form classes (`src/Form/`), custom Access Checkers (`src/Access/`), Menu links (`.links.menu.yml`), and Local tasks (`.links.task.yml`).
 - Re-engineering custom database schemas and tables into appropriate D10/D11 targets: Content Entities (`src/Entity/`), Config Entities, Config API (`config.factory`), State API (`\Drupal::state()`), KeyValue stores, or dedicated Repository Services (`src/Repository/`) utilizing `\Drupal\Core\Database\Connection`.
-- Authoring module migration plans in `reports/custom-modules/PLAN-<MODULE>.md` with exhaustive file-to-class/function and database table accounting.
+- Authoring module migration plans in `reports/custom-modules/PLAN-<MODULE>.md` with exhaustive file-to-class/function, hook-to-architecture, and database table accounting.
 - Scaffolding modern module architecture in `<target_module_dir>/<MODULE>/`.
-- Generating `.info.yml`, `.services.yml`, `.routing.yml`, `.permissions.yml`, `.links.menu.yml`, and `drush.services.yml`.
-- Authoring modern PSR-4 OOP classes (`src/Service/`, `src/Controller/`, `src/Form/`, `src/Plugin/`, `src/EventSubscriber/`, `src/Drush/Commands/`, `src/Entity/`, `src/Repository/`).
+- Generating `.info.yml`, `.services.yml`, `.routing.yml`, `.permissions.yml`, `.links.menu.yml`, `.links.task.yml`, `.links.action.yml`, `.links.contextual.yml`, and `drush.services.yml`.
+- Authoring modern PSR-4 OOP classes (`src/Service/`, `src/Controller/`, `src/Form/`, `src/Plugin/`, `src/EventSubscriber/`, `src/Access/`, `src/Drush/Commands/`, `src/Entity/`, `src/Repository/`).
 - Modernizing constructors: converting legacy `ClassName()` and `__construct()` global dependencies into clean constructor Dependency Injection.
 - Delegating scoped service refactoring and database query modernization to `api-modernization`.
 - Scaffolding Unit and Kernel test suites in `<target_module_dir>/<MODULE>/tests/`.
 - Logging all mutations in `logs/file-change-log/`.
-- Proposing component state transitions via `agent_result` with explicit outcome statuses for all files, classes, callables, and database tables.
+- Proposing component state transitions via `agent_result` with explicit outcome statuses for all files, classes, callables, procedural hooks, and database tables.
 
 ---
 

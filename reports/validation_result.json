@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260918204114",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260918205723",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T20:41:14.059189+00:00",
+  "executed_at": "2026-09-18T20:57:23.449719+00:00",
   "summary": {
-    "checks_total": 125,
-    "passed": 124,
+    "checks_total": 142,
+    "passed": 141,
     "failed": 0,
     "warnings": 0,
     "unverified": 1
@@ -1500,6 +1500,233 @@
       "evidence": "README, ARCHITECTURE, and AGENT_PROTOCOL consistently document custom database, schema, SQL safety, and data model re-engineering architecture.",
       "details": "Verified public documentation and template consistency for custom database artifacts.",
       "affected_files": [
+        "README.md",
+        "ARCHITECTURE.md",
+        "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-01",
+      "category": "discovery",
+      "name": "Generic Hook Discovery Contract & 9-Type Taxonomy",
+      "status": "PASS",
+      "evidence": "Discovery agent, D7 analysis skill, and manifest schema define generic procedural hook discovery and classify hooks into the 9 canonical types.",
+      "details": "Verified generic procedural hook discovery contract and taxonomy.",
+      "affected_files": [
+        "agents/discovery/agent.md",
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-02",
+      "category": "analysis",
+      "name": "Custom Hook Discovery & Event Dispatcher Mapping",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills detect custom hooks invoked via module_invoke_all / module_invoke and map them to Symfony EventDispatcher and EventSubscriberInterface architectures.",
+      "details": "Verified custom hook discovery and event architecture mapping heuristics.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-03",
+      "category": "alter_hooks",
+      "name": "Alter Hook Handling & Service Delegation",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills analyze alter hooks for modified targets, changed values, downstream dependencies, and enforce business logic delegation to modern services.",
+      "details": "Verified alter hook behavioral analysis and service delegation.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-04",
+      "category": "routing",
+      "name": "hook_menu() Exhaustive Decomposition",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills decompose monolithic hook_menu() into discrete modern artifacts: routing YAML, Controllers, Form classes, Access Checkers, permissions YAML, Menu Links, Local Tasks, and Actions.",
+      "details": "Verified exhaustive non-1:1 hook_menu() decomposition specification.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "agents/custom-module/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-05",
+      "category": "forms",
+      "name": "Form Hook Behavior & Form API Modernization",
+      "status": "PASS",
+      "evidence": "D7 analysis skill captures complete form behavior including form builders, alters, AJAX callbacks, validation/submit handlers, and form array directives (#states, #ajax, #submit, #validate, #tree, #access, #attached).",
+      "details": "Verified Form API behavioral accounting and modernization heuristics.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/custom-module-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-06",
+      "category": "entities",
+      "name": "Entity Lifecycle Hook Behavior & Preservation",
+      "status": "PASS",
+      "evidence": "D7 analysis skill analyzes entity lifecycle hooks (node, entity, user, taxonomy, comment, file), operations, mutations, side effects, and maps to modern entity hooks / post-save services while preserving execution semantics.",
+      "details": "Verified entity lifecycle hook behavioral analysis and modernization rules.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-07",
+      "category": "security",
+      "name": "Access Hook & Security Handling",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills analyze access control hooks (hook_permission, hook_node_access, hook_file_download), map to permissions.yml and AccessCheckInterface, and escalate security ambiguity to HUMAN_DECISION_REQUIRED / UNVERIFIED.",
+      "details": "Verified access hook and security authorization modernization rules.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-08",
+      "category": "theme",
+      "name": "Theme & Rendering Hook Accounting",
+      "status": "PASS",
+      "evidence": "D7 analysis skill discovers and accounts for theme/rendering hooks (hook_theme, hook_preprocess_*, hook_page_alter, hook_html_head, CSS/JS alters) and maps target architecture for Step 20 consumption.",
+      "details": "Verified theme and rendering hook accounting heuristics.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-09",
+      "category": "blocks",
+      "name": "Block Hook Mapping",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills analyze D7 block hooks (hook_block_info, hook_block_view, hook_block_configure, hook_block_save) and map to Block plugins extending BlockBase with configuration, caching, and context.",
+      "details": "Verified block hook modernization and plugin mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-10",
+      "category": "views",
+      "name": "Views Hook Mapping",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills discover Views data definitions, query alterations, and render handlers, mapping to modern Views plugins and execution hooks.",
+      "details": "Verified Views hook analysis and modernization specifications.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-11",
+      "category": "integrations",
+      "name": "Token & Mail Hook Mapping",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills analyze token hooks (hook_token_info, hook_tokens with BubbleableMetadata) and mail hooks (hook_mail with Mail plugins / services).",
+      "details": "Verified token and mail hook modernization heuristics.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-12",
+      "category": "lifecycle",
+      "name": "Cron & Request Lifecycle Hook Handling",
+      "status": "PASS",
+      "evidence": "D7 analysis and mapping skills analyze hook_cron, hook_init, hook_exit, hook_boot, mapping to Cron services, QueueWorker plugins, and Symfony KernelEvents without blind request overhead.",
+      "details": "Verified cron and request lifecycle hook handling.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-13",
+      "category": "dependencies",
+      "name": "Execution Ordering & Dependency Handling",
+      "status": "PASS",
+      "evidence": "Dependency analysis skill, D7 analysis skill, and manifest trace module weight ({system}.weight), alter ordering, and lifecycle sequencing in the dependency graph.",
+      "details": "Verified hook execution ordering and dependency graph integration.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md",
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-14",
+      "category": "architecture",
+      "name": "Non-1:1 Target Architecture Mapping",
+      "status": "PASS",
+      "evidence": "Custom module skill, mapping skill, and manifest support non-1:1 transformations: 1 hook decomposing to multiple D10 artifacts, multiple hooks consolidating to 1 service, and hook + callbacks to 1 class.",
+      "details": "Verified non-1:1 procedural hook transformation support.",
+      "affected_files": [
+        "skills/custom-module-migration/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-15",
+      "category": "validation",
+      "name": "Zero-Omission Outcome Enforcement",
+      "status": "PASS",
+      "evidence": "Validation agent and skill enforce approved terminal outcomes (MIGRATED, REPLACED, OBSOLETE, EXCLUDED_WITH_REASON, HUMAN_DECISION_REQUIRED, UNVERIFIED) and reject forbidden states for all procedural hook implementations.",
+      "details": "Verified zero-omission outcome enforcement for procedural hooks.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "agents/validation/agent.md",
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-16",
+      "category": "manifest",
+      "name": "Manifest & Schema Accounting Integrity",
+      "status": "PASS",
+      "evidence": "state/migration-manifest.yml defines complete hook_implementations accounting schema covering all 19 required behavioral and architectural metadata fields.",
+      "details": "Verified manifest schema structure for procedural hooks.",
+      "affected_files": [
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-HOOK-17",
+      "category": "compatibility",
+      "name": "Cross-Capability Compatibility",
+      "status": "PASS",
+      "evidence": "Procedural hook discovery and accounting seamlessly coexists with custom database schemas, custom PHP files, and .inc files across all skills, agents, manifest, and public documentation without schema breakage.",
+      "details": "Verified cross-capability architectural compatibility.",
+      "affected_files": [
+        "state/migration-manifest.yml",
         "README.md",
         "ARCHITECTURE.md",
         "AGENT_PROTOCOL.md"

@@ -43,17 +43,28 @@ evidence_summary:
 
 ---
 
-## 3. File, Class & Custom Database Table Accounting & D10 Architectural Mapping
+## 3. File, Class, Procedural Hook & Custom Database Table Accounting & D10 Architectural Mapping
 
-| D7 Source File / Schema | Legacy Artifact / Class / Table | Classification / Semantics | Target D10 Class / Storage Destination | Migration Strategy / Injected Services | Planned Outcome Status |
+| D7 Source File / Schema | Legacy Artifact / Class / Hook / Table | Classification / Semantics | Target D10 Class / Storage Destination | Migration Strategy / Injected Services | Planned Outcome Status |
 |---|---|---|---|---|---|
 | `lib/ExampleProcessor.php` | `class ExampleProcessor` | `SERVICE_BUSINESS_LOGIC` | `src/Service/ExampleProcessor.php` | `@database`, `@config.factory` | `MIGRATED` |
 | `{{ COMPONENT }}.install` | `table: {{ COMPONENT }}_records` | `USER_DATA` | `src/Entity/RecordEntity.php` | `ENTITY_MIGRATION` | `MIGRATED` |
+| `{{ COMPONENT }}.module` | `{{ COMPONENT }}_menu()` | `CORE_HOOK` | `.routing.yml`, `src/Controller/`, `src/Form/`, `.links.menu.yml` | `NON_1_TO_1_DECOMPOSITION` | `MIGRATED` |
+| `{{ COMPONENT }}.module` | `{{ COMPONENT }}_form_alter()` | `ALTER_HOOK` | `src/Service/FormAlterService.php` | `@entity_type.manager` | `MIGRATED` |
 | `{{ COMPONENT }}.module` | `{{ COMPONENT }}_view()` | `CONTROLLER` | `src/Controller/ViewController.php` | `@current_user` | `MIGRATED` |
 | `includes/admin.inc` | `{{ COMPONENT }}_admin_settings()` | `FORM` | `src/Form/SettingsForm.php` | `@config.factory` | `MIGRATED` |
 | `includes/helper.inc` | `{{ COMPONENT }}_calculate_tax()` | `SERVICE_BUSINESS_LOGIC` | `src/Service/CalculationService.php` | N/A | `MIGRATED` |
 | `includes/drush.inc` | `drush_{{ COMPONENT }}_sync()` | `DRUSH_COMMAND` | `src/Drush/Commands/SyncCommands.php` | `@entity_type.manager` | `MIGRATED` |
 | `lib/LegacyCompat.php` | `class LegacyCompat` | `LEGACY_OBSOLETE` | N/A | N/A | `OBSOLETE` |
+
+---
+
+## 4. hook_menu() Decomposition Mapping Matrix
+
+| Legacy D7 Path | Callback (`page callback` / `drupal_get_form`) | Access Check (`access callback`) | Target D10 Route | Target D10 Controller / Form Class | Menu Link / Local Task Target |
+|---|---|---|---|---|---|
+| `admin/config/{{ COMPONENT }}` | `drupal_get_form('{{ COMPONENT }}_admin')` | `user_access('administer')` | `{{ COMPONENT }}.admin` | `src/Form/AdminSettingsForm.php` | `.links.menu.yml` |
+| `{{ COMPONENT }}/item/%` | `{{ COMPONENT }}_view_item` | `{{ COMPONENT }}_item_access` | `{{ COMPONENT }}.item_view` | `src/Controller/ItemController.php` | N/A |
 
 ---
 

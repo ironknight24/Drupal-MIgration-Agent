@@ -1,7 +1,7 @@
 ---
 name: dependency-analysis
-description: Dependency Graph Solver & Wave Scheduling Playbook. Analyzes inter-module couplings, custom PHP class instantiations, .inc function call trees, constructs migration DAGs, detects cycles, and generates dynamic execution waves.
-version: 1.2.0
+description: Dependency Graph Solver & Wave Scheduling Playbook. Analyzes inter-module couplings, custom PHP class instantiations, .inc function call trees, procedural hook execution ordering, module weights, alter dependencies, constructs migration DAGs, detects cycles, and generates dynamic execution waves.
+version: 1.3.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Dependency Analysis & Wave Scheduling Skill
 
 ## Overview
-This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, custom PHP class instantiations, and legacy `.inc` function couplings across legacy Drupal 7 components. It constructs a Directed Acyclic Graph (DAG), detects circular dependencies, and organizes components into executable topological waves.
+This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, procedural hook execution ordering, module weights (`{system}.weight`), alter sequencing (`hook_module_implements_alter`), custom PHP class instantiations, and legacy `.inc` function couplings across legacy Drupal 7 components. It constructs a Directed Acyclic Graph (DAG), detects circular dependencies, and organizes components into executable topological waves.
 
 ---
 
@@ -36,6 +36,7 @@ To establish an accurate DAG, inspect source assets across 5 distinct coupling v
   - Direct calls to functions defined in another custom module's `.inc` or `.module` files.
   - Cross-module class instantiations (`new OtherModuleClass()`, `new \Namespace\OtherClass()`) and static calls (`OtherModuleClass::method()`).
   - Trace whether the called function/class represents a public service candidate or an internal private helper to avoid creating false dependency edges.
+  - Trace hook execution order dependencies based on module weight (`{system}.weight`), `hook_module_implements_alter()`, and entity lifecycle sequencing (`presave` $\rightarrow$ `insert`/`update` $\rightarrow$ `postsave`).
 
 ### 3. Database & Schema Couplings
 - Inspect `hook_schema()` declarations, table ownership, and queries across all module source files:

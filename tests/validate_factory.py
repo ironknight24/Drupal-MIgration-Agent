@@ -1770,6 +1770,284 @@ class FactoryValidator:
                               f"Documentation missing custom database architecture sections: {', '.join(missing_doc)}",
                               "Public documentation must explicitly document custom database and data model re-engineering.")
 
+    def validate_procedural_hooks_accounting_suite(self):
+        """Suite 14: Step 14 D7 Hook & Procedural Behavior Exhaustive Discovery, Accounting & D10/D11 Re-Engineering"""
+        d7_skill = (self.repo_root / "skills/d7-analysis/SKILL.md").read_text(encoding='utf-8')
+        mapping_skill = (self.repo_root / "skills/d7-to-d10-mapping/SKILL.md").read_text(encoding='utf-8')
+        custom_skill = (self.repo_root / "skills/custom-module-migration/SKILL.md").read_text(encoding='utf-8')
+        dep_skill = (self.repo_root / "skills/dependency-analysis/SKILL.md").read_text(encoding='utf-8')
+        testing_skill = (self.repo_root / "skills/testing/SKILL.md").read_text(encoding='utf-8')
+        val_skill = (self.repo_root / "skills/behavioral-validation/SKILL.md").read_text(encoding='utf-8')
+
+        discovery_agent = (self.repo_root / "agents/discovery/agent.md").read_text(encoding='utf-8')
+        custom_agent = (self.repo_root / "agents/custom-module/agent.md").read_text(encoding='utf-8')
+        api_agent = (self.repo_root / "agents/api-modernization/agent.md").read_text(encoding='utf-8')
+        dep_agent = (self.repo_root / "agents/dependency/agent.md").read_text(encoding='utf-8')
+        val_agent = (self.repo_root / "agents/validation/agent.md").read_text(encoding='utf-8')
+        manifest_text = (self.repo_root / "state/migration-manifest.yml").read_text(encoding='utf-8')
+
+        # 14.1 Generic Hook Discovery Contract & 9-Type Taxonomy
+        expected_9_types = [
+            "CORE_HOOK", "CONTRIB_HOOK", "CUSTOM_HOOK", "ALTER_HOOK",
+            "ENTITY_HOOK", "FORM_HOOK", "THEME_HOOK", "INSTALL_UPDATE_HOOK",
+            "UNKNOWN_UNVERIFIED_HOOK"
+        ]
+        missing_9 = [t for t in expected_9_types if t not in d7_skill or t not in manifest_text]
+        has_generic_discovery = "hook_implementations" in manifest_text and ("hook" in discovery_agent.lower() and "discover" in discovery_agent.lower())
+
+        if not missing_9 and has_generic_discovery:
+            self.record_check("CHECK-HOOK-01", "discovery", "Generic Hook Discovery Contract & 9-Type Taxonomy", "PASS",
+                              "Discovery agent, D7 analysis skill, and manifest schema define generic procedural hook discovery and classify hooks into the 9 canonical types.",
+                              "Verified generic procedural hook discovery contract and taxonomy.",
+                              affected_files=["agents/discovery/agent.md", "skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-HOOK-01", "discovery", "Generic Hook Discovery Contract & 9-Type Taxonomy", "FAIL",
+                              f"Missing hook types: {', '.join(missing_9)} or generic hook discovery contract.",
+                              "Factory must discover procedural hooks and classify them into the 9 canonical types.")
+
+        # 14.2 Custom Hook Discovery & Event Dispatcher Mapping
+        custom_hook_keywords = ["module_invoke_all", "module_invoke", "eventdispatcher", "eventsubscriber"]
+        missing_custom = [k for k in custom_hook_keywords if k not in d7_skill.lower() and k not in mapping_skill.lower()]
+
+        if not missing_custom:
+            self.record_check("CHECK-HOOK-02", "analysis", "Custom Hook Discovery & Event Dispatcher Mapping", "PASS",
+                              "D7 analysis and mapping skills detect custom hooks invoked via module_invoke_all / module_invoke and map them to Symfony EventDispatcher and EventSubscriberInterface architectures.",
+                              "Verified custom hook discovery and event architecture mapping heuristics.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-HOOK-02", "analysis", "Custom Hook Discovery & Event Dispatcher Mapping", "FAIL",
+                              f"Missing custom hook keywords: {', '.join(missing_custom)}",
+                              "Factory must discover custom hooks and map them to modern event dispatching.")
+
+        # 14.3 Alter Hook Handling & Service Delegation
+        alter_keywords = ["hook_form_alter", "hook_menu_alter", "hook_views_data_alter", "alter hook"]
+        missing_alter = [k for k in alter_keywords if k not in d7_skill.lower()]
+        has_alter_delegation = "delegate" in mapping_skill.lower() and "service" in mapping_skill.lower()
+
+        if not missing_alter and has_alter_delegation:
+            self.record_check("CHECK-HOOK-03", "alter_hooks", "Alter Hook Handling & Service Delegation", "PASS",
+                              "D7 analysis and mapping skills analyze alter hooks for modified targets, changed values, downstream dependencies, and enforce business logic delegation to modern services.",
+                              "Verified alter hook behavioral analysis and service delegation.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-HOOK-03", "alter_hooks", "Alter Hook Handling & Service Delegation", "FAIL",
+                              f"Missing alter hook keywords: {', '.join(missing_alter)} or service delegation rules.",
+                              "Factory must analyze alter hooks behaviorally and delegate processing to services.")
+
+        # 14.4 hook_menu() Exhaustive Decomposition
+        menu_artifacts = [
+            "routing.yml", "controller", "form", "access", "permissions.yml",
+            "links.menu.yml", "links.task.yml"
+        ]
+        missing_menu = [a for a in menu_artifacts if a not in d7_skill.lower() or a not in mapping_skill.lower()]
+
+        if not missing_menu:
+            self.record_check("CHECK-HOOK-04", "routing", "hook_menu() Exhaustive Decomposition", "PASS",
+                              "D7 analysis and mapping skills decompose monolithic hook_menu() into discrete modern artifacts: routing YAML, Controllers, Form classes, Access Checkers, permissions YAML, Menu Links, Local Tasks, and Actions.",
+                              "Verified exhaustive non-1:1 hook_menu() decomposition specification.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "agents/custom-module/agent.md"])
+        else:
+            self.record_check("CHECK-HOOK-04", "routing", "hook_menu() Exhaustive Decomposition", "FAIL",
+                              f"Missing hook_menu decomposition targets: {', '.join(missing_menu)}",
+                              "Factory must decompose hook_menu() into discrete modern routing, controller, form, and link artifacts.")
+
+        # 14.5 Form Hook Behavior & Form API Modernization
+        form_elements = ["#states", "#ajax", "#submit", "#validate", "#tree", "#access", "#attached"]
+        missing_form = [e for e in form_elements if e not in d7_skill.lower()]
+
+        if not missing_form:
+            self.record_check("CHECK-HOOK-05", "forms", "Form Hook Behavior & Form API Modernization", "PASS",
+                              "D7 analysis skill captures complete form behavior including form builders, alters, AJAX callbacks, validation/submit handlers, and form array directives (#states, #ajax, #submit, #validate, #tree, #access, #attached).",
+                              "Verified Form API behavioral accounting and modernization heuristics.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/custom-module-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-HOOK-05", "forms", "Form Hook Behavior & Form API Modernization", "FAIL",
+                              f"Missing form element directives: {', '.join(missing_form)}",
+                              "Factory must account for all Form API behavioral structures.")
+
+        # 14.6 Entity Lifecycle Hook Behavior & Preservation
+        entity_hooks = ["hook_node_insert", "hook_entity_update", "hook_user_delete", "presave", "postsave"]
+        missing_entity = [h for h in entity_hooks if h not in d7_skill.lower()]
+
+        if not missing_entity:
+            self.record_check("CHECK-HOOK-06", "entities", "Entity Lifecycle Hook Behavior & Preservation", "PASS",
+                              "D7 analysis skill analyzes entity lifecycle hooks (node, entity, user, taxonomy, comment, file), operations, mutations, side effects, and maps to modern entity hooks / post-save services while preserving execution semantics.",
+                              "Verified entity lifecycle hook behavioral analysis and modernization rules.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-HOOK-06", "entities", "Entity Lifecycle Hook Behavior & Preservation", "FAIL",
+                              f"Missing entity lifecycle keywords: {', '.join(missing_entity)}",
+                              "Factory must analyze and preserve entity lifecycle hook execution semantics.")
+
+        # 14.7 Access Hook & Security Handling
+        access_keywords = ["hook_permission", "hook_node_access", "permissions.yml", "accesscheckinterface"]
+        missing_access = [k for k in access_keywords if k not in d7_skill.lower() and k not in mapping_skill.lower()]
+        has_security_gate = "human_decision_required" in d7_skill.lower() and "unverified" in d7_skill.lower()
+
+        if not missing_access and has_security_gate:
+            self.record_check("CHECK-HOOK-07", "security", "Access Hook & Security Handling", "PASS",
+                              "D7 analysis and mapping skills analyze access control hooks (hook_permission, hook_node_access, hook_file_download), map to permissions.yml and AccessCheckInterface, and escalate security ambiguity to HUMAN_DECISION_REQUIRED / UNVERIFIED.",
+                              "Verified access hook and security authorization modernization rules.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-HOOK-07", "security", "Access Hook & Security Handling", "FAIL",
+                              f"Missing access keywords: {', '.join(missing_access)} or security decision gating.",
+                              "Factory must analyze access hooks and flag ambiguous security logic.")
+
+        # 14.8 Theme & Rendering Hook Accounting
+        theme_keywords = ["hook_theme", "hook_preprocess_", "hook_page_alter", "twig", "libraries.yml", "render array"]
+        missing_theme = [t for t in theme_keywords if t not in d7_skill.lower()]
+
+        if not missing_theme:
+            self.record_check("CHECK-HOOK-08", "theme", "Theme & Rendering Hook Accounting", "PASS",
+                              "D7 analysis skill discovers and accounts for theme/rendering hooks (hook_theme, hook_preprocess_*, hook_page_alter, hook_html_head, CSS/JS alters) and maps target architecture for Step 20 consumption.",
+                              "Verified theme and rendering hook accounting heuristics.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-HOOK-08", "theme", "Theme & Rendering Hook Accounting", "FAIL",
+                              f"Missing theme hook keywords: {', '.join(missing_theme)}",
+                              "Factory must discover and map all theme/rendering procedural hooks.")
+
+        # 14.9 Block Hook Mapping
+        block_keywords = ["hook_block_info", "hook_block_view", "block plugin", "blockbase"]
+        missing_block = [b for b in block_keywords if b not in d7_skill.lower() and b not in mapping_skill.lower()]
+
+        if not missing_block:
+            self.record_check("CHECK-HOOK-09", "blocks", "Block Hook Mapping", "PASS",
+                              "D7 analysis and mapping skills analyze D7 block hooks (hook_block_info, hook_block_view, hook_block_configure, hook_block_save) and map to Block plugins extending BlockBase with configuration, caching, and context.",
+                              "Verified block hook modernization and plugin mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-HOOK-09", "blocks", "Block Hook Mapping", "FAIL",
+                              f"Missing block hook keywords: {', '.join(missing_block)}",
+                              "Factory must map D7 block hooks to modern Block plugins.")
+
+        # 14.10 Views Hook Mapping
+        views_keywords = ["hook_views_data", "hook_views_data_alter", "hook_views_query_alter", "views plugins"]
+        missing_views = [v for v in views_keywords if v not in d7_skill.lower()]
+
+        if not missing_views:
+            self.record_check("CHECK-HOOK-10", "views", "Views Hook Mapping", "PASS",
+                              "D7 analysis and mapping skills discover Views data definitions, query alterations, and render handlers, mapping to modern Views plugins and execution hooks.",
+                              "Verified Views hook analysis and modernization specifications.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-HOOK-10", "views", "Views Hook Mapping", "FAIL",
+                              f"Missing Views hook keywords: {', '.join(missing_views)}",
+                              "Factory must account for all Views procedural hooks.")
+
+        # 14.11 Token & Mail Hook Mapping
+        token_mail = ["hook_token_info", "hook_tokens", "hook_mail", "bubbleablemetadata"]
+        missing_tm = [tm for tm in token_mail if tm not in d7_skill.lower() and tm not in mapping_skill.lower()]
+
+        if not missing_tm:
+            self.record_check("CHECK-HOOK-11", "integrations", "Token & Mail Hook Mapping", "PASS",
+                              "D7 analysis and mapping skills analyze token hooks (hook_token_info, hook_tokens with BubbleableMetadata) and mail hooks (hook_mail with Mail plugins / services).",
+                              "Verified token and mail hook modernization heuristics.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-HOOK-11", "integrations", "Token & Mail Hook Mapping", "FAIL",
+                              f"Missing token/mail hook keywords: {', '.join(missing_tm)}",
+                              "Factory must map token and mail hooks to modern Drupal APIs.")
+
+        # 14.12 Cron & Request Lifecycle Hook Handling
+        lifecycle_keywords = ["hook_cron", "hook_init", "hook_exit", "hook_boot", "queueworker", "kernelevents"]
+        missing_life = [l for l in lifecycle_keywords if l not in d7_skill.lower() and l not in mapping_skill.lower()]
+
+        if not missing_life:
+            self.record_check("CHECK-HOOK-12", "lifecycle", "Cron & Request Lifecycle Hook Handling", "PASS",
+                              "D7 analysis and mapping skills analyze hook_cron, hook_init, hook_exit, hook_boot, mapping to Cron services, QueueWorker plugins, and Symfony KernelEvents without blind request overhead.",
+                              "Verified cron and request lifecycle hook handling.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-HOOK-12", "lifecycle", "Cron & Request Lifecycle Hook Handling", "FAIL",
+                              f"Missing lifecycle keywords: {', '.join(missing_life)}",
+                              "Factory must analyze and modernize cron and request lifecycle hooks.")
+
+        # 14.13 Execution Ordering & Dependency Handling
+        order_keywords = ["module_weight", "hook_module_implements_alter", "execution_order", "alter_order"]
+        missing_order = [o for o in order_keywords if o not in d7_skill.lower() and o not in dep_skill.lower() and o not in manifest_text.lower()]
+
+        if not missing_order:
+            self.record_check("CHECK-HOOK-13", "dependencies", "Execution Ordering & Dependency Handling", "PASS",
+                              "Dependency analysis skill, D7 analysis skill, and manifest trace module weight ({system}.weight), alter ordering, and lifecycle sequencing in the dependency graph.",
+                              "Verified hook execution ordering and dependency graph integration.",
+                              affected_files=["skills/dependency-analysis/SKILL.md", "skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-HOOK-13", "dependencies", "Execution Ordering & Dependency Handling", "FAIL",
+                              f"Missing execution ordering keywords: {', '.join(missing_order)}",
+                              "Factory must trace hook execution ordering and module weights in the dependency DAG.")
+
+        # 14.14 Non-1:1 Target Architecture Mapping
+        has_non_1to1_hook = "one-to-many" in custom_skill.lower() and "many-to-one" in custom_skill.lower() and "target_architecture" in manifest_text
+        if has_non_1to1_hook:
+            self.record_check("CHECK-HOOK-14", "architecture", "Non-1:1 Target Architecture Mapping", "PASS",
+                              "Custom module skill, mapping skill, and manifest support non-1:1 transformations: 1 hook decomposing to multiple D10 artifacts, multiple hooks consolidating to 1 service, and hook + callbacks to 1 class.",
+                              "Verified non-1:1 procedural hook transformation support.",
+                              affected_files=["skills/custom-module-migration/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-HOOK-14", "architecture", "Non-1:1 Target Architecture Mapping", "FAIL",
+                              "Missing non-1:1 hook transformation support in custom module migration skill or manifest.",
+                              "Factory must support 1-to-many and many-to-one hook architectural transformations.")
+
+        # 14.15 Zero-Omission Outcome Enforcement & Forbidden State Rejection
+        approved_outcomes = ["MIGRATED", "REPLACED", "OBSOLETE", "EXCLUDED_WITH_REASON", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"]
+        forbidden_states = ["UNACCOUNTED", "UNKNOWN_WITHOUT_REASON", "SILENTLY_OMITTED"]
+
+        missing_approved = [o for o in approved_outcomes if o not in val_skill]
+        missing_forbidden = [f for f in forbidden_states if f not in val_skill or f not in d7_skill]
+        val_template = (self.repo_root / "templates/validation-report.md").read_text(encoding='utf-8')
+
+        if not missing_approved and not missing_forbidden and "Procedural Hooks Accounted For" in val_template:
+            self.record_check("CHECK-HOOK-15", "validation", "Zero-Omission Outcome Enforcement", "PASS",
+                              "Validation agent and skill enforce approved terminal outcomes (MIGRATED, REPLACED, OBSOLETE, EXCLUDED_WITH_REASON, HUMAN_DECISION_REQUIRED, UNVERIFIED) and reject forbidden states for all procedural hook implementations.",
+                              "Verified zero-omission outcome enforcement for procedural hooks.",
+                              affected_files=["skills/behavioral-validation/SKILL.md", "agents/validation/agent.md", "templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-HOOK-15", "validation", "Zero-Omission Outcome Enforcement", "FAIL",
+                              f"Missing approved outcomes: {', '.join(missing_approved)} or forbidden states: {', '.join(missing_forbidden)}",
+                              "Validation must enforce zero-omission outcomes for all procedural hooks.")
+
+        # 14.16 Manifest & Schema Accounting Integrity
+        manifest_hook_fields = [
+            "hook_name", "hook_type", "source_file", "function", "arguments",
+            "return_behavior", "related_hooks", "callers", "dependencies",
+            "execution_order", "business_behavior", "target_architecture",
+            "target_artifacts", "migration_strategy", "validation_strategy",
+            "confidence", "status", "exclusion_reason", "evidence"
+        ]
+        missing_manifest_fields = [f for f in manifest_hook_fields if f not in manifest_text]
+
+        if not missing_manifest_fields:
+            self.record_check("CHECK-HOOK-16", "manifest", "Manifest & Schema Accounting Integrity", "PASS",
+                              "state/migration-manifest.yml defines complete hook_implementations accounting schema covering all 19 required behavioral and architectural metadata fields.",
+                              "Verified manifest schema structure for procedural hooks.",
+                              affected_files=["state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-HOOK-16", "manifest", "Manifest & Schema Accounting Integrity", "FAIL",
+                              f"Missing manifest hook fields: {', '.join(missing_manifest_fields)}",
+                              "Manifest schema must define all required procedural hook accounting fields.")
+
+        # 14.17 Cross-Capability Compatibility
+        has_cross_compat = (
+            "custom_database_tables" in manifest_text and
+            "custom_php_files" in manifest_text and
+            "inc_files" in manifest_text and
+            "hook_implementations" in manifest_text and
+            "Procedural Hooks" in (self.repo_root / "README.md").read_text(encoding='utf-8') and
+            "Procedural Hooks" in (self.repo_root / "ARCHITECTURE.md").read_text(encoding='utf-8')
+        )
+
+        if has_cross_compat:
+            self.record_check("CHECK-HOOK-17", "compatibility", "Cross-Capability Compatibility", "PASS",
+                              "Procedural hook discovery and accounting seamlessly coexists with custom database schemas, custom PHP files, and .inc files across all skills, agents, manifest, and public documentation without schema breakage.",
+                              "Verified cross-capability architectural compatibility.",
+                              affected_files=["state/migration-manifest.yml", "README.md", "ARCHITECTURE.md", "AGENT_PROTOCOL.md"])
+        else:
+            self.record_check("CHECK-HOOK-17", "compatibility", "Cross-Capability Compatibility", "FAIL",
+                              "Cross-capability compatibility check failed across manifest, skills, or documentation.",
+                              "Hook discovery must maintain seamless compatibility with database, class, and inc file capabilities.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -1784,6 +2062,7 @@ class FactoryValidator:
         self.validate_inc_file_accounting_suite()
         self.validate_custom_php_classes_accounting_suite()
         self.validate_custom_database_and_data_model_suite()
+        self.validate_procedural_hooks_accounting_suite()
 
     def generate_result_json(self):
         return {

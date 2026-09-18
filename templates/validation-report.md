@@ -21,6 +21,7 @@ evidence_summary:
 - **Automated Tests Executed**: {{ TESTS_COUNT }}
 - **Manual Verification Checks**: {{ CHECKS_COUNT }}
 - **Custom PHP Classes Accounted For**: {{ CLASSES_ACCOUNTED_COUNT }} / {{ CLASSES_TOTAL_COUNT }}
+- **Procedural Hooks Accounted For**: {{ HOOKS_ACCOUNTED_COUNT }} / {{ HOOKS_TOTAL_COUNT }}
 - **Legacy .inc Files Accounted For**: {{ INC_ACCOUNTED_COUNT }} / {{ INC_TOTAL_COUNT }}
 - **Custom Database Tables Accounted For**: {{ TABLES_ACCOUNTED_COUNT }} / {{ TABLES_TOTAL_COUNT }}
 
@@ -45,12 +46,14 @@ evidence_summary:
 
 ---
 
-## 3. Custom PHP Class, Callable & Database Table Outcome Verification
+## 3. Custom PHP Class, Procedural Hook, Callable & Database Table Outcome Verification
 
-| D7 Source File / Schema | Class / Method / Table | Legacy Dependencies / Schema | D10 Target Implementation | Final Outcome Status | Verification Evidence / Reason |
+| D7 Source File / Schema | Class / Hook / Method / Table | Legacy Dependencies / Schema | D10 Target Implementation | Final Outcome Status | Verification Evidence / Reason |
 |---|---|---|---|---|---|
 | `lib/ExampleProcessor.php` | `class ExampleProcessor` | `ExampleProcessor($db)` | `src/Service/ExampleProcessor.php` | `MIGRATED` | Service construction & Unit test passed |
 | `{{ COMPONENT }}.install` | `table: {{ COMPONENT }}_records` | `hook_schema: record_id, uid` | `src/Entity/RecordEntity.php` | `MIGRATED` | Entity CRUD & migration test verified |
+| `{{ COMPONENT }}.module` | `{{ COMPONENT }}_menu()` | `hook_menu` | `.routing.yml`, `src/Controller/` | `MIGRATED` | Route & controller response verified |
+| `{{ COMPONENT }}.module` | `{{ COMPONENT }}_form_alter()` | `hook_form_alter` | `src/Service/FormAlterService.php` | `MIGRATED` | Form alter unit test passed |
 | `includes/admin.inc` | `{{ COMPONENT }}_admin_settings()` | N/A | `src/Form/SettingsForm.php` | `MIGRATED` | Form submission unit test passed |
 | `includes/helper.inc` | `{{ COMPONENT }}_calc()` | N/A | `src/Service/CalcService.php` | `MIGRATED` | Kernel test verified math parity |
 | `includes/drush.inc` | `drush_{{ COMPONENT }}_sync()` | N/A | `src/Drush/Commands/SyncCommands.php` | `MIGRATED` | CLI execution verified |

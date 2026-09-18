@@ -134,6 +134,47 @@ target_system:
 #       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
 #       exclusion_reason: null
 #       evidence: "hook_schema defines table with primary key record_id; 4 CRUD callers in my_module.module"
+#   # Comprehensive Procedural Hook & Custom Hook Accounting
+#   hook_implementations:
+#     - hook_name: "hook_menu"
+#       hook_type: "CORE_HOOK" # CORE_HOOK | CONTRIB_HOOK | CUSTOM_HOOK | ALTER_HOOK | ENTITY_HOOK | FORM_HOOK | THEME_HOOK | INSTALL_UPDATE_HOOK | UNKNOWN_UNVERIFIED_HOOK
+#       source_file: "my_module.module"
+#       function: "my_module_menu"
+#       arguments: []
+#       return_behavior: "Returns array of menu router items defining paths, page callbacks, access callbacks, and title definitions."
+#       related_hooks: ["hook_permission", "hook_menu_alter"]
+#       callers: ["menu_router_build()", "module_invoke_all('menu')"]
+#       dependencies:
+#         functions: ["my_module_page_callback()"]
+#         services: []
+#       database_dependencies: ["my_module_records"]
+#       configuration_dependencies: ["my_module.settings"]
+#       state_dependencies: []
+#       entity_dependencies: ["node", "user"]
+#       execution_order:
+#         module_weight: 0
+#         alter_order: null
+#         lifecycle_stage: "ROUTING_INIT"
+#       business_behavior: "Provides admin management routes and public item view endpoints."
+#       target_architecture: "ROUTE" # Target Architecture:
+#       # CONTROLLER | FORM_CLASS | SERVICE | EVENT_SUBSCRIBER | PLUGIN | BLOCK_PLUGIN | ACCESS_CHECKER |
+#       # ENTITY_HANDLER | STORAGE_HANDLER | QUEUE_WORKER | CRON_HANDLER | DRUSH_COMMAND | TWIG_PREPROCESS |
+#       # LIBRARY | ROUTE | MENU_LINK | LOCAL_TASK | LOCAL_ACTION | CONTEXTUAL_LINK | PERMISSION | CONFIGURATION |
+#       # OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       target_artifacts:
+#         - "my_module.routing.yml"
+#         - "src/Controller/MyModuleController.php"
+#         - "my_module.links.menu.yml"
+#         - "src/Access/CustomAccessCheck.php"
+#       migration_strategy: "DECOMPOSE_TO_ROUTES_AND_CONTROLLER" # Migration Strategy:
+#       # DECOMPOSE_TO_ROUTES_AND_CONTROLLER | EVENT_SUBSCRIBER_CONVERSION | PLUGIN_CONVERSION |
+#       # SERVICE_DELEGATION | FORM_CLASS_CONVERSION | THEME_PREPROCESS_CONVERSION | REPLACED |
+#       # OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       validation_strategy: "ROUTE_HTTP_AND_CONTROLLER_ASSERTION" # ROUTE_HTTP_AND_CONTROLLER_ASSERTION | FORM_SUBMIT_TEST | EVENT_DISPATCH_ASSERTION | KERNEL_ENTITY_HOOK_TEST | UNIT_TEST
+#       confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
+#       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       exclusion_reason: null
+#       evidence: "my_module.module:L12-L45 defines 3 router items with page and access callbacks"
 custom_modules: []
 
 # ------------------------------------------------------------------------------

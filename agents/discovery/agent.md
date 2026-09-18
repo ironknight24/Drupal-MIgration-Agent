@@ -123,7 +123,11 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
    - Extract legacy Drush commands from `*.drush.inc` and arbitrary `.inc`/`.php` files, cataloging command names, arguments, options, aliases, and side effects.
 10. **Theme, Hook & Database Inventory**:
     - Locate themes, base themes, and `.tpl.php` templates.
-    - Grep for `hook_menu()`, `hook_schema()`, `hook_install()`, `hook_uninstall()`, `hook_update_N()`, `hook_node_info()`, `hook_form_alter()`, `hook_views_api()`.
+    - Exhaustively discover all procedural hook implementations across custom modules matching `<module>_<hook>` naming patterns.
+    - Classify discovered hooks into the 9-type taxonomy: `CORE_HOOK`, `CONTRIB_HOOK`, `CUSTOM_HOOK`, `ALTER_HOOK`, `ENTITY_HOOK`, `FORM_HOOK`, `THEME_HOOK`, `INSTALL_UPDATE_HOOK`, `UNKNOWN_UNVERIFIED_HOOK`.
+    - Discover custom hooks defined or invoked via `module_invoke_all('{hook}', ...)`, `module_invoke('{module}', '{hook}', ...)`, or custom hook documentation.
+    - Identify alter hooks (`hook_form_alter`, `hook_form_FORM_ID_alter`, `hook_menu_alter`, `hook_views_data_alter`, `hook_query_alter`, etc.) and trace altered targets.
+    - Decompose `hook_menu()` implementations into discrete menu items (paths, page callbacks, access callbacks, menu links, local tasks, local actions, and contextual links).
     - Catalog custom database tables defined in `.install`, `.module`, and `.inc` files with columns, primary keys, indexes, unique constraints, and foreign keys.
 11. **Database API & Static SQL Query Discovery**:
     - Inventory procedural database calls: `db_query()`, `db_query_range()`, `db_select()`, `db_insert()`, `db_update()`, `db_delete()`, `db_merge()`, `db_transaction()`.
@@ -135,7 +139,7 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
     - Detect entity references (`uid`, `nid`, `tid`, `fid`, `entity_id`, `delta`) and cross-table entity relationships.
     - Map complete CRUD call trees (CREATE, READ, UPDATE, DELETE callers) across all services, forms, controllers, queue workers, cron, and Drush.
 13. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
-14. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, and `custom_database_tables` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
+14. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, `hook_implementations`, and `custom_database_tables` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
 15. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
 16. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
 

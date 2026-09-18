@@ -1,7 +1,7 @@
 ---
 name: d7-to-d10-mapping
-description: Behavioral and architectural mapping rules for converting procedural Drupal 7 APIs and legacy custom PHP classes into modern Drupal 10/11 object-oriented patterns.
-version: 1.1.0
+description: Behavioral and architectural mapping rules for converting procedural Drupal 7 APIs, hooks, and legacy custom PHP classes into modern Drupal 10/11 object-oriented patterns.
+version: 1.2.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep
 # Drupal 7 to Drupal 10/11 Architectural Mapping Skill
 
 ## Overview
-This skill provides the architectural mapping rules required to translate Drupal 7 procedural constructs, legacy custom PHP classes, constructors, interfaces, traits, and `.inc` files into modern Symfony/Drupal 10 and Drupal 11 object-oriented paradigms, prioritizing Dependency Injection, PSR-4 autoloading, service containers, and testability.
+This skill provides the architectural mapping rules required to translate Drupal 7 procedural constructs, hooks (core, contrib, custom, alter, entity, form, theme, install/update), legacy custom PHP classes, constructors, interfaces, traits, and `.inc` files into modern Symfony/Drupal 10 and Drupal 11 object-oriented paradigms, prioritizing Dependency Injection, PSR-4 autoloading, service containers, event subscribers, and testability.
 
 ---
 
@@ -47,22 +47,46 @@ For detailed syntax examples and conversion catalogs, consult:
   - For controllers and form classes: implement `create(ContainerInterface $container)` and pass injected services to the constructor.
 
 ### 3. Non-1:1 Transformations (Decomposition & Consolidation)
-- **One-to-Many**: A single legacy D7 PHP or `.inc` file containing mixed procedural duties or monolithic classes must be decomposed into dedicated, single-responsibility PSR-4 classes.
-- **Many-to-One**: Multiple legacy procedural helper scripts or related class shims can be consolidated into a unified modern service class where cohesive.
+- **One-to-Many**: A single legacy D7 PHP file, `.inc` file, or monolithic hook implementation (e.g. `hook_menu()`) must be decomposed into dedicated, single-responsibility PSR-4 classes, plugins, and YAML route/link files.
+- **Many-to-One**: Multiple legacy procedural helper scripts, hook implementations, or related class shims can be consolidated into a unified modern service class where cohesive.
 
-### 4. hook_menu() Separation
+### 4. hook_menu() Exhaustive Decomposition
 In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual links, and form endpoints simultaneously. In modern Drupal, these are decoupled:
-- Page URLs & Handlers -> `<module>.routing.yml` & `ControllerBase`
-- Menu links -> `<module>.links.menu.yml`
-- Local tasks (tabs) -> `<module>.links.task.yml`
-- Contextual actions -> `<module>.links.action.yml`
-- Permission definitions -> `<module>.permissions.yml`
+- **Routes**: Page callbacks, form routes, delivery callbacks $\rightarrow$ `<module>.routing.yml` pointing to Controller (`_controller`) or Form (`_form`).
+- **Controllers & Forms**: Procedural page callbacks $\rightarrow$ `src/Controller/<Name>Controller.php` extending `ControllerBase`; procedural form callbacks $\rightarrow$ `src/Form/<Name>Form.php` extending `FormBase` or `ConfigFormBase`.
+- **Access Checkers**: Procedural access callbacks $\rightarrow$ custom access check services in `src/Access/` implementing `AccessCheckInterface` registered in `.services.yml` with `_custom_access` route requirements.
+- **Permissions**: Defined in `<module>.permissions.yml` and referenced via `_permission` route requirement.
+- **Menu Links**: `MENU_NORMAL_ITEM` $\rightarrow$ `<module>.links.menu.yml`.
+- **Local Tasks (Tabs)**: `MENU_LOCAL_TASK` / `MENU_DEFAULT_LOCAL_TASK` $\rightarrow$ `<module>.links.task.yml`.
+- **Local Actions**: `MENU_LOCAL_ACTION` $\rightarrow$ `<module>.links.action.yml`.
+- **Contextual Links**: `MENU_CONTEXT_PAGE` / `MENU_CONTEXT_INLINE` $\rightarrow$ `<module>.links.contextual.yml`.
+- **Parameter Converters & Wildcard Loaders**: `%node`, `%user`, `%custom` loaders $\rightarrow$ ParamConverters or route parameter auto-upcasting.
 
-### 5. State & Settings Modernization
+### 5. Hook Modernization & Event Architecture
+- **Custom Hooks (`module_invoke_all`, `module_invoke`)**: Modernized to Symfony Event Dispatcher:
+  - Define custom `Event` class extending `Symfony\Contracts\EventDispatcher\Event` in `src/Event/`.
+  - Dispatch event via injected `EventDispatcherInterface`.
+  - Implement listeners as `EventSubscriberInterface` classes in `src/EventSubscriber/` tagged with `event_subscriber` in `.services.yml`.
+- **Lifecycle & Request Hooks (`hook_init`, `hook_exit`, `hook_boot`)**:
+  - Map to Symfony Kernel Events (`KernelEvents::REQUEST`, `KernelEvents::RESPONSE`, `KernelEvents::TERMINATE`) in an event subscriber or HTTP middleware.
+- **Alter Hooks**:
+  - `hook_form_alter()` / `hook_form_FORM_ID_alter()`: Retained in `.module` but must delegate business processing to injected services.
+  - `hook_menu_alter()` $\rightarrow$ Route subscriber extending `RouteSubscriberBase`.
+  - `hook_views_data_alter()`, `hook_views_query_alter()` $\rightarrow$ Retained in `.views.execution.inc` or Views plugins.
+  - `hook_theme_registry_alter()`, `hook_js_alter()`, `hook_css_alter()` $\rightarrow$ Target `.theme` hooks or `hook_page_attachments_alter()`.
+- **Subsystem Procedural Hooks**:
+  - *Entity Lifecycles (`hook_node_*`, `hook_user_*`, `hook_entity_*`)* $\rightarrow$ Entity hooks in `.module` delegating to entity service / event subscriber, or custom entity class overrides (`preSave()`, `postSave()`).
+  - *Blocks (`hook_block_info`, `hook_block_view`, `hook_block_configure`, `hook_block_save`)* $\rightarrow$ Block plugins extending `BlockBase` in `src/Plugin/Block/`.
+  - *Access Control (`hook_permission`, `hook_node_access`)* $\rightarrow$ `<module>.permissions.yml`, custom access checkers, or entity access control handlers.
+  - *Tokens (`hook_token_info`, `hook_tokens`)* $\rightarrow$ Retained in `.tokens.inc` with modern `BubbleableMetadata` caching.
+  - *Mail (`hook_mail`)* $\rightarrow$ Retained in `.module` or modernized via Mail plugins / `plugin.manager.mail`.
+  - *Cron (`hook_cron`)* $\rightarrow$ Retained in `.module` delegating to a dedicated cron service or QueueWorker plugin in `src/Plugin/QueueWorker/`.
+
+### 6. State & Settings Modernization
 - **Configuration (CMI)**: Static settings that should be deployed across environments map to Configuration Objects (`config/install/<module>.settings.yml` and `config/schema/`).
 - **State API**: Dynamic environment-specific values (`last_cron_run`, synchronization timestamps) map to the `state` service (`\Drupal::state()` or injected `StateInterface`).
 
-### 6. Entity, Custom Database & Repository Abstraction
+### 7. Entity, Custom Database & Repository Abstraction
 - **Core Entity Queries**: Direct `db_query()` targeting core tables (`{node}`, `{users}`, `{taxonomy_term_data}`, `{file_managed}`) MUST be replaced by Entity Queries or Entity Storage via `EntityTypeManagerInterface`.
 - **Custom Database Table Target Architecture Mapping**:
   - *Content Entity (`src/Entity/`)*: Appropriate when the table represents domain content, user submissions, or business objects with fieldable requirements, revisioning, or access control.
@@ -79,7 +103,3 @@ In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual li
 - **Serialized Data Modernization**:
   - Migrate legacy PHP serialized strings (`serialize()` / `unserialize()`) to modern structured formats (JSON, typed entity properties, or typed arrays).
   - Explicitly flag serialized PHP objects requiring custom migration process plugins.
-
-### 7. Hook Alter & Event Conversion
-- System events (e.g., user login, response filters, routing alterations) map to Symfony `EventSubscriberInterface`.
-- Form alters (`hook_form_alter()`) remain in `.module` but must delegate business processing to an injected service.

@@ -198,10 +198,75 @@ For every custom table, trace complete CRUD call trees across the codebase:
   - Identify `db_transaction()`, explicit locking (`$txn = db_transaction()`), race-condition sensitive counters, atomic increment operations.
   - Ensure target D10/D11 architecture preserves transactional consistency.
 
+### 15. Generic & Custom Hook Discovery & Taxonomy
+Recursively detect and catalog all procedural hook implementations across custom module source files (`*.module`, `*.inc`, `*.php`, `*.install`, `*.profile`, `*.drush.inc`):
+- **Hook Name Resolution**:
+  - Pattern matching: `{module}_{hook_name}(...)` or `{module}_{alter_hook_name}_alter(...)`.
+  - Resolve function signature, arguments, return value expectations, invoking subsystems, and related hooks.
+- **Hook Classification Taxonomy (9 Types)**:
+  1. `CORE_HOOK`: Standard Drupal 7 core hook (e.g. `hook_init`, `hook_cron`, `hook_permission`, `hook_theme`, `hook_mail`).
+  2. `CONTRIB_HOOK`: Hooks defined by contributed modules (e.g. `hook_views_data`, `hook_token_info`, `hook_ctools_plugin_api`).
+  3. `CUSTOM_HOOK`: Custom extension points defined by custom modules via `module_invoke_all('{custom_hook}', ...)` or `module_invoke(...)`.
+  4. `ALTER_HOOK`: Alterations modifying arrays or queries (`hook_form_alter`, `hook_menu_alter`, `hook_query_TAG_alter`).
+  5. `ENTITY_HOOK`: Entity lifecycle hooks (`hook_node_insert`, `hook_user_update`, `hook_taxonomy_term_delete`).
+  6. `FORM_HOOK`: Form builders, form validation, and submission handlers.
+  7. `THEME_HOOK`: Preprocessors, theme declarations, and asset altering hooks (`hook_preprocess_*`, `hook_css_alter`).
+  8. `INSTALL_UPDATE_HOOK`: Module installation, uninstallation, schema, and update hooks (`hook_install`, `hook_update_N`).
+  9. `UNKNOWN_UNVERIFIED_HOOK`: Procedural function whose hook origin cannot be statically confirmed without runtime reflection.
+
+### 16. Custom Hook Invocation & Modern Event Dispatching
+Identify bespoke extension points created by custom modules:
+- **Invocation Patterns**: `module_invoke_all('my_event', ...)`, `module_invoke('module', 'my_hook', ...)`, `drupal_alter('my_data', ...)`.
+- **Target Modernization Architecture**:
+  - Map custom hook invocations to Symfony Event Dispatcher (`\Drupal::service('event_dispatcher')->dispatch(...)` or injected `EventDispatcherInterface`).
+  - Define custom Event classes (`src/Event/<EventName>Event.php`) extending `Symfony\Contracts\EventDispatcher\Event`.
+  - Convert custom hook implementations into Symfony Event Subscribers (`src/EventSubscriber/<SubscriberName>.php`) implementing `EventSubscriberInterface`.
+
+### 17. Alter Hook Behavioral Analysis
+Analyze the behavioral impact of alter hooks:
+- **Alter Hooks Discovered**: `hook_form_alter()`, `hook_form_FORM_ID_alter()`, `hook_menu_alter()`, `hook_views_data_alter()`, `hook_views_query_alter()`, `hook_query_TAG_alter()`, `hook_entity_info_alter()`, `hook_theme_registry_alter()`.
+- **Analysis Matrix**: Trace modified data keys, injected validation/submit handlers, condition alterations, and downstream dependencies.
+
+### 18. Mandatory hook_menu() Decomposition
+Exhaustively dissect every router item in `hook_menu()` implementations:
+- **Router Item Attributes Extracted**:
+  - `path`: URL pattern, wildcards (`%`, `%node`, `%user`, `%custom_loader`), and load arguments.
+  - `page callback` & `page arguments`: Callback function and parameter indices.
+  - `access callback` & `access arguments`: Permission strings (`'access content'`) or custom access check functions.
+  - `title`, `title callback`, `title arguments`, `description`.
+  - `type`: `MENU_NORMAL_ITEM`, `MENU_CALLBACK`, `MENU_SUGGESTED_ITEM`, `MENU_LOCAL_TASK`, `MENU_DEFAULT_LOCAL_TASK`, `MENU_LOCAL_ACTION`, `MENU_CONTEXTUAL_TAB`.
+  - `file`, `file path`, `delivery callback`, `theme callback`, `weight`, `menu_name`.
+- **Non-1:1 Modernization Mapping**:
+  - Decompose 1 `hook_menu()` into multiple modern D10/D11 artifacts:
+    - Route Definitions $\rightarrow$ `<module>.routing.yml`
+    - Page Callback $\rightarrow$ Controller class (`src/Controller/`) or Form class (`src/Form/`)
+    - Access Callback $\rightarrow$ Route `_permission`, `_custom_access`, or `AccessCheckInterface` service (`src/Access/`)
+    - Wildcard Loaders $\rightarrow$ Route parameter converters (`ParamConverterInterface`)
+    - Menu Items $\rightarrow$ `<module>.links.menu.yml`
+    - Tabs / Local Tasks $\rightarrow$ `<module>.links.task.yml`
+    - Actions $\rightarrow$ `<module>.links.action.yml`
+    - Contextual Links $\rightarrow$ `<module>.links.contextual.yml`
+
+### 19. Subsystem Hook Modernization Mapping
+Explicitly analyze and map specialized D7 subsystem hooks:
+- **Form Behavior (`hook_form_*`, `hook_form_alter`, `hook_form_FORM_ID_alter`)**: Form builders, form validation callbacks, submit callbacks, AJAX callbacks, form state, `#states`, `#ajax`, `#submit`, `#validate`, `#tree`, `#access`, `#attached` assets $\rightarrow$ modern Form API classes (`FormBase`, `ConfigFormBase`, `ConfirmFormBase`).
+- **Entity Lifecycle Hooks (`hook_node_insert`, `hook_node_update`, `hook_node_delete`, `hook_entity_insert`, `hook_entity_update`, `hook_entity_delete`, `hook_user_insert`, `hook_user_update`, `hook_user_delete`, `hook_taxonomy_term_insert`, `hook_taxonomy_term_update`, `hook_taxonomy_term_delete`, `hook_comment_insert`, `hook_comment_update`, `hook_comment_delete`, `hook_file_insert`, `hook_file_update`, `hook_file_delete`, `hook_file_presave`)**: Pre/post save logic, side effects, notifications, presave, postsave $\rightarrow$ modern entity hooks or Event Subscribers (`hook_ENTITY_TYPE_insert`, `hook_ENTITY_TYPE_presave`).
+- **Access Control Hooks (`hook_permission`, `hook_node_access`, `hook_file_download`, `user_access`)**: Permissions and granular access checks $\rightarrow$ `<module>.permissions.yml`, Entity Access Control Handlers (`EntityAccessControlHandler`), or Custom Access Checkers implementing `AccessCheckInterface`. Ambiguous access logic must be flagged as `HUMAN_DECISION_REQUIRED` or `UNVERIFIED`.
+- **Theme & Rendering Hooks (`hook_theme`, `hook_theme_registry_alter`, `hook_preprocess_*`, `hook_process_*`, `hook_page_build`, `hook_page_alter`, `hook_html_head`, `hook_css_alter`, `hook_js_alter`)**: Template registrations, render array alterations, and assets $\rightarrow$ Twig templates, `<theme>.theme` preprocess functions, and `<module>.libraries.yml`.
+- **Block Hooks (`hook_block_info`, `hook_block_view`, `hook_block_configure`, `hook_block_save`)**: Procedural block callbacks $\rightarrow$ modern Block Plugin classes (`src/Plugin/Block/`) extending `BlockBase` with annotations/attributes.
+- **Views Hooks (`hook_views_data`, `hook_views_data_alter`, `hook_views_query_alter`, `hook_views_pre_execute`, `hook_views_post_execute`, `hook_views_pre_render`, `hook_views_post_render`)**: Custom views data, query alters, and render handlers $\rightarrow$ modern `hook_views_data()` and Views plugins.
+- **Token Hooks (`hook_token_info`, `hook_tokens`)**: Token definitions and replacements $\rightarrow$ modern `hook_token_info()`, `hook_tokens()`, and `BubbleableMetadata` caching.
+- **Mail Hooks (`hook_mail`)**: Email formatting and body construction $\rightarrow$ modern `MailInterface` plugins or Mail Manager service.
+- **Cron & Request Lifecycle Hooks (`hook_cron`, `hook_init`, `hook_exit`, `hook_boot`)**: Scheduled jobs and request interceptors $\rightarrow$ Cron services, QueueWorker plugins (`src/Plugin/QueueWorker/`), or Symfony Kernel Event Subscribers (`KernelEvents::REQUEST`, `KernelEvents::RESPONSE`, `KernelEvents::TERMINATE`).
+
+### 20. Hook Call Graph & Execution Ordering
+- **Call Graph Dependencies**: Trace functions, services, database queries, and config objects invoked by every hook.
+- **Execution Ordering Constraints**: Account for module weight (`{system}.weight`), `hook_module_implements_alter()`, execution_order, alter_order, presave vs postsave lifecycle timings, and form validation sequences.
+
 ---
 
 ## Output Reporting Standard
 All discovery outputs must:
-1. Provide verifiable file paths, class names, method signatures, table names, and line numbers (`[OBSERVED FACT]`).
-2. Populate `custom_php_files`, `inc_files`, and `custom_database_tables` in `state/migration-manifest.yml`.
-3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL as `[UNVERIFIED RESULT]`.
+1. Provide verifiable file paths, class names, method signatures, table names, hook names, and line numbers (`[OBSERVED FACT]`).
+2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, and `hook_implementations` in `state/migration-manifest.yml`.
+3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call as `[UNVERIFIED RESULT]`.
