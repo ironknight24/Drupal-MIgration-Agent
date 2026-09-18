@@ -1,0 +1,88 @@
+# ==============================================================================
+# DRUPAL MIGRATION AGENT FRAMEWORK — STATE TRACKER
+# ==============================================================================
+# Answers: "WHERE are we in the migration?"
+#
+# Tracks high-level lifecycle progress, active phase, completion timestamps,
+# statistics, and active system blockers. This file is inspectable and resumable.
+# ==============================================================================
+
+version: "1.0"
+last_updated: "2026-09-18T19:00:00Z"
+current_phase: "phase_0_framework_init"
+status: "initialized" # initialized | in_progress | paused | completed | blocked
+global_block: false
+
+# Phase Progress State
+phases:
+  phase_0_framework_init:
+    name: "Framework Initialization"
+    status: "completed"
+    started_at: "2026-09-18T19:00:00Z"
+    completed_at: "2026-09-18T19:00:00Z"
+    notes: "Step 0 complete: Factory specifications, protocols, and templates created."
+
+  phase_1_discovery:
+    name: "Project Discovery & Baseline Audit"
+    status: "not_started"
+    started_at: null
+    completed_at: null
+    notes: "Pending Step 1 initiation."
+
+  phase_2_dependencies:
+    name: "Dependency Analysis & Dynamic Sequencing"
+    status: "not_started"
+    started_at: null
+    completed_at: null
+
+  phase_3_contrib_strategy:
+    name: "Contributed Module Strategy"
+    status: "not_started"
+    started_at: null
+    completed_at: null
+
+  phase_4_planning:
+    name: "Dynamic Migration Planning"
+    status: "not_started"
+    started_at: null
+    completed_at: null
+
+  phase_5_execution:
+    name: "Modernization & Code Implementation"
+    status: "not_started"
+    started_at: null
+    completed_at: null
+
+  phase_6_testing:
+    name: "Automated Testing & Static Analysis"
+    status: "not_started"
+    started_at: null
+    completed_at: null
+
+  phase_7_validation:
+    name: "Comparative Behavioral Validation"
+    status: "not_started"
+    started_at: null
+    completed_at: null
+
+  phase_8_final_audit:
+    name: "Final Migration Audit & Sign-off"
+    status: "not_started"
+    started_at: null
+    completed_at: null
+
+# Aggregate Component Progress
+statistics:
+  total_components: 0
+  completed: 0
+  in_progress: 0
+  blocked: 0
+  pending: 0
+
+# Active Blockers (Component or Global)
+active_blockers: []
+# Schema:
+# - ticket_id: "BLOCKED-XXX-001"
+#   type: "COMPONENT" # COMPONENT | GLOBAL
+#   component: "module_name"
+#   created_at: "..."

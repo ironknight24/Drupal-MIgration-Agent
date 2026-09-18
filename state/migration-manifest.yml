@@ -1,0 +1,91 @@
+# ==============================================================================
+# DRUPAL MIGRATION AGENT FRAMEWORK — MIGRATION MANIFEST
+# ==============================================================================
+# Answers: "WHAT exactly are we migrating?"
+#
+# This file tracks every component, module, theme, configuration entity,
+# custom database table, and data pipeline to be migrated.
+#
+# NOTE: This manifest schema is initialized during Step 0 and will be
+# fully populated by the Discovery Agent in Step 1.
+# ==============================================================================
+
+version: "1.0"
+generated_at: null # Populated during Step 1 (Discovery)
+source_system:
+  drupal_version: "7"
+  php_version: ""
+target_system:
+  drupal_version: "10"
+  php_version: ""
+
+# ------------------------------------------------------------------------------
+# 1. Custom Modules Inventory
+# ------------------------------------------------------------------------------
+# Schema for each custom module:
+# - name: "my_module"
+#   source_path: "drupal7/modules/custom/my_module"
+#   target_path: "drupal/web/modules/custom/my_module"
+#   d7_entry_file: "my_module.module"
+#   dependencies: []
+#   requires_custom_schema: false
+#   status: "not_started" # not_started | analyzed | planned | in_progress | completed | blocked
+#   tests_passed: false
+#   validation_status: "pending" # pending | PASS | PARTIAL | FAIL | BLOCKED | N/A
+custom_modules: []
+
+# ------------------------------------------------------------------------------
+# 2. Contributed Modules Strategy Inventory
+# ------------------------------------------------------------------------------
+# Schema for each contrib module:
+# - name: "views"
+#   d7_version: "7.x-3.24"
+#   d10_status: "core_merged" # core_merged | d10_available | community_replacement | custom_needed | obsolete
+#   recommended_replacement: "drupal/core"
+#   requires_config_migration: true
+#   requires_data_migration: true
+#   status: "not_started"
+contrib_modules: []
+
+# ------------------------------------------------------------------------------
+# 3. Custom Themes Inventory
+# ------------------------------------------------------------------------------
+# Schema for each theme:
+# - name: "my_theme"
+#   source_path: "drupal7/themes/my_theme"
+#   target_path: "drupal/web/themes/custom/my_theme"
+#   base_theme: "olivero"
+#   status: "not_started" # not_started | planned | in_progress | completed | blocked
+themes: []
+
+# ------------------------------------------------------------------------------
+# 4. Configuration & Entities Inventory
+# ------------------------------------------------------------------------------
+# Schema for configuration items:
+# - type: "content_type" # content_type | taxonomy_vocabulary | field | view | image_style | role
+#   name: "article"
+#   status: "not_started"
+configuration: []
+
+# ------------------------------------------------------------------------------
+# 5. Data Migration Pipelines Inventory
+# ------------------------------------------------------------------------------
+# Schema for data migration pipelines:
+# - id: "d7_node_article"
+#   source_entity: "node:article"
+#   target_entity: "node:article"
+#   dependencies: ["d7_user", "d7_file"]
+#   source_count: null
+#   migrated_count: null
+#   status: "not_started" # not_started | in_progress | completed | blocked
+data_migrations: []
+
+# ------------------------------------------------------------------------------
+# 6. Third-Party Integrations Inventory
+# ------------------------------------------------------------------------------
+# Schema for integration endpoints:
+# - name: "payment_gateway"
+#   type: "rest" # rest | soap | webhook | auth | external_db
+#   target_service: "my_module.payment_client"
+#   status: "not_started"
+integrations: []
