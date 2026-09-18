@@ -23,7 +23,7 @@ phases:
     status: "completed"
     started_at: "2026-09-18T19:00:00Z"
     completed_at: "2026-09-18T22:30:00Z"
-    notes: "Step 0-3 complete: Specifications, skills, references, and orchestration contracts formalized."
+    notes: "Framework initialized and ready for migration execution."
 
   DISCOVERY:
     name: "Project Discovery & Baseline Audit"
@@ -126,7 +126,7 @@ active_blockers: []
 last_action:
   timestamp: "2026-09-18T22:30:00Z"
   agent: "orchestrator"
-  summary: "Factory Step 3: Formalized workflow orchestration and coordination contracts."
+  summary: "Framework initialized. Ready to execute /preflight and /discover."
 next_action:
   recommended_agent: "discovery"
   command: "/discover"

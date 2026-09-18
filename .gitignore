@@ -22,6 +22,10 @@ Thumbs.db
 *.pem
 *.key
 
+# Consumer Active Configuration (Created from migration.config.example.yml)
+migration.config.yml
+!migration.config.example.yml
+
 # Temporary / Scratch Files
 scratch/
 tmp/

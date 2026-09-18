@@ -210,8 +210,6 @@ class FactoryValidator:
         forbidden_pattern = re.compile(r'/Users/[a-zA-Z0-9_-]+/Desktop/Projects/|C:\\Users\\[a-zA-Z0-9_-]+\\|/home/[a-zA-Z0-9_-]+/')
         violations = []
         exempt_files = {
-            "reports/final/step-1-package-validation.md",
-            "logs/file-change-log/step-1-package-change-log.md",
             "tests/validate_factory.py"
         }
         for root, dirs, files in os.walk(self.repo_root):
@@ -1303,7 +1301,7 @@ class FactoryValidator:
     def generate_result_json(self):
         return {
             "schema_version": "1.0",
-            "validation_id": f"VAL-FACTORY-STEP10-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
+            "validation_id": f"VAL-FACTORY-v1.0.0-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
             "validator": "drupal-migration:factory-self-validation",
             "executed_at": datetime.now(timezone.utc).isoformat(),
             "summary": self.summary,
@@ -1312,7 +1310,7 @@ class FactoryValidator:
 
     def print_summary(self):
         print("=" * 80)
-        print(" DRUPAL-MIGRATION-AGENT FACTORY SELF-VALIDATION SUMMARY (STEP 10)")
+        print(" DRUPAL-MIGRATION-AGENT FACTORY SELF-VALIDATION SUMMARY (v1.0.0 RELEASE)")
         print("=" * 80)
         print(f" Total Checks Evaluated : {self.summary['checks_total']}")
         print(f"   [PASS]        Passed : {self.summary['passed']}")
@@ -1348,8 +1346,8 @@ def main():
 
         result_json = validator.generate_result_json()
 
-        # Write to step-10 reports directory
-        reports_dir = repo_root / "reports" / "step-10"
+        # Write to reports directory
+        reports_dir = repo_root / "reports"
         reports_dir.mkdir(parents=True, exist_ok=True)
         with open(reports_dir / "validation_result.json", 'w', encoding='utf-8') as f:
             json.dump(result_json, f, indent=2)

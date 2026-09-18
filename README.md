@@ -217,11 +217,12 @@ Drupal-MIgration-Agent/
 │   └── file-change-log.md           # Granular file modification audit template
 │
 ├── reports/                         # Deterministic report output directories
+├── tests/                           # Factory self-validation suite & JSON schemas
 ├── state/                           # Dual state management templates (state & manifest)
 ├── logs/                            # Audit logs (file change tracking)
 │
 ├── migration.config.example.yml     # Canonical configuration template for consumer onboarding
-├── migration.config.yml             # Workspace configuration instance
+├── LICENSE                          # Open-source MIT License
 ├── README.md                        # Package documentation & usage guide
 ├── ARCHITECTURE.md                  # Factory vs Migration execution architecture
 ├── AGENT_PROTOCOL.md                # Inter-agent handoff contracts & evidence taxonomy

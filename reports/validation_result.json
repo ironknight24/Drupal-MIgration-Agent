@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-STEP9-20260918191059",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260918193406",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T19:10:59.988893+00:00",
+  "executed_at": "2026-09-18T19:34:06.338477+00:00",
   "summary": {
-    "checks_total": 89,
-    "passed": 87,
+    "checks_total": 96,
+    "passed": 94,
     "failed": 0,
     "warnings": 1,
     "unverified": 1
@@ -1021,6 +1021,92 @@
       "evidence": "Simulated 9-step safe resume sequence successfully verified all integrity gates and authorized dispatch.",
       "details": "Verified safe resume algorithm.",
       "affected_files": [],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REL-01",
+      "category": "packaging",
+      "name": "Package Version Consistency",
+      "status": "PASS",
+      "evidence": "Verified consistent v1.0.0 versioning across plugin.json, marketplace.json, and configuration templates.",
+      "details": "Verified package release version alignment.",
+      "affected_files": [
+        ".claude-plugin/plugin.json",
+        ".claude-plugin/marketplace.json",
+        "migration.config.example.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REL-02",
+      "category": "packaging",
+      "name": "Open Source License Declaration",
+      "status": "PASS",
+      "evidence": "LICENSE file exists with valid MIT License text matching package manifests.",
+      "details": "Verified open-source license distribution readiness.",
+      "affected_files": [
+        "LICENSE"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REL-03",
+      "category": "documentation",
+      "name": "Consumer Onboarding Guide Completeness",
+      "status": "PASS",
+      "evidence": "README.md contains end-to-end consumer onboarding guide with all commands, configuration steps, and safety disclaimers.",
+      "details": "Verified consumer documentation usability.",
+      "affected_files": [
+        "README.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REL-04",
+      "category": "packaging",
+      "name": "Repository Directory Inventory Integrity",
+      "status": "PASS",
+      "evidence": "All 10 mandatory repository directories exist and are properly structured.",
+      "details": "Verified repository structural integrity for distribution.",
+      "affected_files": [],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REL-05",
+      "category": "safety",
+      "name": "Comprehensive Final Safety Matrix Verification",
+      "status": "PASS",
+      "evidence": "All 15 cardinal safety rules, recovery algorithms, and 4-phase production safety checklists are fully verified.",
+      "details": "Verified production safety framework.",
+      "affected_files": [
+        "SAFETY_RULES.md",
+        "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REL-06",
+      "category": "packaging",
+      "name": "Git Distribution Hygiene & Exclusion Rules",
+      "status": "PASS",
+      "evidence": ".gitignore properly excludes OS artifacts, IDE directories, environment secrets, and scratch files.",
+      "details": "Verified clean repository packaging.",
+      "affected_files": [
+        ".gitignore"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REL-07",
+      "category": "documentation",
+      "name": "Runtime Limitation Notice Enforcement",
+      "status": "PASS",
+      "evidence": "Universal runtime limitation notice is explicitly preserved across all public documentation.",
+      "details": "Verified truthful runtime boundary representation.",
+      "affected_files": [
+        "README.md",
+        "AGENT_PROTOCOL.md"
+      ],
       "remediation": ""
     }
   ]
