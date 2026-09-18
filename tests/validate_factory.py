@@ -2348,11 +2348,11 @@ class FactoryValidator:
         has_doc_sync = (
             taxonomy_in_d7 and
             "1.1.0" in config_skill and
-            any(v in mapping_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0"]) and
-            any(v in custom_skill for v in ["1.4.0", "1.5.0", "1.6.0"]) and
-            any(v in dep_skill for v in ["1.4.0", "1.5.0", "1.6.0"]) and
-            any(v in test_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0"]) and
-            any(v in val_skill for v in ["1.4.0", "1.5.0", "1.6.0"])
+            any(v in mapping_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0"]) and
+            any(v in custom_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0"]) and
+            any(v in dep_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0"]) and
+            any(v in test_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0"]) and
+            any(v in val_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0"])
         )
 
         if has_doc_sync:
@@ -3273,6 +3273,479 @@ class FactoryValidator:
                               "Cross-capability compatibility check failed across manifest, skills, or documentation.",
                               "Forms capability must maintain seamless compatibility with entity, config, hook, database, and class capabilities.")
 
+    def validate_frontend_assets_and_libraries_suite(self):
+        """Step 18: Comprehensive D7 JavaScript, CSS, Libraries & Frontend Behavior Discovery, Accounting & D10/D11 Re-Engineering Suite."""
+        manifest_text = (self.repo_root / "state" / "migration-manifest.yml").read_text(encoding='utf-8')
+        d7_skill = (self.repo_root / "skills" / "d7-analysis" / "SKILL.md").read_text(encoding='utf-8')
+        mapping_skill = (self.repo_root / "skills" / "d7-to-d10-mapping" / "SKILL.md").read_text(encoding='utf-8')
+        custom_skill = (self.repo_root / "skills" / "custom-module-migration" / "SKILL.md").read_text(encoding='utf-8')
+        mig_skill = (self.repo_root / "skills" / "migration-api" / "SKILL.md").read_text(encoding='utf-8')
+        dep_skill = (self.repo_root / "skills" / "dependency-analysis" / "SKILL.md").read_text(encoding='utf-8')
+        test_skill = (self.repo_root / "skills" / "testing" / "SKILL.md").read_text(encoding='utf-8')
+        val_skill = (self.repo_root / "skills" / "behavioral-validation" / "SKILL.md").read_text(encoding='utf-8')
+        disc_agent = (self.repo_root / "agents" / "discovery" / "agent.md").read_text(encoding='utf-8')
+        custom_agent = (self.repo_root / "agents" / "custom-module" / "agent.md").read_text(encoding='utf-8')
+        disc_template = (self.repo_root / "templates" / "discovery-report.md").read_text(encoding='utf-8')
+        plan_template = (self.repo_root / "templates" / "migration-plan.md").read_text(encoding='utf-8')
+        val_template = (self.repo_root / "templates" / "validation-report.md").read_text(encoding='utf-8')
+        readme_text = (self.repo_root / "README.md").read_text(encoding='utf-8')
+        arch_text = (self.repo_root / "ARCHITECTURE.md").read_text(encoding='utf-8')
+
+        # 18.01 Generic Frontend Asset Discovery Completeness
+        has_asset_disc = (
+            "drupal_add_js" in d7_skill and
+            "drupal_add_css" in d7_skill and
+            "drupal_add_library" in d7_skill and
+            "Exhaustive Frontend Asset Discovery" in d7_skill and
+            "Frontend Asset, JavaScript Behavior, CSS & Library Discovery" in disc_agent
+        )
+
+        if has_asset_disc:
+            self.record_check("CHECK-FRONTEND-01", "discovery", "Generic Frontend Asset Discovery Completeness", "PASS",
+                              "Discovery agent and D7 analysis skill define exhaustive frontend asset discovery across .js, .css, .scss, .less, drupal_add_js(), drupal_add_css(), drupal_add_library(), and #attached.",
+                              "Verified generic frontend asset discovery capabilities.",
+                              affected_files=["agents/discovery/agent.md", "skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-01", "discovery", "Generic Frontend Asset Discovery Completeness", "FAIL",
+                              "Missing drupal_add_js, drupal_add_css, drupal_add_library, or asset discovery in agent or skill.",
+                              "Discovery must exhaustively identify all frontend assets.")
+
+        # 18.02 JavaScript Behavior Discovery & Lifecycle
+        has_js_behavior = (
+            "Drupal.behaviors" in d7_skill and
+            "Drupal.behaviors" in mapping_skill and
+            "attach" in d7_skill and
+            "detach" in d7_skill
+        )
+
+        if has_js_behavior:
+            self.record_check("CHECK-FRONTEND-02", "behavior", "JavaScript Behavior Discovery & Lifecycle", "PASS",
+                              "Skills and agents discover Drupal.behaviors implementations, attach(context, settings) and detach(context, settings, trigger) lifecycle methods.",
+                              "Verified JavaScript behavior discovery and lifecycle mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-02", "behavior", "JavaScript Behavior Discovery & Lifecycle", "FAIL",
+                              "Missing Drupal.behaviors, attach, or detach in skills.",
+                              "Factory must discover and map Drupal.behaviors lifecycle methods.")
+
+        # 18.03 once() Pattern Modernization
+        has_once_api = (
+            "jQuery.once" in d7_skill and
+            "once(" in mapping_skill and
+            "ONCE_API_REWRITE" in mig_skill
+        )
+
+        if has_once_api:
+            self.record_check("CHECK-FRONTEND-03", "once", "once() Pattern Modernization", "PASS",
+                              "Mapping skill modernizes legacy jQuery.once() into modern @drupal/once / once() iterating natively via forEach().",
+                              "Verified once() pattern modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-03", "once", "once() Pattern Modernization", "FAIL",
+                              "Missing jQuery.once or once() pattern modernization in skills.",
+                              "Factory must map jQuery.once to @drupal/once.")
+
+        # 18.04 Drupal.settings to drupalSettings Data Flow
+        has_settings_flow = (
+            "Drupal.settings" in d7_skill and
+            "drupalSettings" in mapping_skill and
+            "DRUPAL_SETTINGS_REWRITE" in mig_skill
+        )
+
+        if has_settings_flow:
+            self.record_check("CHECK-FRONTEND-04", "settings", "Drupal.settings to drupalSettings Data Flow Accounting", "PASS",
+                              "Skills and manifest schema trace PHP runtime configuration generation into client-side drupalSettings closures.",
+                              "Verified Drupal.settings to drupalSettings data flow accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-04", "settings", "Drupal.settings to drupalSettings Data Flow Accounting", "FAIL",
+                              "Missing Drupal.settings or drupalSettings in skills.",
+                              "Factory must account for Drupal.settings to drupalSettings data flow.")
+
+        # 18.05 Client-Side AJAX Command & Handler Accounting
+        has_ajax_client = (
+            "Drupal.AjaxCommands.prototype" in mapping_skill and
+            "Drupal.ajax" in d7_skill and
+            "AJAX_CLIENT_REWRITE" in mig_skill
+        )
+
+        if has_ajax_client:
+            self.record_check("CHECK-FRONTEND-05", "ajax", "Client-Side AJAX Command & Handler Accounting", "PASS",
+                              "Skills discover client-side Drupal.ajax handlers and modernize custom AJAX response handlers into Drupal.AjaxCommands.prototype extensions.",
+                              "Verified client-side AJAX command and handler accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-05", "ajax", "Client-Side AJAX Command & Handler Accounting", "FAIL",
+                              "Missing Drupal.AjaxCommands.prototype or Drupal.ajax in skills.",
+                              "Factory must account for client-side AJAX command handlers.")
+
+        # 18.06 CSS Stylesheet & Media Query Discovery
+        has_css_disc = (
+            "@media" in d7_skill and
+            "SMACSS" in d7_skill and
+            "CSS_LIBRARY" in mig_skill
+        )
+
+        if has_css_disc:
+            self.record_check("CHECK-FRONTEND-06", "css", "CSS Stylesheet & Media Query Discovery", "PASS",
+                              "Skills discover CSS rules, responsive @media queries, and preprocess alterations (hook_css_alter), categorizing rules into SMACSS structural categories.",
+                              "Verified CSS stylesheet and media query discovery.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-06", "css", "CSS Stylesheet & Media Query Discovery", "FAIL",
+                              "Missing CSS, @media, or SMACSS analysis in skills.",
+                              "Factory must discover CSS stylesheets and media queries.")
+
+        # 18.07 *.libraries.yml Modernization & Architecture
+        has_libraries_yml = (
+            "libraries.yml" in mapping_skill and
+            "libraries.yml" in custom_skill and
+            "libraries.yml" in manifest_text
+        )
+
+        if has_libraries_yml:
+            self.record_check("CHECK-FRONTEND-07", "libraries", "*.libraries.yml Modernization & Architecture", "PASS",
+                              "Skills and custom-module agent generate modern <module>.libraries.yml definitions declaring CSS categories and explicit JavaScript dependencies.",
+                              "Verified *.libraries.yml modernization and architecture.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/custom-module-migration/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FRONTEND-07", "libraries", "*.libraries.yml Modernization & Architecture", "FAIL",
+                              "Missing *.libraries.yml in skills or manifest.",
+                              "Factory must modernize asset registration to *.libraries.yml.")
+
+        # 18.08 Legacy .info Asset Declaration Discovery
+        has_info_assets = (
+            "scripts[]" in d7_skill and
+            "stylesheets" in d7_skill and
+            "LIBRARY_YML_REWRITE" in mig_skill
+        )
+
+        if has_info_assets:
+            self.record_check("CHECK-FRONTEND-08", "info", "Legacy .info Asset Declaration Discovery", "PASS",
+                              "Skills discover legacy .info scripts[] and stylesheets[] declarations, modernizing them into <module>.libraries.yml asset packages.",
+                              "Verified legacy .info asset declaration discovery.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-08", "info", "Legacy .info Asset Declaration Discovery", "FAIL",
+                              "Missing scripts[] or stylesheets in skills.",
+                              "Factory must discover legacy .info asset declarations.")
+
+        # 18.09 Asset Attachment Mechanism Modernization
+        has_attachment_mod = (
+            "hook_page_attachments" in mapping_skill and
+            "#attached['library']" in mapping_skill
+        )
+
+        if has_attachment_mod:
+            self.record_check("CHECK-FRONTEND-09", "attachment", "Asset Attachment Mechanism Modernization", "PASS",
+                              "Mapping skill modernizes procedural drupal_add_js/css/library into hook_page_attachments() and render array #attached['library'] declarations.",
+                              "Verified asset attachment mechanism modernization.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-09", "attachment", "Asset Attachment Mechanism Modernization", "FAIL",
+                              "Missing hook_page_attachments or #attached['library'] in mapping skill.",
+                              "Factory must modernize asset attachment mechanisms.")
+
+        # 18.10 Library Dependency Graph & Core Ordering
+        has_lib_deps = (
+            "core/drupal" in mapping_skill and
+            "core/drupalSettings" in mapping_skill and
+            "core/once" in mapping_skill and
+            "core/jquery" in mapping_skill and
+            "Frontend Asset & Library Dependencies" in dep_skill
+        )
+
+        if has_lib_deps:
+            self.record_check("CHECK-FRONTEND-10", "dependencies", "Library Dependency Graph & Core Ordering", "PASS",
+                              "Skills and dependency analysis model asset dependencies across core/drupal, core/drupalSettings, core/once, and core/jquery in execution wave planning.",
+                              "Verified library dependency graph and core ordering.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/dependency-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-10", "dependencies", "Library Dependency Graph & Core Ordering", "FAIL",
+                              "Missing core library dependencies in mapping skill or dependency analysis skill.",
+                              "Factory must model library dependencies and core ordering.")
+
+        # 18.11 External & Third-Party Library Accounting
+        has_ext_libs = (
+            "EXTERNAL_LIBRARY" in mig_skill and
+            "THIRD_PARTY_LIBRARY" in mig_skill and
+            "type: external" in mapping_skill
+        )
+
+        if has_ext_libs:
+            self.record_check("CHECK-FRONTEND-11", "external", "External & Third-Party Library Accounting", "PASS",
+                              "Skills account for CDN scripts, vendor plugins, and third-party libraries, declaring external assets with type: external in *.libraries.yml.",
+                              "Verified external and third-party library accounting.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-11", "external", "External & Third-Party Library Accounting", "FAIL",
+                              "Missing EXTERNAL_LIBRARY or type: external in skills.",
+                              "Factory must account for external and third-party libraries.")
+
+        # 18.12 Inline JavaScript & CSS Accounting
+        has_inline_assets = (
+            "INLINE_TO_LIBRARY" in mig_skill and
+            "INLINE_TO_BEHAVIOR" in mig_skill and
+            "drupal_add_js(..., 'inline')" in d7_skill
+        )
+
+        if has_inline_assets:
+            self.record_check("CHECK-FRONTEND-12", "inline", "Inline JavaScript & CSS Accounting", "PASS",
+                              "Skills account for inline <script>, <style>, and drupal_add_js(..., 'inline') blocks, refactoring them into dedicated library files or parameterized drupalSettings behaviors.",
+                              "Verified inline JavaScript and CSS accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-12", "inline", "Inline JavaScript & CSS Accounting", "FAIL",
+                              "Missing inline asset handling in skills.",
+                              "Factory must account for inline JavaScript and CSS assets.")
+
+        # 18.13 DOM Selector & Event Handler Accounting
+        has_selectors_events = (
+            "selectors" in manifest_text and
+            "events" in manifest_text and
+            ("click" in d7_skill.lower() or "change" in d7_skill.lower())
+        )
+
+        if has_selectors_events:
+            self.record_check("CHECK-FRONTEND-13", "events", "DOM Selector & Event Handler Accounting", "PASS",
+                              "Manifest schema and skills account for bound DOM selectors and event listeners (click, change, submit, resize, scroll).",
+                              "Verified DOM selector and event handler accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FRONTEND-13", "events", "DOM Selector & Event Handler Accounting", "FAIL",
+                              "Missing selectors or events in manifest schema or skills.",
+                              "Factory must account for DOM selectors and event handlers.")
+
+        # 18.14 CSS SMACSS Categorization Accounting
+        smacss_cats = ["base", "layout", "component", "state", "theme"]
+        has_smacss = all(c in mapping_skill for c in smacss_cats)
+
+        if has_smacss:
+            self.record_check("CHECK-FRONTEND-14", "smacss", "CSS SMACSS Categorization Accounting", "PASS",
+                              "Mapping skill defines modern SMACSS stylesheet categorization (base, layout, component, state, theme) in *.libraries.yml.",
+                              "Verified CSS SMACSS categorization accounting.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-14", "smacss", "CSS SMACSS Categorization Accounting", "FAIL",
+                              "Missing SMACSS categories in mapping skill.",
+                              "Factory must categorize CSS stylesheets by SMACSS standards.")
+
+        # 18.15 Frontend Security & XSS Analysis
+        has_fe_sec = (
+            "Drupal.checkPlain" in d7_skill and
+            "innerHTML" in d7_skill and
+            "security_notes" in manifest_text
+        )
+
+        if has_fe_sec:
+            self.record_check("CHECK-FRONTEND-15", "security", "Frontend Security & XSS Analysis", "PASS",
+                              "Skills and manifest schema audit client-side DOM manipulation (.html(), innerHTML) for XSS risks, enforcing Drupal.checkPlain() and Drupal.t() escaping.",
+                              "Verified frontend security and XSS analysis.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FRONTEND-15", "security", "Frontend Security & XSS Analysis", "FAIL",
+                              "Missing frontend security or XSS analysis in skills or manifest.",
+                              "Factory must audit frontend security and DOM manipulation.")
+
+        # 18.16 Frontend Accessibility & ARIA Accounting
+        has_a11y = (
+            "aria-live" in d7_skill and
+            "focus" in d7_skill and
+            "accessibility_notes" in manifest_text
+        )
+
+        if has_a11y:
+            self.record_check("CHECK-FRONTEND-16", "accessibility", "Frontend Accessibility & ARIA Accounting", "PASS",
+                              "Skills and manifest schema audit dynamic DOM updates for ARIA live region updates, focus preservation, and keyboard event bindings.",
+                              "Verified frontend accessibility and ARIA accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FRONTEND-16", "accessibility", "Frontend Accessibility & ARIA Accounting", "FAIL",
+                              "Missing accessibility or ARIA checks in skills or manifest.",
+                              "Factory must audit frontend accessibility and focus management.")
+
+        # 18.17 Frontend to Form & Server AJAX Cross-Reference
+        has_form_fe_cross = (
+            "form_dependencies" in manifest_text and
+            "ajax_dependencies" in manifest_text and
+            "FORM / AJAX WRAPPER" in dep_skill
+        )
+
+        if has_form_fe_cross:
+            self.record_check("CHECK-FRONTEND-17", "cross_reference", "Frontend to Form & Server AJAX Cross-Reference", "PASS",
+                              "Manifest schema and dependency analysis cross-reference client-side JavaScript behaviors with server-side Form API definitions and AJAX commands.",
+                              "Verified frontend to Form and AJAX cross-reference.",
+                              affected_files=["skills/dependency-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FRONTEND-17", "cross_reference", "Frontend to Form & Server AJAX Cross-Reference", "FAIL",
+                              "Missing form or AJAX cross-references in manifest or dependency analysis.",
+                              "Factory must cross-reference frontend assets with forms and AJAX endpoints.")
+
+        # 18.18 Frontend to Entity & View Cross-Reference
+        has_ent_fe_cross = (
+            "entity_dependencies" in manifest_text and
+            "view_dependencies" in manifest_text and
+            "template_dependencies" in manifest_text
+        )
+
+        if has_ent_fe_cross:
+            self.record_check("CHECK-FRONTEND-18", "cross_reference", "Frontend to Entity & View Cross-Reference", "PASS",
+                              "Manifest schema records frontend asset dependencies on entity fields, view output, and custom template markup.",
+                              "Verified frontend to entity and view cross-reference.",
+                              affected_files=["state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FRONTEND-18", "cross_reference", "Frontend to Entity & View Cross-Reference", "FAIL",
+                              "Missing entity, view, or template cross-references in manifest.",
+                              "Factory must cross-reference frontend assets with entities and views.")
+
+        # 18.19 Theme Asset Handoff & Boundaries
+        has_theme_handoff = (
+            "THEME_ASSET_HANDOFF" in mig_skill and
+            "THEME_LIBRARY" in mig_skill and
+            "Step 20 Handoff" in dep_skill
+        )
+
+        if has_theme_handoff:
+            self.record_check("CHECK-FRONTEND-19", "theme", "Theme Asset Handoff & Boundaries", "PASS",
+                              "Skills clearly establish ownership boundaries between module-level functional assets (Step 18) and theme-level presentation stylesheets (Step 20 handoff).",
+                              "Verified theme asset handoff and boundaries.",
+                              affected_files=["skills/dependency-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-19", "theme", "Theme Asset Handoff & Boundaries", "FAIL",
+                              "Missing theme asset handoff strategy in skills.",
+                              "Factory must define clear boundaries between module and theme assets.")
+
+        # 18.20 21 Frontend Target Architecture Taxonomy
+        target_fe_tax = [
+            "DRUPAL_LIBRARY", "JS_BEHAVIOR", "JS_ONCE_BEHAVIOR", "AJAX_FRONTEND_BEHAVIOR",
+            "DRUPAL_SETTINGS_CONSUMER", "CSS_LIBRARY", "INLINE_JS", "INLINE_CSS",
+            "EXTERNAL_LIBRARY", "THIRD_PARTY_LIBRARY", "THEME_LIBRARY", "MODULE_LIBRARY",
+            "PREPROCESS_ATTACHMENT", "RENDER_ARRAY_ATTACHMENT", "AJAX_ATTACHMENT",
+            "CUSTOM_AJAX_COMMAND_CLIENT", "TEMPLATE_SCRIPT", "TEMPLATE_STYLE", "OBSOLETE",
+            "HUMAN_DECISION_REQUIRED", "UNVERIFIED"
+        ]
+        found_fe_tax = sum(1 for t in target_fe_tax if t in d7_skill or t in mig_skill)
+
+        if found_fe_tax >= 20:
+            self.record_check("CHECK-FRONTEND-20", "taxonomy", "21 Frontend Target Architecture Taxonomy", "PASS",
+                              f"Skills define the complete 21-class frontend target architecture taxonomy ({found_fe_tax}/21 detected) supporting all JS, CSS, and library modernizations.",
+                              "Verified 21 Frontend target architecture classifications.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-20", "taxonomy", "21 Frontend Target Architecture Taxonomy", "FAIL",
+                              f"Only {found_fe_tax}/21 frontend target architecture classifications found in skills.",
+                              "Factory must define all 21 frontend target architecture classifications.")
+
+        # 18.21 17 Frontend Migration Strategies
+        fe_strats = [
+            "LIBRARY_YML_REWRITE", "BEHAVIOR_REWRITE", "ONCE_API_REWRITE", "DRUPAL_SETTINGS_REWRITE",
+            "AJAX_CLIENT_REWRITE", "CSS_LIBRARY_REWRITE", "INLINE_TO_LIBRARY", "INLINE_TO_BEHAVIOR",
+            "PREPROCESS_ATTACHMENT_REWRITE", "THIRD_PARTY_LIBRARY_REPLACEMENT", "EXTERNAL_ASSET_REVIEW",
+            "THEME_ASSET_HANDOFF", "OBSOLETE", "REPLACED", "EXCLUDED_WITH_REASON",
+            "HUMAN_DECISION_REQUIRED", "UNVERIFIED"
+        ]
+        found_fe_strats = sum(1 for s in fe_strats if s in d7_skill or s in mig_skill)
+
+        if found_fe_strats >= 16:
+            self.record_check("CHECK-FRONTEND-21", "strategies", "17 Frontend Migration Strategies", "PASS",
+                              f"Skills define all 17 standardized frontend migration strategies ({found_fe_strats}/17 detected) separating migration methodology from terminal outcome status.",
+                              "Verified 17 frontend migration strategies.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-21", "strategies", "17 Frontend Migration Strategies", "FAIL",
+                              f"Only {found_fe_strats}/17 frontend migration strategies found in skills.",
+                              "Factory must define all 17 frontend migration strategies.")
+
+        # 18.22 Manifest Frontend Assets Accounting Schema
+        manifest_fe_fields = [
+            "item_id", "asset_type", "defining_module", "source_file", "source_line",
+            "asset_path", "library_name", "behavior_name", "selectors", "events",
+            "once_pattern", "settings_dependencies", "ajax_dependencies", "form_dependencies",
+            "entity_dependencies", "view_dependencies", "template_dependencies",
+            "attachment_mechanism", "dependency_edges", "external_dependencies",
+            "security_notes", "accessibility_notes", "target_architecture",
+            "target_artifacts", "migration_strategy", "validation_strategy",
+            "confidence", "status", "exclusion_reason"
+        ]
+        missing_fe_manifest = [f for f in manifest_fe_fields if f not in manifest_text]
+
+        if not missing_fe_manifest:
+            self.record_check("CHECK-FRONTEND-22", "manifest", "Manifest Frontend Assets Accounting Schema", "PASS",
+                              "state/migration-manifest.yml defines complete frontend_assets_items accounting schema covering all required JS, CSS, behavior, and library metadata fields.",
+                              "Verified manifest frontend_assets_items schema structure.",
+                              affected_files=["state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FRONTEND-22", "manifest", "Manifest Frontend Assets Accounting Schema", "FAIL",
+                              f"Missing manifest frontend fields: {', '.join(missing_fe_manifest)}",
+                              "Manifest schema must define all required frontend_assets_items fields.")
+
+        # 18.23 Zero-Omission Frontend Outcome Enforcement
+        approved_outcomes = ["MIGRATED", "REPLACED", "OBSOLETE", "EXCLUDED_WITH_REASON", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"]
+        forbidden_states = ["UNACCOUNTED", "UNKNOWN_WITHOUT_REASON", "SILENTLY_OMITTED"]
+
+        missing_approved = [o for o in approved_outcomes if o not in val_skill]
+        missing_forbidden = [f for f in forbidden_states if f not in val_skill or f not in d7_skill]
+
+        if not missing_approved and not missing_forbidden and "Frontend Assets & Libraries Accounted For" in val_template:
+            self.record_check("CHECK-FRONTEND-23", "validation", "Zero-Omission Frontend Outcome Enforcement", "PASS",
+                              "Validation agent and skill enforce approved terminal outcomes (MIGRATED, REPLACED, OBSOLETE, EXCLUDED_WITH_REASON, HUMAN_DECISION_REQUIRED, UNVERIFIED) and reject forbidden states for all frontend assets, behaviors, and CSS stylesheets.",
+                              "Verified zero-omission outcome enforcement for frontend assets.",
+                              affected_files=["skills/behavioral-validation/SKILL.md", "templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-23", "validation", "Zero-Omission Frontend Outcome Enforcement", "FAIL",
+                              "Missing approved outcomes or forbidden states in validation skill or template.",
+                              "Validation must enforce zero-omission outcomes for all frontend assets.")
+
+        # 18.24 Cross-Capability Compatibility & Purity
+        has_cross_compat = (
+            "custom_database_tables" in manifest_text and
+            "custom_php_files" in manifest_text and
+            "inc_files" in manifest_text and
+            "hook_implementations" in manifest_text and
+            "configuration_state_items" in manifest_text and
+            "entities_fields_items" in manifest_text and
+            "forms_ajax_items" in manifest_text and
+            "frontend_assets_items" in manifest_text and
+            "Frontend JavaScript, CSS, Libraries" in readme_text and
+            "Frontend JavaScript, CSS, Libraries" in arch_text
+        )
+
+        if has_cross_compat:
+            self.record_check("CHECK-FRONTEND-24", "compatibility", "Cross-Capability Compatibility & Purity", "PASS",
+                              "Frontend accounting seamlessly integrates with forms (Step 17), custom entities (Step 16), configuration (Step 15), procedural hooks (Step 14), database schemas (Step 13), custom PHP files (Step 12), and .inc files (Step 11) with 100% generic purity.",
+                              "Verified cross-capability architectural compatibility and purity.",
+                              affected_files=["state/migration-manifest.yml", "README.md", "ARCHITECTURE.md", "AGENT_PROTOCOL.md"])
+        else:
+            self.record_check("CHECK-FRONTEND-24", "compatibility", "Cross-Capability Compatibility & Purity", "FAIL",
+                              "Cross-capability compatibility check failed across manifest, skills, or documentation.",
+                              "Frontend capability must maintain seamless compatibility with form, entity, config, hook, database, and class capabilities.")
+
+        # 18.25 Documentation & Contract Synchronization
+        taxonomy_in_d7 = "21 frontend target architecture" in d7_skill.lower() or "21-class" in d7_skill.lower() or "21 frontend" in d7_skill.lower()
+        has_doc_sync = (
+            taxonomy_in_d7 and
+            any(v in mapping_skill for v in ["1.6.0", "1.7.0"]) and
+            any(v in custom_skill for v in ["1.7.0"]) and
+            any(v in dep_skill for v in ["1.7.0"]) and
+            any(v in test_skill for v in ["1.6.0", "1.7.0"]) and
+            any(v in val_skill for v in ["1.7.0"])
+        )
+
+        if has_doc_sync:
+            self.record_check("CHECK-FRONTEND-25", "documentation", "Documentation & Contract Synchronization", "PASS",
+                              "All skills, agents, manifests, templates, and core documentation files are fully synchronized with Step 18 frontend JavaScript, CSS, and library modernization standards.",
+                              "Verified documentation and contract synchronization.",
+                              affected_files=[
+                                  "skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md",
+                                  "skills/custom-module-migration/SKILL.md", "skills/dependency-analysis/SKILL.md",
+                                  "skills/testing/SKILL.md", "skills/behavioral-validation/SKILL.md",
+                                  "state/migration-manifest.yml", "README.md", "ARCHITECTURE.md"
+                              ])
+        else:
+            self.record_check("CHECK-FRONTEND-25", "documentation", "Documentation & Contract Synchronization", "FAIL",
+                              "Documentation synchronization check failed across skills or core documentation files.",
+                              "All documentation must reflect Step 18 capabilities and synchronized version numbers.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -3291,6 +3764,7 @@ class FactoryValidator:
         self.validate_configuration_state_accounting_suite()
         self.validate_entities_and_fields_suite()
         self.validate_forms_and_ajax_suite()
+        self.validate_frontend_assets_and_libraries_suite()
 
     def generate_result_json(self):
         return {

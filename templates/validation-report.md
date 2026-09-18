@@ -32,6 +32,9 @@ evidence_summary:
 - **Forms & Builders Accounted For**: {{ FORMS_ACCOUNTED_COUNT }} / {{ FORMS_TOTAL_COUNT }}
 - **Form Alters Accounted For**: {{ FORM_ALTERS_ACCOUNTED_COUNT }} / {{ FORM_ALTERS_TOTAL_COUNT }}
 - **AJAX Callbacks & Commands Accounted For**: {{ AJAX_ACCOUNTED_COUNT }} / {{ AJAX_TOTAL_COUNT }}
+- **Frontend Assets & Libraries Accounted For**: {{ FRONTEND_ACCOUNTED_COUNT }} / {{ FRONTEND_TOTAL_COUNT }}
+- **JavaScript Behaviors Accounted For**: {{ BEHAVIORS_ACCOUNTED_COUNT }} / {{ BEHAVIORS_TOTAL_COUNT }}
+- **CSS Stylesheets Accounted For**: {{ STYLESHEETS_ACCOUNTED_COUNT }} / {{ STYLESHEETS_TOTAL_COUNT }}
 
 ---
 
@@ -46,7 +49,7 @@ evidence_summary:
 | **5. Relationships** | | | `PASS` | |
 | **6. Configuration & State** | | | `PASS` | |
 | **7. Routes & URLs** | | | `PASS` | |
-| **8. Forms** | | | `PASS` | |
+| **8. Forms & Frontend** | | | `PASS` | |
 | **9. Integrations** | | | `PASS` | |
 | **10. Output & Markup** | | | `PASS` | |
 | **11. Workflows** | | | `PASS` | |
@@ -64,6 +67,8 @@ evidence_summary:
 | `{{ COMPONENT }}.module:hook_field_info` | `field: field_related_item` | `entityreference` | `field.storage.record.field_related_item` | `MIGRATED` | Reference integrity & lookup verified |
 | `{{ COMPONENT }}.module` | `form: {{ COMPONENT }}_filter_form` | `drupal_get_form` | `src/Form/FilterForm.php` | `MIGRATED` | Form submission & validation test passed |
 | `{{ COMPONENT }}.module` | `ajax: {{ COMPONENT }}_ajax_filter_callback` | `#ajax` callback | `src/Form/FilterForm.php::ajaxFilterCallback` | `MIGRATED` | AjaxResponse command test passed |
+| `js/widget.js` | `behavior: {{ COMPONENT }}Widget` | `jQuery.once` | `js/widget.js` (`core/once`) | `MIGRATED` | `once()` behavior execution verified |
+| `css/widget.css` | `stylesheet: widget.css` | `stylesheets[all][]` | `css/widget.css` (`libraries.yml`) | `MIGRATED` | Library parsing & SMACSS category verified |
 | `{{ COMPONENT }}.install` | `table: {{ COMPONENT }}_records` | `hook_schema: record_id, uid` | `src/Entity/RecordEntity.php` | `MIGRATED` | Entity CRUD & migration test verified |
 | `includes/admin.inc:24` | `variable: {{ COMPONENT }}_endpoint` | `https://api.example.com` | `config/install/{{ COMPONENT }}.settings.yml` | `MIGRATED` | Schema test & ConfigForm submit verified |
 | `{{ COMPONENT }}.module:110` | `variable: {{ COMPONENT }}_last_sync` | `0` (int) | `State API` (`{{ COMPONENT }}.last_sync`) | `MIGRATED` | State persistence kernel test passed |

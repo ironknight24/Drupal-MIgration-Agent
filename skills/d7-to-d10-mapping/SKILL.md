@@ -1,7 +1,7 @@
 ---
 name: d7-to-d10-mapping
-description: Behavioral and architectural mapping rules for converting procedural Drupal 7 APIs, hooks, variables, custom entities, fields, revisions, translations, forms, AJAX interactions, and legacy custom PHP classes into modern Drupal 10/11 object-oriented patterns.
-version: 1.5.0
+description: Exhaustive pattern mapping rules for converting Drupal 7 procedural code, inc files, custom database schemas, procedural hooks, configuration variables, entities, forms, and frontend assets into modern Drupal 10/11 object-oriented architecture.
+version: 1.6.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep
@@ -153,3 +153,60 @@ In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual li
 - **Multistep & Wizard Modernization**:
   - Multi-step state persisted via `FormStateInterface` storage (`$form_state->set('step', $step)`, `$form_state->get('step')`).
   - Step transitions trigger `$form_state->setRebuild(TRUE)` to re-invoke `buildForm()` with the updated step state.
+
+## 10. Frontend JavaScript, CSS, `*.libraries.yml`, `once()`, and `drupalSettings` Modernization
+- **Modern Library Registration (`*.libraries.yml`)**:
+  - All direct `drupal_add_js()` / `drupal_add_css()` calls and `.info` `scripts[]` / `stylesheets[]` declarations are replaced by structured `<module>.libraries.yml` definitions.
+  - Stylesheets categorized by SMACSS: `css: { base: { ... }, layout: { ... }, component: { ... }, state: { ... }, theme: { ... } }`.
+  - Core JavaScript dependencies explicitly declared (`dependencies: [core/drupal, core/drupalSettings, core/once, core/jquery]`).
+- **`Drupal.behaviors` and `once()` Pattern**:
+  - Legacy `jQuery.once()` is modernized to `@drupal/once` / `once()` iterating natively with `forEach()`:
+    ```javascript
+    (function (Drupal, once, drupalSettings) {
+      'use strict';
+      Drupal.behaviors.myModuleBehavior = {
+        attach: function (context, settings) {
+          once('my-behavior-key', '.my-selector', context).forEach(function (element) {
+            // Behavioral attachment logic
+          });
+        },
+        detach: function (context, settings, trigger) {
+          if (trigger === 'unload') {
+            // Cleanup logic
+          }
+        }
+      };
+    })(Drupal, once, drupalSettings);
+    ```
+- **`Drupal.settings` $\rightarrow$ `drupalSettings` Mapping**:
+  - PHP runtime data passed via render array attachments: `$attachments['#attached']['drupalSettings']['myModule']['key'] = $value`.
+  - Client-side scripts access data directly via the passed `drupalSettings` parameter in the behavior closure.
+- **Client-Side AJAX Commands (`Drupal.AjaxCommands`)**:
+  - Custom client-side AJAX command handlers modernize to prototype extensions:
+    ```javascript
+    (function (Drupal) {
+      'use strict';
+      Drupal.AjaxCommands.prototype.myCustomCommand = function (ajax, response, status) {
+        // Custom DOM reaction logic
+      };
+    })(Drupal);
+    ```
+- **Attachment APIs**:
+  - Page-level attachments modernized via `hook_page_attachments(array &$attachments)`.
+  - Element-level attachments modernized via `#attached['library'][] = '<module>/<library_name>'`.
+- **External & Third-Party Library Declarations**:
+  - CDN and third-party external assets declared in `<module>.libraries.yml` with `type: external`:
+    ```yaml
+    external-cdn-lib:
+      remote: https://cdn.example.com/lib
+      version: 1.0.0
+      license:
+        name: MIT
+        url: https://cdn.example.com/license
+        gpl-compatible: true
+      js:
+        https://cdn.example.com/lib.min.js: { type: external, minified: true }
+      css:
+        component:
+          https://cdn.example.com/lib.min.css: { type: external, minified: true }
+    ```

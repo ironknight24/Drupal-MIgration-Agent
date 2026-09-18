@@ -423,10 +423,57 @@ Audit form security and specialized form types:
 - **Approved Terminal Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
 - **Forbidden Terminal States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`.
 
+### 46. Exhaustive Frontend Asset Discovery
+Recursively discover all frontend assets across `.js`, `.css`, `.scss`, `.less`, `.info`, `.module`, `.theme`, `.inc`, `.php`, and template files:
+- **Direct Asset Files**: Discovers JavaScript files, stylesheets, CSS preprocessor files, vendor libraries, and theme assets.
+- **Attachment Mechanisms**: Detects `drupal_add_js()`, `drupal_add_css()`, `drupal_add_library()`, `#attached` render array declarations, preprocess attachment routines (`hook_preprocess_page`, `hook_preprocess_node`), and theme `.info` declarations (`scripts[]`, `stylesheets[]`).
+- **Dynamic & Inline Assets**: Detects `drupal_add_js(..., 'inline')`, `drupal_add_css(..., 'inline')`, inline `<script>` tags, inline `<style>` tags, and PHP-generated CSS/JS blocks.
+
+### 47. JavaScript Behaviors, Attach/Detach Lifecycle & `once()` Modernization
+Exhaustively parse JavaScript behavior implementations and execution lifecycles:
+- **`Drupal.behaviors` Implementations**: Discovers all `Drupal.behaviors.<name>` objects, `attach(context, settings)` methods, `detach(context, settings, trigger)` methods, and context DOM scopes.
+- **DOM Ready & Event Handlers**: Detects legacy `$(document).ready()`, `$(function() { ... })`, and unbound event listeners (`click`, `change`, `submit`, `resize`, `scroll`, `keydown`, `keyup`), mapping them to proper `Drupal.behaviors` execution contracts.
+- **`once()` Pattern Modernization**: Modernizes legacy `jQuery.once()` (`$(selector, context).once('key')`) and `.once()` plugins to modern `@drupal/once` / `once('key', selector, context)` iterating natively via `forEach()`.
+
+### 48. `Drupal.settings` $\rightarrow$ `drupalSettings` Data Flow Analysis
+Trace the lifecycle and transmission of PHP runtime configurations to client-side scripts:
+- **PHP Configuration Producers**: Discovers `drupal_add_js(array('myModule' => $data), 'setting')` and `#attached['js'] = array(array('data' => array('myModule' => $data), 'type' => 'setting'))` $\rightarrow$ modern `$attachments['#attached']['drupalSettings']['myModule'] = $data`.
+- **Client-Side Consumers**: Maps `Drupal.settings.myModule.key` read access in JavaScript to `drupalSettings.myModule.key` passed via behavior closures. Flag dynamically assembled or opaque settings as `UNVERIFIED`.
+
+### 49. Client-Side AJAX Behavior, Custom Commands & Event Handling
+Analyze client-side AJAX interactions and response reactions:
+- **`Drupal.ajax` Client Instances**: Discovers `Drupal.ajax`, `Drupal.ajax.instances`, custom submit button bindings, progress indicators (`throbber`, `bar`), and AJAX URL endpoints.
+- **Custom AJAX Commands**: Detects custom `Drupal.ajax.prototype.commands.<command_name>` or `Drupal.AjaxCommands.prototype.<command_name>` client-side implementations reacting to server-side `CommandInterface` responses.
+- **AJAX Lifecycle Events**: Analyzes event reactions (`ajaxStart`, `ajaxComplete`, `ajaxError`, `ajaxSuccess`) and dynamic behavior reattachment across DOM updates.
+
+### 50. CSS Stylesheets, Media Queries, Preprocess & SMACSS Architecture
+Analyze stylesheet rules, selectors, and structural categories:
+- **CSS Selectors & SMACSS Categories**: Classifies stylesheet rules into SMACSS categories (`base`, `layout`, `component`, `state`, `theme`) for modern `*.libraries.yml` asset grouping.
+- **Responsive & Media Rules**: Analyzes `@media` queries (screen, print, min-width, max-width, orientation) and responsive breakpoint assumptions.
+- **Dynamic & Preprocessed CSS**: Detects preprocess CSS alterations (`hook_css_alter()`), stylesheet overrides, and aggregation weight assumptions (`CSS_SYSTEM`, `CSS_DEFAULT`, `CSS_THEME`).
+
+### 51. Asset Attachment Mechanisms, Modern `*.libraries.yml` & Info Declarations
+Modernize legacy asset registration into Drupal 10/11 library definitions:
+- **Legacy `.info` Declarations**: Converts `scripts[] = js/my_script.js` and `stylesheets[all][] = css/my_style.css` into modern `<module>.libraries.yml` definitions.
+- **Modern Library Dependencies**: Explicitly discovers and declares modern core library dependencies (`core/drupal`, `core/drupalSettings`, `core/once`, `core/jquery`, `core/drupal.ajax`).
+- **Render Attachment**: Maps `drupal_add_library('system', 'ui.dialog')` to modern `#attached['library'][] = 'core/drupal.dialog'`.
+
+### 52. Frontend Security, Accessibility & Third-Party Library Management
+Audit frontend security vulnerabilities, accessibility hooks, and external dependencies:
+- **Security & XSS Analysis**: Audits DOM manipulation for unsafe HTML insertion (`.html()`, `innerHTML`, `document.write()`, `eval()`), ensuring `Drupal.checkPlain()` or `Drupal.t()` string placeholder escaping is utilized.
+- **Accessibility & Focus Management**: Audits keyboard event bindings (`keydown`, `keypress`), ARIA live regions (`aria-live="polite"`), focus preservation on AJAX updates, and dialog focus trapping.
+- **Third-Party & External Assets**: Identifies external CDN scripts, third-party plugin libraries, vendor files, and license compatibilities $\rightarrow$ modern Composer asset management or local library bundling.
+
+### 53. 21 Frontend Target Architecture Taxonomy & Migration Strategies
+- **21 Frontend Target Architecture Classifications**: `DRUPAL_LIBRARY`, `JS_BEHAVIOR`, `JS_ONCE_BEHAVIOR`, `AJAX_FRONTEND_BEHAVIOR`, `DRUPAL_SETTINGS_CONSUMER`, `CSS_LIBRARY`, `INLINE_JS`, `INLINE_CSS`, `EXTERNAL_LIBRARY`, `THIRD_PARTY_LIBRARY`, `THEME_LIBRARY`, `MODULE_LIBRARY`, `PREPROCESS_ATTACHMENT`, `RENDER_ARRAY_ATTACHMENT`, `AJAX_ATTACHMENT`, `CUSTOM_AJAX_COMMAND_CLIENT`, `TEMPLATE_SCRIPT`, `TEMPLATE_STYLE`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Standardized Migration Strategies (17 Strategies)**: `LIBRARY_YML_REWRITE`, `BEHAVIOR_REWRITE`, `ONCE_API_REWRITE`, `DRUPAL_SETTINGS_REWRITE`, `AJAX_CLIENT_REWRITE`, `CSS_LIBRARY_REWRITE`, `INLINE_TO_LIBRARY`, `INLINE_TO_BEHAVIOR`, `PREPROCESS_ATTACHMENT_REWRITE`, `THIRD_PARTY_LIBRARY_REPLACEMENT`, `EXTERNAL_ASSET_REVIEW`, `THEME_ASSET_HANDOFF`, `OBSOLETE`, `REPLACED`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Approved Terminal Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Forbidden Terminal States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`.
+
 ---
 
 ## Output Reporting Standard
 All discovery outputs must:
-1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, and line numbers (`[OBSERVED FACT]`).
-2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, and `forms_ajax_items` in `state/migration-manifest.yml`.
-3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.
+1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, JavaScript behavior names, library identifiers, and line numbers (`[OBSERVED FACT]`).
+2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, and `frontend_assets_items` in `state/migration-manifest.yml`.
+3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback / dynamic JS setting as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.

@@ -127,6 +127,9 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
      - D7 confirmation form / `confirm_form()` $\rightarrow$ D10 `ConfirmFormBase` in `src/Form/`
      - D7 entity edit form $\rightarrow$ D10 `ContentEntityForm` in `src/Form/`
      - D7 AJAX callback $\rightarrow$ D10 `AjaxResponse` returning `CommandInterface` objects
+     - D7 client-side JavaScript / `Drupal.behaviors` $\rightarrow$ D10 `once()` behavior in `js/` registered in `<module>.libraries.yml` with `core/drupal`, `core/drupalSettings`, `core/once`
+     - D7 `Drupal.settings` $\rightarrow$ D10 `#attached['drupalSettings']` + client `drupalSettings` parameter
+     - D7 CSS stylesheets $\rightarrow$ D10 SMACSS structured `<module>.libraries.yml` definitions in `css/`
      - D7 form alter (`hook_form_alter`) $\rightarrow$ D10 `hook_form_alter()` or EventSubscriber
      - D7 Drush command $\rightarrow$ modern Drush Command class in `src/Drush/Commands/`
      - D7 access callback $\rightarrow$ D10 Custom Access Check service in `src/Access/` or `EntityAccessControlHandler`
@@ -138,18 +141,18 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
    - Convert global references and static API calls to constructor-injected services (`database`, `entity_type.manager`, `config.factory`, `current_user`).
    - Avoid unnecessary service proliferation; only inject genuinely required dependencies.
 4. **Author Migration Plan (Step 7)**:
-   - Write `reports/custom-modules/PLAN-<MODULE>.md` detailing modern class hierarchy, entity definitions, form classes, service container definitions, routing, and an exhaustive File-to-Class/Function/Entity/Form Accounting Table.
+   - Write `reports/custom-modules/PLAN-<MODULE>.md` detailing modern class hierarchy, entity definitions, form classes, service container definitions, library declarations, JavaScript behaviors, CSS stylesheets, routing, and an exhaustive File-to-Class/Function/Entity/Form/Frontend Accounting Table.
 5. **Target Scaffolding (Step 8)**:
    - Create `<target_module_dir>/<MODULE>/<MODULE>.info.yml`.
    - Scaffold `<MODULE>.services.yml`, `<MODULE>.routing.yml`, `<MODULE>.permissions.yml`, `<MODULE>.libraries.yml`, `drush.services.yml` where needed.
-6. **OOP, Entity & Form Implementation & Scoped Delegation**:
-   - Implement controllers, form classes (`FormBase`, `ConfigFormBase`, `ConfirmFormBase`, `ContentEntityForm`), AJAX handlers, services, custom entities, Drush commands, and plugins with constructor Dependency Injection.
+6. **OOP, Entity, Form & Frontend Implementation & Scoped Delegation**:
+   - Implement controllers, form classes (`FormBase`, `ConfigFormBase`, `ConfirmFormBase`, `ContentEntityForm`), AJAX handlers, JavaScript `once()` behaviors (`js/`), SMACSS stylesheets (`css/`), `.libraries.yml` definitions, services, custom entities, Drush commands, and plugins with constructor Dependency Injection.
    - If complex procedural-to-service conversion is required, delegate scoped service authoring to `api-modernization`.
    - Author Unit and Kernel test classes in `tests/src/Unit/` and `tests/src/Kernel/`.
 7. **Log File Mutations**: Register every created file in `logs/file-change-log/`.
 8. **Author Implementation Report (Step 12)**:
-   - Generate `reports/custom-modules/REPORT-<MODULE>.md` recording explicit status for every source file, class, method, entity/field, and form definition (`MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`).
-9. **Generate `agent_result`**: Output canonical result payload proposing transition to `CODE_COMPLETE` with class, entity, and form accounting evidence and requesting downstream handoff to `testing`.
+   - Generate `reports/custom-modules/REPORT-<MODULE>.md` recording explicit status for every source file, class, method, entity/field, form definition, and frontend asset (`MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`).
+9. **Generate `agent_result`**: Output canonical result payload proposing transition to `CODE_COMPLETE` with class, entity, form, and frontend accounting evidence and requesting downstream handoff to `testing`.
 
 ---
 

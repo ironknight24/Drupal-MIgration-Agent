@@ -1,7 +1,7 @@
 ---
 name: custom-module-migration
-description: Comprehensive 12-step engineering playbook for migrating custom Drupal 7 modules into modern Drupal 10/11 modules, with recursive custom PHP file/class re-engineering, procedural hook decomposition, configuration, state, custom entities, fields, revisions, translations, forms, AJAX interactions, constructor DI modernization, and Drush modernization.
-version: 1.6.0
+description: End-to-end modernization methodology for migrating Drupal 7 custom modules, procedural hooks, database schemas, configuration variables, entities, forms, AJAX interactions, and frontend JavaScript/CSS/libraries into PSR-4 Drupal 10/11 modules.
+version: 1.7.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -73,6 +73,9 @@ Determine target version from project configuration (`target.core_version`):
      - D7 confirmation form / `confirm_form()` $\rightarrow$ D10 `ConfirmFormBase` in `src/Form/`
      - D7 entity edit/add form $\rightarrow$ D10 `ContentEntityForm` in `src/Form/` or registered entity form handler
      - D7 AJAX callback / commands $\rightarrow$ D10 `AjaxResponse` method returning `CommandInterface` objects
+     - D7 client-side JavaScript / `Drupal.behaviors` $\rightarrow$ D10 `once()` behavior in `js/` registered in `<module>.libraries.yml` with `core/drupal`, `core/drupalSettings`, `core/once`
+     - D7 `Drupal.settings` / `drupal_add_js(..., 'setting')` $\rightarrow$ D10 `#attached['drupalSettings']` + client `drupalSettings`
+     - D7 CSS stylesheets / `.info` stylesheets $\rightarrow$ D10 SMACSS structured `<module>.libraries.yml` definitions in `css/`
      - D7 form alter (`hook_form_alter`) $\rightarrow$ D10 `hook_form_alter()` or Event Subscriber
      - D7 business logic class / function / procedural hook $\rightarrow$ D10 Service class in `src/Service/` registered in `.services.yml`
      - D7 page callback from `hook_menu()` $\rightarrow$ D10 Controller in `src/Controller/`
@@ -96,30 +99,29 @@ Determine target version from project configuration (`target.core_version`):
 
 7. **Step 7: Migration Plan Formulation & Complete Accounting Matrix**
    - Generate `reports/custom-modules/PLAN-<MODULE>.md` using `templates/migration-plan.md`.
-   - Maintain an explicit File/Class/Hook/Database/Configuration/Entity/Form Accounting Table showing the exact target class, service, entity, field config, form class, AJAX handler, config object, state key, event subscriber, plugin, or routing artifact for every legacy item.
+   - Maintain an explicit File/Class/Hook/Database/Configuration/Entity/Form/Frontend Accounting Table showing the exact target class, service, entity, field config, form class, AJAX handler, library definition, JavaScript behavior, config object, state key, event subscriber, plugin, or routing artifact for every legacy item.
 
 8. **Step 8: Controlled Implementation & Modernization**
    - Scaffold module metadata (`.info.yml`, `.services.yml`, `.routing.yml`, `.permissions.yml`, `.links.menu.yml`, `.links.task.yml`, `drush.services.yml`, `.libraries.yml`).
    - Generate default configuration (`config/install/<module>.settings.yml`), schema (`config/schema/<module>.schema.yml`), and field definitions (`config/install/field.storage.*`, `field.field.*`).
-   - Implement entity classes (`src/Entity/`), access handlers, storage handlers, services, controllers, form classes (`FormBase`, `ConfigFormBase`, `ConfirmFormBase`), AJAX handlers, event subscribers, plugins, repository classes, and Drush classes strictly inside `target.path/web/modules/custom/<MODULE>/`.
+   - Implement entity classes (`src/Entity/`), access handlers, storage handlers, services, controllers, form classes (`FormBase`, `ConfigFormBase`, `ConfirmFormBase`), AJAX handlers, JavaScript `once()` behaviors (`js/`), SMACSS stylesheets (`css/`), `.libraries.yml` definitions, event subscribers, plugins, repository classes, and Drush classes strictly inside `target.path/web/modules/custom/<MODULE>/`.
    - Delegate scoped complex service authoring, DI modernization, and database query modernization to `api-modernization` where required.
    - Log all file creations and modifications in `logs/file-change-log/`.
 
 9. **Step 9: Automated Testing**
-   - Author PHPUnit Unit and Kernel tests targeting modernized entities (CRUD, revisions, translations), field storage, services, controllers, form submissions (`submitForm()`), form validation (`validateForm()`), AJAX response commands, configuration schemas, state persistence, event subscribers, repositories, and entities using `skills/testing`.
+   - Author PHPUnit Unit and Kernel tests targeting modernized entities (CRUD, revisions, translations), field storage, services, controllers, form submissions (`submitForm()`), form validation (`validateForm()`), AJAX response commands, JavaScript/CSS library registrations, configuration schemas, state persistence, event subscribers, repositories, and entities using `skills/testing`.
 
 10. **Step 10: Behavioral Validation**
     - Execute comparative audit against D7 baseline specifications using `skills/behavioral-validation`.
-    - Verify that every discovered custom PHP file, class, method, function, procedural hook, custom database table, configuration/state variable, entity type, field, form builder, form alter, and AJAX callback has an explicit modern equivalent or valid reason.
+    - Verify that every discovered custom PHP file, class, method, function, procedural hook, custom database table, configuration/state variable, entity type, field, form builder, form alter, AJAX callback, JavaScript behavior, and CSS asset has an explicit modern equivalent or valid reason.
 
 11. **Step 11: Gap Analysis & Outcome Accounting**
-    - Verify that every custom PHP file, class, function, procedural hook implementation, custom database table, configuration/state artifact, entity type, field, form, and AJAX callback ends in an approved outcome state:
+    - Verify that every custom PHP file, class, function, procedural hook implementation, custom database table, configuration/state artifact, entity type, field, form, AJAX callback, and frontend asset ends in an approved outcome state:
       `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, or `UNVERIFIED`.
     - Reject any `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, or `SILENTLY_OMITTED` items.
 
 12. **Step 12: Sign-Off & Manifest Update**
     - Generate `reports/custom-modules/REPORT-<MODULE>.md`.
-    - Propose updating component status to `CODE_COMPLETE` via `agent_result`.
 
 12. **Step 12: Sign-Off & Manifest Update**
     - Generate `reports/custom-modules/REPORT-<MODULE>.md`.

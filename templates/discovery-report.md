@@ -114,7 +114,16 @@ evidence_summary:
 
 ---
 
-## 11. Contributed Modules Inventory
+## 11. Frontend Assets, JavaScript Behaviors, CSS & Libraries Inventory (Step 18)
+
+| Module | Asset Path | Asset Type (10 Types) | Library / Behavior Name | Selectors & Events | `once()` Pattern | `drupalSettings` Consumed | Target Architecture (21 Types) | Migration Strategy (17 Strategies) | Status |
+|---|---|---|---|---|---|---|---|---|---|
+| `example_module` | `js/example-widget.js` | `JAVASCRIPT` | `exampleModuleBehavior` | `.example-widget` (click) | `ONCE_JS` | `exampleModule.apiEndpoint` | `JS_ONCE_BEHAVIOR` | `ONCE_API_REWRITE` | `MIGRATED` |
+| `example_module` | `css/example-style.css` | `STYLESHEET` | `example_module/widget_assets` | `.example-widget` | N/A | N/A | `CSS_LIBRARY` | `CSS_LIBRARY_REWRITE` | `MIGRATED` |
+
+---
+
+## 12. Contributed Modules Inventory
 
 | Contrib Module | D7 Version | Core in D10? | D10 Available? | Community Replacement | Action Plan |
 |---|---|---|---|---|---|
@@ -123,7 +132,7 @@ evidence_summary:
 
 ---
 
-## 11. Custom Themes Inventory
+## 13. Custom Themes Inventory
 
 | Theme Name | Path | Base Theme | Template Files (.tpl.php) | Preprocess Functions |
 |---|---|---|---|---|
@@ -131,7 +140,7 @@ evidence_summary:
 
 ---
 
-## 12. Custom Database Tables & Data-Model Inventory
+## 14. Custom Database Tables & Data-Model Inventory
 
 | Module | Table Name | Schema Location (`hook_schema`) | Primary Key & Indexes | Entity References (`uid`, `nid`, etc.) | Data Semantics (17 Categories) | Serialization (`PHP_SERIALIZE`, `JSON`, etc.) | CRUD Callers (Create/Read/Update/Delete) | Target Architecture |
 |---|---|---|---|---|---|---|---|---|

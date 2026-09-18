@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260918214605",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260918220043",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T21:46:05.123856+00:00",
+  "executed_at": "2026-09-18T22:00:43.109503+00:00",
   "summary": {
-    "checks_total": 212,
-    "passed": 211,
+    "checks_total": 237,
+    "passed": 236,
     "failed": 0,
     "warnings": 0,
     "unverified": 1
@@ -2643,6 +2643,340 @@
         "README.md",
         "ARCHITECTURE.md",
         "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-01",
+      "category": "discovery",
+      "name": "Generic Frontend Asset Discovery Completeness",
+      "status": "PASS",
+      "evidence": "Discovery agent and D7 analysis skill define exhaustive frontend asset discovery across .js, .css, .scss, .less, drupal_add_js(), drupal_add_css(), drupal_add_library(), and #attached.",
+      "details": "Verified generic frontend asset discovery capabilities.",
+      "affected_files": [
+        "agents/discovery/agent.md",
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-02",
+      "category": "behavior",
+      "name": "JavaScript Behavior Discovery & Lifecycle",
+      "status": "PASS",
+      "evidence": "Skills and agents discover Drupal.behaviors implementations, attach(context, settings) and detach(context, settings, trigger) lifecycle methods.",
+      "details": "Verified JavaScript behavior discovery and lifecycle mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-03",
+      "category": "once",
+      "name": "once() Pattern Modernization",
+      "status": "PASS",
+      "evidence": "Mapping skill modernizes legacy jQuery.once() into modern @drupal/once / once() iterating natively via forEach().",
+      "details": "Verified once() pattern modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-04",
+      "category": "settings",
+      "name": "Drupal.settings to drupalSettings Data Flow Accounting",
+      "status": "PASS",
+      "evidence": "Skills and manifest schema trace PHP runtime configuration generation into client-side drupalSettings closures.",
+      "details": "Verified Drupal.settings to drupalSettings data flow accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-05",
+      "category": "ajax",
+      "name": "Client-Side AJAX Command & Handler Accounting",
+      "status": "PASS",
+      "evidence": "Skills discover client-side Drupal.ajax handlers and modernize custom AJAX response handlers into Drupal.AjaxCommands.prototype extensions.",
+      "details": "Verified client-side AJAX command and handler accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-06",
+      "category": "css",
+      "name": "CSS Stylesheet & Media Query Discovery",
+      "status": "PASS",
+      "evidence": "Skills discover CSS rules, responsive @media queries, and preprocess alterations (hook_css_alter), categorizing rules into SMACSS structural categories.",
+      "details": "Verified CSS stylesheet and media query discovery.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-07",
+      "category": "libraries",
+      "name": "*.libraries.yml Modernization & Architecture",
+      "status": "PASS",
+      "evidence": "Skills and custom-module agent generate modern <module>.libraries.yml definitions declaring CSS categories and explicit JavaScript dependencies.",
+      "details": "Verified *.libraries.yml modernization and architecture.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/custom-module-migration/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-08",
+      "category": "info",
+      "name": "Legacy .info Asset Declaration Discovery",
+      "status": "PASS",
+      "evidence": "Skills discover legacy .info scripts[] and stylesheets[] declarations, modernizing them into <module>.libraries.yml asset packages.",
+      "details": "Verified legacy .info asset declaration discovery.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-09",
+      "category": "attachment",
+      "name": "Asset Attachment Mechanism Modernization",
+      "status": "PASS",
+      "evidence": "Mapping skill modernizes procedural drupal_add_js/css/library into hook_page_attachments() and render array #attached['library'] declarations.",
+      "details": "Verified asset attachment mechanism modernization.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-10",
+      "category": "dependencies",
+      "name": "Library Dependency Graph & Core Ordering",
+      "status": "PASS",
+      "evidence": "Skills and dependency analysis model asset dependencies across core/drupal, core/drupalSettings, core/once, and core/jquery in execution wave planning.",
+      "details": "Verified library dependency graph and core ordering.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/dependency-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-11",
+      "category": "external",
+      "name": "External & Third-Party Library Accounting",
+      "status": "PASS",
+      "evidence": "Skills account for CDN scripts, vendor plugins, and third-party libraries, declaring external assets with type: external in *.libraries.yml.",
+      "details": "Verified external and third-party library accounting.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-12",
+      "category": "inline",
+      "name": "Inline JavaScript & CSS Accounting",
+      "status": "PASS",
+      "evidence": "Skills account for inline <script>, <style>, and drupal_add_js(..., 'inline') blocks, refactoring them into dedicated library files or parameterized drupalSettings behaviors.",
+      "details": "Verified inline JavaScript and CSS accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-13",
+      "category": "events",
+      "name": "DOM Selector & Event Handler Accounting",
+      "status": "PASS",
+      "evidence": "Manifest schema and skills account for bound DOM selectors and event listeners (click, change, submit, resize, scroll).",
+      "details": "Verified DOM selector and event handler accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-14",
+      "category": "smacss",
+      "name": "CSS SMACSS Categorization Accounting",
+      "status": "PASS",
+      "evidence": "Mapping skill defines modern SMACSS stylesheet categorization (base, layout, component, state, theme) in *.libraries.yml.",
+      "details": "Verified CSS SMACSS categorization accounting.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-15",
+      "category": "security",
+      "name": "Frontend Security & XSS Analysis",
+      "status": "PASS",
+      "evidence": "Skills and manifest schema audit client-side DOM manipulation (.html(), innerHTML) for XSS risks, enforcing Drupal.checkPlain() and Drupal.t() escaping.",
+      "details": "Verified frontend security and XSS analysis.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-16",
+      "category": "accessibility",
+      "name": "Frontend Accessibility & ARIA Accounting",
+      "status": "PASS",
+      "evidence": "Skills and manifest schema audit dynamic DOM updates for ARIA live region updates, focus preservation, and keyboard event bindings.",
+      "details": "Verified frontend accessibility and ARIA accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-17",
+      "category": "cross_reference",
+      "name": "Frontend to Form & Server AJAX Cross-Reference",
+      "status": "PASS",
+      "evidence": "Manifest schema and dependency analysis cross-reference client-side JavaScript behaviors with server-side Form API definitions and AJAX commands.",
+      "details": "Verified frontend to Form and AJAX cross-reference.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-18",
+      "category": "cross_reference",
+      "name": "Frontend to Entity & View Cross-Reference",
+      "status": "PASS",
+      "evidence": "Manifest schema records frontend asset dependencies on entity fields, view output, and custom template markup.",
+      "details": "Verified frontend to entity and view cross-reference.",
+      "affected_files": [
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-19",
+      "category": "theme",
+      "name": "Theme Asset Handoff & Boundaries",
+      "status": "PASS",
+      "evidence": "Skills clearly establish ownership boundaries between module-level functional assets (Step 18) and theme-level presentation stylesheets (Step 20 handoff).",
+      "details": "Verified theme asset handoff and boundaries.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-20",
+      "category": "taxonomy",
+      "name": "21 Frontend Target Architecture Taxonomy",
+      "status": "PASS",
+      "evidence": "Skills define the complete 21-class frontend target architecture taxonomy (21/21 detected) supporting all JS, CSS, and library modernizations.",
+      "details": "Verified 21 Frontend target architecture classifications.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-21",
+      "category": "strategies",
+      "name": "17 Frontend Migration Strategies",
+      "status": "PASS",
+      "evidence": "Skills define all 17 standardized frontend migration strategies (17/17 detected) separating migration methodology from terminal outcome status.",
+      "details": "Verified 17 frontend migration strategies.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-22",
+      "category": "manifest",
+      "name": "Manifest Frontend Assets Accounting Schema",
+      "status": "PASS",
+      "evidence": "state/migration-manifest.yml defines complete frontend_assets_items accounting schema covering all required JS, CSS, behavior, and library metadata fields.",
+      "details": "Verified manifest frontend_assets_items schema structure.",
+      "affected_files": [
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-23",
+      "category": "validation",
+      "name": "Zero-Omission Frontend Outcome Enforcement",
+      "status": "PASS",
+      "evidence": "Validation agent and skill enforce approved terminal outcomes (MIGRATED, REPLACED, OBSOLETE, EXCLUDED_WITH_REASON, HUMAN_DECISION_REQUIRED, UNVERIFIED) and reject forbidden states for all frontend assets, behaviors, and CSS stylesheets.",
+      "details": "Verified zero-omission outcome enforcement for frontend assets.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-24",
+      "category": "compatibility",
+      "name": "Cross-Capability Compatibility & Purity",
+      "status": "PASS",
+      "evidence": "Frontend accounting seamlessly integrates with forms (Step 17), custom entities (Step 16), configuration (Step 15), procedural hooks (Step 14), database schemas (Step 13), custom PHP files (Step 12), and .inc files (Step 11) with 100% generic purity.",
+      "details": "Verified cross-capability architectural compatibility and purity.",
+      "affected_files": [
+        "state/migration-manifest.yml",
+        "README.md",
+        "ARCHITECTURE.md",
+        "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FRONTEND-25",
+      "category": "documentation",
+      "name": "Documentation & Contract Synchronization",
+      "status": "PASS",
+      "evidence": "All skills, agents, manifests, templates, and core documentation files are fully synchronized with Step 18 frontend JavaScript, CSS, and library modernization standards.",
+      "details": "Verified documentation and contract synchronization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/custom-module-migration/SKILL.md",
+        "skills/dependency-analysis/SKILL.md",
+        "skills/testing/SKILL.md",
+        "skills/behavioral-validation/SKILL.md",
+        "state/migration-manifest.yml",
+        "README.md",
+        "ARCHITECTURE.md"
       ],
       "remediation": ""
     }

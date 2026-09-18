@@ -1,7 +1,7 @@
 ---
 name: testing
-description: Test Strategy & Automated Quality Assurance Playbook. Configures and validates PHPUnit test suites, custom class autoloading, constructor DI verification, hook replacement testing, event subscriber assertions, config schema validation, state persistence testing, entity CRUD/revision/translation testing, form validation/submit testing, AJAX response command testing, PHPStan static analysis, and PHPCS coding standards.
-version: 1.5.0
+description: Testing standards, PHPUnit test generation, assertion authoring, behavioral validation, and test suite execution guidelines for modern Drupal 10/11 modules.
+version: 1.6.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -53,14 +53,19 @@ When testing modernized custom OOP classes, services, procedural hook replacemen
    - **AJAX Response & Commands**: Assert AJAX callbacks return valid `AjaxResponse` objects containing expected `CommandInterface` instances (`ReplaceCommand`, `HtmlCommand`, `InvokeCommand`, `MessageCommand`).
    - **Multistep Rebuild State**: Assert multi-step forms correctly transition across steps using `$form_state->setRebuild(TRUE)` and persist state across rebuild requests.
    - **CSRF & Access Checks**: Assert forms validate CSRF tokens on submission and enforce route/entity permission constraints.
-7. **Public API & Business Logic Parity**:
+7. **Frontend JavaScript, CSS & Library Validation (Step 18)**:
+   - **Library Parsing & SMACSS**: Assert `<module>.libraries.yml` parses cleanly, specifies valid SMACSS categories (`base`, `layout`, `component`, `state`, `theme`), and declares required core dependencies (`core/drupal`, `core/drupalSettings`, `core/once`, `core/jquery`).
+   - **`once()` Idempotency**: Assert JavaScript behaviors utilize `once()` to guarantee idempotent execution across multiple AJAX reattachments.
+   - **`drupalSettings` Injection**: Assert PHP attachment pipelines correctly inject settings under `$form['#attached']['drupalSettings']` and scripts read them without errors.
+   - **Accessibility & Focus**: Assert dynamic DOM updates update ARIA attributes (`aria-live`, `aria-expanded`) and manage focus correctly.
+8. **Public API & Business Logic Parity**:
    - Author PHPUnit Unit tests targeting domain calculations, validation algorithms, and state transitions.
-8. **Integration, Custom Database & Repository Operations**:
+9. **Integration, Custom Database & Repository Operations**:
    - Author PHPUnit Kernel tests targeting custom entity CRUD, custom database table repository queries, dynamic SQL filters, and configuration schema adherence.
    - Verify transaction rollback semantics: ensure failed operations rollback completely without leaving orphaned records.
-9. **Data Migration ETL Pipeline Tests**:
-   - Author Kernel migration tests verifying source-to-destination mappings, serialized payload transformations, entity reference lookups, revision transfers, translation mappings, and rollback behavior.
-10. **Error Handling & Edge Cases**:
+10. **Data Migration ETL Pipeline Tests**:
+    - Author Kernel migration tests verifying source-to-destination mappings, serialized payload transformations, entity reference lookups, revision transfers, translation mappings, and rollback behavior.
+11. **Error Handling & Edge Cases**:
     - Assert exception throwing on invalid inputs, missing dependencies, database constraint violations, or failed external requests.
 
 ---

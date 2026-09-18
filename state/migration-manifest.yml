@@ -336,6 +336,47 @@ target_system:
 #       confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
 #       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
 #       exclusion_reason: null
+#   # Comprehensive JavaScript, CSS, Libraries & Frontend Behavior Accounting
+#   frontend_assets_items:
+#     - item_id: "FE-001"
+#       asset_type: "JAVASCRIPT" # JAVASCRIPT | STYLESHEET | DRUPAL_BEHAVIOR | DRUPAL_SETTING | LIBRARY_DECLARATION | INLINE_SCRIPT | INLINE_STYLE | EXTERNAL_ASSET | AJAX_COMMAND_HANDLER | PREPROCESS_ATTACHMENT
+#       defining_module: "my_module"
+#       source_file: "js/my_module.js"
+#       source_line: 12
+#       asset_path: "js/my_module.js"
+#       library_name: "my_module/interactive_widgets"
+#       behavior_name: "myModuleBehavior"
+#       selectors: [".my-widget-container", "#my-interactive-btn"]
+#       events: ["click", "change", "drupalAjaxComplete"]
+#       once_pattern: "ONCE_JS" # JQUERY_ONCE | ONCE_JS | DOM_READY | NONE
+#       settings_dependencies: ["myModule.apiEndpoint", "myModule.debounceInterval"]
+#       ajax_dependencies: ["my_module_ajax_endpoint", "ajax_command_replace"]
+#       form_dependencies: ["my_module_filter_form"]
+#       entity_dependencies: ["node", "media"]
+#       view_dependencies: ["my_module_interactive_view"]
+#       template_dependencies: ["my-module-widget.html.twig"]
+#       attachment_mechanism: "LIBRARIES_YML" # DRUPAL_ADD_JS | DRUPAL_ADD_CSS | DRUPAL_ADD_LIBRARY | ATTACHED_RENDER_ARRAY | PREPROCESS_ATTACH | THEME_INFO | AJAX_COMMAND_ATTACH
+#       dependency_edges: ["core/drupal", "core/drupalSettings", "core/once", "core/jquery"]
+#       external_dependencies: []
+#       security_notes: "XSS audit required for innerHTML / .html() manipulation; verified safe string escaping"
+#       accessibility_notes: "ARIA live regions and focus management updated for AJAX DOM replacements"
+#       target_architecture: "JS_ONCE_BEHAVIOR" # 21 Target Architectures:
+#       # DRUPAL_LIBRARY | JS_BEHAVIOR | JS_ONCE_BEHAVIOR | AJAX_FRONTEND_BEHAVIOR | DRUPAL_SETTINGS_CONSUMER |
+#       # CSS_LIBRARY | INLINE_JS | INLINE_CSS | EXTERNAL_LIBRARY | THIRD_PARTY_LIBRARY | THEME_LIBRARY |
+#       # MODULE_LIBRARY | PREPROCESS_ATTACHMENT | RENDER_ARRAY_ATTACHMENT | AJAX_ATTACHMENT |
+#       # CUSTOM_AJAX_COMMAND_CLIENT | TEMPLATE_SCRIPT | TEMPLATE_STYLE | OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       target_artifacts:
+#         - "my_module.libraries.yml"
+#         - "js/my-module.js"
+#       migration_strategy: "ONCE_API_REWRITE" # 17 Migration Strategies:
+#       # LIBRARY_YML_REWRITE | BEHAVIOR_REWRITE | ONCE_API_REWRITE | DRUPAL_SETTINGS_REWRITE |
+#       # AJAX_CLIENT_REWRITE | CSS_LIBRARY_REWRITE | INLINE_TO_LIBRARY | INLINE_TO_BEHAVIOR |
+#       # PREPROCESS_ATTACHMENT_REWRITE | THIRD_PARTY_LIBRARY_REPLACEMENT | EXTERNAL_ASSET_REVIEW |
+#       # THEME_ASSET_HANDOFF | OBSOLETE | REPLACED | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       validation_strategy: "NIGHTWATCH_OR_FUNCTIONAL_JS_TEST" # NIGHTWATCH_OR_FUNCTIONAL_JS_TEST | BROWSER_TEST | LIBRARY_PARSING_TEST | UNIT_TEST
+#       confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
+#       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       exclusion_reason: null
 custom_modules: []
 
 # ------------------------------------------------------------------------------

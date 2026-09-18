@@ -226,6 +226,48 @@ Apply one of the 16 explicit strategies to every discovered entity and field ite
 14. **`HUMAN_DECISION_REQUIRED`**: Dynamic form IDs or ambiguous security flows requiring human review.
 15. **`UNVERIFIED`**: Dynamic or unverified form structures requiring runtime validation.
 
+### 21 Frontend Target Architecture Classifications
+1. **`DRUPAL_LIBRARY`**: Standard asset package registered in `<module>.libraries.yml`.
+2. **`JS_BEHAVIOR`**: Modular client-side script implementing `Drupal.behaviors.<name>`.
+3. **`JS_ONCE_BEHAVIOR`**: JavaScript behavior utilizing `@drupal/once` for idempotent DOM attachment.
+4. **`AJAX_FRONTEND_BEHAVIOR`**: Client-side script responding to asynchronous form/page updates.
+5. **`DRUPAL_SETTINGS_CONSUMER`**: Client-side script consuming PHP runtime parameters via `drupalSettings`.
+6. **`CSS_LIBRARY`**: SMACSS structured stylesheet asset registered under base/layout/component/state/theme.
+7. **`INLINE_JS`**: Legacy inline `<script>` or `drupal_add_js(..., 'inline')` requiring refactoring.
+8. **`INLINE_CSS`**: Legacy inline `<style>` or `drupal_add_css(..., 'inline')` requiring refactoring.
+9. **`EXTERNAL_LIBRARY`**: Remote CDN stylesheet or script declared in `*.libraries.yml` with `type: external`.
+10. **`THIRD_PARTY_LIBRARY`**: Vendor or third-party JavaScript/CSS plugin package.
+11. **`THEME_LIBRARY`**: Presentation-only stylesheet or behavior owned by custom/contrib theme.
+12. **`MODULE_LIBRARY`**: Functional module-level stylesheet or behavior package.
+13. **`PREPROCESS_ATTACHMENT`**: Asset attached dynamically via `hook_preprocess_*()` or `hook_page_attachments()`.
+14. **`RENDER_ARRAY_ATTACHMENT`**: Asset attached to element render arrays via `#attached['library']`.
+15. **`AJAX_ATTACHMENT`**: Asset injected dynamically during AJAX response delivery.
+16. **`CUSTOM_AJAX_COMMAND_CLIENT`**: Client-side prototype handler extending `Drupal.AjaxCommands`.
+17. **`TEMPLATE_SCRIPT`**: Script directly embedded in legacy template or Twig template.
+18. **`TEMPLATE_STYLE`**: Style directly embedded in legacy template or Twig template.
+19. **`OBSOLETE`**: Deprecated frontend asset superseded by modern core features.
+20. **`HUMAN_DECISION_REQUIRED`**: External library or dynamic script requiring architectural decision.
+21. **`UNVERIFIED`**: Unresolved dynamic asset path or runtime-dependent frontend behavior.
+
+### 17 Frontend Migration Strategies
+1. **`LIBRARY_YML_REWRITE`**: Converting `.info` scripts/stylesheets and `drupal_add_*` to `<module>.libraries.yml`.
+2. **`BEHAVIOR_REWRITE`**: Refactoring procedural JS / DOM ready into strict `Drupal.behaviors` syntax.
+3. **`ONCE_API_REWRITE`**: Converting `jQuery.once()` to modern `@drupal/once` / `once()` iterating with `forEach()`.
+4. **`DRUPAL_SETTINGS_REWRITE`**: Modernizing `Drupal.settings` to `#attached['drupalSettings']` and `drupalSettings` parameter.
+5. **`AJAX_CLIENT_REWRITE`**: Modernizing custom AJAX event bindings and `Drupal.ajax` commands.
+6. **`CSS_LIBRARY_REWRITE`**: Restructuring legacy CSS into modern SMACSS categories in `*.libraries.yml`.
+7. **`INLINE_TO_LIBRARY`**: Extracting inline scripts/styles into dedicated library asset files.
+8. **`INLINE_TO_BEHAVIOR`**: Converting inline PHP script blocks into parametrized `drupalSettings` behaviors.
+9. **`PREPROCESS_ATTACHMENT_REWRITE`**: Modernizing `drupal_add_js/css` in preprocess to `hook_page_attachments()`.
+10. **`THIRD_PARTY_LIBRARY_REPLACEMENT`**: Replacing legacy jQuery plugins with modern npm/Composer or native JS.
+11. **`EXTERNAL_ASSET_REVIEW`**: Auditing external CDN scripts for security and declaring with `type: external`.
+12. **`THEME_ASSET_HANDOFF`**: Transferring presentation-only stylesheets to Step 20 theme architecture.
+13. **`OBSOLETE`**: Deprecating obsolete frontend assets (e.g. polyfills, deprecated jQuery UI).
+14. **`REPLACED`**: Legacy custom widget replaced by Drupal 10/11 core UI components (e.g. core Dialog, Media).
+15. **`EXCLUDED_WITH_REASON`**: Deliberately excluded frontend assets with documented justification.
+16. **`HUMAN_DECISION_REQUIRED`**: Unresolved third-party plugin or licensing decision requiring human review.
+17. **`UNVERIFIED`**: Dynamic frontend script or unverified selector requiring browser validation.
+
 ---
 
 ## Data Integrity Verification & Checksums
