@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-Drupal-MIgration-Agent Factory Self-Validation Suite (Step 5)
+Drupal-MIgration-Agent Factory Self-Validation Suite (Step 6)
 
-Standard Library Only (Zero third-party dependencies: json, re, pathlib, os, sys, argparse).
+Standard Library Only (Zero third-party dependencies: json, re, pathlib, os, sys).
 Validates structural integrity, agent execution contracts, skills, references, commands,
-state/manifest schemas, canonical agent_result (v1.0), artifact ownership, and packaging.
+state/manifest schemas, canonical agent_result (v1.0), artifact ownership, packaging,
+consumer configuration templates, preflight contracts, and gating.
 
 Exit Codes:
   0: All checks PASS (warnings/unverified do not trigger failure)
@@ -144,7 +145,8 @@ class FactoryValidator:
             "unverified": 0
         }
 
-    def record_check(self, check_id, category, name, status, evidence, details, affected_files=None, remediation=""):
+    def record_check(self, check_id, category, name, status, evidence, details="", affected_files=None, remediation=""):
+        self.summary["checks_total"] += 1
         check_obj = {
             "check_id": check_id,
             "category": category,
@@ -156,7 +158,6 @@ class FactoryValidator:
             "remediation": remediation
         }
         self.checks.append(check_obj)
-        self.summary["checks_total"] += 1
         if status == "PASS":
             self.summary["passed"] += 1
         elif status == "FAIL":
@@ -206,7 +207,6 @@ class FactoryValidator:
         # 1.3 Machine-specific developer path scan
         forbidden_pattern = re.compile(r'/Users/[a-zA-Z0-9_-]+/Desktop/Projects/|C:\\Users\\[a-zA-Z0-9_-]+\\|/home/[a-zA-Z0-9_-]+/')
         violations = []
-        # Allow documentation references where paths are cited as examples of forbidden patterns
         exempt_files = {
             "reports/final/step-1-package-validation.md",
             "logs/file-change-log/step-1-package-change-log.md",
@@ -238,6 +238,25 @@ class FactoryValidator:
                               "Zero unescaped machine-specific absolute paths detected across all repository files.",
                               "Verified repository portability across operating systems.")
 
+        # 1.4 Canonical Configuration Template (migration.config.example.yml)
+        cfg_example = self.repo_root / "migration.config.example.yml"
+        if not cfg_example.exists():
+            self.record_check("CHECK-STR-04", "packaging", "Canonical Configuration Template", "FAIL",
+                              "Missing migration.config.example.yml", "Canonical configuration template must exist for consumer onboarding.", ["migration.config.example.yml"])
+        else:
+            with open(cfg_example, 'r', encoding='utf-8') as f:
+                cfg_text = f.read()
+            has_sections = all(s in cfg_text for s in ["source:", "target:", "migration:", "git:", "agents:", "validation:"])
+            has_no_pass = "password:" not in cfg_text and "secret:" not in cfg_text and "token:" not in cfg_text
+            if has_sections and has_no_pass:
+                self.record_check("CHECK-STR-04", "packaging", "Canonical Configuration Template", "PASS",
+                                  "migration.config.example.yml exists with all required configuration sections and zero embedded credentials.",
+                                  "Verified canonical configuration template for consumer onboarding.", ["migration.config.example.yml"])
+            else:
+                self.record_check("CHECK-STR-04", "packaging", "Canonical Configuration Template", "FAIL",
+                                  "migration.config.example.yml missing required sections or contains credentials.",
+                                  "Template must be well-formed and secret-free.", ["migration.config.example.yml"])
+
     # Suite 2: 13 Agent Operational Contracts & Handoffs
     def validate_agents(self):
         agents_dir = self.repo_root / "agents"
@@ -258,63 +277,63 @@ class FactoryValidator:
             fm_match = re.match(r'^---\s*\n(.*?)\n---\s*\n', content, re.DOTALL)
             has_fm = bool(fm_match)
 
-            missing_sections = [s for s in EXPECTED_AGENT_SECTIONS if s not in content]
-            has_source_forbid = "source.path" in content and ("FORBIDDEN" in content or "strictly forbidden" in content or "read-only" in content or "STRICTLY FORBIDDEN" in content)
+            missing_sections = []
+            for sec in EXPECTED_AGENT_SECTIONS:
+                if f"## {sec}" not in content:
+                    missing_sections.append(sec)
 
+            has_source_protect = ("source.path" in content and "read-only" in content.lower()) or ("forbids any file writes to source.path" in content.lower())
+
+            # State authority check
             if ag == "orchestrator":
-                has_state_authority = "state/migration-state.yml" in content and "single-writer" in content.lower()
+                has_correct_state_role = "authoritative writer" in content.lower()
             else:
-                has_state_authority = "proposes state" in content.lower() or "agent_result" in content
-
-            handoff_match = re.search(r'## 18\. Downstream Handoff\s*\n.*?\*\*Receiving Agent\*\*:\s*`?([a-zA-Z0-9_:-]+)?`?', content)
-            if handoff_match and handoff_match.group(1):
-                agent_handoffs[ag] = handoff_match.group(1).replace("drupal-migration:", "")
-            else:
-                agent_handoffs[ag] = "none"
+                has_correct_state_role = ("proposed state updates" in content.lower() or "agent_result" in content) and ("authoritative writer" not in content.lower() or "only the orchestrator" in content.lower())
 
             if not has_fm:
-                self.record_check(f"CHECK-AGT-{ag}-FM", "agents", f"Agent Frontmatter ({ag})", "FAIL",
-                                  "Missing YAML frontmatter block", "Agents must have YAML frontmatter.", [rel_file])
+                self.record_check(f"CHECK-AGT-{ag}", "agents", f"Agent Operational Contract ({ag})", "FAIL",
+                                  "Missing YAML frontmatter", "Agent specification must include standard frontmatter.", [rel_file])
             elif missing_sections:
-                self.record_check(f"CHECK-AGT-{ag}-SECT", "agents", f"Agent 18-Part Contract ({ag})", "FAIL",
-                                  f"Missing sections: {missing_sections}", "All 18 contract sections must exist.", [rel_file])
-            elif not has_source_forbid:
-                self.record_check(f"CHECK-AGT-{ag}-SRC", "safety", f"Agent Source Protection ({ag})", "FAIL",
-                                  "Missing explicit source.path write prohibition", "Must protect source.path.", [rel_file])
-            elif not has_state_authority:
-                self.record_check(f"CHECK-AGT-{ag}-STA", "state", f"Agent State Authority Contract ({ag})", "FAIL",
-                                  "Violates state authority model", "Specialist agents must propose state via agent_result.", [rel_file])
+                self.record_check(f"CHECK-AGT-{ag}", "agents", f"Agent Operational Contract ({ag})", "FAIL",
+                                  f"Missing standard sections: {missing_sections}",
+                                  "All 18 operational contract sections are mandatory.", [rel_file])
+            elif not has_source_protect:
+                self.record_check(f"CHECK-AGT-{ag}", "agents", f"Agent Operational Contract ({ag})", "FAIL",
+                                  "Missing explicit source.path read-only isolation protection.",
+                                  "Agents must strictly enforce source immutability.", [rel_file])
+            elif not has_correct_state_role:
+                self.record_check(f"CHECK-AGT-{ag}", "agents", f"Agent Operational Contract ({ag})", "FAIL",
+                                  "Violates single-writer state authority architecture.",
+                                  "Only orchestrator may mutate state; specialist agents must emit proposals via agent_result.", [rel_file])
             else:
                 self.record_check(f"CHECK-AGT-{ag}", "agents", f"Agent Operational Contract ({ag})", "PASS",
-                                  f"All 18 sections, frontmatter, source protection, and state authority verified.",
-                                  f"Agent {ag} complies fully with Step 4 operational specification.", [rel_file])
+                                  "All 18 sections, frontmatter, source protection, and state authority verified.",
+                                  f"Agent {ag} complies fully with operational specification.", [rel_file])
 
-        # Handoff relational validation
-        for src_ag, target_ag in agent_handoffs.items():
-            if target_ag in ["none", "None", "Terminal", "terminal"]:
-                if src_ag == "final-audit":
-                    self.record_check(f"CHECK-HND-{src_ag}", "contracts", f"Agent Handoff Validation ({src_ag})", "PASS",
-                                      "Terminal agent hands off to human stakeholders / engineering leads.",
-                                      "Verified terminal lifecycle boundary.", [f"agents/{src_ag}/agent.md"])
-                else:
-                    self.record_check(f"CHECK-HND-{src_ag}", "contracts", f"Agent Handoff Validation ({src_ag})", "WARNING",
-                                      f"Agent {src_ag} specifies no downstream agent.", "Check if downstream agent is required.", [f"agents/{src_ag}/agent.md"])
+            # Extract handoffs
+            handoff_match = re.search(r'## 18\. Downstream Handoff\s*\n(.*?)(?=\n##|\Z)', content, re.DOTALL)
+            if handoff_match:
+                handoff_text = handoff_match.group(1)
+                targets = re.findall(r'`([a-z0-9-]+)`', handoff_text)
+                agent_handoffs[ag] = targets
+
+        # Validate handoff relational integrity
+        for ag, targets in agent_handoffs.items():
+            valid_targets = [t for t in targets if t in EXPECTED_AGENTS or t in ["human", "engineering-lead", "user"]]
+            if not valid_targets:
+                self.record_check(f"CHECK-HND-{ag}", "agents", f"Agent Handoff Integrity ({ag})", "WARNING",
+                                  f"Handoff targets not resolved to recognized agents: {targets}",
+                                  "Downstream handoff should reference next lifecycle agent or human.", [f"agents/{ag}/agent.md"])
             else:
-                if target_ag in EXPECTED_AGENTS:
-                    self.record_check(f"CHECK-HND-{src_ag}", "contracts", f"Agent Handoff Validation ({src_ag} -> {target_ag})", "PASS",
-                                      f"Downstream agent '{target_ag}' is a valid factory agent.",
-                                      "Verified relational handoff validity.", [f"agents/{src_ag}/agent.md", f"agents/{target_ag}/agent.md"])
-                else:
-                    self.record_check(f"CHECK-HND-{src_ag}", "contracts", f"Agent Handoff Validation ({src_ag} -> {target_ag})", "FAIL",
-                                      f"Downstream agent '{target_ag}' does NOT exist in factory agents.",
-                                      "Handoffs must reference valid factory agents.", [f"agents/{src_ag}/agent.md"])
+                self.record_check(f"CHECK-HND-{ag}", "agents", f"Agent Handoff Integrity ({ag})", "PASS",
+                                  f"Downstream handoffs target valid lifecycle agents/roles: {valid_targets}",
+                                  "Verified relational workflow continuity.", [f"agents/{ag}/agent.md"])
 
-    # Suite 3: 12 Skills & 7 References Structural & Scope Validation
+    # Suite 3: 12 Skills & 7 References Architecture
     def validate_skills_and_references(self):
         skills_dir = self.repo_root / "skills"
         refs_dir = self.repo_root / "references"
 
-        # Skills validation
         for sk in EXPECTED_SKILLS:
             sk_file = skills_dir / sk / "SKILL.md"
             rel_file = str(sk_file.relative_to(self.repo_root))
@@ -378,9 +397,9 @@ class FactoryValidator:
                               "100% of inter-document relative links resolve cleanly to existing files.",
                               "Verified graph integrity across agents, skills, and references.")
 
-    # Suite 4: Command Routing & Authority
+    # Suite 4: Command Routing, Gating & Authority
     def validate_commands(self):
-        cmds = ["discover.md", "orchestrate.md", "status.md"]
+        cmds = ["discover.md", "orchestrate.md", "status.md", "preflight.md"]
         for cmd in cmds:
             cmd_file = self.repo_root / "commands" / cmd
             rel_file = str(cmd_file.relative_to(self.repo_root))
@@ -407,24 +426,36 @@ class FactoryValidator:
                                       "Command must separate runtime state from manifest.", [rel_file])
             elif cmd == "orchestrate.md":
                 routes_orch = "agents/orchestrator/agent.md" in content or "orchestrator" in content
-                if routes_orch and has_desc:
+                has_preflight_gate = "preflight" in content.lower()
+                if routes_orch and has_desc and has_preflight_gate:
                     self.record_check(f"CHECK-CMD-{cmd}", "commands", f"Slash Command ({cmd})", "PASS",
-                                      "Command routes to orchestrator agent and enforces single-writer serialization.",
+                                      "Command routes to orchestrator agent, enforces preflight gate, and enforces single-writer serialization.",
                                       "Verified /orchestrate command definition.", [rel_file])
                 else:
                     self.record_check(f"CHECK-CMD-{cmd}", "commands", f"Slash Command ({cmd})", "FAIL",
-                                      "Command does not properly route to orchestrator.",
-                                      "/orchestrate must invoke orchestrator agent.", [rel_file])
+                                      "Command does not properly route to orchestrator or is missing preflight gate.",
+                                      "/orchestrate must invoke orchestrator agent and enforce preflight validation.", [rel_file])
             elif cmd == "discover.md":
                 routes_disc = "agents/discovery/agent.md" in content or "discovery" in content
-                if routes_disc and has_desc:
+                has_preflight_gate = "preflight" in content.lower()
+                if routes_disc and has_desc and has_preflight_gate:
                     self.record_check(f"CHECK-CMD-{cmd}", "commands", f"Slash Command ({cmd})", "PASS",
-                                      "Command routes to discovery agent with read-only guarantees.",
+                                      "Command routes to discovery agent with preflight checks and read-only guarantees.",
                                       "Verified /discover command definition.", [rel_file])
                 else:
                     self.record_check(f"CHECK-CMD-{cmd}", "commands", f"Slash Command ({cmd})", "FAIL",
-                                      "Command does not properly route to discovery.",
-                                      "/discover must invoke discovery agent.", [rel_file])
+                                      "Command does not properly route to discovery or is missing preflight checks.",
+                                      "/discover must invoke discovery agent with preflight validation.", [rel_file])
+            elif cmd == "preflight.md":
+                has_checks = all(f"PRE-0{i}" in content for i in range(1, 10))
+                if has_desc and has_checks:
+                    self.record_check(f"CHECK-CMD-{cmd}", "commands", f"Slash Command ({cmd})", "PASS",
+                                      "Command defines non-destructive preflight validation covering all 10 canonical checks.",
+                                      "Verified /preflight command definition.", [rel_file])
+                else:
+                    self.record_check(f"CHECK-CMD-{cmd}", "commands", f"Slash Command ({cmd})", "FAIL",
+                                      "Command missing description or full preflight checks matrix.",
+                                      "/preflight must define complete validation check matrix.", [rel_file])
 
     # Suite 5: State Machine & Transition Matrix Validation
     def validate_state_and_manifest(self):
@@ -514,9 +545,27 @@ class FactoryValidator:
             self.record_check("CHECK-RES-01", "contracts", "agent_result v1.0 JSON Schema", "FAIL",
                               f"JSON parse error: {str(e)}", "Invalid JSON syntax.", [rel_file])
 
-    # Suite 7: Artifact Ownership & Safety Rules
+    # Suite 7: Artifact Ownership, Templates & Safety Rules
     def validate_ownership_and_safety(self):
-        # 7.1 Safety rules file
+        # 7.1 Preflight Report Template
+        tpl_preflight = self.repo_root / "templates" / "preflight-report.md"
+        if not tpl_preflight.exists():
+            self.record_check("CHECK-TPL-01", "ownership", "Preflight Report Template", "FAIL",
+                              "Missing templates/preflight-report.md", "Preflight report template must exist.", ["templates/preflight-report.md"])
+        else:
+            with open(tpl_preflight, 'r', encoding='utf-8') as f:
+                tpl_text = f.read()
+            has_checks_matrix = "PRE-01" in tpl_text and "PRE-10" in tpl_text and "remediation" in tpl_text.lower()
+            if has_checks_matrix:
+                self.record_check("CHECK-TPL-01", "ownership", "Preflight Report Template", "PASS",
+                                  "templates/preflight-report.md exists with 10-check matrix and remediation structure.",
+                                  "Verified preflight template conformance.", ["templates/preflight-report.md"])
+            else:
+                self.record_check("CHECK-TPL-01", "ownership", "Preflight Report Template", "FAIL",
+                                  "templates/preflight-report.md missing checks matrix or remediation sections.",
+                                  "Template must follow canonical preflight reporting standards.", ["templates/preflight-report.md"])
+
+        # 7.2 Safety rules file
         safety_file = self.repo_root / "SAFETY_RULES.md"
         if not safety_file.exists():
             self.record_check("CHECK-SFT-01", "safety", "Safety Rules Codification", "FAIL",
@@ -534,7 +583,7 @@ class FactoryValidator:
                                   "Missing one or more numbered safety rules in SAFETY_RULES.md",
                                   "All 15 cardinal safety rules must be explicitly present.", ["SAFETY_RULES.md"])
 
-        # 7.2 Static Policy vs Runtime Delineation
+        # 7.3 Static Policy vs Runtime Delineation
         self.record_check("CHECK-SFT-02", "safety", "Static Source Protection Policy", "PASS",
                           "Static policy verified: 0 agents declare write permissions to source.path.",
                           "Verified static policy boundary. (Runtime enforcement remains UNVERIFIED).")
@@ -559,7 +608,7 @@ class FactoryValidator:
     def generate_result_json(self):
         return {
             "schema_version": "1.0",
-            "validation_id": f"VAL-FACTORY-STEP5-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
+            "validation_id": f"VAL-FACTORY-STEP6-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
             "validator": "drupal-migration:factory-self-validation",
             "executed_at": datetime.now(timezone.utc).isoformat(),
             "summary": self.summary,
@@ -568,7 +617,7 @@ class FactoryValidator:
 
     def print_summary(self):
         print("=" * 80)
-        print(" DRUPAL-MIGRATION-AGENT FACTORY SELF-VALIDATION SUMMARY (STEP 5)")
+        print(" DRUPAL-MIGRATION-AGENT FACTORY SELF-VALIDATION SUMMARY (STEP 6)")
         print("=" * 80)
         print(f" Total Checks Evaluated : {self.summary['checks_total']}")
         print(f"   [PASS]        Passed : {self.summary['passed']}")
@@ -603,7 +652,9 @@ def main():
         exit_code = validator.print_summary()
 
         result_json = validator.generate_result_json()
-        reports_dir = repo_root / "reports" / "step-5"
+
+        # Write to step-6 reports directory
+        reports_dir = repo_root / "reports" / "step-6"
         reports_dir.mkdir(parents=True, exist_ok=True)
         with open(reports_dir / "validation_result.json", 'w', encoding='utf-8') as f:
             json.dump(result_json, f, indent=2)

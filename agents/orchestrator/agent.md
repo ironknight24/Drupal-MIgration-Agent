@@ -75,6 +75,7 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
 
 ## 9. Preconditions
 - `migration.config.yml` exists, is readable, and defines non-overlapping `source.path` and `target.path`.
+- Preflight Validation Gate (`commands/preflight.md`) executed with overall status `PASS`.
 - `state/migration-state.yml` exists or can be initialized.
 - `global_block` is `false` in `state/migration-state.yml`.
 
@@ -82,6 +83,7 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
 
 ## 10. Required Inputs
 - Master configuration: `migration.config.yml`.
+- Preflight validation report: `reports/preflight/PREFLIGHT-REPORT-<DATE>.md`.
 - Runtime state: `state/migration-state.yml`.
 - Scope manifest: `state/migration-manifest.yml`.
 - Dependency DAG artifact: `reports/dependencies/DEPENDENCY-GRAPH-<DATE>.md`.
@@ -101,7 +103,10 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
 
 ## 12. Operational Execution Procedure
 1. **Load Configuration & State**: Parse `migration.config.yml`, `state/migration-manifest.yml`, `state/migration-state.yml`.
-2. **Path & Environment Check**: Validate `source.path` exists and does not collide with `target.path`. If collision -> generate `BLOCKED-000-GLOBAL.md` and set `global_block: true`.
+2. **Preflight Validation Gate (Phase 0b)**:
+   - Validate `source.path` and `target.path` exist and do not collide (Checks `PRE-01` to `PRE-04`).
+   - Validate D7 and D10/11 core structural markers (`PRE-05`, `PRE-06`) and secret isolation (`PRE-09`).
+   - If Preflight fails -> generate `reports/preflight/PREFLIGHT-REPORT-<DATE>.md`, generate `BLOCKED-000-GLOBAL.md`, set `global_block: true`, and halt.
 3. **Determine Lifecycle Phase**: Check `lifecycle_phase` in `state/migration-state.yml`.
 4. **Dispatch Initial Phases**:
    - If `phase_0_setup` -> advance to `phase_1_discovery` and dispatch `discovery`.
@@ -129,6 +134,7 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
 ---
 
 ## 14. Artifact & Evidence Outputs
+- Preflight report: `reports/preflight/PREFLIGHT-REPORT-<DATE>.md` (via Preflight Gate).
 - Authoritative state updates in `state/migration-state.yml`.
 - Global blocker ticket: `reports/blocked/BLOCKED-000-GLOBAL.md` (on safety/environment failure).
 - Executive summary: `reports/final/FINAL-MIGRATION-SUMMARY.md` (on lifecycle completion).

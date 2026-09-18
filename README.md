@@ -17,44 +17,136 @@ This repository serves as a **distributable Claude Code plugin package** that de
 
 ---
 
-## Claude Code Installation & Usage
+## Consumer Onboarding & First-Run Guide
 
-### 1. Local Development / Testing
-To test or use this package locally in Claude Code:
-```bash
-claude --plugin-dir /path/to/Drupal-MIgration-Agent
-```
-Within your active Claude Code session, reload plugins with:
-```text
-/reload-plugins
-```
+Follow these steps to initialize and run a migration against your Drupal projects:
 
-### 2. Direct GitHub Installation
-Install the package directly from GitHub:
+### 1. Obtain & Install the Package
+
+**Direct GitHub Installation (Claude Code):**
 ```text
 /plugin install ironknight24/Drupal-MIgration-Agent
 ```
 
-### 3. Marketplace Installation (Optional)
-If registering as a marketplace catalog:
+**Local Development / Testing Mode:**
+```bash
+claude --plugin-dir /path/to/Drupal-MIgration-Agent
+```
+*(Within your Claude Code session, reload plugins with `/reload-plugins`)*
+
+---
+
+### 2. Configure Your Migration Workspace
+
+1. In your workspace root, create your configuration from the canonical factory template:
+   ```bash
+   cp migration.config.example.yml migration.config.yml
+   ```
+2. Edit `migration.config.yml` to specify your project locations:
+   ```yaml
+   source:
+     drupal_version: "7"
+     path: "/path/to/your/drupal7_source"
+     custom_modules_path: "sites/all/modules/custom"
+     custom_themes_path: "sites/all/themes"
+
+   target:
+     drupal_version: "10" # or "11"
+     path: "/path/to/your/drupal10_target"
+     web_root: "web"
+     custom_modules_path: "web/modules/custom"
+     custom_themes_path: "web/themes/custom"
+     config_sync_directory: "config/sync"
+   ```
+   > [!IMPORTANT]
+   > Do NOT commit passwords or credentials to `migration.config.yml`. Passwords should be supplied via environment variables or local drush aliases.
+
+---
+
+### 3. Run Preflight Environment Validation
+
+Before scanning or modifying any code, execute the non-destructive preflight gate:
 ```text
-/plugin marketplace add ironknight24/Drupal-MIgration-Agent
-/plugin install drupal-migration-agent@drupal-migration-marketplace
+/preflight
+```
+The preflight command evaluates:
+- Configuration validity and secret isolation (`PRE-01`, `PRE-09`).
+- `source.path` and `target.path` existence and non-overlap (`PRE-02` through `PRE-04`).
+- Drupal 7 structural markers (`includes/bootstrap.inc`, `modules/system/system.module`) (`PRE-05`).
+- Drupal 10/11 target markers (`core/lib/Drupal.php`, `composer.json`) (`PRE-06`).
+- Target version consistency and target directory write permissions (`PRE-07`, `PRE-08`).
+
+Inspect the generated report at `reports/preflight/PREFLIGHT-REPORT-<DATE>.md`. If any critical check fails, resolve the blockers before continuing.
+
+---
+
+### 4. Execute Discovery Baseline Audit
+
+Once Preflight reports `PASS`, run a comprehensive read-only audit:
+```text
+/discover
+```
+This inventories all D7 custom modules, contrib modules, themes, hooks, database tables, and external integrations, generating `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` and populating `state/migration-manifest.yml`.
+
+---
+
+### 5. Orchestrate End-to-End Migration
+
+To initiate or resume the full, dynamic wave-by-wave migration workflow:
+```text
+/orchestrate
+```
+To check progress, active wave, component statuses, and blockers at any time:
+```text
+/status
 ```
 
 ---
 
 ## User Experience & Slash Commands
 
-Users do not need to invoke 13 individual subagents manually. Use the provided slash commands:
-
 | Command | Full Plugin Namespace | Purpose |
 |:---|:---|:---|
-| `/orchestrate` | `/drupal-migration-agent:orchestrate` | Guides setup and initiates the full end-to-end migration lifecycle. |
+| `/preflight` | `/drupal-migration-agent:preflight` | Non-destructive validation of configuration, paths, permissions, and Drupal markers. |
 | `/discover` | `/drupal-migration-agent:discover` | Runs a standalone, read-only baseline audit on D7/D10 environments. |
+| `/orchestrate` | `/drupal-migration-agent:orchestrate` | Gated by Preflight; guides setup and initiates the full end-to-end migration lifecycle. |
 | `/status` | `/drupal-migration-agent:status` | Displays real-time phase progress, manifest statistics, and blockers. |
 
-*Advanced Mode*: Individual agents can still be directly invoked by advanced users (e.g. `drupal-migration:custom-module`).
+*Advanced Mode*: Individual specialist agents can still be directly invoked by advanced users (e.g. `drupal-migration:custom-module`).
+
+---
+
+## Factory vs. Consumer Artifact Ownership
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            ARTIFACT OWNERSHIP MATRIX                        │
+├───────────────────────┬─────────────────────────────────────────────────────┤
+│ CLASSIFICATION        │ REPOSITORY PATHS / PURPOSE                          │
+├───────────────────────┼─────────────────────────────────────────────────────┤
+│ Factory-Owned         │ • .claude-plugin/plugin.json, marketplace.json      │
+│ (Immutable Template)  │ • agents/*/agent.md (13 specialist contracts)       │
+│                       │ • skills/*/SKILL.md (12 migration skills)           │
+│                       │ • references/**/*.md (7 technical references)       │
+│                       │ • templates/*.md (report templates)                 │
+│                       │ • tests/validate_factory.py, tests/schemas/*.json   │
+│                       │ • migration.config.example.yml                      │
+├───────────────────────┼─────────────────────────────────────────────────────┤
+│ Consumer-Owned        │ • migration.config.yml (consumer workspace settings)│
+│ (Project-Specific)    │ • External D7 Source Codebase (source.path)         │
+│                       │ • External D10/11 Target Codebase (target.path)     │
+├───────────────────────┼─────────────────────────────────────────────────────┤
+│ Runtime-Generated     │ • state/migration-state.yml (mutable runtime state) │
+│ (State & Inventory)   │ • state/migration-manifest.yml (static scope)       │
+├───────────────────────┼─────────────────────────────────────────────────────┤
+│ Persistent Evidence   │ • reports/preflight/PREFLIGHT-REPORT-*.md           │
+│ (Audit Trail)         │ • reports/discovery/DISCOVERY-AUDIT-*.md            │
+│                       │ • reports/migration-plan/MIGRATION-PLAN-*.md        │
+│                       │ • reports/validation/VALIDATION-REPORT-*.md         │
+│                       │ • reports/final-audit/FINAL-MIGRATION-AUDIT-*.md     │
+│                       │ • logs/file-change-log/*.md                         │
+└───────────────────────┴─────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -68,12 +160,13 @@ Drupal-MIgration-Agent/
 │   └── marketplace.json             # Optional marketplace catalog definition
 │
 ├── commands/                        # User-facing slash commands
-│   ├── orchestrate.md               # /orchestrate entry point
-│   ├── discover.md                  # /discover baseline audit
+│   ├── preflight.md                 # /preflight non-destructive validation gate
+│   ├── orchestrate.md               # /orchestrate entry point (preflight gated)
+│   ├── discover.md                  # /discover baseline audit (preflight gated)
 │   └── status.md                    # /status dashboard
 │
 ├── agents/                          # 13 Specialized Migration Workers
-│   ├── orchestrator.md              # Master orchestration & dynamic sequencing
+│   ├── orchestrator.md              # Master orchestration, preflight gate & wave sequencing
 │   ├── discovery.md                 # Read-only environment & code auditing
 │   ├── dependency.md                # Dependency DAG solver & execution wave sequencing
 │   ├── contrib-module.md            # Contrib module compatibility & core merge analysis
@@ -114,11 +207,21 @@ Drupal-MIgration-Agent/
 │       └── field-mapping.md         # Field type & Migrate API process pipeline mappings
 │
 ├── templates/                       # Standardized report & ticket templates
+│   ├── preflight-report.md          # Preflight environment & configuration audit template
+│   ├── discovery-report.md          # Discovery baseline audit report template
+│   ├── dependency-report.md         # Dependency graph & wave schedule template
+│   ├── migration-plan.md            # Component migration plan template
+│   ├── blocked-item.md              # Standardized blocker ticket template
+│   ├── validation-report.md         # Behavioral & data validation template
+│   ├── final-audit.md               # Final migration sign-off report template
+│   └── file-change-log.md           # Granular file modification audit template
+│
 ├── reports/                         # Deterministic report output directories
 ├── state/                           # Dual state management templates (state & manifest)
 ├── logs/                            # Audit logs (file change tracking)
 │
-├── migration.config.yml             # Master configuration template & defaults
+├── migration.config.example.yml     # Canonical configuration template for consumer onboarding
+├── migration.config.yml             # Workspace configuration instance
 ├── README.md                        # Package documentation & usage guide
 ├── ARCHITECTURE.md                  # Factory vs Migration execution architecture
 ├── AGENT_PROTOCOL.md                # Inter-agent handoff contracts & evidence taxonomy
@@ -150,9 +253,10 @@ Drupal-MIgration-Agent/
   - Factory Step 3: Workflow Orchestration & Agent Coordination [COMPLETE]
   - Factory Step 4: Agent Operationalization & Execution Contracts [COMPLETE]
   - Factory Step 5: Self-Validation, Contract Testing & Runtime Readiness [COMPLETE]
+  - Factory Step 6: Consumer Onboarding, Configuration Boundary & Preflight [COMPLETE]
 
 - **Migration Execution Lifecycle (When running against a real project)**:
-  - Migration Step 0: Setup & Path Verification
+  - Migration Step 0: Setup & Path Verification (Preflight Gate)
   - Migration Step 1: Project Discovery & Baseline Audit
   - Migration Step 2: Dependency Graph & Wave Scheduling
   - Migration Step 3: Contrib Compatibility Strategy

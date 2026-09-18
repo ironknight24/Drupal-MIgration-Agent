@@ -1,0 +1,124 @@
+# ==============================================================================
+# DRUPAL MIGRATION AGENT FRAMEWORK — CANONICAL CONFIGURATION TEMPLATE
+# ==============================================================================
+# Factory Version: 1.0.0
+# Description: Copy this file to 'migration.config.yml' in your workspace root
+#              and update the paths and settings for your specific migration.
+#
+# USAGE:
+#   cp migration.config.example.yml migration.config.yml
+#
+# MANDATORY SAFETY RULES:
+# - Do NOT place database credentials, API keys, passwords, or tokens here.
+# - The source.path is strictly READ-ONLY by all agents and commands.
+# - All write operations target target.path exclusively.
+# - source.path and target.path MUST NOT overlap or nest inside each other.
+# ==============================================================================
+
+version: "1.0"
+
+# ------------------------------------------------------------------------------
+# 1. Source Environment (Drupal 7)
+# ------------------------------------------------------------------------------
+source:
+  drupal_version: "7"
+  # Absolute path or workspace-relative path to your Drupal 7 codebase root:
+  path: "/path/to/drupal7_source"
+  
+  # Subdirectories relative to source.path:
+  custom_modules_path: "sites/all/modules/custom" # Common: sites/all/modules/custom or modules/custom
+  custom_themes_path: "sites/all/themes"          # Common: sites/all/themes or themes
+  sites_path: "sites/default"
+  
+  # Read-only database introspection metadata (optional, credentials via ENV)
+  database:
+    driver: "mysql"
+    host: "localhost"
+    port: 3306
+    name: "" # Set DB name if introspecting live D7 DB; NO PASSWORDS HERE
+    prefix: ""
+
+# ------------------------------------------------------------------------------
+# 2. Target Environment (Drupal 10 or Drupal 11)
+# ------------------------------------------------------------------------------
+target:
+  # Target major version: "10" or "11"
+  drupal_version: "10"
+  # Absolute path or workspace-relative path to your Drupal 10/11 target project root:
+  path: "/path/to/drupal_target"
+  
+  # Project layout relative to target.path:
+  web_root: "web"
+  custom_modules_path: "web/modules/custom"
+  custom_themes_path: "web/themes/custom"
+  config_sync_directory: "config/sync"
+
+# ------------------------------------------------------------------------------
+# 3. Migration Scope & Component Toggles
+# ------------------------------------------------------------------------------
+migration:
+  migrate_custom_modules: true
+  migrate_custom_themes: true
+  migrate_configuration: true
+  migrate_data: true
+  migrate_contrib_modules: true
+  migrate_integrations: true
+  run_tests: true
+  behavioral_validation: true
+
+# ------------------------------------------------------------------------------
+# 4. Source Control & Git Safety Guardrails
+# ------------------------------------------------------------------------------
+# WARNING: Automated commits and branch operations are disabled by default.
+# All code modifications are tracked in logs/file-change-log/ and diffs.
+git:
+  allow_commits: false
+  allow_branch_creation: false
+
+# ------------------------------------------------------------------------------
+# 5. Agent Autonomy & Execution Constraints
+# ------------------------------------------------------------------------------
+agents:
+  autonomous_modification: false
+  require_plan_before_modification: true
+  # Maximum retries on transient errors before marking a component BLOCKED
+  max_retries_per_component: 2
+  # Path protection enforcement
+  enforce_path_isolation: true
+  disallow_d7_writes: true
+
+# ------------------------------------------------------------------------------
+# 6. Validation Rules & Data Tolerance
+# ------------------------------------------------------------------------------
+validation:
+  compare_d7_behavior: true
+  compare_data: true
+  run_phpunit: true
+  run_static_analysis: true
+  # Tolerance for data migrations: strict | balanced | permissive
+  data_integrity_threshold: "strict"
+
+# ------------------------------------------------------------------------------
+# 7. Blocked Work & Exception Handling
+# ------------------------------------------------------------------------------
+blocked_work:
+  continue_other_tasks: true
+  generate_blocked_report: true
+
+# ------------------------------------------------------------------------------
+# 8. Configurable Test Suite Execution
+# ------------------------------------------------------------------------------
+# Tool presence is dynamically verified during Preflight & Discovery;
+# commands are executed only when enabled and tools exist in the target project.
+testing:
+  enabled: false
+  tools:
+    phpunit:
+      enabled: false
+      command: "vendor/bin/phpunit -c web/core/phpunit.xml"
+    phpstan:
+      enabled: false
+      command: "vendor/bin/phpstan analyze --memory-limit=1G"
+    phpcs:
+      enabled: false
+      command: "vendor/bin/phpcs --standard=Drupal,DrupalPractice web/modules/custom"

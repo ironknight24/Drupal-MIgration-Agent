@@ -71,12 +71,14 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
 ## 9. Preconditions
 - `migration.config.yml` provides valid, existing, and readable `source.path`.
 - `source.path` and `target.path` do not overlap.
+- Preflight Validation Gate (`commands/preflight.md`) executed with status `PASS`.
 - Framework is in `phase_1_discovery`.
 
 ---
 
 ## 10. Required Inputs
 - Master configuration: `migration.config.yml`.
+- Preflight validation report: `reports/preflight/PREFLIGHT-REPORT-<DATE>.md`.
 - File system tree of `source.path` (D7).
 - File system tree of `target.path` (D10/D11).
 - Optional D7 database credentials for schema queries (read-only).
