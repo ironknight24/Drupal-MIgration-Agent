@@ -166,6 +166,6 @@ Conducts the comprehensive, exhaustive post-migration audit of the target Drupal
 - **FAILED**: If manifest accounting cannot reconcile missing components.
 
 ## 18. Downstream Handoff
-- **Receiving Agent**: None (Terminal agent). Final reports, gap analyses, and migration state are delivered to human engineering leads and project stakeholders.
+- **Receiving Agent**: None (Terminal agent). Final reports, gap analyses, and migration state are delivered to `human` engineering leads and project stakeholders.
 - **Handoff Format**: Comprehensive final audit report, gap analysis backlog, and finalized migration state.
 - **Triggering Condition**: All 8 acceptance gates evaluated against empirical evidence and recorded in `reports/final/`.

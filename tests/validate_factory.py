@@ -1286,6 +1286,149 @@ class FactoryValidator:
                               f"Documents missing runtime limitation disclaimer: {', '.join(missing_disclaimers)}",
                               "Public documentation must explicitly retain runtime unverified status.")
 
+    def validate_inc_file_accounting_suite(self):
+        """
+        Suite 11: Legacy .inc File Re-engineering & Exhaustive Accounting Suite
+        Validates recursive discovery, inclusion trees, callable dissection, 18-class taxonomy,
+        non-1:1 architectural mapping, Drush command modernization, and zero-omission outcome tracking.
+        """
+        # 11.1 Recursive .inc Discovery & Arbitrary Naming Heuristics
+        discovery_agent = (self.repo_root / "agents/discovery/agent.md").read_text(encoding='utf-8')
+        d7_skill = (self.repo_root / "skills/d7-analysis/SKILL.md").read_text(encoding='utf-8')
+        manifest_text = (self.repo_root / "state/migration-manifest.yml").read_text(encoding='utf-8')
+
+        discovery_keywords = ["recursive", ".inc", "includes/", "arbitrary", "files[]", "module.inc", "admin.inc"]
+        missing_discovery = [k for k in discovery_keywords if k not in discovery_agent.lower() and k not in d7_skill.lower()]
+
+        if not missing_discovery and "inc_files" in manifest_text:
+            self.record_check("CHECK-INC-01", "discovery", "Recursive .inc Discovery & Arbitrary Naming Heuristics", "PASS",
+                              "Discovery agent and D7 analysis skill recursively inventory .inc files in root and subdirectories without naming assumptions.",
+                              "Verified comprehensive .inc discovery heuristics and manifest schema support.",
+                              affected_files=["agents/discovery/agent.md", "skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-INC-01", "discovery", "Recursive .inc Discovery & Arbitrary Naming Heuristics", "FAIL",
+                              f"Missing discovery keywords or manifest support: {', '.join(missing_discovery)}",
+                              "Factory must discover all .inc files recursively without filename convention assumptions.")
+
+        # 11.2 Include & Require Dependency Graph Tracing
+        include_mechanisms = ["include", "include_once", "require", "require_once", "module_load_include", "form_load_include", "hook_menu"]
+        missing_includes = [m for m in include_mechanisms if m not in d7_skill]
+        has_unverified_flag = "[UNVERIFIED RESULT]" in d7_skill or "[UNVERIFIED RESULT]" in discovery_agent
+
+        if not missing_includes and has_unverified_flag:
+            self.record_check("CHECK-INC-02", "analysis", "Include & Require Dependency Graph Tracing", "PASS",
+                              "Static analysis heuristics trace direct and dynamic inclusion mechanisms and flag unverified relationships.",
+                              "Verified include/require relationship graph tracking.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "agents/discovery/agent.md"])
+        else:
+            self.record_check("CHECK-INC-02", "analysis", "Include & Require Dependency Graph Tracing", "FAIL",
+                              f"Missing include mechanism heuristics: {', '.join(missing_includes)}",
+                              "Include/require graph analysis must cover core inclusion patterns.")
+
+        # 11.3 Fine-Grained Content Dissection & Caller Reference Modeling
+        dep_skill = (self.repo_root / "skills/dependency-analysis/SKILL.md").read_text(encoding='utf-8')
+        dep_agent = (self.repo_root / "agents/dependency/agent.md").read_text(encoding='utf-8')
+
+        has_callable_dissection = "callbacks" in d7_skill and "functions" in d7_skill and "classes" in d7_skill
+        has_caller_tracing = "callers" in d7_skill.lower() or "cross-call" in dep_skill.lower() or "cross-calls" in dep_agent.lower()
+
+        if has_callable_dissection and has_caller_tracing:
+            self.record_check("CHECK-INC-03", "analysis", "Fine-Grained Content Dissection & Caller Reference Modeling", "PASS",
+                              "Dissects .inc files into discrete callable units and tracks inter-file / inter-module caller references.",
+                              "Verified content analysis and reference modeling heuristics.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/dependency-analysis/SKILL.md", "agents/dependency/agent.md"])
+        else:
+            self.record_check("CHECK-INC-03", "analysis", "Fine-Grained Content Dissection & Caller Reference Modeling", "FAIL",
+                              "Missing callable dissection or caller reference modeling.",
+                              "Every .inc file must be dissected into discrete functional units with caller tracking.")
+
+        # 11.4 Standardized 18-Class Functional Taxonomy Verification
+        expected_taxonomy = [
+            "CONTROLLER_PAGE", "FORM_HANDLER", "SERVICE_BUSINESS_LOGIC", "PLUGIN_CANDIDATE",
+            "EVENT_SUBSCRIBER", "ACCESS_CHECKER", "ENTITY_FIELD_LOGIC", "QUEUE_WORKER",
+            "BATCH_PROCESSOR", "CRON_HANDLER", "DRUSH_COMMAND", "CONFIGURATION_HANDLER",
+            "THEME_RENDERER", "UTILITY_HELPER", "DATABASE_DATA_ACCESS", "INTEGRATION_CLIENT",
+            "TEST_SUPPORT", "LEGACY_OBSOLETE"
+        ]
+        missing_taxonomy = [t for t in expected_taxonomy if t not in d7_skill]
+        if not missing_taxonomy:
+            self.record_check("CHECK-INC-04", "classification", "Standardized 18-Class Functional Taxonomy Verification", "PASS",
+                              "All 18 standardized functional categories are defined and documented in D7 analysis heuristics.",
+                              "Verified complete functional classification taxonomy.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-INC-04", "classification", "Standardized 18-Class Functional Taxonomy Verification", "FAIL",
+                              f"Missing functional taxonomy classes: {', '.join(missing_taxonomy)}",
+                              "All 18 functional categories must be explicitly present in the skill specification.")
+
+        # 11.5 Non-1:1 D10 Architectural Re-engineering
+        custom_agent = (self.repo_root / "agents/custom-module/agent.md").read_text(encoding='utf-8')
+        custom_skill = (self.repo_root / "skills/custom-module-migration/SKILL.md").read_text(encoding='utf-8')
+        plan_template = (self.repo_root / "templates/migration-plan.md").read_text(encoding='utf-8')
+
+        has_non_1to1 = "non-1:1" in custom_agent.lower() or "non-1:1" in custom_skill.lower() or "File-to-Functionality" in plan_template
+        if has_non_1to1:
+            self.record_check("CHECK-INC-05", "architecture", "Non-1:1 D10 Architectural Re-engineering", "PASS",
+                              "Custom module agent and migration playbook mandate non-1:1 architectural re-engineering into modern OOP classes.",
+                              "Verified architectural mapping rather than mechanical file renaming.",
+                              affected_files=["agents/custom-module/agent.md", "skills/custom-module-migration/SKILL.md", "templates/migration-plan.md"])
+        else:
+            self.record_check("CHECK-INC-05", "architecture", "Non-1:1 D10 Architectural Re-engineering", "FAIL",
+                              "Missing explicit non-1:1 architectural re-engineering mandate.",
+                              "Factory must re-engineer .inc functionality into modern OOP architecture rather than blind file copying.")
+
+        # 11.6 Drush Command Discovery & Modernization
+        has_drush_handling = "drush" in d7_skill.lower() and "drush.services.yml" in custom_agent and "drush_commands" in manifest_text
+        if has_drush_handling:
+            self.record_check("CHECK-INC-06", "drush", "Drush Command Discovery & Modernization", "PASS",
+                              "Explicitly extracts legacy Drush commands from .inc files and maps them to modern Drush command classes.",
+                              "Verified Drush command modernization pipeline.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "agents/custom-module/agent.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-INC-06", "drush", "Drush Command Discovery & Modernization", "FAIL",
+                              "Missing Drush command discovery or modernization specifications.",
+                              "Drush commands in .inc files must be discovered and modernized.")
+
+        # 11.7 Zero-Omission Outcome Accounting & Forbidden State Enforcement
+        val_agent = (self.repo_root / "agents/validation/agent.md").read_text(encoding='utf-8')
+        val_skill = (self.repo_root / "skills/behavioral-validation/SKILL.md").read_text(encoding='utf-8')
+        val_template = (self.repo_root / "templates/validation-report.md").read_text(encoding='utf-8')
+
+        approved_outcomes = ["MIGRATED", "REPLACED", "OBSOLETE", "EXCLUDED_WITH_REASON", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"]
+        forbidden_states = ["UNACCOUNTED", "UNKNOWN_WITHOUT_REASON", "SILENTLY_OMITTED"]
+
+        missing_approved = [o for o in approved_outcomes if o not in val_skill]
+        missing_forbidden = [f for f in forbidden_states if f not in val_skill]
+
+        if not missing_approved and not missing_forbidden and "Legacy .inc File" in val_template:
+            self.record_check("CHECK-INC-07", "validation", "Zero-Omission Outcome Accounting & Forbidden State Enforcement", "PASS",
+                              "Validation agent enforces mandatory outcomes for all .inc files and rejects UNACCOUNTED/SILENTLY_OMITTED items.",
+                              "Verified strict zero-omission outcome validation.",
+                              affected_files=["agents/validation/agent.md", "skills/behavioral-validation/SKILL.md", "templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-INC-07", "validation", "Zero-Omission Outcome Accounting & Forbidden State Enforcement", "FAIL",
+                              f"Missing approved outcomes: {', '.join(missing_approved)} or forbidden states: {', '.join(missing_forbidden)}",
+                              "Validation must enforce explicit outcomes and forbid unaccounted/silently omitted code.")
+
+        # 11.8 Template & Public Documentation Consistency
+        doc_files = [
+            self.repo_root / "README.md",
+            self.repo_root / "ARCHITECTURE.md",
+            self.repo_root / "AGENT_PROTOCOL.md"
+        ]
+        doc_keyword = "recursively analyzes `.inc` files within Drupal 7 custom modules"
+        missing_doc_keywords = [str(p.name) for p in doc_files if doc_keyword not in p.read_text(encoding='utf-8') and "Legacy `.inc` File" not in p.read_text(encoding='utf-8')]
+
+        if not missing_doc_keywords:
+            self.record_check("CHECK-INC-08", "documentation", "Template & Public Documentation Consistency", "PASS",
+                              "README, ARCHITECTURE, and AGENT_PROTOCOL consistently document recursive .inc handling and accounting rules.",
+                              "Verified public documentation and template consistency.",
+                              affected_files=[str(p.relative_to(self.repo_root)) for p in doc_files])
+        else:
+            self.record_check("CHECK-INC-08", "documentation", "Template & Public Documentation Consistency", "FAIL",
+                              f"Documentation missing .inc architecture sections: {', '.join(missing_doc_keywords)}",
+                              "Public documentation must explicitly document recursive .inc handling.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -1297,6 +1440,7 @@ class FactoryValidator:
         self.validate_end_to_end_simulation()
         self.validate_failure_and_recovery_hardening()
         self.validate_release_readiness_and_distribution()
+        self.validate_inc_file_accounting_suite()
 
     def generate_result_json(self):
         return {

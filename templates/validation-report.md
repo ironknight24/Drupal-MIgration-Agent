@@ -20,6 +20,7 @@ evidence_summary:
 - **Overall Verdict**: `{{ OVERALL_VERDICT }}`
 - **Automated Tests Executed**: {{ TESTS_COUNT }}
 - **Manual Verification Checks**: {{ CHECKS_COUNT }}
+- **Legacy .inc Files Accounted For**: {{ INC_ACCOUNTED_COUNT }} / {{ INC_TOTAL_COUNT }}
 
 ---
 
@@ -42,7 +43,18 @@ evidence_summary:
 
 ---
 
-## 3. Detailed Evidence Logs
+## 3. Legacy .inc File & Callable Outcome Verification
+
+| D7 Source File | Function / Callable | D10 Target Implementation | Final Outcome Status | Verification Evidence / Reason |
+|---|---|---|---|---|
+| `includes/admin.inc` | `{{ COMPONENT }}_admin_settings()` | `src/Form/SettingsForm.php` | `MIGRATED` | Form submission unit test passed |
+| `includes/helper.inc` | `{{ COMPONENT }}_calc()` | `src/Service/CalcService.php` | `MIGRATED` | Kernel test verified math parity |
+| `includes/drush.inc` | `drush_{{ COMPONENT }}_sync()` | `src/Drush/Commands/SyncCommands.php` | `MIGRATED` | CLI execution verified |
+| `includes/legacy.inc` | `{{ COMPONENT }}_d6_compat()` | N/A | `OBSOLETE` | Deprecated D6 compatibility shim |
+
+---
+
+## 4. Detailed Evidence Logs
 
 ### Automated Test Logs
 ```
@@ -55,6 +67,6 @@ evidence_summary:
 
 ---
 
-## 4. Discrepancies & Gaps (if any)
+## 5. Discrepancies & Gaps (if any)
 - **Identified Gaps**:
 - **Action Required**:

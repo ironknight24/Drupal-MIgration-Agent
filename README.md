@@ -17,6 +17,24 @@ This repository serves as a **distributable Claude Code plugin package** that de
 
 ---
 
+## Legacy `.inc` File Re-engineering & Accounting Architecture
+
+The factory recursively analyzes `.inc` files within Drupal 7 custom modules and migrates the functionality they contain into appropriate Drupal 10 architecture.
+
+- **Recursive Discovery Without Naming Assumptions**: Scans all custom module roots and nested subdirectories (`includes/`, `admin/`, `forms/`, `pages/`, `commands/`, etc.) discovering all `.inc` and `.php` files regardless of naming patterns (`module.inc`, `admin.inc`, `pages.inc`, `forms.inc`, `functions.inc`, `includes/foo.inc`, `includes/bar.inc`, `custom-command.inc`, `arbitrary-name.inc`).
+- **Include & Require Dependency Graphs**: Inspects direct and transitive inclusion mechanisms (`include`, `include_once`, `require`, `require_once`, `module_load_include()`, `form_load_include()`, `ctools_include()`, `hook_menu()` `'file'` declarations, and `.info` `files[]` entries). Dynamic or unresolved inclusion expressions are explicitly flagged as `[UNVERIFIED RESULT]`.
+- **Callable & Functional Dissection**: Analyzes the actual code inside each `.inc` file—functions, classes, callbacks, hooks, form builders, access checkers, batch operations, queue workers, cron handlers, theme preprocessors, and Drush commands.
+- **Caller & Reference Analysis**: Traces callers across the owning module and other custom modules to inform architectural target selection.
+- **18-Class Functional Taxonomy**: Classifies every functional piece into standard categories (`CONTROLLER_PAGE`, `FORM_HANDLER`, `SERVICE_BUSINESS_LOGIC`, `PLUGIN_CANDIDATE`, `EVENT_SUBSCRIBER`, `ACCESS_CHECKER`, `ENTITY_FIELD_LOGIC`, `QUEUE_WORKER`, `BATCH_PROCESSOR`, `CRON_HANDLER`, `DRUSH_COMMAND`, `CONFIGURATION_HANDLER`, `THEME_RENDERER`, `UTILITY_HELPER`, `DATABASE_DATA_ACCESS`, `INTEGRATION_CLIENT`, `TEST_SUPPORT`, `LEGACY_OBSOLETE`).
+- **Non-1:1 Architectural Re-engineering**:
+  - `.inc` files are not copied blindly.
+  - `.inc` files are not necessarily migrated one-to-one into single D10 files. One `.inc` file may produce multiple D10 classes/services (e.g., page callback $\rightarrow$ Controller, form callback $\rightarrow$ Form class, business logic $\rightarrow$ Service), and multiple `.inc` files may merge into one modern service.
+- **Drush Command Modernization**: Discovered Drush commands in `.inc` files are cataloged and re-engineered into modern Drush 12+ command classes and services (`drush.services.yml`).
+- **Zero-Omission Accounting**: Every `.inc` file and function must end in an approved state: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, or `UNVERIFIED`. The states `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, and `SILENTLY_OMITTED` are strictly forbidden and trigger validation failure.
+- **Human Decision Gates & Verifiable Boundaries**: Where business intent or dynamic behavior cannot be established statically, human decisions are required (`reports/blocked/`) rather than making assumptions.
+
+---
+
 ## Consumer Onboarding & First-Run Guide
 
 Follow these steps to initialize and run a migration against your Drupal projects:

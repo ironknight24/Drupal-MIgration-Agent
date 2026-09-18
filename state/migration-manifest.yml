@@ -27,9 +27,22 @@ target_system:
 #   target_path: "web/modules/custom/my_module"
 #   d7_entry_file: "my_module.module"
 #   declared_dependencies: [] # from .info
-#   implicit_dependencies: [] # hook alters, shared tables
+#   implicit_dependencies: [] # hook alters, shared tables, .inc cross-calls
 #   target_strategy: "OOP_REENGINEERING" # OOP_REENGINEERING | CUSTOM_ENTITY | EXTRACT_SERVICE
 #   requires_custom_schema: false
+#   # Comprehensive .inc Source File & Functionality Accounting
+#   inc_files:
+#     - path: "includes/my_module.admin.inc"
+#       include_type: "MODULE_LOAD_INCLUDE" # DIRECT_REQUIRE | MODULE_LOAD_INCLUDE | MENU_ROUTER_INCLUDE | AUTOLOAD_FILES | DYNAMIC_INCLUDE | UNVERIFIED
+#       parent_callers: ["my_module.module"]
+#       functions:
+#         - name: "my_module_admin_settings_form"
+#           classification: "FORM_HANDLER" # CONTROLLER_PAGE | FORM_HANDLER | SERVICE_BUSINESS_LOGIC | PLUGIN_CANDIDATE | EVENT_SUBSCRIBER | ACCESS_CHECKER | ENTITY_FIELD_LOGIC | QUEUE_WORKER | BATCH_PROCESSOR | CRON_HANDLER | DRUSH_COMMAND | CONFIGURATION_HANDLER | THEME_RENDERER | UTILITY_HELPER | DATABASE_DATA_ACCESS | INTEGRATION_CLIENT | TEST_SUPPORT | LEGACY_OBSOLETE
+#           callers: ["my_module_menu()"]
+#           target_d10: "src/Form/SettingsForm.php"
+#           status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#           exclusion_reason: null
+#       drush_commands: [] # Discovered Drush command implementations
 custom_modules: []
 
 # ------------------------------------------------------------------------------

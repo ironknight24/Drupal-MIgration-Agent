@@ -100,14 +100,27 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
 3. **Module & Feature Inventory**:
    - Locate all `.info` files across `sites/all/modules/`, `sites/default/modules/`, `profiles/`.
    - Categorize modules into custom modules, contributed modules, and features.
-4. **Theme Inventory**: Locate all `.info` files across `sites/all/themes/`, `sites/default/themes/`; categorize base themes and subthemes.
-5. **Hook & Architecture Extraction**:
+4. **Recursive Source & `.inc` File Inventory**:
+   - For every custom module, recursively inventory all source files (`*.module`, `*.inc`, `*.install`, `*.info`, `*.php`, `includes/**/*.inc`, `*.drush.inc`, and arbitrary `.inc` files in any subdirectory).
+   - Never assume `.inc` files follow fixed naming conventions; discover strictly by file type and code structure.
+5. **Include & Dependency Relationship Analysis**:
+   - Trace all include patterns: `include`, `include_once`, `require`, `require_once`, `module_load_include()`, `form_load_include()`, `ctools_include()`, and menu file declarations.
+   - Map direct and transitive include hierarchies (e.g., `my_module.module` -> `includes/admin.inc` -> `includes/helper.inc`).
+   - Mark unresolved or dynamic includes as `[UNVERIFIED RESULT]`.
+6. **`.inc` Content & Caller Analysis**:
+   - Dissect every `.inc` file into individual functions, classes, constants, callbacks, hooks, Drush commands, batch/queue workers, and external API calls.
+   - Scan the codebase to identify callers and usage contexts for every discovered callable.
+   - Classify each functional unit into one of 18 standard categories (`CONTROLLER_PAGE`, `FORM_HANDLER`, `SERVICE_BUSINESS_LOGIC`, `PLUGIN_CANDIDATE`, `EVENT_SUBSCRIBER`, `ACCESS_CHECKER`, `ENTITY_FIELD_LOGIC`, `QUEUE_WORKER`, `BATCH_PROCESSOR`, `CRON_HANDLER`, `DRUSH_COMMAND`, `CONFIGURATION_HANDLER`, `THEME_RENDERER`, `UTILITY_HELPER`, `DATABASE_DATA_ACCESS`, `INTEGRATION_CLIENT`, `TEST_SUPPORT`, `LEGACY_OBSOLETE`).
+7. **Drush Command Extraction**:
+   - Extract legacy Drush commands from `*.drush.inc` and arbitrary `.inc` files, cataloging command names, arguments, options, aliases, and side effects.
+8. **Theme Inventory**: Locate all `.info` files across `sites/all/themes/`, `sites/default/themes/`; categorize base themes, subthemes, and `.tpl.php` templates.
+9. **Hook & Architecture Extraction**:
    - Grep for `hook_menu()`, `hook_schema()`, `hook_node_info()`, `hook_form_alter()`, `hook_views_api()`.
    - Catalog custom database tables defined in `.install` files.
-6. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
-7. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules`, `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
-8. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
-9. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
+10. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
+11. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (including complete `inc_files` and function accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
+12. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
+13. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
 
 ---
 

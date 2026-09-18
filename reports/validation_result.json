@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260918193446",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260918200141",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T19:34:46.653164+00:00",
+  "executed_at": "2026-09-18T20:01:41.310554+00:00",
   "summary": {
-    "checks_total": 96,
-    "passed": 94,
+    "checks_total": 104,
+    "passed": 103,
     "failed": 0,
-    "warnings": 1,
+    "warnings": 0,
     "unverified": 1
   },
   "checks": [
@@ -242,7 +242,7 @@
       "category": "agents",
       "name": "Agent Handoff Integrity (dependency)",
       "status": "PASS",
-      "evidence": "Downstream handoffs target valid lifecycle agents/roles: ['contrib-module', 'orchestrator']",
+      "evidence": "Downstream handoffs target valid lifecycle agents/roles: ['orchestrator']",
       "details": "Verified relational workflow continuity.",
       "affected_files": [
         "agents/dependency/agent.md"
@@ -350,7 +350,7 @@
       "category": "agents",
       "name": "Agent Handoff Integrity (validation)",
       "status": "PASS",
-      "evidence": "Downstream handoffs target valid lifecycle agents/roles: ['orchestrator', 'final-audit']",
+      "evidence": "Downstream handoffs target valid lifecycle agents/roles: ['orchestrator']",
       "details": "Verified relational workflow continuity.",
       "affected_files": [
         "agents/validation/agent.md"
@@ -361,9 +361,9 @@
       "check_id": "CHECK-HND-final-audit",
       "category": "agents",
       "name": "Agent Handoff Integrity (final-audit)",
-      "status": "WARNING",
-      "evidence": "Handoff targets not resolved to recognized agents: []",
-      "details": "Downstream handoff should reference next lifecycle agent or human.",
+      "status": "PASS",
+      "evidence": "Downstream handoffs target valid lifecycle agents/roles: ['human']",
+      "details": "Verified relational workflow continuity.",
       "affected_files": [
         "agents/final-audit/agent.md"
       ],
@@ -1105,6 +1105,115 @@
       "details": "Verified truthful runtime boundary representation.",
       "affected_files": [
         "README.md",
+        "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INC-01",
+      "category": "discovery",
+      "name": "Recursive .inc Discovery & Arbitrary Naming Heuristics",
+      "status": "PASS",
+      "evidence": "Discovery agent and D7 analysis skill recursively inventory .inc files in root and subdirectories without naming assumptions.",
+      "details": "Verified comprehensive .inc discovery heuristics and manifest schema support.",
+      "affected_files": [
+        "agents/discovery/agent.md",
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INC-02",
+      "category": "analysis",
+      "name": "Include & Require Dependency Graph Tracing",
+      "status": "PASS",
+      "evidence": "Static analysis heuristics trace direct and dynamic inclusion mechanisms and flag unverified relationships.",
+      "details": "Verified include/require relationship graph tracking.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "agents/discovery/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INC-03",
+      "category": "analysis",
+      "name": "Fine-Grained Content Dissection & Caller Reference Modeling",
+      "status": "PASS",
+      "evidence": "Dissects .inc files into discrete callable units and tracks inter-file / inter-module caller references.",
+      "details": "Verified content analysis and reference modeling heuristics.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/dependency-analysis/SKILL.md",
+        "agents/dependency/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INC-04",
+      "category": "classification",
+      "name": "Standardized 18-Class Functional Taxonomy Verification",
+      "status": "PASS",
+      "evidence": "All 18 standardized functional categories are defined and documented in D7 analysis heuristics.",
+      "details": "Verified complete functional classification taxonomy.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INC-05",
+      "category": "architecture",
+      "name": "Non-1:1 D10 Architectural Re-engineering",
+      "status": "PASS",
+      "evidence": "Custom module agent and migration playbook mandate non-1:1 architectural re-engineering into modern OOP classes.",
+      "details": "Verified architectural mapping rather than mechanical file renaming.",
+      "affected_files": [
+        "agents/custom-module/agent.md",
+        "skills/custom-module-migration/SKILL.md",
+        "templates/migration-plan.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INC-06",
+      "category": "drush",
+      "name": "Drush Command Discovery & Modernization",
+      "status": "PASS",
+      "evidence": "Explicitly extracts legacy Drush commands from .inc files and maps them to modern Drush command classes.",
+      "details": "Verified Drush command modernization pipeline.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "agents/custom-module/agent.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INC-07",
+      "category": "validation",
+      "name": "Zero-Omission Outcome Accounting & Forbidden State Enforcement",
+      "status": "PASS",
+      "evidence": "Validation agent enforces mandatory outcomes for all .inc files and rejects UNACCOUNTED/SILENTLY_OMITTED items.",
+      "details": "Verified strict zero-omission outcome validation.",
+      "affected_files": [
+        "agents/validation/agent.md",
+        "skills/behavioral-validation/SKILL.md",
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-INC-08",
+      "category": "documentation",
+      "name": "Template & Public Documentation Consistency",
+      "status": "PASS",
+      "evidence": "README, ARCHITECTURE, and AGENT_PROTOCOL consistently document recursive .inc handling and accounting rules.",
+      "details": "Verified public documentation and template consistency.",
+      "affected_files": [
+        "README.md",
+        "ARCHITECTURE.md",
         "AGENT_PROTOCOL.md"
       ],
       "remediation": ""

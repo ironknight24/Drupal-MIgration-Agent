@@ -86,12 +86,25 @@ The architecture decouples **workflow coordination** (Agents) from **reusable do
 5. Reports / Summaries / Dashboards (reports/* -> generated views of state & evidence)
 ```
 
-- **`state/migration-manifest.yml`** ("WHAT are we migrating?"): Static inventory of discovered custom modules, contrib modules, themes, content types, and data pipelines with declared dependencies and target strategy.
+- **`state/migration-manifest.yml`** ("WHAT are we migrating?"): Static inventory of discovered custom modules, .inc source files, functions, inclusion trees, contrib modules, themes, content types, and data pipelines with declared dependencies and target strategy.
 - **`state/migration-state.yml`** ("WHERE are we in the migration?"): The single source of truth for dynamic lifecycle progress, active wave batch, component statuses, health monitoring, and active blocker tickets.
 
 ---
 
-## 4. The 13 Specialized Agents, Skills & References
+## 4. Legacy `.inc` File Re-engineering & Accounting Architecture
+
+The factory recursively analyzes `.inc` files within Drupal 7 custom modules and migrates the functionality they contain into appropriate Drupal 10 architecture.
+
+- **Recursive Scanning & Zero Naming Assumptions**: Scans module roots and nested subdirectories discovering all `.inc` and `.php` files (e.g. `module.inc`, `admin.inc`, `includes/foo.inc`, `commands/*.inc`).
+- **Include / Require Graph Resolution**: Inspects `include`, `require`, `module_load_include()`, `form_load_include()`, `ctools_include()`, and `hook_menu()` `'file'` declarations. Marks unverified dynamic includes as `[UNVERIFIED RESULT]`.
+- **Fine-Grained Callable Dissection**: Extracts functions, classes, callbacks, form builders, access checkers, batch/queue workers, and Drush commands.
+- **18-Class Functional Taxonomy**: Classifies every functional piece into standard architectural roles.
+- **Non-1:1 Architectural Mapping**: `.inc` files are not copied blindly or mapped 1:1 to target files. Functionality is re-engineered into modern Symfony/Drupal OOP services, controllers, forms, plugins, and Drush command classes.
+- **Strict Zero-Omission Outcome Accounting**: Every `.inc` file and function must resolve to `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, or `UNVERIFIED`. The states `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, and `SILENTLY_OMITTED` are forbidden.
+
+---
+
+## 5. The 13 Specialized Agents, Skills & References
 
 | # | Agent | Primary Role | Associated Skills & Key References |
 |---|---|---|---|
@@ -111,7 +124,7 @@ The architecture decouples **workflow coordination** (Agents) from **reusable do
 
 ---
 
-## 5. Dynamic Waves, Concurrency & Failure Recovery
+## 6. Dynamic Waves, Concurrency & Failure Recovery
 
 1. **Dynamic DAG Waves**: Wave batches (`wave_0`, `wave_1`, ... `wave_N`) are calculated at runtime from dependency in-degrees and readiness state.
 2. **Concurrency Serialization**: Parallel execution is permitted only on disjoint file sets. Concurrently modifying shared files (`.services.yml`, `.routing.yml`), shared configuration, or schemas is strictly serialized.
@@ -120,7 +133,7 @@ The architecture decouples **workflow coordination** (Agents) from **reusable do
 
 ---
 
-## 6. File System & Path Protection Model
+## 7. File System & Path Protection Model
 
 ```text
 +-------------------------------------------------------------------+
