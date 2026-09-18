@@ -82,7 +82,17 @@ evidence_summary:
 
 ---
 
-## 6. Contributed Modules Inventory
+## 8. Configuration, State & Persistent Variables Inventory
+
+| Module | Config / Variable Key | Taxonomy Type (20 Types) | Source File:Line | Default Value & Type | Lifecycle (`CREATE->READ->MODIFY->DELETE`) | Security Sensitivity | Target D10 Architecture | Migration Strategy | Status |
+|---|---|---|---|---|---|---|---|---|---|
+| `example_module` | `example_api_key` | `D7_ENVIRONMENT_VALUE` | `includes/admin.inc:24` | `""` (string) | `ADMIN_FORM -> RUNTIME_READ` | `SECRET_CREDENTIAL` | `SETTINGS_API` | `SETTINGS_MIGRATION` | `MIGRATED` |
+| `example_module` | `example_last_sync` | `D7_PERSISTENT_STATE` | `example.module:110` | `0` (int) | `CRON_WRITE -> RUNTIME_READ` | `INTERNAL` | `STATE_API` | `STATE_MIGRATION` | `MIGRATED` |
+| `example_module` | `example_settings` | `D7_ADMIN_SETTING` | `includes/admin.inc:45` | `{"timeout": 30}` (array) | `INSTALL -> ADMIN_FORM -> READ` | `PUBLIC` | `CONFIG_OBJECT` | `DIRECT_CONFIG_MIGRATION` | `MIGRATED` |
+
+---
+
+## 9. Contributed Modules Inventory
 
 | Contrib Module | D7 Version | Core in D10? | D10 Available? | Community Replacement | Action Plan |
 |---|---|---|---|---|---|
@@ -91,7 +101,7 @@ evidence_summary:
 
 ---
 
-## 7. Custom Themes Inventory
+## 10. Custom Themes Inventory
 
 | Theme Name | Path | Base Theme | Template Files (.tpl.php) | Preprocess Functions |
 |---|---|---|---|---|
@@ -99,7 +109,7 @@ evidence_summary:
 
 ---
 
-## 8. Custom Database Tables & Data-Model Inventory
+## 11. Custom Database Tables & Data-Model Inventory
 
 | Module | Table Name | Schema Location (`hook_schema`) | Primary Key & Indexes | Entity References (`uid`, `nid`, etc.) | Data Semantics (17 Categories) | Serialization (`PHP_SERIALIZE`, `JSON`, etc.) | CRUD Callers (Create/Read/Update/Delete) | Target Architecture |
 |---|---|---|---|---|---|---|---|---|
@@ -107,7 +117,7 @@ evidence_summary:
 
 ---
 
-## 9. Entity & Data Architecture
+## 12. Entity & Data Architecture
 - **Content Types**:
 - **Taxonomy Vocabularies**:
 - **Custom SQL Tables**:
@@ -115,13 +125,13 @@ evidence_summary:
 
 ---
 
-## 9. Integrations, External Endpoints & Drush Commands
+## 13. Integrations, External Endpoints & Drush Commands
 - **Webhooks & APIs**:
 - **Authentication Protocols**:
 - **Custom Drush Commands**:
 
 ---
 
-## 10. Baseline Audit Findings & Risks
+## 14. Baseline Audit Findings & Risks
 - **Risk Assessment**:
 - **Recommended Sequence Overrides**:

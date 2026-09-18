@@ -263,10 +263,70 @@ Explicitly analyze and map specialized D7 subsystem hooks:
 - **Call Graph Dependencies**: Trace functions, services, database queries, and config objects invoked by every hook.
 - **Execution Ordering Constraints**: Account for module weight (`{system}.weight`), `hook_module_implements_alter()`, execution_order, alter_order, presave vs postsave lifecycle timings, and form validation sequences.
 
+### 21. Exhaustive Configuration, State & Variable Discovery
+Discover all configuration, variable, state, settings, and persistent key/value access patterns across `*.module`, `*.inc`, `*.php`, `*.install`, `*.profile`, `*.drush.inc`, and `.info` files:
+- **D7 Variable API**: `variable_get()`, `variable_set()`, `variable_del()`, `variable_initialize()`, `variable_realm_*()`, variable defaults, `$conf` array references.
+- **D7 Configuration & Admin Forms**: `system_settings_form()`, `system_settings_save()`, `system_settings_form_submit()`, `variable_get()` inside form builders, configuration forms, admin settings callbacks, settings validation, submit handlers.
+- **Direct Global & Environment Configuration**: `$conf`, global configuration arrays, `$GLOBALS`, static configuration caches, constants representing configuration, environment-derived configuration (`getenv()`, `$_ENV`, `$_SERVER`), `settings.php` references.
+- **Persistent State & Value Storage**: `variable_get/set/del` used as flags or timestamps, state-like persistent values, `cache_get/set` used as persistent application state, custom tables used specifically to persist configuration/state (`db_query()` / `db_select()`), key/value storage patterns, serialized configuration values, JSON configuration values, arrays stored as serialized variables, counters/timestamps/locks stored in variables.
+- **Module Lifecycle Configuration**: `hook_install()`, `hook_uninstall()`, `hook_update_N()`, variable initialization, variable cleanup, default configuration creation, configuration migration logic, update-time variable transformations.
+
+### 22. 20-Type Configuration Taxonomy
+Classify every discovered configuration/state artifact into the generic taxonomy:
+1. `D7_VARIABLE`: Standard variable accessed via `variable_get()`.
+2. `D7_VARIABLE_DEFAULT`: Default fallback value specified in `variable_get()` or module constants.
+3. `D7_VARIABLE_WRITE`: Runtime or administrative write via `variable_set()`.
+4. `D7_VARIABLE_DELETE`: Variable cleanup via `variable_del()`.
+5. `D7_GLOBAL_CONFIG`: Global configuration array or `$conf` / `$GLOBALS` access.
+6. `D7_FORM_SETTING`: Form field bound to a configuration variable in standard forms.
+7. `D7_ADMIN_SETTING`: Administrative setting managed via `system_settings_form()`.
+8. `D7_RUNTIME_SETTING`: Runtime operational flag or threshold evaluated during requests.
+9. `D7_PERSISTENT_STATE`: Non-configuration persistent state (timestamp, counter, lock, sync marker).
+10. `D7_CACHE_STATE`: Persistent application state stored incorrectly in Drupal cache bins.
+11. `D7_CUSTOM_TABLE_STATE`: Dedicated custom key-value or configuration table.
+12. `D7_SERIALIZED_VALUE`: Complex PHP data structure persisted via `serialize()` / `variable_set()`.
+13. `D7_JSON_VALUE`: JSON-encoded configuration or payload.
+14. `D7_ENVIRONMENT_VALUE`: Environment/deployment-specific value, external endpoint, or credential.
+15. `D7_INSTALL_CONFIGURATION`: Default variable initialized during `hook_install()`.
+16. `D7_UPDATE_CONFIGURATION`: Variable created, renamed, or transformed in `hook_update_N()`.
+17. `D7_UNINSTALL_CLEANUP`: Variable deleted during `hook_uninstall()`.
+18. `D7_DERIVED_CONFIGURATION`: Dynamically computed or merged configuration value.
+19. `D7_EXTERNAL_CONFIGURATION`: Configuration pulled from external API, service, or remote file.
+20. `D7_UNKNOWN_UNVERIFIED`: Ambiguous, dynamically assembled, or unresolvable configuration key.
+
+### 23. Read / Write / Delete Lifecycle Analysis
+For every discovered configuration artifact, trace the complete lifecycle:
+- **Reads**: Function/class reading it, location evidence, fallback behavior, type expectations, conditional logic, downstream consumers.
+- **Writes**: Function/class writing it, written value types, triggering lifecycle stage (`INSTALL`, `UPDATE`, `ADMIN_FORM`, `RUNTIME`, `CRON`, `BATCH`, `REQUEST`, `INTEGRATION`).
+- **Deletes**: Location of deletion, uninstall cleanup verification, migration cleanup.
+- **Lifecycle Chain**: Trace `CREATE -> READ -> MODIFY -> DELETE` and identify all callers and dependencies.
+
+### 24. Default Value Accounting
+Exhaustively capture and verify default values:
+- **Key & Fallback Value**: Variable key, default value literal, default data type (`string`, `int`, `float`, `bool`, `array`, `object`, `null`, `dynamic`).
+- **Default Source**: `static_literal`, `variable_get_fallback`, `hook_install`, `conf_override`, `dynamic_expression`, `unknown`.
+- **Static vs Dynamic**: Determine whether the default is a static literal or dynamically computed at runtime.
+- **Context Dependencies**: Identify if the default depends on user, role, language, environment, site, domain, module state, database query, or external service. Never assume `variable_get()` second parameter is the authoritative business default if overridden during installation or bootstrap.
+
+### 25. Serialized & JSON Value Analysis
+- **Serialization Patterns**: Detect `serialize()`, `unserialize()`, `json_encode()`, `json_decode()`, nested configuration structures, and array structures stored in variables.
+- **Data Type & Schema Extraction**: Determine structural schema, key-value mappings, required/optional fields, and type constraints.
+- **Opaque PHP Objects & Complex State**: Serialized PHP classes, closures, or ambiguous binary payloads must be classified as `UNVERIFIED` or `HUMAN_DECISION_REQUIRED`. Never silently discard or truncate serialized data structures.
+
+### 26. Configuration Forms & Admin Semantics Preservation
+- **Form Discovery**: Detect `system_settings_form()`, custom administration form builders, validation callbacks (`_validate`), submit handlers (`_submit`), AJAX settings forms, and permission requirements.
+- **Admin Semantics Preservation**: Preserve configuration key mappings, form element validation rules, dependency toggles (`#states`), and submit transformations.
+- **Modern Target Mapping**: Map D7 admin settings forms to `ConfigFormBase` classes (`src/Form/SettingsForm.php`), defining `getEditableConfigNames()`, `buildForm()`, `validateForm()`, `submitForm()`, and linking routes in `<module>.routing.yml` and menu links in `<module>.links.menu.yml`.
+
+### 27. Install, Update & Uninstall Lifecycle Accounting
+- **Installation Defaults**: Trace `hook_install()` variable creations and initializations $\rightarrow$ modern default configuration files (`config/install/<module>.settings.yml`).
+- **Update Hook Transformations**: Trace `hook_update_N()` variable renames, value migrations, structural splits/merges, and schema updates $\rightarrow$ modern `hook_post_update_NAME()` or `hook_update_N()`.
+- **Uninstall Cleanup**: Trace `hook_uninstall()` `variable_del()` calls $\rightarrow$ modern CMI automatic config deletion or State API cleanup in `hook_uninstall()`.
+
 ---
 
 ## Output Reporting Standard
 All discovery outputs must:
-1. Provide verifiable file paths, class names, method signatures, table names, hook names, and line numbers (`[OBSERVED FACT]`).
-2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, and `hook_implementations` in `state/migration-manifest.yml`.
-3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call as `[UNVERIFIED RESULT]`.
+1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, and line numbers (`[OBSERVED FACT]`).
+2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, and `configuration_state_items` in `state/migration-manifest.yml`.
+3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.

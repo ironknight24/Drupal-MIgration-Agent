@@ -1,7 +1,7 @@
 ---
 name: dependency-analysis
-description: Dependency Graph Solver & Wave Scheduling Playbook. Analyzes inter-module couplings, custom PHP class instantiations, .inc function call trees, procedural hook execution ordering, module weights, alter dependencies, constructs migration DAGs, detects cycles, and generates dynamic execution waves.
-version: 1.3.0
+description: Dependency Graph Solver & Wave Scheduling Playbook. Analyzes inter-module couplings, custom PHP class instantiations, .inc function call trees, procedural hook execution ordering, module weights, alter dependencies, configuration/state couplings, constructs migration DAGs, detects cycles, and generates dynamic execution waves.
+version: 1.4.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Dependency Analysis & Wave Scheduling Skill
 
 ## Overview
-This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, procedural hook execution ordering, module weights (`{system}.weight`), alter sequencing (`hook_module_implements_alter`), custom PHP class instantiations, and legacy `.inc` function couplings across legacy Drupal 7 components. It constructs a Directed Acyclic Graph (DAG), detects circular dependencies, and organizes components into executable topological waves.
+This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, configuration, state, procedural hook execution ordering, module weights (`{system}.weight`), alter sequencing (`hook_module_implements_alter`), custom PHP class instantiations, and legacy `.inc` function couplings across legacy Drupal 7 components. It constructs a Directed Acyclic Graph (DAG), detects circular dependencies, and organizes components into executable topological waves.
 
 ---
 
@@ -20,9 +20,9 @@ This skill provides the procedural playbook and algorithms for discovering code,
 
 ---
 
-## 5-Dimensional Coupling Detection Heuristics
+## 6-Dimensional Coupling Detection Heuristics
 
-To establish an accurate DAG, inspect source assets across 5 distinct coupling vectors:
+To establish an accurate DAG, inspect source assets across 6 distinct coupling vectors:
 
 ### 1. Declared Dependencies
 - Parse `dependencies[]` declarations in source `.info` files (`[OBSERVED FACT]`).
@@ -45,11 +45,21 @@ To establish an accurate DAG, inspect source assets across 5 distinct coupling v
   - Cross-module joins and queries (`db_query`, `db_select`, `db_insert`, `db_update`, `db_delete`) where module A mutates or queries tables defined by module B.
   - Shared junction tables and entity reference columns (`uid`, `nid`, `tid`, `fid`, `entity_id`).
 
-### 4. Presentation & Theme Couplings
+### 4. Configuration, State & Variable Couplings
+- Trace configuration and state read/write/delete relationships across custom modules:
+  - `CONFIG -> SERVICE -> HOOK`: Service loads configuration to execute hook logic.
+  - `FORM -> CONFIG WRITE`: Administration form persists settings used by controllers and services.
+  - `CONFIG -> CONTROLLER`: Controller reads settings to determine view presentation or response parameters.
+  - `STATE -> CRON`: Cron handler reads and updates runtime state (`last_run` timestamp).
+  - `CONFIG -> ENTITY`: Entity type configuration or bundle settings referenced across modules.
+  - `CONFIG -> EXTERNAL API`: Integration client service dependent on endpoint configuration.
+  - Cross-module variable access: Module A reading or mutating variables (`variable_get`/`variable_set`) owned or initialized by Module B.
+
+### 5. Presentation & Theme Couplings
 - Identify custom theme templates (`.tpl.php`) or preprocess functions invoking custom module APIs.
 - Custom modules that provide default themes or template suggestions via `hook_theme()`.
 
-### 5. Data Migration Hierarchy & Database Ordering Couplings
+### 6. Data Migration Hierarchy & Database Ordering Couplings
 - Relational entity and custom table hierarchies where dependent data cannot be migrated before parent entities:
   - Roles & Permissions $\rightarrow$ Users
   - Users $\rightarrow$ Taxonomy Vocabularies $\rightarrow$ Taxonomy Terms

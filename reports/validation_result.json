@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260918205723",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260918211315",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T20:57:23.449719+00:00",
+  "executed_at": "2026-09-18T21:13:15.329390+00:00",
   "summary": {
-    "checks_total": 142,
-    "passed": 141,
+    "checks_total": 162,
+    "passed": 161,
     "failed": 0,
     "warnings": 0,
     "unverified": 1
@@ -1730,6 +1730,264 @@
         "README.md",
         "ARCHITECTURE.md",
         "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-01",
+      "category": "discovery",
+      "name": "Generic Variable & Config Discovery",
+      "status": "PASS",
+      "evidence": "D7 analysis skill recursively scans all custom module file extensions (*.module, *.inc, *.php, *.install, *.profile, *.drush.inc) for variable and configuration access patterns.",
+      "details": "Verified generic recursive configuration discovery.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-02",
+      "category": "discovery",
+      "name": "Dynamic Configuration Pattern Discovery",
+      "status": "PASS",
+      "evidence": "Configuration discovery is source-driven and pattern-based (Variable API, admin forms, $conf, $GLOBALS, static caches, lifecycle hooks) without relying on a static variable list.",
+      "details": "Verified dynamic non-hardcoded configuration discovery.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-03",
+      "category": "lifecycle",
+      "name": "Read/Write/Delete Lifecycle Accounting",
+      "status": "PASS",
+      "evidence": "D7 analysis skill and manifest trace the full CREATE -> READ -> MODIFY -> DELETE lifecycle, tracking readers, writers, deleters, and lifecycle stages.",
+      "details": "Verified configuration read/write/delete lifecycle tracking.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-04",
+      "category": "defaults",
+      "name": "Default Value Accounting",
+      "status": "PASS",
+      "evidence": "D7 analysis skill and manifest capture default values, default types, default sources (literal, fallback, hook_install, override), static vs dynamic evaluation, and contextual dependencies.",
+      "details": "Verified comprehensive default value accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-05",
+      "category": "taxonomy",
+      "name": "Domain Semantic Classification",
+      "status": "PASS",
+      "evidence": "Configuration migration skill provides strict semantic distinction rules separating Configuration (CMI), State (State API), Content (Entities), Environment (Settings), and Cache.",
+      "details": "Verified 5-domain semantic distinction matrix.",
+      "affected_files": [
+        "skills/configuration-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-06",
+      "category": "environment",
+      "name": "Environment & Deployment Classification",
+      "status": "PASS",
+      "evidence": "D7 analysis and configuration skills identify deployment/environment-specific settings, mapping them to settings.php overrides and getenv() calls.",
+      "details": "Verified environment and deployment configuration handling.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/configuration-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-07",
+      "category": "security",
+      "name": "Secret & Credential Protection Standards",
+      "status": "PASS",
+      "evidence": "Configuration migration skill strictly enforces Rule 10: Zero secrets committed to CMI YAML, routing credentials to settings.php, getenv(), or Key module, with ambiguous cases routed to HUMAN_DECISION_REQUIRED.",
+      "details": "Verified secret isolation and credential protection compliance.",
+      "affected_files": [
+        "skills/configuration-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-08",
+      "category": "serialization",
+      "name": "Serialized Value Detection & Transformation",
+      "status": "PASS",
+      "evidence": "D7 analysis and configuration skills detect serialize()/unserialize() patterns and structured arrays, mapping to typed schema mappings and flagging opaque objects as HUMAN_DECISION_REQUIRED or UNVERIFIED.",
+      "details": "Verified serialized value detection and schema mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/configuration-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-09",
+      "category": "json",
+      "name": "JSON Value Detection & Schema Mapping",
+      "status": "PASS",
+      "evidence": "D7 analysis and configuration skills detect json_encode/json_decode payloads, mapping to typed schema mappings or structured state storage.",
+      "details": "Verified JSON value detection and schema mapping.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/configuration-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-10",
+      "category": "lifecycle",
+      "name": "Install / Update / Uninstall Lifecycle Accounting",
+      "status": "PASS",
+      "evidence": "D7 analysis skill traces variable lifecycle across hook_install (default configs), hook_update_N (historical transformations, renames, merges), and hook_uninstall (cleanup).",
+      "details": "Verified install, update, and uninstall lifecycle configuration accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-11",
+      "category": "forms",
+      "name": "Configuration Form Modernization",
+      "status": "PASS",
+      "evidence": "D7 analysis and configuration skills preserve admin form semantics, converting system_settings_form() to modern ConfigFormBase classes with validation, submit handlers, and routing.",
+      "details": "Verified configuration form semantics preservation and ConfigFormBase re-engineering.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/configuration-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-12",
+      "category": "cmi",
+      "name": "Config API & Typed Schema Modernization",
+      "status": "PASS",
+      "evidence": "Configuration migration skill defines complete Config API target artifacts: config/install/*.settings.yml, config/schema/*.schema.yml typed definitions, and injected ConfigFactoryInterface.",
+      "details": "Verified Config API and typed configuration schema standards.",
+      "affected_files": [
+        "skills/configuration-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-13",
+      "category": "state_api",
+      "name": "State API Modernization Mapping",
+      "status": "PASS",
+      "evidence": "Configuration migration skill defines State API mapping for dynamic/runtime state, enforcing StateInterface dependency injection and uninstallation cleanup.",
+      "details": "Verified State API modernization and lifecycle management.",
+      "affected_files": [
+        "skills/configuration-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-14",
+      "category": "settings_api",
+      "name": "Settings & Environment Modernization Mapping",
+      "status": "PASS",
+      "evidence": "Configuration migration skill provides explicit mappings for environment variables, settings.php overrides, and Key module integration.",
+      "details": "Verified settings and environment modernization guidelines.",
+      "affected_files": [
+        "skills/configuration-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-15",
+      "category": "dependencies",
+      "name": "Configuration Dependency Graph Integration",
+      "status": "PASS",
+      "evidence": "Dependency analysis skill models configuration and state read/write/delete edges (CONFIG->SERVICE->HOOK, FORM->CONFIG WRITE, CONFIG->CONTROLLER, STATE->CRON) in the migration DAG.",
+      "details": "Verified configuration dependency graph integration.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-16",
+      "category": "strategies",
+      "name": "Configuration Migration Strategies",
+      "status": "PASS",
+      "evidence": "Configuration migration skill defines 10 standardized migration strategies supporting 1-to-many, many-to-one, and cross-subsystem transformations.",
+      "details": "Verified multi-strategy configuration transformation capabilities.",
+      "affected_files": [
+        "skills/configuration-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-17",
+      "category": "manifest",
+      "name": "Manifest Configuration Accounting Schema",
+      "status": "PASS",
+      "evidence": "state/migration-manifest.yml defines complete configuration_state_items accounting schema covering all 22 required behavioral, lifecycle, and architectural metadata fields.",
+      "details": "Verified manifest configuration accounting schema structure.",
+      "affected_files": [
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-18",
+      "category": "validation",
+      "name": "Zero-Omission Configuration Outcome Enforcement",
+      "status": "PASS",
+      "evidence": "Validation agent and skill enforce approved terminal outcomes (MIGRATED, REPLACED, OBSOLETE, EXCLUDED_WITH_REASON, HUMAN_DECISION_REQUIRED, UNVERIFIED) and reject forbidden states for all configuration and state variables.",
+      "details": "Verified zero-omission outcome enforcement for configuration and state.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-19",
+      "category": "compatibility",
+      "name": "Cross-Capability Compatibility",
+      "status": "PASS",
+      "evidence": "Configuration and state accounting seamlessly integrates alongside custom database schemas, hooks, custom PHP files, and .inc files across manifest, skills, agents, and documentation without conflicts.",
+      "details": "Verified cross-capability architectural compatibility.",
+      "affected_files": [
+        "state/migration-manifest.yml",
+        "README.md",
+        "ARCHITECTURE.md",
+        "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CONFIG-20",
+      "category": "documentation",
+      "name": "Documentation & Contract Synchronization",
+      "status": "PASS",
+      "evidence": "All skills, agents, manifests, templates, and core documentation files are fully synchronized with Step 15 configuration and state modernization standards.",
+      "details": "Verified documentation and contract synchronization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/configuration-migration/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/custom-module-migration/SKILL.md",
+        "skills/dependency-analysis/SKILL.md",
+        "skills/testing/SKILL.md",
+        "skills/behavioral-validation/SKILL.md",
+        "README.md",
+        "ARCHITECTURE.md"
       ],
       "remediation": ""
     }

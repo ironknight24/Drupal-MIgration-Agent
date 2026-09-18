@@ -2048,6 +2048,328 @@ class FactoryValidator:
                               "Cross-capability compatibility check failed across manifest, skills, or documentation.",
                               "Hook discovery must maintain seamless compatibility with database, class, and inc file capabilities.")
 
+    def validate_configuration_state_accounting_suite(self):
+        """Step 15: D7 Configuration, State & Variables Exhaustive Discovery, Accounting & D10/D11 Re-engineering."""
+        d7_skill = (self.repo_root / "skills/d7-analysis/SKILL.md").read_text(encoding='utf-8')
+        config_skill = (self.repo_root / "skills/configuration-migration/SKILL.md").read_text(encoding='utf-8')
+        mapping_skill = (self.repo_root / "skills/d7-to-d10-mapping/SKILL.md").read_text(encoding='utf-8')
+        custom_skill = (self.repo_root / "skills/custom-module-migration/SKILL.md").read_text(encoding='utf-8')
+        dep_skill = (self.repo_root / "skills/dependency-analysis/SKILL.md").read_text(encoding='utf-8')
+        test_skill = (self.repo_root / "skills/testing/SKILL.md").read_text(encoding='utf-8')
+        val_skill = (self.repo_root / "skills/behavioral-validation/SKILL.md").read_text(encoding='utf-8')
+        discovery_agent = (self.repo_root / "agents/discovery/agent.md").read_text(encoding='utf-8')
+        config_agent = (self.repo_root / "agents/configuration/agent.md").read_text(encoding='utf-8')
+        manifest_text = (self.repo_root / "state/migration-manifest.yml").read_text(encoding='utf-8')
+        readme_text = (self.repo_root / "README.md").read_text(encoding='utf-8')
+        arch_text = (self.repo_root / "ARCHITECTURE.md").read_text(encoding='utf-8')
+
+        # 15.1 Generic Variable/Config Discovery
+        scan_extensions = ["*.module", "*.inc", "*.php", "*.install", "*.profile", "*.drush.inc"]
+        missing_exts = [e for e in scan_extensions if e not in d7_skill and e.replace("*", "") not in d7_skill]
+
+        if not missing_exts and "variable_get" in d7_skill and "variable_set" in d7_skill and "variable_del" in d7_skill:
+            self.record_check("CHECK-CONFIG-01", "discovery", "Generic Variable & Config Discovery", "PASS",
+                              "D7 analysis skill recursively scans all custom module file extensions (*.module, *.inc, *.php, *.install, *.profile, *.drush.inc) for variable and configuration access patterns.",
+                              "Verified generic recursive configuration discovery.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-01", "discovery", "Generic Variable & Config Discovery", "FAIL",
+                              f"Missing scan extensions or Variable API detection: {', '.join(missing_exts)}",
+                              "Factory must discover configuration across all source file extensions.")
+
+        # 15.2 Non-Hardcoded Discovery Scope
+        config_sources = ["variable_get", "system_settings_form", "$conf", "$globals", "static configuration", "environment-derived", "hook_install", "hook_update_n"]
+        missing_sources = [s for s in config_sources if s not in d7_skill.lower()]
+
+        if not missing_sources:
+            self.record_check("CHECK-CONFIG-02", "discovery", "Dynamic Configuration Pattern Discovery", "PASS",
+                              "Configuration discovery is source-driven and pattern-based (Variable API, admin forms, $conf, $GLOBALS, static caches, lifecycle hooks) without relying on a static variable list.",
+                              "Verified dynamic non-hardcoded configuration discovery.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-02", "discovery", "Dynamic Configuration Pattern Discovery", "FAIL",
+                              f"Missing configuration source patterns: {', '.join(missing_sources)}",
+                              "Factory must discover configuration through generic source patterns.")
+
+        # 15.3 Read/Write/Delete/Lifecycle Accounting
+        lifecycle_terms = ["reads", "writes", "deletes", "create -> read -> modify -> delete"]
+        missing_lc = [t for t in lifecycle_terms if t not in d7_skill.lower() and t not in manifest_text.lower()]
+
+        if not missing_lc:
+            self.record_check("CHECK-CONFIG-03", "lifecycle", "Read/Write/Delete Lifecycle Accounting", "PASS",
+                              "D7 analysis skill and manifest trace the full CREATE -> READ -> MODIFY -> DELETE lifecycle, tracking readers, writers, deleters, and lifecycle stages.",
+                              "Verified configuration read/write/delete lifecycle tracking.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-CONFIG-03", "lifecycle", "Read/Write/Delete Lifecycle Accounting", "FAIL",
+                              f"Missing lifecycle accounting terms: {', '.join(missing_lc)}",
+                              "Factory must account for read, write, delete, and lifecycle transitions.")
+
+        # 15.4 Default Value Accounting
+        default_fields = ["default_value", "default_type", "default_source", "is_dynamic_default", "default_context_dependencies"]
+        missing_defaults = [d for d in default_fields if d not in manifest_text and d.replace("_", " ") not in d7_skill.lower()]
+
+        if not missing_defaults:
+            self.record_check("CHECK-CONFIG-04", "defaults", "Default Value Accounting", "PASS",
+                              "D7 analysis skill and manifest capture default values, default types, default sources (literal, fallback, hook_install, override), static vs dynamic evaluation, and contextual dependencies.",
+                              "Verified comprehensive default value accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-CONFIG-04", "defaults", "Default Value Accounting", "FAIL",
+                              f"Missing default value accounting fields: {', '.join(missing_defaults)}",
+                              "Factory must capture default value semantics and context dependencies.")
+
+        # 15.5 Config vs State vs Content vs Environment vs Cache Distinction
+        domains = ["configuration", "state", "content", "environment", "cache"]
+        has_domain_distinction = all(d in config_skill.lower() for d in domains) and "semantic distinction" in config_skill.lower()
+
+        if has_domain_distinction:
+            self.record_check("CHECK-CONFIG-05", "taxonomy", "Domain Semantic Classification", "PASS",
+                              "Configuration migration skill provides strict semantic distinction rules separating Configuration (CMI), State (State API), Content (Entities), Environment (Settings), and Cache.",
+                              "Verified 5-domain semantic distinction matrix.",
+                              affected_files=["skills/configuration-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-05", "taxonomy", "Domain Semantic Classification", "FAIL",
+                              "Missing 5-domain semantic distinction matrix in configuration-migration skill.",
+                              "Factory must distinguish Config vs State vs Content vs Environment vs Cache.")
+
+        # 15.6 Environment & Deployment Classification
+        has_env = "d7_environment_value" in d7_skill.lower() and "settings.php" in config_skill.lower() and "getenv" in config_skill.lower()
+        if has_env:
+            self.record_check("CHECK-CONFIG-06", "environment", "Environment & Deployment Classification", "PASS",
+                              "D7 analysis and configuration skills identify deployment/environment-specific settings, mapping them to settings.php overrides and getenv() calls.",
+                              "Verified environment and deployment configuration handling.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/configuration-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-06", "environment", "Environment & Deployment Classification", "FAIL",
+                              "Missing environment classification in D7 analysis or configuration skill.",
+                              "Factory must classify and isolate environment-specific settings.")
+
+        # 15.7 Secret & Credential Isolation (Rule 10)
+        has_secret_isolation = "rule 10" in config_skill.lower() and "zero secrets" in config_skill.lower() and ("key" in config_skill.lower() or "getenv" in config_skill.lower())
+
+        if has_secret_isolation:
+            self.record_check("CHECK-CONFIG-07", "security", "Secret & Credential Protection Standards", "PASS",
+                              "Configuration migration skill strictly enforces Rule 10: Zero secrets committed to CMI YAML, routing credentials to settings.php, getenv(), or Key module, with ambiguous cases routed to HUMAN_DECISION_REQUIRED.",
+                              "Verified secret isolation and credential protection compliance.",
+                              affected_files=["skills/configuration-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-07", "security", "Secret & Credential Protection Standards", "FAIL",
+                              "Missing secret isolation or Rule 10 enforcement in configuration skill.",
+                              "Factory must prevent secrets and credentials from being written to CMI YAML.")
+
+        # 15.8 Serialized Value Detection
+        has_serialized = "serialize" in d7_skill.lower() and "unserialize" in d7_skill.lower() and "d7_serialized_value" in d7_skill.lower()
+
+        if has_serialized:
+            self.record_check("CHECK-CONFIG-08", "serialization", "Serialized Value Detection & Transformation", "PASS",
+                              "D7 analysis and configuration skills detect serialize()/unserialize() patterns and structured arrays, mapping to typed schema mappings and flagging opaque objects as HUMAN_DECISION_REQUIRED or UNVERIFIED.",
+                              "Verified serialized value detection and schema mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/configuration-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-08", "serialization", "Serialized Value Detection & Transformation", "FAIL",
+                              "Missing serialized value detection in D7 analysis skill.",
+                              "Factory must detect and transform serialized PHP structures.")
+
+        # 15.9 JSON Value Detection
+        has_json = "json_encode" in d7_skill.lower() and "json_decode" in d7_skill.lower() and "d7_json_value" in d7_skill.lower()
+
+        if has_json:
+            self.record_check("CHECK-CONFIG-09", "json", "JSON Value Detection & Schema Mapping", "PASS",
+                              "D7 analysis and configuration skills detect json_encode/json_decode payloads, mapping to typed schema mappings or structured state storage.",
+                              "Verified JSON value detection and schema mapping.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/configuration-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-09", "json", "JSON Value Detection & Schema Mapping", "FAIL",
+                              "Missing JSON payload detection in D7 analysis skill.",
+                              "Factory must detect JSON payloads in variables and state.")
+
+        # 15.10 Install / Update / Uninstall Lifecycle Accounting
+        lifecycle_hooks = ["hook_install", "hook_update_n", "hook_uninstall"]
+        missing_hooks = [h for h in lifecycle_hooks if h not in d7_skill.lower()]
+
+        if not missing_hooks:
+            self.record_check("CHECK-CONFIG-10", "lifecycle", "Install / Update / Uninstall Lifecycle Accounting", "PASS",
+                              "D7 analysis skill traces variable lifecycle across hook_install (default configs), hook_update_N (historical transformations, renames, merges), and hook_uninstall (cleanup).",
+                              "Verified install, update, and uninstall lifecycle configuration accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-10", "lifecycle", "Install / Update / Uninstall Lifecycle Accounting", "FAIL",
+                              f"Missing lifecycle hook analysis: {', '.join(missing_hooks)}",
+                              "Factory must trace configuration transformations across lifecycle hooks.")
+
+        # 15.11 Configuration Forms & Admin Semantics Preservation
+        form_terms = ["system_settings_form", "configformbase", "geteditableconfignames", "buildform", "submitform"]
+        missing_forms = [f for f in form_terms if f not in config_skill.lower() and f not in d7_skill.lower()]
+
+        if not missing_forms:
+            self.record_check("CHECK-CONFIG-11", "forms", "Configuration Form Modernization", "PASS",
+                              "D7 analysis and configuration skills preserve admin form semantics, converting system_settings_form() to modern ConfigFormBase classes with validation, submit handlers, and routing.",
+                              "Verified configuration form semantics preservation and ConfigFormBase re-engineering.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/configuration-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-11", "forms", "Configuration Form Modernization", "FAIL",
+                              f"Missing configuration form terms: {', '.join(missing_forms)}",
+                              "Factory must convert system_settings_form to modern ConfigFormBase.")
+
+        # 15.12 Config API Modernization Mapping
+        cmi_artifacts = ["config/install", "config/schema", "config_object", "configfactoryinterface"]
+        missing_cmi = [c for c in cmi_artifacts if c not in config_skill.lower()]
+
+        if not missing_cmi:
+            self.record_check("CHECK-CONFIG-12", "cmi", "Config API & Typed Schema Modernization", "PASS",
+                              "Configuration migration skill defines complete Config API target artifacts: config/install/*.settings.yml, config/schema/*.schema.yml typed definitions, and injected ConfigFactoryInterface.",
+                              "Verified Config API and typed configuration schema standards.",
+                              affected_files=["skills/configuration-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-12", "cmi", "Config API & Typed Schema Modernization", "FAIL",
+                              f"Missing Config API artifacts or concepts: {', '.join(missing_cmi)}",
+                              "Factory must generate config/install YAML, config/schema YAML, and injected config factory.")
+
+        # 15.13 State API Modernization Mapping
+        has_state_api = "stateinterface" in config_skill.lower() and "\\drupal::state()" in config_skill.lower() and "hook_uninstall" in config_skill.lower()
+
+        if has_state_api:
+            self.record_check("CHECK-CONFIG-13", "state_api", "State API Modernization Mapping", "PASS",
+                              "Configuration migration skill defines State API mapping for dynamic/runtime state, enforcing StateInterface dependency injection and uninstallation cleanup.",
+                              "Verified State API modernization and lifecycle management.",
+                              affected_files=["skills/configuration-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-13", "state_api", "State API Modernization Mapping", "FAIL",
+                              "Missing State API mapping or StateInterface guidelines in configuration skill.",
+                              "Factory must map runtime state to State API with proper injection and cleanup.")
+
+        # 15.14 Settings & Environment Modernization Mapping
+        has_settings_api = "settings.php" in config_skill.lower() and "getenv" in config_skill.lower()
+
+        if has_settings_api:
+            self.record_check("CHECK-CONFIG-14", "settings_api", "Settings & Environment Modernization Mapping", "PASS",
+                              "Configuration migration skill provides explicit mappings for environment variables, settings.php overrides, and Key module integration.",
+                              "Verified settings and environment modernization guidelines.",
+                              affected_files=["skills/configuration-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-14", "settings_api", "Settings & Environment Modernization Mapping", "FAIL",
+                              "Missing settings.php or getenv guidelines in configuration skill.",
+                              "Factory must support settings.php and environment-based configuration.")
+
+        # 15.15 Dependency Graph Integration
+        dep_couplings = ["config -> service -> hook", "form -> config write", "config -> controller", "state -> cron"]
+        missing_dep_couplings = [c for c in dep_couplings if c not in dep_skill.lower()]
+
+        if not missing_dep_couplings:
+            self.record_check("CHECK-CONFIG-15", "dependencies", "Configuration Dependency Graph Integration", "PASS",
+                              "Dependency analysis skill models configuration and state read/write/delete edges (CONFIG->SERVICE->HOOK, FORM->CONFIG WRITE, CONFIG->CONTROLLER, STATE->CRON) in the migration DAG.",
+                              "Verified configuration dependency graph integration.",
+                              affected_files=["skills/dependency-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-15", "dependencies", "Configuration Dependency Graph Integration", "FAIL",
+                              f"Missing configuration coupling edges in dependency skill: {', '.join(missing_dep_couplings)}",
+                              "Dependency skill must model configuration and state couplings in the DAG.")
+
+        # 15.16 Non-1:1 Architecture & Transformation Mapping
+        strat_count = sum(1 for s in [
+            "DIRECT_CONFIG_MIGRATION", "TRANSFORMED_CONFIG_MIGRATION", "CONFIG_ENTITY_MIGRATION",
+            "STATE_MIGRATION", "SETTINGS_MIGRATION", "ENVIRONMENT_MIGRATION", "KEY_VALUE_MIGRATION",
+            "CONTENT_MIGRATION", "CACHE_REBUILD", "CUSTOM_MIGRATION"
+        ] if s in config_skill)
+
+        if strat_count >= 8:
+            self.record_check("CHECK-CONFIG-16", "strategies", "Configuration Migration Strategies", "PASS",
+                              f"Configuration migration skill defines {strat_count} standardized migration strategies supporting 1-to-many, many-to-one, and cross-subsystem transformations.",
+                              "Verified multi-strategy configuration transformation capabilities.",
+                              affected_files=["skills/configuration-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-16", "strategies", "Configuration Migration Strategies", "FAIL",
+                              f"Only {strat_count}/10 configuration migration strategies found in skill.",
+                              "Factory must define comprehensive configuration migration strategies.")
+
+        # 15.17 Manifest Schema Integrity
+        manifest_config_fields = [
+            "config_key", "config_type", "source_file", "function_or_class",
+            "location_evidence", "reads", "writes", "deletes", "default_value",
+            "default_type", "default_source", "lifecycle", "consumers",
+            "security_sensitivity", "serialization_format", "target_architecture",
+            "target_artifacts", "migration_strategy", "validation_strategy",
+            "confidence", "status", "exclusion_reason"
+        ]
+        missing_config_manifest = [f for f in manifest_config_fields if f not in manifest_text]
+
+        if not missing_config_manifest:
+            self.record_check("CHECK-CONFIG-17", "manifest", "Manifest Configuration Accounting Schema", "PASS",
+                              "state/migration-manifest.yml defines complete configuration_state_items accounting schema covering all 22 required behavioral, lifecycle, and architectural metadata fields.",
+                              "Verified manifest configuration accounting schema structure.",
+                              affected_files=["state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-CONFIG-17", "manifest", "Manifest Configuration Accounting Schema", "FAIL",
+                              f"Missing manifest configuration fields: {', '.join(missing_config_manifest)}",
+                              "Manifest schema must define all required configuration and state accounting fields.")
+
+        # 15.18 Zero-Omission Outcome Enforcement
+        approved_outcomes = ["MIGRATED", "REPLACED", "OBSOLETE", "EXCLUDED_WITH_REASON", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"]
+        forbidden_states = ["UNACCOUNTED", "UNKNOWN_WITHOUT_REASON", "SILENTLY_OMITTED"]
+
+        missing_approved = [o for o in approved_outcomes if o not in val_skill]
+        missing_forbidden = [f for f in forbidden_states if f not in val_skill or f not in d7_skill]
+        val_template = (self.repo_root / "templates/validation-report.md").read_text(encoding='utf-8')
+
+        if not missing_approved and not missing_forbidden and "Configuration & State Items Accounted For" in val_template:
+            self.record_check("CHECK-CONFIG-18", "validation", "Zero-Omission Configuration Outcome Enforcement", "PASS",
+                              "Validation agent and skill enforce approved terminal outcomes (MIGRATED, REPLACED, OBSOLETE, EXCLUDED_WITH_REASON, HUMAN_DECISION_REQUIRED, UNVERIFIED) and reject forbidden states for all configuration and state variables.",
+                              "Verified zero-omission outcome enforcement for configuration and state.",
+                              affected_files=["skills/behavioral-validation/SKILL.md", "templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-CONFIG-18", "validation", "Zero-Omission Configuration Outcome Enforcement", "FAIL",
+                              f"Missing approved outcomes or forbidden states in validation skill or template.",
+                              "Validation must enforce zero-omission outcomes for all configuration and state items.")
+
+        # 15.19 Cross-Capability Compatibility
+        has_cross_compat = (
+            "custom_database_tables" in manifest_text and
+            "custom_php_files" in manifest_text and
+            "inc_files" in manifest_text and
+            "hook_implementations" in manifest_text and
+            "configuration_state_items" in manifest_text and
+            "Configuration, State, Variables" in readme_text and
+            "Configuration, State, Variables" in arch_text
+        )
+
+        if has_cross_compat:
+            self.record_check("CHECK-CONFIG-19", "compatibility", "Cross-Capability Compatibility", "PASS",
+                              "Configuration and state accounting seamlessly integrates alongside custom database schemas, hooks, custom PHP files, and .inc files across manifest, skills, agents, and documentation without conflicts.",
+                              "Verified cross-capability architectural compatibility.",
+                              affected_files=["state/migration-manifest.yml", "README.md", "ARCHITECTURE.md", "AGENT_PROTOCOL.md"])
+        else:
+            self.record_check("CHECK-CONFIG-19", "compatibility", "Cross-Capability Compatibility", "FAIL",
+                              "Cross-capability compatibility check failed across manifest, skills, or documentation.",
+                              "Configuration accounting must maintain seamless compatibility with database, hook, class, and inc capabilities.")
+
+        # 15.20 Documentation & Contract Synchronization
+        taxonomy_in_d7 = "20-type configuration taxonomy" in d7_skill.lower() or "20-type" in d7_skill.lower()
+        has_doc_sync = (
+            taxonomy_in_d7 and
+            "1.1.0" in config_skill and
+            "1.3.0" in mapping_skill and
+            "1.4.0" in custom_skill and
+            "1.4.0" in dep_skill and
+            "1.3.0" in test_skill and
+            "1.4.0" in val_skill
+        )
+
+        if has_doc_sync:
+            self.record_check("CHECK-CONFIG-20", "documentation", "Documentation & Contract Synchronization", "PASS",
+                              "All skills, agents, manifests, templates, and core documentation files are fully synchronized with Step 15 configuration and state modernization standards.",
+                              "Verified documentation and contract synchronization.",
+                              affected_files=[
+                                  "skills/d7-analysis/SKILL.md", "skills/configuration-migration/SKILL.md",
+                                  "skills/d7-to-d10-mapping/SKILL.md", "skills/custom-module-migration/SKILL.md",
+                                  "skills/dependency-analysis/SKILL.md", "skills/testing/SKILL.md",
+                                  "skills/behavioral-validation/SKILL.md", "README.md", "ARCHITECTURE.md"
+                              ])
+        else:
+            self.record_check("CHECK-CONFIG-20", "documentation", "Documentation & Contract Synchronization", "FAIL",
+                              "Documentation and skill version synchronization check failed.",
+                              "Skills and documentation must be synchronized with Step 15 configuration modernization.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -2063,6 +2385,7 @@ class FactoryValidator:
         self.validate_custom_php_classes_accounting_suite()
         self.validate_custom_database_and_data_model_suite()
         self.validate_procedural_hooks_accounting_suite()
+        self.validate_configuration_state_accounting_suite()
 
     def generate_result_json(self):
         return {

@@ -1,7 +1,7 @@
 ---
 name: testing
-description: Test Strategy & Automated Quality Assurance Playbook. Configures and validates PHPUnit test suites, custom class autoloading, constructor DI verification, hook replacement testing, event subscriber assertions, PHPStan static analysis, and PHPCS coding standards.
-version: 1.2.0
+description: Test Strategy & Automated Quality Assurance Playbook. Configures and validates PHPUnit test suites, custom class autoloading, constructor DI verification, hook replacement testing, event subscriber assertions, config schema validation, state persistence testing, PHPStan static analysis, and PHPCS coding standards.
+version: 1.3.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Automated Testing & Quality Assurance Playbook Skill
 
 ## Overview
-This skill provides the procedural guidelines and runner configurations for establishing automated testing pipelines, static code analysis, custom PHP class testing, procedural hook replacement testing, event subscriber assertions, and coding standards compliance across migrated Drupal 10 and Drupal 11 custom modules and themes.
+This skill provides the procedural guidelines and runner configurations for establishing automated testing pipelines, static code analysis, custom PHP class testing, procedural hook replacement testing, event subscriber assertions, configuration schema validation, state API assertions, and coding standards compliance across migrated Drupal 10 and Drupal 11 custom modules and themes.
 
 ---
 
@@ -19,9 +19,9 @@ This skill provides the procedural guidelines and runner configurations for esta
 
 ---
 
-## Test Expectations for Migrated Custom PHP Classes, Services & Hook Replacements
+## Test Expectations for Migrated Custom PHP Classes, Services, Hooks & Configuration
 
-When testing modernized custom OOP classes, services, and procedural hook replacements, configure tests appropriate to their architectural responsibility:
+When testing modernized custom OOP classes, services, procedural hook replacements, and configuration/state artifacts, configure tests appropriate to their architectural responsibility:
 1. **Class Autoloading & Container Construction**:
    - Verify class is discoverable via Composer PSR-4 without manual includes.
    - Verify service builds from `<module>.services.yml` container definition without container exceptions.
@@ -32,14 +32,20 @@ When testing modernized custom OOP classes, services, and procedural hook replac
    - Assert that event subscribers properly handle dispatched custom events with expected arguments.
    - Assert that modernized form alter handlers (`hook_form_alter` delegating to service) attach expected elements, validation callbacks, and submit handlers.
    - Assert that modernized route controllers, form classes, and custom access check services return expected `AccessResult` and HTTP responses.
-4. **Public API & Business Logic Parity**:
+4. **Configuration Schema, ConfigFormBase & State API Validation**:
+   - Assert default configuration installs cleanly from `config/install/<module>.settings.yml`.
+   - Validate configuration against `config/schema/<module>.schema.yml` using `SchemaCheckTestTrait`.
+   - Assert `ConfigFormBase` builds, validates, and persists configuration correctly into CMI.
+   - Assert State API persistence (`\Drupal::state()`) stores, retrieves, and deletes runtime state flags and timestamps correctly.
+   - Assert Secret Isolation (Rule 10): verify zero credentials/API keys exist in exported CMI YAML files.
+5. **Public API & Business Logic Parity**:
    - Author PHPUnit Unit tests targeting domain calculations, validation algorithms, and state transitions.
-5. **Integration, Custom Database & Repository Operations**:
+6. **Integration, Custom Database & Repository Operations**:
    - Author PHPUnit Kernel tests targeting custom entity CRUD, custom database table repository queries, dynamic SQL filters, and configuration schema adherence.
    - Verify transaction rollback semantics: ensure failed operations rollback completely without leaving orphaned records.
-6. **Data Migration ETL Pipeline Tests**:
+7. **Data Migration ETL Pipeline Tests**:
    - Author Kernel migration tests verifying source-to-destination mappings, serialized payload transformations, entity reference lookups, and rollback behavior.
-7. **Error Handling & Edge Cases**:
+8. **Error Handling & Edge Cases**:
    - Assert exception throwing on invalid inputs, missing dependencies, database constraint violations, or failed external requests.
 
 ---

@@ -1,7 +1,7 @@
 ---
 name: d7-to-d10-mapping
-description: Behavioral and architectural mapping rules for converting procedural Drupal 7 APIs, hooks, and legacy custom PHP classes into modern Drupal 10/11 object-oriented patterns.
-version: 1.2.0
+description: Behavioral and architectural mapping rules for converting procedural Drupal 7 APIs, hooks, variables, state, and legacy custom PHP classes into modern Drupal 10/11 object-oriented patterns.
+version: 1.3.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep
 # Drupal 7 to Drupal 10/11 Architectural Mapping Skill
 
 ## Overview
-This skill provides the architectural mapping rules required to translate Drupal 7 procedural constructs, hooks (core, contrib, custom, alter, entity, form, theme, install/update), legacy custom PHP classes, constructors, interfaces, traits, and `.inc` files into modern Symfony/Drupal 10 and Drupal 11 object-oriented paradigms, prioritizing Dependency Injection, PSR-4 autoloading, service containers, event subscribers, and testability.
+This skill provides the architectural mapping rules required to translate Drupal 7 procedural constructs, hooks (core, contrib, custom, alter, entity, form, theme, install/update), persistent variables, configuration forms, runtime state, legacy custom PHP classes, constructors, interfaces, traits, and `.inc` files into modern Symfony/Drupal 10 and Drupal 11 object-oriented paradigms, prioritizing Dependency Injection, PSR-4 autoloading, service containers, event subscribers, typed configuration, and testability.
 
 ---
 
@@ -82,9 +82,13 @@ In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual li
   - *Mail (`hook_mail`)* $\rightarrow$ Retained in `.module` or modernized via Mail plugins / `plugin.manager.mail`.
   - *Cron (`hook_cron`)* $\rightarrow$ Retained in `.module` delegating to a dedicated cron service or QueueWorker plugin in `src/Plugin/QueueWorker/`.
 
-### 6. State & Settings Modernization
-- **Configuration (CMI)**: Static settings that should be deployed across environments map to Configuration Objects (`config/install/<module>.settings.yml` and `config/schema/`).
-- **State API**: Dynamic environment-specific values (`last_cron_run`, synchronization timestamps) map to the `state` service (`\Drupal::state()` or injected `StateInterface`).
+### 6. Configuration, State, Variable & Settings Modernization
+- **Configuration API (CMI)**: Administrator-managed settings (`variable_get` / `variable_set` / `$conf`) map to Configuration Objects (`config/install/<module>.settings.yml`) with typed schema (`config/schema/<module>.schema.yml`). Access via injected `ConfigFactoryInterface` (`$this->configFactory->get('<module>.settings')`).
+- **Configuration Forms**: Procedural `system_settings_form()` builders map to `ConfigFormBase` classes (`src/Form/SettingsForm.php`) implementing `getEditableConfigNames()`, `buildForm()`, `validateForm()`, and `submitForm()`.
+- **State API**: Runtime, machine-specific flags and counters (timestamps, cron markers, sync counters) map to `StateInterface` (`\Drupal::state()` or injected `state` service).
+- **Settings API & Secret Isolation (Rule 10)**: Secrets, passwords, private keys, API credentials, and environment overrides map to `Settings::get(...)`, `settings.php` overrides, or Key module. **NEVER** commit credentials into CMI YAML files.
+- **KeyValue API**: Dedicated key-value collections map to `\Drupal::keyValue()` or `keyvalue.expirable`.
+- **14 Migration Strategies Applied**: Explicitly choose from `DIRECT_CONFIG_MIGRATION`, `TRANSFORMED_CONFIG_MIGRATION`, `CONFIG_ENTITY_MIGRATION`, `STATE_MIGRATION`, `SETTINGS_MIGRATION`, `ENVIRONMENT_MIGRATION`, `KEY_VALUE_MIGRATION`, `CONTENT_MIGRATION`, `CACHE_REBUILD`, `CUSTOM_MIGRATION`, `REPLACED`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
 
 ### 7. Entity, Custom Database & Repository Abstraction
 - **Core Entity Queries**: Direct `db_query()` targeting core tables (`{node}`, `{users}`, `{taxonomy_term_data}`, `{file_managed}`) MUST be replaced by Entity Queries or Entity Storage via `EntityTypeManagerInterface`.

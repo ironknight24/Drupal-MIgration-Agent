@@ -175,6 +175,53 @@ target_system:
 #       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
 #       exclusion_reason: null
 #       evidence: "my_module.module:L12-L45 defines 3 router items with page and access callbacks"
+#   # Comprehensive Configuration, State & Variable Accounting
+#   configuration_state_items:
+#     - config_key: "my_module_api_endpoint"
+#       config_type: "D7_ADMIN_SETTING" # 20-Type Taxonomy:
+#       # D7_VARIABLE | D7_VARIABLE_DEFAULT | D7_VARIABLE_WRITE | D7_VARIABLE_DELETE | D7_GLOBAL_CONFIG |
+#       # D7_FORM_SETTING | D7_ADMIN_SETTING | D7_RUNTIME_SETTING | D7_PERSISTENT_STATE | D7_CACHE_STATE |
+#       # D7_CUSTOM_TABLE_STATE | D7_SERIALIZED_VALUE | D7_JSON_VALUE | D7_ENVIRONMENT_VALUE |
+#       # D7_INSTALL_CONFIGURATION | D7_UPDATE_CONFIGURATION | D7_UNINSTALL_CLEANUP |
+#       # D7_DERIVED_CONFIGURATION | D7_EXTERNAL_CONFIGURATION | D7_UNKNOWN_UNVERIFIED
+#       source_file: "my_module.admin.inc"
+#       function_or_class: "my_module_admin_settings_form"
+#       location_evidence: "my_module.admin.inc:L24 variable_get('my_module_api_endpoint', 'https://api.example.com')"
+#       reads: ["my_module_send_request()", "my_module_admin_settings_form()"]
+#       writes: ["system_settings_form_submit()", "my_module_update_7101()"]
+#       deletes: ["my_module_uninstall()"]
+#       default_value: "https://api.example.com"
+#       default_type: "string" # string | int | float | bool | array | object | null | dynamic
+#       default_source: "variable_get_fallback" # static_literal | variable_get_fallback | hook_install | conf_override | dynamic_expression | unknown
+#       is_dynamic_default: false
+#       default_context_dependencies: [] # user | role | language | environment | site | domain | database | external_service
+#       lifecycle: "INSTALL_INITIALIZE -> FORM_WRITE -> RUNTIME_READ -> UNINSTALL_CLEANUP"
+#       consumers: ["MyModuleApiClientService", "SettingsForm"]
+#       callers: ["my_module_cron()", "my_module_form_submit()"]
+#       dependencies: []
+#       database_dependencies: []
+#       entity_dependencies: []
+#       configuration_dependencies: []
+#       environment_dependencies: []
+#       security_sensitivity: "PUBLIC" # PUBLIC | INTERNAL | SECRET_CREDENTIAL | ENVIRONMENT_SPECIFIC
+#       serialization_format: "NONE" # NONE | PHP_SERIALIZE | JSON | OPAQUE_OBJECT | UNKNOWN
+#       target_architecture: "CONFIG_OBJECT" # Target Architecture:
+#       # CONFIG_OBJECT | CONFIG_ENTITY | CONTENT_ENTITY | STATE_API | KEY_VALUE_API | SETTINGS_API |
+#       # SERVICE_CONTAINER | ENVIRONMENT_CONFIG | CONFIG_SCHEMA | CONFIG_FORM_BASE | PLUGIN_CONFIG |
+#       # THIRD_PARTY_SETTINGS | FIELD_CONFIG | ENTITY_CONFIG | CACHE_BIN | TEMP_STORE | CUSTOM_STORAGE |
+#       # OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       target_artifacts:
+#         - "config/install/my_module.settings.yml"
+#         - "config/schema/my_module.schema.yml"
+#         - "src/Form/SettingsForm.php"
+#       migration_strategy: "DIRECT_CONFIG_MIGRATION" # 14 Migration Strategies:
+#       # DIRECT_CONFIG_MIGRATION | TRANSFORMED_CONFIG_MIGRATION | CONFIG_ENTITY_MIGRATION | STATE_MIGRATION |
+#       # SETTINGS_MIGRATION | ENVIRONMENT_MIGRATION | KEY_VALUE_MIGRATION | CONTENT_MIGRATION | CACHE_REBUILD |
+#       # CUSTOM_MIGRATION | REPLACED | OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       validation_strategy: "CONFIG_SCHEMA_AND_FORM_SUBMIT_TEST" # CONFIG_SCHEMA_AND_FORM_SUBMIT_TEST | STATE_PERSISTENCE_TEST | SETTINGS_OVERRIDE_TEST | UNIT_TEST
+#       confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
+#       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       exclusion_reason: null
 custom_modules: []
 
 # ------------------------------------------------------------------------------

@@ -24,6 +24,7 @@ evidence_summary:
 - **Procedural Hooks Accounted For**: {{ HOOKS_ACCOUNTED_COUNT }} / {{ HOOKS_TOTAL_COUNT }}
 - **Legacy .inc Files Accounted For**: {{ INC_ACCOUNTED_COUNT }} / {{ INC_TOTAL_COUNT }}
 - **Custom Database Tables Accounted For**: {{ TABLES_ACCOUNTED_COUNT }} / {{ TABLES_TOTAL_COUNT }}
+- **Configuration & State Items Accounted For**: {{ CONFIG_ACCOUNTED_COUNT }} / {{ CONFIG_TOTAL_COUNT }}
 
 ---
 
@@ -36,7 +37,7 @@ evidence_summary:
 | **3. Permissions & Access**| | | `PASS` | |
 | **4. Data Integrity** | | | `PASS` | |
 | **5. Relationships** | | | `PASS` | |
-| **6. Configuration** | | | `PASS` | |
+| **6. Configuration & State** | | | `PASS` | |
 | **7. Routes & URLs** | | | `PASS` | |
 | **8. Forms** | | | `PASS` | |
 | **9. Integrations** | | | `PASS` | |
@@ -46,12 +47,15 @@ evidence_summary:
 
 ---
 
-## 3. Custom PHP Class, Procedural Hook, Callable & Database Table Outcome Verification
+## 3. Custom Class, Hook, Database & Configuration Outcome Verification
 
-| D7 Source File / Schema | Class / Hook / Method / Table | Legacy Dependencies / Schema | D10 Target Implementation | Final Outcome Status | Verification Evidence / Reason |
+| D7 Source File / Schema / Key | Class / Hook / Table / Variable | Legacy Dependencies / Fallback | D10 Target Implementation | Final Outcome Status | Verification Evidence / Reason |
 |---|---|---|---|---|---|
 | `lib/ExampleProcessor.php` | `class ExampleProcessor` | `ExampleProcessor($db)` | `src/Service/ExampleProcessor.php` | `MIGRATED` | Service construction & Unit test passed |
 | `{{ COMPONENT }}.install` | `table: {{ COMPONENT }}_records` | `hook_schema: record_id, uid` | `src/Entity/RecordEntity.php` | `MIGRATED` | Entity CRUD & migration test verified |
+| `includes/admin.inc:24` | `variable: {{ COMPONENT }}_endpoint` | `https://api.example.com` | `config/install/{{ COMPONENT }}.settings.yml` | `MIGRATED` | Schema test & ConfigForm submit verified |
+| `{{ COMPONENT }}.module:110` | `variable: {{ COMPONENT }}_last_sync` | `0` (int) | `State API` (`{{ COMPONENT }}.last_sync`) | `MIGRATED` | State persistence kernel test passed |
+| `includes/admin.inc:48` | `variable: {{ COMPONENT }}_api_key` | `""` (secret) | `settings.php` override / Key module | `MIGRATED` | Zero secrets in CMI assertion passed |
 | `{{ COMPONENT }}.module` | `{{ COMPONENT }}_menu()` | `hook_menu` | `.routing.yml`, `src/Controller/` | `MIGRATED` | Route & controller response verified |
 | `{{ COMPONENT }}.module` | `{{ COMPONENT }}_form_alter()` | `hook_form_alter` | `src/Service/FormAlterService.php` | `MIGRATED` | Form alter unit test passed |
 | `includes/admin.inc` | `{{ COMPONENT }}_admin_settings()` | N/A | `src/Form/SettingsForm.php` | `MIGRATED` | Form submission unit test passed |

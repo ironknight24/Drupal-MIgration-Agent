@@ -43,13 +43,16 @@ evidence_summary:
 
 ---
 
-## 3. File, Class, Procedural Hook & Custom Database Table Accounting & D10 Architectural Mapping
+## 3. File, Class, Hook, Database & Configuration Accounting & D10 Architectural Mapping
 
-| D7 Source File / Schema | Legacy Artifact / Class / Hook / Table | Classification / Semantics | Target D10 Class / Storage Destination | Migration Strategy / Injected Services | Planned Outcome Status |
+| D7 Source File / Key / Schema | Legacy Artifact / Hook / Table / Variable | Classification / Semantics | Target D10 Class / Storage Destination | Migration Strategy / Injected Services | Planned Outcome Status |
 |---|---|---|---|---|---|
 | `lib/ExampleProcessor.php` | `class ExampleProcessor` | `SERVICE_BUSINESS_LOGIC` | `src/Service/ExampleProcessor.php` | `@database`, `@config.factory` | `MIGRATED` |
 | `{{ COMPONENT }}.install` | `table: {{ COMPONENT }}_records` | `USER_DATA` | `src/Entity/RecordEntity.php` | `ENTITY_MIGRATION` | `MIGRATED` |
-| `{{ COMPONENT }}.module` | `{{ COMPONENT }}_menu()` | `CORE_HOOK` | `.routing.yml`, `src/Controller/`, `src/Form/`, `.links.menu.yml` | `NON_1_TO_1_DECOMPOSITION` | `MIGRATED` |
+| `includes/admin.inc:24` | `variable: {{ COMPONENT }}_endpoint` | `D7_ADMIN_SETTING` | `config/install/{{ COMPONENT }}.settings.yml` | `DIRECT_CONFIG_MIGRATION` (`@config.factory`) | `MIGRATED` |
+| `{{ COMPONENT }}.module:110` | `variable: {{ COMPONENT }}_last_sync` | `D7_PERSISTENT_STATE` | `State API` (`{{ COMPONENT }}.last_sync`) | `STATE_MIGRATION` (`@state`) | `MIGRATED` |
+| `includes/admin.inc:48` | `variable: {{ COMPONENT }}_api_key` | `D7_ENVIRONMENT_VALUE` | `settings.php` override / Key module | `SETTINGS_MIGRATION` (Rule 10: No Secrets in CMI) | `MIGRATED` |
+| `{{ COMPONENT }}.module` | `{{ COMPONENT }}_menu()` | `CORE_HOOK` | `.routing.yml`, `src/Controller/`, `src/Form/`, `.links.menu.yml` | `DECOMPOSE_TO_ROUTES_AND_CONTROLLER` | `MIGRATED` |
 | `{{ COMPONENT }}.module` | `{{ COMPONENT }}_form_alter()` | `ALTER_HOOK` | `src/Service/FormAlterService.php` | `@entity_type.manager` | `MIGRATED` |
 | `{{ COMPONENT }}.module` | `{{ COMPONENT }}_view()` | `CONTROLLER` | `src/Controller/ViewController.php` | `@current_user` | `MIGRATED` |
 | `includes/admin.inc` | `{{ COMPONENT }}_admin_settings()` | `FORM` | `src/Form/SettingsForm.php` | `@config.factory` | `MIGRATED` |

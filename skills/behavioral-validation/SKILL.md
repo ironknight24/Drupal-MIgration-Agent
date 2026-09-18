@@ -1,7 +1,7 @@
 ---
 name: behavioral-validation
-description: 12-Dimensional Comparative Behavioral Validation Playbook with exhaustive custom PHP file, class, constructor, procedural hook, custom hook, and .inc file outcome auditing.
-version: 1.3.0
+description: 12-Dimensional Comparative Behavioral Validation Playbook with exhaustive custom PHP file, class, constructor, procedural hook, custom hook, database schema, configuration, state, and .inc file outcome auditing.
+version: 1.4.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # 12-Dimensional Comparative Behavioral Validation Skill
 
 ## Overview
-This skill provides the operational audit methodology and evidence standards for conducting rigorous side-by-side behavioral comparisons between the Drupal 7 baseline and the migrated Drupal 10/11 implementation across 12 distinct functional dimensions, including exhaustive accounting and outcome verification for legacy custom PHP files, OOP classes, constructors, methods, procedural hooks, custom hooks, and `.inc` files.
+This skill provides the operational audit methodology and evidence standards for conducting rigorous side-by-side behavioral comparisons between the Drupal 7 baseline and the migrated Drupal 10/11 implementation across 12 distinct functional dimensions, including exhaustive accounting and outcome verification for legacy custom PHP files, OOP classes, constructors, methods, procedural hooks, custom hooks, custom database schemas, configuration, state, persistent variables, and `.inc` files.
 
 ---
 
@@ -31,7 +31,7 @@ Every evaluated component must be audited across the following 12 dimensions:
 | 3 | **Permissions & Access** | Are route requirements, entity access checks, custom access checkers, and role permissions correctly enforced? | Access check log / automated kernel test asserting 403 vs 200. |
 | 4 | **Data Integrity** | Are record and database row counts, UTF-8 character sets, and timestamps preserved without truncation? | Database row count query output comparing D7 to D10. |
 | 5 | **Relationships** | Are entity references, parent-child links, and taxonomy associations accurate? | Sample query verifying target entity reference IDs. |
-| 6 | **Configuration** | Does exported CMI configuration match intended runtime site behavior? | CMI validation against `config/schema/`. |
+| 6 | **Configuration & State** | Does exported CMI configuration match intended runtime site behavior? Are State API values and environment settings preserved? | CMI validation against `config/schema/` and State API assertion logs. |
 | 7 | **Routes & URLs** | Do legacy paths from `hook_menu()`, route aliases, redirects, and query parameters resolve? | Route definition inspection and HTTP status response. |
 | 8 | **Forms** | Do form elements, CSRF tokens, AJAX callbacks, form alters, and submit handlers behave correctly? | Form submit assertion log or functional test. |
 | 9 | **Integrations** | Do outbound payloads, webhook responses, event subscribers, and API auth mechanisms conform to specifications? | Integration test log with mock API response assertions. |
@@ -41,22 +41,22 @@ Every evaluated component must be audited across the following 12 dimensions:
 
 ---
 
-## Mandatory Custom PHP File, Class, Procedural Hook, .inc & Database Schema Outcome Accounting
+## Mandatory Custom Code, Hook, Database & Configuration Outcome Accounting
 
-In addition to the 12 functional dimensions, validate that every custom PHP source file, class, interface, trait, constructor, method, procedural hook implementation, custom hook, alter hook, `.inc` file, custom database table, and stored data-model artifact discovered in the D7 source has reached an approved, certified outcome:
+In addition to the 12 functional dimensions, validate that every custom PHP source file, class, interface, trait, constructor, method, procedural hook implementation, custom hook, alter hook, `.inc` file, custom database table, stored data-model artifact, and configuration/state/variable artifact discovered in the D7 source has reached an approved, certified outcome:
 
 ### Approved Outcome States
-- **`MIGRATED`**: The class/function/hook/behavior/table has been re-engineered into a target D10 PSR-4 class, service, repository, event subscriber, controller, form, plugin, or Content Entity with verified tests.
-- **`REPLACED`**: The legacy behavior/hook/table is superseded by a modern Drupal 10 core API, contrib module, or service with documented mapping.
-- **`OBSOLETE`**: The functionality/hook/table is dead code, temporary cache, or deprecated API with documented evidence.
+- **`MIGRATED`**: The class/function/hook/table/variable has been re-engineered into a target D10 PSR-4 class, service, repository, event subscriber, controller, form, plugin, Config Object, or State API key with verified tests.
+- **`REPLACED`**: The legacy behavior/hook/table/variable is superseded by a modern Drupal 10 core API, contrib module, or service with documented mapping.
+- **`OBSOLETE`**: The functionality/hook/table/variable is dead code, temporary cache, or deprecated API with documented evidence.
 - **`EXCLUDED_WITH_REASON`**: Explicitly excluded from migration scope with documented business/architectural rationale.
-- **`HUMAN_DECISION_REQUIRED`**: Unresolved business logic, ambiguous hook semantics, ambiguous schema relationships, or unverified dynamic SQL flagged for human decision in `reports/blocked/`.
-- **`UNVERIFIED`**: Dynamic behavior or runtime database state that cannot be statically verified, explicitly marked with `[UNVERIFIED RESULT]`.
+- **`HUMAN_DECISION_REQUIRED`**: Unresolved business logic, ambiguous hook semantics, ambiguous schema relationships, credentials/secrets, or unverified dynamic SQL flagged for human decision in `reports/blocked/`.
+- **`UNVERIFIED`**: Dynamic behavior, dynamic variable keys, or runtime database state that cannot be statically verified, explicitly marked with `[UNVERIFIED RESULT]`.
 
 ### Forbidden States (Immediate Validation `FAIL`)
-- **`UNACCOUNTED`**: Any custom PHP file, class, constructor, method, procedural hook, custom hook, `.inc` file, or custom database table present in discovery but missing from the migration plan or report.
-- **`UNKNOWN_WITHOUT_REASON`**: Any excluded or omitted code, hook, or database table lacking documented technical or business rationale.
-- **`SILENTLY_OMITTED`**: Any code, hook, or database table dropped during refactoring without an explicit record.
+- **`UNACCOUNTED`**: Any custom PHP file, class, constructor, method, procedural hook, custom hook, `.inc` file, custom database table, or configuration/state variable present in discovery but missing from the migration plan or report.
+- **`UNKNOWN_WITHOUT_REASON`**: Any excluded or omitted code, hook, database table, or variable lacking documented technical or business rationale.
+- **`SILENTLY_OMITTED`**: Any code, hook, database table, or variable dropped during refactoring without an explicit record.
 
 ---
 
