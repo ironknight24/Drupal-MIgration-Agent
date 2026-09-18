@@ -1,26 +1,226 @@
 # Agent Communication & Operational Protocol
 
-## 1. Zero-Memory Artifact Handoff & Contract Schema
+## 1. Zero-Memory Artifact Handoff & Operational Contract
 
-Agents in this framework operate without reliance on shared conversational memory or implicit context. Every inter-agent handoff is governed by an **Explicit Artifact Contract**.
+Agents in this framework operate without reliance on shared conversational memory or implicit context. Every inter-agent handoff is governed by an **Explicit Artifact Contract** and a **Structured Result Payload (`agent_result`)**.
 
 An agent must never assume another agent has run unless the expected filesystem artifact exists, is parseable, and satisfies the defined preconditions.
 
-### Standardized 7-Part Agent Handoff Contract
+### Standardized 18-Part Agent Operational Execution Contract
 
 Every agent specification in `agents/*/agent.md` defines:
 
-1. **Preconditions**: Environmental conditions, file existence checks, and upstream phase requirements that must evaluate to `TRUE` before execution begins.
-2. **Inputs**: Specific markdown reports, YAML manifests, code files, or configuration artifacts consumed.
-3. **Outputs**: Concrete structured reports, code files, or state updates produced.
-4. **State Updates**: Explicit fields and records modified in `state/migration-state.yml` (runtime status) and `state/migration-manifest.yml` (scope metadata).
-5. **Downstream Handoff**: Next specialized agent(s) or workflow dispatch targets receiving the generated artifacts.
-6. **Blockers & Escalation Criteria**: Explicit triggers for halting execution or raising a `BLOCKED-XXX` ticket.
-7. **Evidence Requirements**: Mandatory empirical proofs (`[OBSERVED FACT]`, `[VERIFIED RESULT]`, terminal logs, count queries) required before claiming completion.
+1. **Identity**: Name, full namespace (`drupal-migration:<name>`), role, and model configuration.
+2. **Purpose**: Specific role in the migration lifecycle.
+3. **Allowed Scope**: Explicit domains and tasks the agent is authorized to execute.
+4. **Forbidden Scope**: Explicit restrictions, anti-patterns, and boundaries.
+5. **Read Permissions**: Exact files, paths, databases, and configs authorized for read access.
+6. **Write Permissions**: Exact target directories and artifact paths authorized for write access.
+7. **Forbidden Writes**: Paths strictly protected against writes (D7 source is ALWAYS read-only).
+8. **Conceptual Tool Capabilities**: Least-privilege capabilities (Read, Search, Write, Command Execution, Network, State Access).
+9. **Preconditions**: Required previous phase outputs, manifest entries, state fields, and evidence.
+10. **Required Inputs**: Manifest data, state data, configs, source code, reference paths.
+11. **Skill & Reference Dependencies**: Explicit links to required Skills and References.
+12. **Operational Execution Procedure**: Step-by-step deterministic execution workflow.
+13. **Decision Rules & Target Version Branching**: Config-driven D10 vs D11 logic, modern API rules.
+14. **Artifact & Evidence Outputs**: Markdown reports, code files, configs, evidence logs.
+15. **Proposed State Updates**: Proposes transitions using the 15 canonical states from Step 3.
+16. **Structured Result Generation**: Generating the canonical `agent_result` payload.
+17. **Stop Conditions & Failure Handling**: STOPPED, BLOCKED, ESCALATED, FAILED with stage routing.
+18. **Downstream Handoff**: Target receiving agent, trigger conditions, required handoff package.
 
 ---
 
-## 2. Source of Truth Hierarchy
+## 2. Single-Writer State Authority & Result-State-Handoff Flow
+
+To maintain strict state consistency without race conditions or partial writes, the **Orchestrator is the single authoritative writer of runtime lifecycle state (`state/migration-state.yml`)**.
+
+Specialist agents observe state, execute scoped work, generate artifacts, and produce an `agent_result` containing a `proposed_to_state` transition. The Orchestrator validates the result and authoritatively commits the state update.
+
+```text
+Specialist Agent starts
+           │
+           ▼
+Validates preconditions
+           │
+           ▼
+Performs scoped work (Skills + References)
+           │
+           ▼
+Generates code & evidence artifacts
+           │
+           ▼
+Generates canonical `agent_result` (v1.0)
+           │
+           ▼
+Orchestrator Result Validation Gate (Validates schema, scope, evidence)
+           │
+           ▼
+Orchestrator commits state update to `migration-state.yml`
+           │
+           ▼
+Orchestrator recalculates dynamic waves & dependency readiness
+           │
+           ▼
+Dispatches next eligible Agent
+```
+
+---
+
+## 3. Canonical Structured Agent Result Schema (`agent_result` v1.0)
+
+All specialist agents return execution outcomes using the canonical `agent_result` schema:
+
+```yaml
+agent_result:
+  schema_version: "1.0"
+  execution_id: "exec-<COMPONENT>-<DATE>-<SEQ>" # e.g. exec-custom_booking-20260918-001
+  attempt_number: 1
+  started_at: "2026-09-18T22:30:00Z"
+  completed_at: "2026-09-18T22:32:15Z"
+  agent_name: "custom-module"
+  component_id: "custom_module.custom_booking"
+  lifecycle_phase: "phase_4_implementation"
+  current_wave: "wave_1"
+  execution_status: "SUCCESS" # SUCCESS | BLOCKED | STOPPED | ESCALATED | FAILED
+  state_transition:
+    from_state: "IN_PROGRESS"
+    proposed_to_state: "CODE_COMPLETE"
+  outputs:
+    code_artifacts:
+      - "web/modules/custom/custom_booking/custom_booking.info.yml"
+      - "web/modules/custom/custom_booking/src/BookingManager.php"
+    report_artifacts:
+      - "reports/custom-modules/REPORT-custom_booking.md"
+  evidence:
+    observed_facts:
+      - "Extracted booking calculation rules from custom_booking.module:L45-L89"
+    verified_results:
+      - "PHPStan static analysis passed at Level 2 with 0 errors"
+  blockers: []
+  decisions_required: []
+  files_changed:
+    - path: "web/modules/custom/custom_booking/custom_booking.info.yml"
+      operation: "CREATE"
+      reason: "Module metadata declaration"
+      evidence: "Verified YAML syntax"
+  tests:
+    status: "TEST_PASSED" # TEST_PASSED | TEST_FAILED | TEST_NOT_APPLICABLE | TEST_UNAVAILABLE | TEST_NOT_EXECUTED
+    summary: "Unit tests executed with exit code 0"
+  validation:
+    status: "PENDING"
+  next_action:
+    target_agent: "testing"
+    recommended_payload: "web/modules/custom/custom_booking"
+```
+
+---
+
+## 4. Orchestrator Result Validation Gate
+
+Before committing any proposed state transition to `state/migration-state.yml`, the Orchestrator validates the `agent_result` against 10 strict integrity checks:
+
+1. **Schema Integrity**: `schema_version` is `"1.0"` and all mandatory fields exist.
+2. **Agent Authorization**: `agent_name` matches the agent dispatched for this phase and component.
+3. **Component In-Scope**: `component_id` is registered and in-scope in `state/migration-manifest.yml`.
+4. **Valid State Transition**: `from_state` matches current runtime state; `proposed_to_state` is a valid forward transition in the 15 canonical states.
+5. **Write Boundary Compliance**: All paths in `files_changed` fall strictly within the agent's authorized write scope derived from `migration.config.yml`.
+6. **Source Immutability (Rule 1 & 2)**: Zero files in `source.path` were touched or modified.
+7. **Secret Protection (Rule 10)**: No credentials, tokens, or private keys committed to config or code.
+8. **Evidence Citation**: `evidence` cites empirical facts (`[OBSERVED FACT]`, `[VERIFIED RESULT]`, test logs).
+9. **Blocker Classification**: If `execution_status` is `BLOCKED` or `STOPPED`, blocker record exists with valid `remediation_stage`.
+10. **Target Version Consistency**: Modern code patterns conform to configured `target.core_version`.
+
+*On Validation Failure*: The Orchestrator rejects the result, generates an `EVIDENCE_GAP` or `STATE_INCONSISTENCY` blocker, and does NOT commit the proposed state change.
+
+---
+
+## 5. Artifact Ownership & Permission Matrix
+
+To eliminate write collisions and ambiguous responsibilities, every writable artifact has an explicit Primary Owner, allowed Delegations, and Serialization Rules:
+
+| Writable Artifact / Target Area | Primary Owner Agent | Delegated Agent(s) | Serialization Rule | Read Access |
+|:---|:---|:---|:---|:---|
+| `state/migration-state.yml` | `orchestrator` | None (Single-Writer) | Strict Single-Writer serialization | All Agents |
+| `state/migration-manifest.yml` | `discovery` | None (Static Scope) | Initialized during discovery | All Agents |
+| `reports/dependencies/*` (DAG) | `dependency` | None | Owned by dependency agent | All Agents |
+| `reports/contrib/*` | `contrib-module` | None | Advisory only; non-destructive | Orchestrator, Custom Module |
+| `<target_module_dir>/<MODULE>/*` | `custom-module` | `api-modernization` | Scoped delegation; component lock | Testing, Validation |
+| `<target_theme_dir>/<THEME>/*` | `custom-theme` | None | Component locked during wave | Testing, Validation |
+| `<target_config_dir>/*` | `configuration` | None | Component locked during wave | Testing, Data Migration |
+| `<target_module_dir>/<PROJECT>_migrate/*` | `data-migration` | None | Component locked during wave | Testing, Validation |
+| `reports/testing/*` | `testing` | None | Test runner execution | Validation, Orchestrator |
+| `reports/validation/*` | `validation` | None | Comparative audit | Final Audit, Orchestrator |
+| `reports/final/*` | `final-audit` | None | Gate audit & sign-off | Human Stakeholders |
+| `reports/blocked/*` | Originating Agent | Orchestrator | Atomic ticket generation | Orchestrator, Human |
+| `logs/file-change-log/*` | Any Modifying Agent | None | Append-only per file mutation | All Agents |
+
+---
+
+## 6. Dynamic Config-Driven Path Resolution
+
+Agents must NEVER assume fixed directories like `web/` or `config/sync`. Target paths are dynamically resolved from `migration.config.yml`:
+
+```yaml
+# Dynamic path resolution formulas:
+target_base       = config.target.path
+target_docroot    = config.target.docroot              # e.g., "web", "docroot", "html", or ""
+target_module_dir = config.target.custom_module_dir   # e.g., "{target_base}/{target_docroot}/modules/custom"
+target_theme_dir  = config.target.custom_theme_dir    # e.g., "{target_base}/{target_docroot}/themes/custom"
+target_config_dir = config.target.config_sync_dir     # e.g., "{target_base}/config/sync"
+```
+
+---
+
+## 7. Scoped Delegation Protocol (`custom-module` ↔ `api-modernization`)
+
+1. `custom-module` owns end-to-end modernization of a custom module component.
+2. If complex procedural-to-OOP refactoring or service container injection is required, `custom-module` explicitly delegates the scoped service conversion to `api-modernization`.
+3. `api-modernization` refactors the service classes, verifies constructor DI, logs changes in `logs/file-change-log/`, and returns an `agent_result` payload to `custom-module`.
+4. `custom-module` incorporates the modern services into the module scaffold, completes component implementation, and returns final `agent_result` to the Orchestrator.
+5. Both agents must never concurrently modify the same file.
+
+---
+
+## 8. Human Decision Gates & Escalation Protocol
+
+Agents must NOT autonomously assume high-impact business decisions. The following trigger mandatory human escalation via `decision_required`:
+
+```yaml
+decision_required:
+  decision_id: "DEC-001-BOOKING-PAYMENT"
+  question: "Should legacy offline payment gateway be replaced with modern Commerce payment plugin?"
+  context: "Legacy custom_booking module implements direct cURL calls to obsolete payment provider."
+  evidence: "custom_booking.module:L120-L155 calls discontinued gateway API."
+  options:
+    - option_id: "A"
+      description: "Port legacy cURL logic into custom Drupal 10 Guzzle service."
+      impact: "High maintenance; potential security debt."
+    - option_id: "B"
+      description: "Replace with Drupal Commerce core payment integration."
+      impact: "Requires Drupal Commerce dependency; clean architecture."
+  agent_recommendation: "Option B"
+  human_decision: null
+  decision_status: "REQUIRED" # REQUIRED | APPROVED | REJECTED | DEFERRED
+```
+
+Execution cannot proceed past a mandatory human gate until `decision_status` is explicitly updated to `APPROVED` or `REJECTED`.
+
+---
+
+## 9. 4-Way Stop Conditions & Execution Statuses
+
+When an agent cannot complete its normal workflow, it must exit with one of 4 explicit statuses:
+
+| Stop Status | Meaning & Cause | Result Payload Status | Target Remediation Stage |
+|:---|:---|:---|:---|
+| `STOPPED` | Execution halted intentionally because a prerequisite is absent or unsafe | `execution_status: STOPPED` | Originating / Setup Stage |
+| `BLOCKED` | A technical dependency, circular coupling, or unmapped entity prevents progress | `execution_status: BLOCKED` | Stage-Aware Remediation Routing |
+| `ESCALATED` | A high-impact architectural or business decision requires human input | `execution_status: ESCALATED` | Human Decision Gate |
+| `FAILED` | Code syntax error, static analysis failure, or test assertion failure | `execution_status: FAILED` | Originating Implementation Stage |
+
+---
+
 
 To prevent conflicting claims between reports, state tracking, and manifests, the framework strictly enforces an explicit precedence hierarchy:
 

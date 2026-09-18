@@ -148,8 +148,8 @@ Drupal-MIgration-Agent/
   - Factory Step 1: Claude Code Package & Architecture Transformation [COMPLETE]
   - Factory Step 2: Migration Skills & Knowledge Codification [COMPLETE]
   - Factory Step 3: Workflow Orchestration & Agent Coordination [COMPLETE]
-  - Factory Step 4: End-to-End Package Testing & Verification [NEXT]
-  - Factory Step 5: Distribution & Release [PLANNED]
+  - Factory Step 4: Agent Operationalization & Execution Contracts [COMPLETE]
+  - Factory Step 5: Distribution & Release Verification [NEXT]
 
 - **Migration Execution Lifecycle (When running against a real project)**:
   - Migration Step 0: Setup & Path Verification

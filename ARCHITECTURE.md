@@ -11,48 +11,63 @@ The architecture decouples **workflow coordination** (Agents) from **reusable do
 ## 2. Execution Architecture & Coordination Topology
 
 ```text
-                           USER / CLI
-                               │
-                               ▼
-                         SLASH COMMANDS  [/orchestrate, /discover, /status]
-                               │
-                               ▼
-                       ORCHESTRATOR AGENT
-                 (Lifecycle & State Authority)
-                               │
-                ┌──────────────┴──────────────┐
-                ▼                             ▼
-         DISCOVERY AGENT              DEPENDENCY AGENT
-      [Inspects baseline]           [Builds dependency DAG]
-                │                             │
-                └──────────────┬──────────────┘
-                               │
-                               ▼
-                   DYNAMIC WAVE DISPATCHER
-             (Topological Execution Batches: wave_0, wave_1, ... wave_N)
-                               │
-         ┌─────────────────────┼─────────────────────┐
-         ▼                     ▼                     ▼
-   CONTRIB AGENT         CUSTOM MODULE          CUSTOM THEME / CONFIG /
-                         & API AGENTS           DATA MIGRATION AGENTS
-         │                     │                     │
-         └─────────────────────┼─────────────────────┘
-                               │
-                               ▼
-                         TESTING AGENT
-          (Component-Appropriate Testing & Verification Strategy)
-                               │
-                               ▼
-                       VALIDATION AGENT
-          (12-Dimensional Comparative Behavioral Parity Audit)
-                               │
-                               ▼
-                       FINAL AUDIT AGENT
-             (8 Evidence-Based Lifecycle Acceptance Gates)
-                               │
-                               ▼
-                        FINAL OUTCOME
-          [COMPLETE | COMPLETE_WITH_GAPS | BLOCKED | INCOMPLETE]
+                            USER / CLI
+                                │
+                                ▼
+                          SLASH COMMANDS  [/orchestrate, /discover, /status]
+                                │
+                                ▼
+                        ORCHESTRATOR AGENT
+                  (Single-Writer State Authority)
+                                │
+                 ┌──────────────┴──────────────┐
+                 ▼                             ▼
+          DISCOVERY AGENT              DEPENDENCY AGENT
+       [Inspects baseline]           [Builds dependency DAG]
+                 │                             │
+                 └──────────────┬──────────────┘
+                                │
+                                ▼
+                    DYNAMIC WAVE DISPATCHER
+              (Topological Execution Batches: wave_0, wave_1, ... wave_N)
+                                │
+          ┌─────────────────────┼─────────────────────┐
+          ▼                     ▼                     ▼
+    CONTRIB AGENT         CUSTOM MODULE          CUSTOM THEME / CONFIG /
+                          (Delegates API work)   DATA MIGRATION AGENTS
+          │                     │                     │
+          │                     ▼                     │
+          │              API-MODERNIZATION            │
+          │              (Scoped DI conversion)       │
+          │                     │                     │
+          └─────────────────────┼─────────────────────┘
+                                │
+                                ▼
+                   CANONICAL `agent_result` (v1.0)
+                                │
+                                ▼
+                   ORCHESTRATOR VALIDATION GATE
+              (Validates schema, scope, evidence, paths)
+                                │
+                                ▼
+                   AUTHORITATIVE STATE UPDATE
+                 (state/migration-state.yml)
+                                │
+                                ▼
+                          TESTING AGENT
+           (Component-Appropriate Testing & Verification Strategy)
+                                │
+                                ▼
+                        VALIDATION AGENT
+           (12-Dimensional Comparative Behavioral Parity Audit)
+                                │
+                                ▼
+                        FINAL AUDIT AGENT
+              (8 Evidence-Based Lifecycle Acceptance Gates)
+                                │
+                                ▼
+                         FINAL OUTCOME
+           [COMPLETE | COMPLETE_WITH_GAPS | BLOCKED | INCOMPLETE]
 ```
 
 ---
@@ -107,7 +122,7 @@ The architecture decouples **workflow coordination** (Agents) from **reusable do
 
 ## 6. File System & Path Protection Model
 
-```
+```text
 +-------------------------------------------------------------------+
 |                        WORKSPACE ROOT                             |
 |                                                                   |
@@ -115,8 +130,10 @@ The architecture decouples **workflow coordination** (Agents) from **reusable do
 |  ├── modules/                                                     |
 |  └── ...                                                          |
 |                                                                   |
-|  [target.path (D10/11)]   WRITE-ALLOWED  (Logged modifications)    |
-|  ├── web/modules/custom/                                          |
+|  [target.path (D10/11)]   WRITE-ALLOWED  (Config-driven docroot)   |
+|  ├── <target_module_dir>/                                         |
+|  ├── <target_theme_dir>/                                          |
+|  ├── <target_config_dir>/                                         |
 |  └── ...                                                          |
 |                                                                   |
 |  [migration-agent-framework]  STATE & AUDIT                       |
@@ -131,4 +148,5 @@ The architecture decouples **workflow coordination** (Agents) from **reusable do
 
 - Writes to `source.path` are rejected immediately.
 - Overlapping source and target paths trigger an immediate **Global Migration Block**.
+- Target paths (`target_module_dir`, `target_theme_dir`, `target_config_dir`) are dynamically derived from `migration.config.yml`.
 - Every modified, created, or deleted file in `target.path` must generate an entry in `logs/file-change-log/`.

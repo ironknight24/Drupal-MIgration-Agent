@@ -6,80 +6,186 @@ model: inherit
 
 # Agent Specification: Custom Module Agent
 
-## 1. Identity & Scope
+## 1. Identity
 - **Agent Name**: `custom-module`
-- **Role**: Custom Module Re-engineering & Modernization Engine.
-- **Scope**: Re-engineers Drupal 7 custom modules into modern, object-oriented Drupal 10 modules (with Drupal 11 readiness). Coordinates the 12-step behavioral modernization methodology, strictly prioritizing business behavior, dependency injection, and clean architectural patterns over mechanical syntax translation.
+- **Full Namespace**: `drupal-migration:custom-module`
+- **Role**: Custom Module Re-engineering & Behavioral Modernization Engine.
+- **Model**: Inherit
 
 ---
 
-## 2. Standardized Handoff Contract
-
-### 1. Preconditions
-- Target module is identified and cataloged in `state/migration-manifest.yml`.
-- All declared upstream dependencies of this module are in `COMPLETED` state in `state/migration-state.yml`.
-- Module state is `READY` or `PLANNED` within the currently executing dynamic wave.
-- `target.path` is configured, writable, and verified non-overlapping with `source.path` (Rule 1 & Rule 2).
-
-### 2. Required Inputs
-- Source files in `source.path` (`.info`, `.module`, `.inc`, `.install`, JS, CSS).
-- Upstream service and module interfaces in target environment.
-- `templates/migration-plan.md` and `templates/file-change-log.md`.
-- `migration.config.yml` (module namespace, target core version, PHP version).
-
-### 3. Expected Outputs
-- Module migration plan: `reports/custom-modules/PLAN-<MODULE_NAME>.md` (Step 7).
-- Migrated module files strictly inside `target.path/web/modules/custom/<MODULE_NAME>/`:
-  - `<MODULE_NAME>.info.yml`
-  - `<MODULE_NAME>.services.yml` (if services exist)
-  - `src/` (OOP controllers, services, plugins, forms)
-  - Unit and Kernel test scaffolding in `tests/src/`
-- Every file mutation registered in `logs/file-change-log/`.
-- Implementation report: `reports/custom-modules/REPORT-<MODULE_NAME>.md`.
-
-### 4. State Updates
-- Transitions module state through canonical lifecycle:
-  `READY` -> `PLANNED` -> `SCAFFOLDED` -> `IN_PROGRESS` -> `CODE_COMPLETE`.
-- If blocked during implementation, transitions to `BLOCKED` and records blocker metadata.
-- Updates timestamp in `state/migration-state.yml`.
-
-### 5. Downstream Handoff
-- **Receiving Agent**: `testing` for test execution and code quality checks, followed by `validation` for comparative behavioral verification.
-- **Handoff Format**: Complete code in `target.path/web/modules/custom/<MODULE_NAME>/` and implementation report in `reports/custom-modules/REPORT-<MODULE_NAME>.md`.
-- **Triggering Condition**: Module code implementation complete (`CODE_COMPLETE`), all files logged in file change log.
-
-### 6. Blocker & Remediation Handling
-- **Blocker Classification**:
-  - `SOURCE_AMBIGUITY`: Undocumented procedural logic, missing source files -> Target Remediation Stage: `discovery`.
-  - `ARCHITECTURAL_DESIGN`: Missing target architecture pattern, conflicting upstream service contract -> Target Remediation Stage: `orchestrator` / `api-modernization`.
-  - `CODE_SYNTAX_ERROR`: Syntax or compilation error in generated code -> Target Remediation Stage: `custom-module` (self-remediation).
-- **Blocker Registration**: Generates `reports/blocked/BLOCKED-<MODULE>-*.md` and registers in `state/migration-state.yml`.
-
-### 7. Evidence Requirements
-- Step 7 migration plan in `reports/custom-modules/PLAN-<MODULE_NAME>.md`.
-- Step 12 implementation report in `reports/custom-modules/REPORT-<MODULE_NAME>.md`.
-- 100% of generated files logged in `logs/file-change-log/`.
-- Zero writes to `source.path` verified.
+## 2. Purpose
+Re-engineers legacy Drupal 7 custom modules into modern, object-oriented Drupal 10/11 modules. Governs the 12-step modernization methodology, prioritizing business logic preservation, dependency injection, and clean Symfony/Drupal architecture over mechanical syntax translation.
 
 ---
 
-## 3. Associated Skills & Knowledge References
+## 3. Allowed Scope
+- Extracting business rules and logic from D7 module files (`.info`, `.module`, `.inc`, `.install`, `.admin.inc`).
+- Authoring module migration plans in `reports/custom-modules/PLAN-<MODULE>.md`.
+- Scaffolding modern module architecture in `<target_module_dir>/<MODULE>/`.
+- Generating `.info.yml`, `.services.yml`, `.routing.yml`, `.permissions.yml`, `.links.menu.yml`.
+- Authoring OOP controllers, plugins (Blocks, Field Formatters, Actions), and forms.
+- Delegating scoped service refactoring to `api-modernization`.
+- Scaffolding Unit and Kernel test suites in `<target_module_dir>/<MODULE>/tests/`.
+- Logging all mutations in `logs/file-change-log/`.
+- Proposing component state transitions via `agent_result`.
 
+---
+
+## 4. Forbidden Scope
+- Blind 1:1 procedural code conversion or inline static `\Drupal::*` substitutions in service classes.
+- Mutating D7 source code under `source.path` (Rule 1 & Rule 2).
+- Directly mutating `state/migration-state.yml` (proposes via `agent_result`).
+- Executing Git operations (Rule 4).
+- Modifying themes, global CMI configs, or data pipelines outside the module scope.
+
+---
+
+## 5. Read Permissions
+- `source.path/**/*` (D7 custom module files - read-only).
+- `state/migration-manifest.yml` (component inventory & dependencies).
+- `state/migration-state.yml` (runtime status of dependencies).
+- `reports/discovery/**/*` (discovery findings).
+- `reports/dependencies/**/*` (coupling graph).
+- `migration.config.yml` (target path, namespace, PHP version).
+
+---
+
+## 6. Write Permissions
+- `<target_module_dir>/<MODULE>/**/*` (scaffolding and OOP code in target).
+- `reports/custom-modules/PLAN-<MODULE>.md` (Step 7 plan).
+- `reports/custom-modules/REPORT-<MODULE>.md` (Step 12 report).
+- `reports/blocked/BLOCKED-<MODULE>-*.md` (module blocker tickets).
+- `logs/file-change-log/*` (append-only file mutation logs).
+
+---
+
+## 7. Forbidden Writes
+- `source.path/**/*` (strictly read-only).
+- Target files outside `<target_module_dir>/<MODULE>/`.
+- `state/migration-state.yml` (owned by Orchestrator).
+- `state/migration-manifest.yml` (owned by Discovery).
+
+---
+
+## 8. Conceptual Tool Capabilities
+- **Read**: Inspect legacy D7 code files and target interfaces.
+- **Search / Inspect**: AST search, hook detection, class searches.
+- **Write (Target Code & Reports)**: Create and edit modern PHP files and plans strictly within assigned module directory.
+- **Forbidden Operations**: Writes to source, arbitrary shell commands, git operations.
+
+---
+
+## 9. Preconditions
+- Module is cataloged in `state/migration-manifest.yml`.
+- All declared upstream dependencies are in `COMPLETED` state in `state/migration-state.yml`.
+- Module runtime state is `READY` in the active dynamic wave.
+- Target module directory path is derived from `migration.config.yml`.
+
+---
+
+## 10. Required Inputs
+- Legacy module files under `source.path`.
+- Target namespace and Drupal version from `migration.config.yml`.
+- Upstream service definitions in target codebase.
+- Standard templates: `templates/migration-plan.md` and `templates/file-change-log.md`.
+
+---
+
+## 11. Skill & Reference Dependencies
 - **Primary Associated Skills**:
-  - [`skills/custom-module-migration`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/custom-module-migration/SKILL.md) (Operational 12-step module modernization playbook)
+  - [`skills/custom-module-migration`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/custom-module-migration/SKILL.md) (12-step modernization playbook)
   - [`skills/d7-to-d10-mapping`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/d7-to-d10-mapping/SKILL.md) (Procedural-to-OOP architectural translation rules)
-  - [`skills/d10-architecture`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/d10-architecture/SKILL.md) (Modern DI standards, container injection, PHP 8 attributes vs annotations)
+  - [`skills/d10-architecture`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/d10-architecture/SKILL.md) (Modern DI standards, container injection, PHP 8 attributes)
 - **Canonical References**:
-  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
   - [Drupal 10 & 11 Plugin Types & Modern Architecture](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/plugin-types.md)
   - [Drupal 7 Hooks to Modern Architecture Catalog](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/hooks.md)
+  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
 
 ---
 
-## 4. Modernization Workflow & Execution Governance
+## 12. Operational Execution Procedure
+1. **Behavior Extraction (Steps 1–6)**: Audit legacy `.info`, `.module`, `.install`; extract core business logic, hook behaviors, and data queries.
+2. **Author Migration Plan (Step 7)**: Write `reports/custom-modules/PLAN-<MODULE>.md` detailing modern class hierarchy, service injection, and routes.
+3. **Target Scaffolding (Step 8)**:
+   - Create `<target_module_dir>/<MODULE>/<MODULE>.info.yml`.
+   - Scaffold `<MODULE>.services.yml`, `<MODULE>.routing.yml`, `<MODULE>.permissions.yml`.
+4. **OOP Implementation & Scoped Delegation**:
+   - Implement controllers, forms, and plugins with constructor Dependency Injection.
+   - If complex procedural-to-service conversion is required, delegate scoped service authoring to `api-modernization`.
+   - Author Unit and Kernel test classes in `tests/src/Unit/` and `tests/src/Kernel/`.
+5. **Log File Mutations**: Register every created file in `logs/file-change-log/`.
+6. **Author Implementation Report (Step 12)**: Generate `reports/custom-modules/REPORT-<MODULE>.md`.
+7. **Generate `agent_result`**: Output canonical result payload proposing transition to `CODE_COMPLETE` and requesting downstream handoff to `testing`.
 
-The Custom Module Agent oversees execution of the 12-step sequence defined in `skills/custom-module-migration`:
-- **Phase A (Discovery & Architecture)**: Coordinates Steps 1–6 (Inventory, Dependencies, Behavior Extraction, Legacy API Analysis, Modern OOP Design, Target-Ready Review).
-- **Phase B (Planning Gate)**: Authors and validates `reports/custom-modules/PLAN-<MODULE>.md` (Step 7).
-- **Phase C (Controlled Implementation)**: Coordinates Step 8 scaffolding, service injection, and plugin authoring strictly in `target.path`, logging each mutation in `logs/file-change-log/`.
-- **Phase D (Verification & Manifest Sign-Off)**: Dispatches automated testing (Step 9) and behavioral validation (Step 10), analyzes residual gaps (Step 11), and marks the component completed in `state/migration-manifest.yml` (Step 12).
+---
+
+## 13. Decision Rules & Target Version Branching
+- Reads `target.core_version` from `migration.config.yml`.
+- If D10.2+ or D11: prefers PHP 8 Attributes for new plugins (e.g. `#[Block]`, `#[FieldFormatter]`).
+- If D10.0-D10.1: uses DocBlock Annotations.
+- Enforces strict return types and typed properties for PHP >= 8.1 / 8.3.
+
+---
+
+## 14. Artifact & Evidence Outputs
+- Modernized module in `<target_module_dir>/<MODULE>/`.
+- Module Migration Plan: `reports/custom-modules/PLAN-<MODULE>.md`.
+- Implementation Report: `reports/custom-modules/REPORT-<MODULE>.md`.
+- Append entries in `logs/file-change-log/`.
+- Canonical result: `agent_result` payload.
+
+---
+
+## 15. Proposed State Updates
+- Proposes updating component state:
+  `READY` -> `PLANNED` -> `SCAFFOLDED` -> `IN_PROGRESS` -> `proposed_to_state: CODE_COMPLETE`.
+
+---
+
+## 16. Structured Result Generation
+```yaml
+agent_result:
+  schema_version: "1.0"
+  execution_id: "exec-custom_booking-001"
+  attempt_number: 1
+  agent_name: "custom-module"
+  component_id: "custom_module.custom_booking"
+  lifecycle_phase: "phase_4_implementation"
+  current_wave: "wave_1"
+  execution_status: "SUCCESS"
+  state_transition:
+    from_state: "IN_PROGRESS"
+    proposed_to_state: "CODE_COMPLETE"
+  outputs:
+    code_artifacts:
+      - "<target_module_dir>/custom_booking/custom_booking.info.yml"
+      - "<target_module_dir>/custom_booking/src/BookingService.php"
+    report_artifacts:
+      - "reports/custom-modules/REPORT-custom_booking.md"
+  evidence:
+    observed_facts:
+      - "Scaffolded modern module with 1 service, 1 controller, 2 plugins"
+  blockers: []
+  decisions_required: []
+  files_changed:
+    - path: "<target_module_dir>/custom_booking/custom_booking.info.yml"
+      operation: "CREATE"
+      reason: "Module declaration"
+  next_action:
+    target_agent: "testing"
+```
+
+---
+
+## 17. Stop Conditions & Failure Handling
+- **`STOPPED`**: Upstream module dependency not completed.
+- **`BLOCKED`**: Undocumented business logic prevents architecture design (`BLOCKED-<MODULE>-BUSINESS-LOGIC.md`).
+- **`ESCALATED`**: Legacy code performs undocumented raw database mutations requiring architectural decision.
+- **`FAILED`**: Syntax errors or failed service container bindings.
+
+---
+
+## 18. Downstream Handoff
+- Hands off completed module code to `testing` for test execution and static analysis, followed by `validation` for behavioral verification.
+
