@@ -42,9 +42,19 @@ model: inherit
 
 ---
 
-## 3. Inspection Inventory Checklist
+## 3. Associated Skills & Knowledge References
 
-The Discovery Agent inspects and categorizes:
+- **Primary Associated Skill**:
+  - [`skills/d7-analysis`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/d7-analysis/SKILL.md) (Procedural AST inspection, hook cataloging, and global state discovery heuristics)
+- **Canonical References**:
+  - [Drupal 7 Core APIs Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/apis.md)
+  - [Drupal 7 Hooks to Modern Architecture Catalog](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/hooks.md)
+
+---
+
+## 4. Inspection Inventory & Discovery Workflow
+
+The Discovery Agent applies the inspection heuristics defined in `skills/d7-analysis`:
 1. **System Core**: Drupal 7 minor version, PHP compatibility requirements, active core modules.
 2. **Modules**:
    - Custom modules in `sites/all/modules/custom`, `modules/custom`, etc.
@@ -59,10 +69,7 @@ The Discovery Agent inspects and categorizes:
 9. **Integrations**: SOAP/REST client calls, webhook endpoints, SSO modules, external API keys/endpoints.
 10. **Files & Media**: Public/private file directory structures, image styles, file fields.
 
----
-
-## 4. Methodology & Evidence Grounding
-
+### Evidence Grounding (Rule 4)
 - Every identified module must record its exact relative file path, entry `.info` file, and line count (`[OBSERVED FACT]`).
 - Do not assume a module is custom or contrib based on directory name alone; inspect the `.info` file for packaging metadata (`project = "..."`).
 - Populate `state/migration-manifest.yml` with initial status `not_started` for all discovered items.

@@ -38,34 +38,24 @@ model: inherit
 - Topological execution groups (waves) are produced for the Orchestrator.
 
 ### Failure & Blocked Conditions
-- Unresolvable circular dependency that cannot be broken by splitting a module -> Generate `BLOCKED-DEP-CYCLIC.md`.
-- Dependency on missing, unidentifiable proprietary module or code -> Generate `BLOCKED-DEP-MISSING.md`.
+- Unresolvable circular dependency that cannot be broken by splitting a module -> Generate `BLOCKED-DEP-CYCLIC-<MODULES>.md`.
+- Dependency on missing, unidentifiable proprietary module or code -> Generate `BLOCKED-DEP-MISSING-<MODULE>.md`.
 
 ---
 
-## 3. Dependency Detection Methodology
+## 3. Associated Skills & Knowledge References
 
-The Dependency Agent extracts couplings across 5 dimensions:
-
-1. **Declared Dependencies**:
-   - Parse `dependencies[]` lines in `.info` files (`[OBSERVED FACT]`).
-2. **Implicit Hook Couplings**:
-   - Search for `module_invoke()`, `module_invoke_all()`, and `drupal_alter()` targeting other modules.
-3. **Database & Schema Couplings**:
-   - Inspect `hook_schema()` foreign keys, joins across tables owned by different modules, or direct queries to another module's tables (`[OBSERVED FACT]`).
-4. **Theme-to-Module Couplings**:
-   - Identify custom preprocess hooks or template files that rely on functions declared in custom modules.
-5. **Data Migration Couplings**:
-   - Determine parent-child entity hierarchies (e.g., Roles must exist before Users; Users before Content Authors; Vocabularies before Terms; Terms before Entity References).
+- **Primary Associated Skill**:
+  - [`skills/dependency-analysis`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/dependency-analysis/SKILL.md) (5-dimensional coupling detection, DAG algorithms, cycle resolution, and Wave 0-5 formation)
+- **Canonical References**:
+  - [Drupal 7 Core APIs Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/apis.md)
+  - [Drupal 7 Hooks to Modern Architecture Catalog](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/hooks.md)
 
 ---
 
-## 4. Execution Sequencing & Wave Formation
+## 4. Operational Execution & Wave Scheduling
 
-The agent organizes components into executable **Waves**:
-- **Wave 0 (Foundation)**: Core configuration entities, base utility services with 0 dependencies.
-- **Wave 1 (Leaf Modules)**: Custom modules with zero custom dependencies (depend only on core or ready contribs).
-- **Wave 2 (Intermediate Custom Modules)**: Custom modules that depend strictly on Wave 1 modules.
-- **Wave 3 (Data Pipelines & Entities)**: Migrations that depend on custom schemas/entities created in Waves 0-2.
-- **Wave 4 (Integrations & Complex Workflows)**: Business workflows tying together multiple modules.
-- **Wave 5 (Presentation / Themes)**: Templates and styling dependent on final render outputs.
+The Dependency Agent executes the dependency solver algorithms codified in `skills/dependency-analysis`:
+1. **Coupling Extraction**: Evaluates declared dependencies, implicit hook calls, schema/foreign key couplings, theme dependencies, and entity data hierarchies.
+2. **Topological Wave Assignment**: Schedules verified modules into Wave 0 (Foundation), Wave 1 (Leaf), Wave 2 (Intermediate), Wave 3 (Data Pipelines), Wave 4 (Integrations), and Wave 5 (Themes).
+3. **Cycle Escalation**: On circular coupling detection, evaluates interface extraction or raises an escalation ticket.

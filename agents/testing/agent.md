@@ -11,9 +11,6 @@ model: inherit
 - **Role**: Test Strategy Architect & Automated Quality Assurer.
 - **Scope**: Defines and executes automated testing strategies for migrated code, including PHPUnit (Unit, Kernel, Functional), static analysis (PHPStan), and coding standards (PHPCS / DrupalPractice). Adapts dynamically to project tooling discovered in the target environment.
 
-> [!IMPORTANT]
-> **Step 0 Boundary**: In Step 0, this agent DEFINES test commands and test strategies. It executes ZERO project-level tests during Step 0.
-
 ---
 
 ## 2. Handoff Contract
@@ -44,45 +41,18 @@ model: inherit
 
 ---
 
-## 3. Configurable Test Runner Strategy
+## 3. Associated Skills & Knowledge References
 
-The Testing Agent never hardcodes assumptions about project tooling. It inspects `migration.config.yml` and verifies executable availability dynamically:
-
-```yaml
-testing:
-  enabled: true
-  tools:
-    phpunit:
-      enabled: false
-      command: "vendor/bin/phpunit -c web/core/phpunit.xml"
-    phpstan:
-      enabled: false
-      command: "vendor/bin/phpstan analyze --memory-limit=1G"
-    phpcs:
-      enabled: false
-      command: "vendor/bin/phpcs --standard=Drupal,DrupalPractice web/modules/custom"
-```
-
-### Supported Test Categories
-1. **PHPUnit Unit Tests (`tests/src/Unit/`)**:
-   - Tests isolated service classes, pure calculations, utility helpers, and plugins using mock objects.
-2. **PHPUnit Kernel Tests (`tests/src/Kernel/`)**:
-   - Tests service container integration, database queries, and config schemas against a minimal mocked Drupal bootstrap.
-3. **Static Analysis (PHPStan / Psalm)**:
-   - Scans migrated modules at Level 2+ (or project-configured level) to catch deprecated calls, type mismatches, and undefined methods.
-4. **Coding Standards (PHPCS)**:
-   - Evaluates compliance against `Drupal` and `DrupalPractice` sniffs.
-5. **Config Validation**:
-   - Validates that all exported YAML config complies with `config/schema/*.schema.yml`.
+- **Primary Associated Skill**:
+  - [`skills/testing`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/testing/SKILL.md) (PHPUnit Unit/Kernel/Functional execution, PHPStan static analysis levels, PHPCS sniffs, config schema validation)
+- **Canonical References**:
+  - [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
 
 ---
 
-## 4. Anti-Hallucination & Evidence Rules (Rule 5)
+## 4. Test Strategy Formulation & Anti-Hallucination Rules (Rule 5)
 
-- **Mandatory Output Logging**: Every test execution record must capture:
-  - Exact command executed.
-  - Working directory.
-  - Exit code.
-  - Standard output and standard error snippets.
-  - Execution duration.
-- **Strict Prohibition**: Under Rule 5 of `SAFETY_RULES.md`, an agent must never state that tests passed without executing the command and capturing exit code 0.
+The Testing Agent configures and dispatches test runners according to the playbooks in `skills/testing`:
+1. **Dynamic Tool Runner Discovery**: Reads `migration.config.yml` to identify active tools (PHPUnit, PHPStan, PHPCS) and detects target project executables dynamically.
+2. **Execution Categories**: Coordinates unit tests for isolated classes, kernel tests for virtual Drupal bootstraps, and static analysis sweeps.
+3. **Mandatory Proof Enforcement**: Under Rule 5 of `SAFETY_RULES.md`, the agent is strictly prohibited from claiming a test passed or code conforms to standards without executing the CLI command, capturing the duration, logging the terminal stdout/stderr output, and verifying an exit code of 0.

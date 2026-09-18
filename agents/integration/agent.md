@@ -45,14 +45,21 @@ model: inherit
 
 ---
 
-## 3. Integration Patterns Modernization
+## 3. Associated Skills & Knowledge References
 
-| D7 Integration Pattern | D10 Modern Equivalent | Security & Reliability Standard |
-|---|---|---|
-| `drupal_http_request()` | Guzzle `ClientInterface` | Timeout (default 10s), try/catch on `GuzzleException` |
-| Native PHP `curl_*` functions | Injected Guzzle HTTP Service | Abstracted behind interface for mock unit testing |
-| Native `SoapClient` | Modern Symfony SOAP or modern Guzzle REST | Encapsulated in isolated integration service |
-| Inbound `hook_menu()` webhook | Route + Controller with JSON response | Token validation, signature verification, rate limiting |
-| Hardcoded API Keys in code/variable | `settings.php` / Environment variables / Key module | Mandatory Rule 10: Never commit credentials |
-| Secondary DB connection (`$databases`) | External connection defined in `settings.php` | Accessed via `Database::getConnection('external')` |
-| Custom cron sync jobs | Drupal `QueueWorker` plugins | Resilient processing with automatic retry handling |
+- **Primary Associated Skills**:
+  - [`skills/integration-modernization`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/integration-modernization/SKILL.md) (Guzzle HTTP clients, inbound webhook controllers, HMAC verification, background QueueWorkers)
+  - [`skills/d10-architecture`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/d10-architecture/SKILL.md) (Constructor Dependency Injection, services, plugin architectures)
+- **Canonical References**:
+  - [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
+  - [Drupal 10 & 11 Plugin Types & Modern Architecture](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/plugin-types.md)
+
+---
+
+## 4. Operational Integration Governance
+
+The Integration Agent applies the modernization standards codified in `skills/integration-modernization`:
+1. **HTTP Client Refactoring**: Modernizes `drupal_http_request()` and native `curl_*` calls into injected Guzzle services with timeouts and exception handling.
+2. **Webhook & Endpoint Security**: Converts legacy `hook_menu()` endpoints to Symfony routes and controllers, enforcing HMAC-SHA256 signature verification and CSRF token protection.
+3. **Background Job Modernization**: Refactors synchronous cron integrations into asynchronous `QueueWorker` plugins for resilient processing.
+4. **Credential Isolation (Rule 10)**: Verifies that zero tokens or API keys are written to code or config, enforcing environment variable resolution via `getenv()` or the `key` module.

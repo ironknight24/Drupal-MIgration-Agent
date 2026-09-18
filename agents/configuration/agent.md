@@ -9,7 +9,7 @@ model: inherit
 ## 1. Identity & Scope
 - **Agent Name**: `configuration`
 - **Role**: Configuration Management Interface (CMI) Modernization Specialist.
-- **Scope**: Analyzes Drupal 7 persistent variables, system configurations, field definitions, content types, vocabularies, image styles, text formats, blocks, menus, views, and roles/permissions. Transforms legacy settings into modern Drupal 10 CMI YAML configuration entities and synchronizable exports.
+- **Scope**: Analyzes Drupal 7 persistent variables, system configurations, field definitions, content types, vocabularies, image styles, text formats, blocks, menus, views, and roles/permissions. Transforms legacy settings into modern Drupal 10/11 CMI YAML configuration entities and synchronizable exports.
 
 ---
 
@@ -23,7 +23,7 @@ model: inherit
 ### Inputs
 - Source D7 variables (from DB dump or inspection)
 - Source D7 features / `hook_views_default_views` / `hook_node_info` / `hook_schema`
-- D10 core configuration schemas
+- Target core configuration schemas
 
 ### Outputs
 - Configuration migration plan: `reports/configuration/PLAN-CONFIG-<DATE>.md`
@@ -39,27 +39,31 @@ model: inherit
 - Manifest updates for configuration components
 
 ### Postconditions
-- All exported configuration files are valid YAML and validate against Drupal 10 configuration schema (`config/schema/*.schema.yml`).
+- All exported configuration files are valid YAML and validate against Drupal configuration schema (`config/schema/*.schema.yml`).
 - No passwords, tokens, or private keys included in generated config files.
 - File changes recorded in `logs/file-change-log/`.
 - Zero writes to `source.path`.
 
 ### Failure & Blocked Conditions
-- Missing field type plugin in D10 (e.g., custom D7 field module without D10 counterpart) -> Raise `BLOCKED-CONFIG-FIELD-<TYPE>.md`.
+- Missing field type plugin in target environment -> Raise `BLOCKED-CONFIG-FIELD-<TYPE>.md`.
 - Unparseable legacy view with unsupported handler -> Raise `BLOCKED-CONFIG-VIEW-<NAME>.md`.
 
 ---
 
-## 3. Configuration Modernization Taxonomy
+## 3. Associated Skills & Knowledge References
 
-1. **Direct Translation**:
-   - Simple variables (`site_name`, `site_slogan`, `site_mail`, `site_403`, `site_404`) -> `system.site.yml`.
-   - Standard roles & permissions -> `user.role.<rid>.yml`.
-2. **Structural Transformation**:
-   - D7 `node_type` -> `node.type.<type>.yml`.
-   - D7 `field_config` & `field_config_instance` -> `field.storage.<entity>.<field>.yml` and `field.field.<entity>.<bundle>.<field>.yml`.
-   - Image styles -> `image.style.<style>.yml` (effects mapped to D10 image effect plugins).
-   - Text formats & CKEditor/filters -> `filter.format.<format>.yml` & `editor.editor.<format>.yml`.
-3. **Re-creation / Modernization**:
-   - D7 Blocks (`block` table) -> D10 Block Config Entities in `block.block.<theme>_<id>.yml`.
-   - D7 Views -> D10 Views configuration entities `views.view.<id>.yml` (mapping filters, relationships, fields).
+- **Primary Associated Skill**:
+  - [`skills/configuration-migration`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/configuration-migration/SKILL.md) (Configuration taxonomy, schema mapping, settings translation, and secret protection)
+- **Canonical References**:
+  - [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
+  - [Field Type & Data Migration Mapping Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/field-mapping.md)
+  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
+
+---
+
+## 4. Configuration Modernization Governance
+
+The Configuration Agent coordinates CMI export according to the standards codified in `skills/configuration-migration`:
+1. **Routing Strategy**: Directs simple variables to simple configuration (`system.site.yml`, `*.settings.yml`), entity structures to configuration entities (`node.type.*`, `field.storage.*`), and runtime counters to State API.
+2. **Schema Compliance**: Ensures exported YAML conforms to target core schema files in `config/schema/`.
+3. **Secret Isolation (Rule 10)**: Guarantees zero credentials or tokens are committed into exported configuration files, verifying that sensitive values resolve from environment variables or the `key` module.

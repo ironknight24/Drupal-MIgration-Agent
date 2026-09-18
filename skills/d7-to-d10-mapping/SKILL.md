@@ -7,17 +7,26 @@ disable-model-invocation: false
 allowed-tools: Read, Grep
 ---
 
-# Drupal 7 to Drupal 10 Architectural Mapping Skill
+# Drupal 7 to Drupal 10/11 Architectural Mapping Skill
 
 ## Overview
-This skill provides the architectural mapping rules required to translate Drupal 7 procedural constructs into modern Symfony/Drupal 10 object-oriented paradigms, prioritizing Dependency Injection, service containers, and testability.
+This skill provides the architectural mapping rules required to translate Drupal 7 procedural constructs into modern Symfony/Drupal 10 and Drupal 11 object-oriented paradigms, prioritizing Dependency Injection, service containers, and testability.
+
+---
+
+## Technical References
+For detailed syntax examples and conversion catalogs, consult:
+- [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
+- [Drupal 7 Hooks to Modern Architecture Catalog](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/hooks.md)
+- [Drupal 10 & 11 Plugin Types & Modern Architecture](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/plugin-types.md)
+- [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
 
 ---
 
 ## Core Mapping Rules
 
 ### 1. hook_menu() Separation
-In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual links, and form endpoints simultaneously. In Drupal 10, these are decoupled:
+In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual links, and form endpoints simultaneously. In modern Drupal, these are decoupled:
 - Page URLs & Handlers -> `<module>.routing.yml` & `ControllerBase`
 - Menu links -> `<module>.links.menu.yml`
 - Local tasks (tabs) -> `<module>.links.task.yml`

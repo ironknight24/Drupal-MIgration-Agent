@@ -23,7 +23,7 @@ model: inherit
 ### Inputs
 - `state/migration-manifest.yml`
 - Contrib module records from Discovery
-- Drupal core 10 ecosystem specifications (core module list, deprecated features)
+- Target Drupal core version specification (D10 vs D11)
 
 ### Outputs
 - `reports/contrib/CONTRIB-STRATEGY-<DATE>.md`
@@ -32,7 +32,7 @@ model: inherit
 - Updated `state/migration-state.yml` (advancing phase)
 
 ### Postconditions
-- Every required contrib module has a documented evaluation covering the 8 required assessment criteria.
+- Every required contrib module has a documented evaluation covering the 8 assessment criteria.
 - Zero packages added or installed via Composer in `target.path` during this step.
 - Zero modifications made to `source.path`.
 
@@ -41,27 +41,19 @@ model: inherit
 
 ---
 
-## 3. The 8 Mandatory Assessment Criteria
+## 3. Associated Skills & Knowledge References
 
-For every D7 contrib module evaluated, the agent must document:
-1. **Drupal 10 Release Status**: Is there an official release on Drupal.org / Packagist? (`[OBSERVED FACT]` or `[ASSUMPTION]`).
-2. **Stability & D11 Readiness**: Is the D10 release stable, RC, or alpha? Does it support Drupal 11?
-3. **Core Consolidation**: Has the functionality moved into Drupal core? (e.g., Views, Date, Entity API, CKEditor, Breakpoint, Email, Link, Phone).
-4. **Community Replacement**: If abandoned, has the community rallied around an alternative module? (e.g., Webform 7.x -> Webform 6.x in D10; Bean -> Block Content; Panopoly -> Layout Builder).
-5. **Custom Port Requirement**: Does the module require custom re-implementation due to unique custom patches or lack of modern equivalents?
-6. **Configuration Migration**: Does this module store configuration that must be imported into CMI?
-7. **Data Migration**: Does this module own custom database tables or field tables that must be migrated?
-8. **Custom Module Couplings**: Which custom modules invoke hooks or APIs provided by this module?
+- **Primary Associated Skill**:
+  - [`skills/contrib-evaluation`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/contrib-evaluation/SKILL.md) (8 assessment criteria, core consolidation taxonomy, and D11 core removal evaluation)
+- **Canonical References**:
+  - [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
+  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
 
 ---
 
-## 4. Safety & Anti-Hallucination Guardrails
+## 4. Evaluation Execution & Safety Guardrails (Rule 7)
 
-- **No Silent Replacements**: The agent must NEVER automatically alter `composer.json` or swap module namespaces without human authorization.
-- **Evidence Required**: Release numbers, Packagist URLs, or core issue references must be cited when claiming a module is available or moved to core.
-- **Categorization Taxonomy**:
-  - `CORE_MERGED`: Functionality provided natively by Drupal 10 core.
-  - `D10_AVAILABLE`: Official compatible port exists.
-  - `COMMUNITY_REPLACEMENT`: Modern replacement module identified.
-  - `CUSTOM_REIMPLEMENTATION`: Bespoke code required.
-  - `OBSOLETE`: No longer needed in modern Drupal architectures.
+The Contrib Module Agent applies the decision frameworks codified in `skills/contrib-evaluation`:
+1. **Assessment Criteria**: Audits target release availability, stability, D11 readiness, core merges, community replacements, and custom couplings.
+2. **D11 Core Removal Handling**: For modules removed in Drupal 11 (e.g. `book`, `forum`, `action`), follows the 7-step evaluation protocol (core equivalent, contrib port, custom requirement, actual usage, evidence, decision, gaps).
+3. **Non-Destructive Guardrail**: The agent never mutates `composer.json` or executes Composer commands. All recommendations are output as structured audit reports for developer review.

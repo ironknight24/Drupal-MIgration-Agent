@@ -106,21 +106,21 @@ graph TD
 
 ## 4. The 13 Specialized Agents & Associated Skills
 
-| # | Agent | Primary Role | Associated Skills & References |
+| # | Agent | Primary Role | Associated Skills & Key References |
 |---|---|---|---|
-| 1 | **`orchestrator`** | Master workflow coordinator and wave scheduler. | `skills/d7-to-d10-mapping`, `references/migration-patterns/` |
-| 2 | **`discovery`** | Deep read-only inspection of D7 and D10 environments. | `skills/d7-analysis`, `references/drupal-7/apis.md` |
-| 3 | **`dependency`** | Builds dependency DAG and wave planning. | `skills/dependency-analysis` (planned) |
-| 4 | **`contrib-module`** | Evaluates contrib compatibility, core merges, and ports. | `skills/contrib-evaluation` (planned) |
-| 5 | **`custom-module`** | Executes 12-step modernization of custom modules. | `skills/custom-module-migration`, `skills/d10-architecture` |
-| 6 | **`custom-theme`** | Converts PHPTemplate to Twig and modern asset libraries. | `skills/theme-modernization` (planned) |
-| 7 | **`configuration`** | Translates variables and settings into CMI YAML. | `skills/configuration-migration` (planned) |
-| 8 | **`data-migration`** | Architects core Migration API pipelines and table ETL. | `skills/migration-api` (planned) |
-| 9 | **`api-modernization`** | Enforces Dependency Injection; forbids blind `\Drupal::*`. | `skills/d10-architecture`, `references/drupal-10/` |
-| 10 | **`integration`** | Modernizes REST, SOAP, webhooks, and external DB connections. | `skills/d10-architecture` |
-| 11 | **`testing`** | Configures and validates PHPUnit, PHPStan, and PHPCS. | `skills/testing` (planned) |
-| 12 | **`validation`** | Conducts 12-point comparative behavioral audits. | `skills/behavioral-validation` (planned) |
-| 13 | **`final-audit`** | Verifies D11 readiness, security posture, and sign-off. | All references and validation matrices |
+| 1 | **`orchestrator`** | Master workflow coordinator, wave scheduler & global safety gate. | Pure lifecycle governance; `references/migration-patterns/common-conversions.md` |
+| 2 | **`discovery`** | Deep read-only inspection of D7 and D10 environments. | `skills/d7-analysis`, `references/drupal-7/apis.md`, `references/drupal-7/hooks.md` |
+| 3 | **`dependency`** | Builds dependency DAG and wave planning. | `skills/dependency-analysis`, `references/drupal-7/apis.md` |
+| 4 | **`contrib-module`** | Evaluates contrib compatibility, core merges, and ports. | `skills/contrib-evaluation`, `references/drupal-10/architecture.md` |
+| 5 | **`custom-module`** | Coordinates 12-step modernization of custom modules. | `skills/custom-module-migration`, `skills/d7-to-d10-mapping`, `skills/d10-architecture` |
+| 6 | **`custom-theme`** | Converts PHPTemplate to Twig and modern asset libraries. | `skills/theme-modernization`, `references/drupal-10/twig-filters.md` |
+| 7 | **`configuration`** | Translates variables and settings into CMI YAML. | `skills/configuration-migration`, `references/drupal-10/architecture.md` |
+| 8 | **`data-migration`** | Architects core Migration API pipelines and table ETL. | `skills/migration-api`, `references/migration-patterns/field-mapping.md` |
+| 9 | **`api-modernization`** | Enforces Dependency Injection; forbids blind `\Drupal::*`. | `skills/d7-to-d10-mapping`, `skills/d10-architecture`, `references/drupal-10/` |
+| 10 | **`integration`** | Modernizes REST, SOAP, webhooks, and external DB connections. | `skills/integration-modernization`, `skills/d10-architecture` |
+| 11 | **`testing`** | Configures and validates PHPUnit, PHPStan, and PHPCS. | `skills/testing`, `references/drupal-10/architecture.md` |
+| 12 | **`validation`** | Conducts 12-point comparative behavioral audits. | `skills/behavioral-validation`, `references/migration-patterns/` |
+| 13 | **`final-audit`** | Verifies D11 readiness, security posture, and sign-off. | Pure lifecycle governance; All 7 references and validation matrices |
 
 ---
 

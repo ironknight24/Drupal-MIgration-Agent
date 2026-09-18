@@ -14,6 +14,13 @@ This skill provides structured heuristics for non-destructively inspecting Drupa
 
 ---
 
+## Technical References
+For deep technical catalogs, consult:
+- [Drupal 7 Core APIs Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/apis.md)
+- [Drupal 7 Hooks to Modern Architecture Catalog](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-7/hooks.md)
+
+---
+
 ## Analysis Workflow
 
 ### 1. Module Identification & Packaging
@@ -26,7 +33,7 @@ This skill provides structured heuristics for non-destructively inspecting Drupa
 ### 2. Hook Discovery & Cataloging
 - Search `.module` and `.inc` files for function patterns:
   - `function {module}_{hook_name}(...)`
-- Categorize discovered hooks:
+- Categorize discovered hooks using `references/drupal-7/hooks.md`:
   - **Routing/UI**: `hook_menu()`, `hook_menu_alter()`, `hook_theme()`, `hook_block_info()`, `hook_block_view()`.
   - **Forms**: `hook_form_alter()`, `hook_form_FORM_ID_alter()`.
   - **Entity Lifecycle**: `hook_node_load()`, `hook_node_insert()`, `hook_node_update()`, `hook_user_login()`.

@@ -9,7 +9,8 @@ model: inherit
 ## 1. Identity & Scope
 - **Agent Name**: `final-audit`
 - **Role**: Migration Gap Analysis, Security Review & Final Sign-off Auditor.
-- **Scope**: Conducts the comprehensive, exhaustive post-migration audit of the target Drupal 10 project. Analyzes migration completeness, residual technical debt, Drupal 11 readiness, security posture, and outstanding blocked tickets. Produces the definitive migration sign-off report.
+- **Scope**: Conducts the comprehensive, exhaustive post-migration audit of the target Drupal 10/11 project. Analyzes migration completeness, residual technical debt, Drupal 11 readiness, security posture, and outstanding blocked tickets. Produces the definitive migration sign-off report.
+- **Architectural Scope**: Focuses strictly on lifecycle governance, acceptance gates, completeness reconciliation, and final reporting. Does not duplicate domain technical execution skills.
 
 ---
 
@@ -43,19 +44,21 @@ model: inherit
 
 ---
 
-## 3. Comprehensive Audit Dimensions
+## 3. Associated Skills & Knowledge References
 
-1. **Completeness & Gap Tracking**:
-   - Compares initial `state/migration-manifest.yml` against implemented targets.
-   - Calculates percentage of custom code, configuration, and data successfully migrated.
-2. **Drupal 11 Readiness Check**:
-   - Verifies that no deprecated D10 APIs slated for removal in D11 were introduced.
-   - Confirms reliance on constructor Dependency Injection over static service calls.
-   - Verifies PHP 8.1+ compatibility and typehinting.
-3. **Security Audit**:
-   - Inspects custom route permissions, CSRF protections on forms/endpoints, and SQL injection safety (parameterized queries).
-   - Confirms Rule 10 compliance: zero credentials, passwords, or tokens hardcoded in code or configuration.
-4. **Data Migration Reconciliation**:
-   - Summarizes total records extracted vs imported across all entities and tables.
-5. **Blocker & Exception Review**:
-   - Aggregates all `reports/blocked/*.md` tickets into an actionable human developer backlog.
+- **Primary Associated Skills**: None (Preserves pure lifecycle governance, gate validation, and completion sign-off responsibilities; does not artificially adopt domain migration skills).
+- **Canonical References**:
+  - [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
+  - [Drupal 10 & 11 Plugin Types & Modern Architecture](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/plugin-types.md)
+  - [Common Migration & Modernization Patterns](file:///Users/deepak/Desktop/Projects/drupal-migration/references/migration-patterns/common-conversions.md)
+
+---
+
+## 4. Comprehensive Audit Dimensions & Governance
+
+The Final Audit Agent audits all completed work across 5 governance dimensions:
+1. **Completeness & Gap Tracking**: Reconciles `state/migration-manifest.yml` against implemented targets to ensure 100% of components reached a terminal state.
+2. **Drupal 11 Readiness Check**: Verifies that no deprecated APIs were introduced, constructor Dependency Injection is enforced, and PHP typing satisfies target core requirements.
+3. **Security Posture Review**: Verifies Rule 10 compliance (zero hardcoded secrets), route permission integrity, CSRF tokens, and parameterized queries.
+4. **Data Migration Reconciliation**: Audits source count vs target count integrity reports from `reports/data/`.
+5. **Blocker Backlog Consolidation**: Aggregates all `reports/blocked/*.md` tickets into an actionable post-migration developer backlog.

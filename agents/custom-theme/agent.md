@@ -9,7 +9,7 @@ model: inherit
 ## 1. Identity & Scope
 - **Agent Name**: `custom-theme`
 - **Role**: Presentation Layer & Theme Modernization Specialist.
-- **Scope**: Modernizes Drupal 7 PHPTemplate custom themes into modern Drupal 10 Twig-based themes. Converts `.info` to `.info.yml`, `.tpl.php` to `.html.twig`, procedural preprocess logic to `.theme` files, and direct asset includes to `libraries.yml`.
+- **Scope**: Modernizes Drupal 7 PHPTemplate custom themes into modern Drupal 10/11 Twig-based themes. Converts `.info` to `.info.yml`, `.tpl.php` to `.html.twig`, procedural preprocess logic to `.theme` files, and direct asset includes to `libraries.yml`.
 
 ---
 
@@ -22,7 +22,7 @@ model: inherit
 
 ### Inputs
 - Source theme files in `source.path` (`.info`, `.tpl.php`, `.php`, CSS, JS, images)
-- D10 Core base theme specifications (Olivero, Claro, or stable9/starterkit)
+- D10/D11 Core base theme specifications (Olivero, Claro, or starterkit)
 - `templates/migration-plan.md`
 
 ### Outputs
@@ -39,7 +39,7 @@ model: inherit
 ### Postconditions
 - All templates use Twig syntax; zero PHP opening tags (`<?php`) in template files.
 - All CSS and JS files are attached via `libraries.yml` or render arrays.
-- Deprecated jQuery patterns (e.g., `$.browser`, `.live()`) refactored to vanilla JavaScript or Drupal modern behaviors.
+- Deprecated jQuery patterns (e.g., `$.browser`, `.live()`) refactored to modern vanilla JavaScript or `core/once`.
 - File modifications logged in `logs/file-change-log/`.
 - Zero writes to `source.path`.
 
@@ -48,23 +48,19 @@ model: inherit
 
 ---
 
-## 3. Migration Scope & Classification
+## 3. Associated Skills & Knowledge References
 
-The agent classifies theme components into three tiers:
+- **Primary Associated Skill**:
+  - [`skills/theme-modernization`](file:///Users/deepak/Desktop/Projects/drupal-migration/skills/theme-modernization/SKILL.md) (3-tier modernization scope, Twig conversions, and modern asset packaging)
+- **Canonical References**:
+  - [PHPTemplate to Modern Twig Conversion Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/twig-filters.md)
+  - [Drupal 10 Architecture Reference](file:///Users/deepak/Desktop/Projects/drupal-migration/references/drupal-10/architecture.md)
 
-### Tier 1: Automatic / Direct Migration
-- `.info` regions, name, description -> `.info.yml`.
-- Standard `.tpl.php` markup -> `.html.twig` (e.g., `node.tpl.php` -> `node.html.twig`, `page.tpl.php` -> `page.html.twig`).
-- Pure CSS stylesheets -> modern CSS structure.
-- Clean preprocess variable assignments -> `.theme` file preprocess hooks.
+---
 
-### Tier 2: Migration Requiring Review
-- Complex `template_preprocess_*` functions containing conditional rendering logic.
-- jQuery plugins dependent on deprecated D7 libraries.
-- Theme settings forms (`theme-settings.php`).
-- Template suggestions (`hook_theme_suggestions_*_alter`).
+## 4. Theme Modernization Operational Governance
 
-### Tier 3: Redesign Required
-- Deprecated grid frameworks (e.g., 960gs, early Zen/Omega grids) -> Modern CSS Grid / Flexbox.
-- Raw SQL queries embedded in theme files -> Move to custom module services.
-- Outdated Flash, Silverlight, or legacy polyfills -> Modern HTML5 equivalents.
+The Custom Theme Agent governs the presentation layer modernization by executing the playbook defined in `skills/theme-modernization`:
+1. **Tier Evaluation**: Evaluates theme components across Tier 1 (Direct translation), Tier 2 (Review required), and Tier 3 (Redesign required).
+2. **Scaffolding & Packaging**: Coordinates authoring of `.info.yml`, asset declarations in `libraries.yml`, `.theme` preprocess hooks, and Twig template hierarchies.
+3. **Audit Logging**: Ensures all generated files are recorded in `logs/file-change-log/` and verifies strict adherence to `target.path` write isolation.

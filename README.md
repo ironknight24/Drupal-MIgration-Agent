@@ -88,16 +88,30 @@ Drupal-MIgration-Agent/
 │   └── final-audit.md               # Gap analysis, security review, and final sign-off
 │
 ├── skills/                          # Reusable Domain Capabilities (Agent Skills Standard)
-│   ├── d7-analysis/SKILL.md         # [IMPLEMENTED] Read-only D7 code/AST inspection heuristics
-│   ├── d7-to-d10-mapping/SKILL.md   # [IMPLEMENTED] Procedural-to-OOP transformation rules
-│   ├── d10-architecture/SKILL.md    # [IMPLEMENTED] Modern D10/D11 standards (PHP 8 attributes, DI)
-│   ├── custom-module-migration/SKILL.md # [IMPLEMENTED] 12-step module modernization playbook
-│   └── ...                          # Other skills explicitly designated as PLANNED
+│   ├── d7-analysis/SKILL.md         # Read-only D7 code/AST inspection heuristics
+│   ├── d7-to-d10-mapping/SKILL.md   # Procedural-to-OOP architectural translation rules
+│   ├── d10-architecture/SKILL.md    # Modern D10/D11 standards (PHP 8 attributes, DI)
+│   ├── custom-module-migration/SKILL.md # 12-step module modernization playbook
+│   ├── dependency-analysis/SKILL.md # 5-dimension coupling detection & DAG wave scheduler
+│   ├── contrib-evaluation/SKILL.md  # 8-point contrib evaluation & D11 core removal rules
+│   ├── theme-modernization/SKILL.md # PHPTemplate to Twig, libraries.yml, modern CSS/JS
+│   ├── configuration-migration/SKILL.md # Variables to CMI YAML & configuration schemas
+│   ├── migration-api/SKILL.md       # Core Migration API pipeline architect & ETL integrity
+│   ├── testing/SKILL.md             # PHPUnit, PHPStan, PHPCS test runner playbooks
+│   ├── behavioral-validation/SKILL.md # 12-point comparative behavioral validation matrix
+│   └── integration-modernization/SKILL.md # External APIs, Guzzle clients, webhooks, QueueWorkers
 │
 ├── references/                      # Deep Technical Knowledge Bases
-│   ├── drupal-7/apis.md             # D7 core APIs, hooks, database, globals
-│   ├── drupal-10/architecture.md    # D10/D11 services, plugins, CMI, routing
-│   └── migration-patterns/common-conversions.md # Canonical conversion patterns
+│   ├── drupal-7/
+│   │   ├── apis.md                  # D7 core APIs, database calls, globals, variables
+│   │   └── hooks.md                 # D7 hooks to modern architecture catalog
+│   ├── drupal-10/
+│   │   ├── architecture.md          # D10/D11 services, plugins, CMI, routing
+│   │   ├── plugin-types.md          # Plugin types & PHP 8 Attributes vs Annotations
+│   │   └── twig-filters.md          # PHPTemplate functions to Twig syntax dictionary
+│   └── migration-patterns/
+│       ├── common-conversions.md    # Canonical before/after conversion patterns
+│       └── field-mapping.md         # Field type & Migrate API process pipeline mappings
 │
 ├── templates/                       # Standardized report & ticket templates
 ├── reports/                         # Deterministic report output directories
@@ -131,9 +145,9 @@ Drupal-MIgration-Agent/
 
 - **Factory Development Lifecycle (Building this Package)**:
   - Factory Step 0: Framework & Specification Definition [COMPLETE]
-  - Factory Step 1: Claude Code Package & Architecture Transformation [CURRENT]
-  - Factory Step 2: Migration Skills & Knowledge Codification [NEXT]
-  - Factory Step 3: Agent Execution Logic Implementation [PLANNED]
+  - Factory Step 1: Claude Code Package & Architecture Transformation [COMPLETE]
+  - Factory Step 2: Migration Skills & Knowledge Codification [COMPLETE]
+  - Factory Step 3: Agent Execution Logic Implementation [NEXT]
   - Factory Step 4: End-to-End Package Testing & Verification [PLANNED]
   - Factory Step 5: Distribution & Release [PLANNED]
 
