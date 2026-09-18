@@ -107,3 +107,35 @@ Every validation report must present the 12-dimensional comparison matrix:
 - `FAIL`: Behavior diverges or fails assertion.
 - `BLOCKED`: Cannot be tested due to upstream block.
 - `N/A`: Dimension not applicable to this component.
+
+---
+
+## 6. Standard Operational Incident Report Schema (`reports/blocked/INC-XXX.md`)
+
+When a major failure, unexpected interruption, safety block, or state anomaly occurs, an incident report is generated to capture full diagnostic context:
+
+```yaml
+---
+incident_id: "INC-20260919-001"
+timestamp: "2026-09-19T00:30:00Z"
+phase: "phase_4_implementation"
+component: "custom_booking"
+agent: "custom-module"
+failure_class: "AGENT_FAILURE" # AGENT_FAILURE | TOOL_FAILURE | DEPENDENCY_FAILURE | CONFIG_FAILURE | SAFETY_FAILURE | ARTIFACT_FAILURE | HUMAN_GATE_FAILURE | PROCESS_FAILURE
+severity: "MAJOR" # INFO | WARNING | MAJOR | CRITICAL | GLOBAL_BLOCK
+error_summary: "PHPStan static analysis reported 3 fatal syntax errors during AST transformation."
+evidence:
+  - "Output from vendor/bin/phpstan analyse web/modules/custom/custom_booking"
+  - "Exit code 1 on BookingManager.php line 42"
+affected_artifacts:
+  - "web/modules/custom/custom_booking/src/BookingManager.php"
+state_before: "IN_PROGRESS"
+state_after: "FAILED_RETRYABLE"
+retry_eligibility:
+  eligible: true
+  attempt_count: 1
+  max_retries: 3
+remediation_stage: "IN_PROGRESS"
+human_intervention_required: false
+---
+```

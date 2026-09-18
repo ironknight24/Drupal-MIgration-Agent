@@ -312,3 +312,44 @@ Step 8 executes an automated, deterministic **Factory Workflow Simulation** vali
 - **Agent Result Validation Gate**: Confirms Orchestrator validates schema and evidence before state mutation.
 - **Failure Recovery Simulation**: Verifies Cases A through F recovery paths.
 - **Final Audit Gate Evaluation**: Validates 8 acceptance gates for complete component accounting.
+
+---
+
+## Failure, Recovery & Production Hardening (Step 9)
+
+Step 9 hardens the factory for edge cases, failures, unexpected interruptions, state corruption, and operational resilience:
+
+### 1. Canonical Failure Taxonomy & Severity Model
+- **8 Failure Classes**: `AGENT_FAILURE`, `TOOL_FAILURE`, `DEPENDENCY_FAILURE`, `CONFIG_FAILURE`, `SAFETY_FAILURE`, `ARTIFACT_FAILURE`, `HUMAN_GATE_FAILURE`, `PROCESS_FAILURE`.
+- **5 Severity Levels**: `INFO`, `WARNING`, `MAJOR` (component remediation), `CRITICAL` (`BLOCKED_UPSTREAM` propagation), `GLOBAL_BLOCK` (immediate pipeline halt).
+
+### 2. Deterministic Retry Policy & Recovery Boundaries
+- Configurable `max_retries` (default: 3). Failed components enter `FAILED_RETRYABLE` up to the threshold, after which they transition to `BLOCKED` with human escalation.
+- Retries re-enter at the designated remediation stage without re-running completed phases.
+- The factory guarantees *safe resume and idempotent re-entry where the underlying operation supports idempotency*.
+- Automatic arbitrary rollback is not claimed; rollbacks rely on the append-only `logs/file-change-log/` audit trail.
+
+### 3. Partial Wave & Interruption Handling
+- In dynamic waves with mixed results, completed components remain completed while failed components are isolated and downstream dependents are marked `BLOCKED_UPSTREAM`.
+- On unexpected process termination, the Orchestrator reconciles uncommitted components in `IN_PROGRESS` back to `READY` or `FAILED_RETRYABLE` based on verified on-disk logs.
+
+### 4. State Corruption Fail-Safe Protocol
+- If `state/migration-state.yml` is corrupt or missing, the system triggers `GLOBAL_BLOCK` and halts. It preserves diagnostic evidence and refuses silent destructive overwriting.
+
+### 5. Safe Resume Algorithm (9 Steps)
+1. Load consumer configuration.
+2. Validate state file schema and integrity.
+3. Verify required artifacts and check freshness (`CURRENT`).
+4. Verify global safety conditions (`global_block == false`, source read-only).
+5. Reconcile incomplete components.
+6. Evaluate dependency DAG.
+7. Verify human decision gates.
+8. Calculate executable topological wave.
+9. Dispatch eligible work to specialist agents.
+
+### 6. Production Safety Checklist
+A 4-phase operational checklist covers Pre-Execution, Runtime Execution, Post-Interruption Recovery, and Final Sign-Off gates.
+
+### 7. Runtime Status Boundary
+All static structures, contracts, and simulation models are verified. Claude Code live execution and live Drupal environment testing remain explicitly marked:
+`[RUNTIME UNVERIFIED — CLAUDE CODE CLI/ACCESS NOT AVAILABLE]`.

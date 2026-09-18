@@ -428,3 +428,135 @@ When resuming an interrupted or failed migration, the Orchestrator evaluates the
 | **Safety** | D7 read-only policy & non-overlap validation | `STATIC_VERIFIED` | Verified statically |
 | **Safety** | Live OS filesystem write blocking | `RUNTIME_REQUIRED` | `[RUNTIME UNVERIFIED]` |
 | **Full Migration**| End-to-end AST parsing & database replatforming | `CONSUMER_ENVIRONMENT_REQUIRED` | `[RUNTIME UNVERIFIED]` |
+
+---
+
+## 12. Canonical Failure Taxonomy & Severity Model
+
+To avoid treating disparate operational anomalies as generic failures, the framework classifies all runtime issues into 8 distinct failure classes and 5 standardized severity levels:
+
+### 8 Failure Classes
+1. **Agent Failure (`AGENT_FAILURE`)**: Agent returns execution error, malformed `agent_result`, missing mandatory evidence links, or unauthorized state transition proposal.
+2. **Tool Failure (`TOOL_FAILURE`)**: Underlying CLI tools (Drush, PHP, PHPUnit, PHPStan) are unavailable, timed out, or return fatal non-zero exit codes.
+3. **Dependency Failure (`DEPENDENCY_FAILURE`)**: Upstream component failure, cyclical dependency detected, or required upstream interface artifact missing/invalid.
+4. **Configuration Failure (`CONFIG_FAILURE`)**: Missing configuration keys, invalid target version specification, unresolvable paths, or configuration drift.
+5. **Safety Failure (`SAFETY_FAILURE`)**: Attempted write to D7 source path, source/target directory overlap, committed secret/credential detected, unauthorized target write scope, or un-serialized shared file collision.
+6. **Artifact Failure (`ARTIFACT_FAILURE`)**: Mandatory artifact missing, malformed YAML frontmatter, stale input context hash, superseded artifact consumed as current, or corrupt state file.
+7. **Human Gate Failure (`HUMAN_GATE_FAILURE`)**: Plan remains `PENDING` during execution wave, plan `REJECTED`, changes requested without updated plan, or contradictory human inputs.
+8. **Process Failure (`PROCESS_FAILURE`)**: Interrupted execution process, unhandled runner termination, partial wave execution abort, or runner restart during active component work.
+
+### 5 Failure Severity Levels
+| Severity | Definition & Scope | Immediate Operational Action | Gating / Impact |
+|:---|:---|:---|:---|
+| `INFO` | Informational diagnostic or benign telemetry event | Log event to report / change log | Execution continues uninterrupted |
+| `WARNING` | Non-fatal divergence, fallback mechanism used | Record warning; flag in telemetry | Execution continues; flag in audit |
+| `MAJOR` | Single isolated component failure | Route component to remediation stage | Component blocked; independent components continue |
+| `CRITICAL` | Transitive failure affecting dependency subtree | Propagate `BLOCKED_UPSTREAM` down DAG | Subtree blocked; requires remediation or human gate |
+| `GLOBAL_BLOCK`| Safety rule violation, state corruption, path overlap | Halt all agent execution immediately (`global_block: true`)| Pipeline paused; requires developer remediation |
+
+---
+
+## 13. Deterministic Retry Policy & Recovery Boundaries
+
+### Retry Policy Invariants
+1. **Maximum Retries**: Configured via `max_retries` in `migration.config.yml` (default: 3 attempts per component per stage).
+2. **Retry Tracking**: Every retry increments `attempt_number` in `agent_result` and `component_states.<id>.attempts`.
+3. **Stage-Aware Re-entry**: Retries do NOT restart the entire migration; they re-enter at the designated remediation stage.
+4. **Terminal Failure**: Upon exceeding `max_retries`, the component transitions from `FAILED_RETRYABLE` to `BLOCKED` and triggers mandatory human escalation.
+5. **Precondition Preservation**: A retry must **NEVER** bypass Preflight, Human Decision Gates, Safety Gates, or Dependency Invariants.
+6. **Idempotency Guarantee**: The framework guarantees *safe resume and idempotent re-entry where the underlying operation supports idempotency*.
+
+### Recovery Boundaries
+- **Recoverable**: Transient CLI timeout, temporary memory exhaustion, retryable agent syntax error.
+- **Remediable**: Missing configuration setting, missing upstream module, human-requested architectural adjustment.
+- **Non-Recoverable Without Human Intervention**: Corrupted authoritative state, source modification attempt, security violation.
+- **Rollback Boundary**: The factory does *NOT* claim automatic rollback of arbitrary Drupal database or code mutations. Rollback is governed by inspecting the append-only `logs/file-change-log/` audit trail and performing controlled file-reversion or snapshot restoration.
+
+---
+
+## 14. Partial Wave Failure & Interruption Reconciliation
+
+### Partial Wave Failure Handling
+When components in an active dynamic execution wave complete with mixed results:
+$$\text{Wave } N: \quad [A \rightarrow \text{COMPLETE}, \quad B \rightarrow \text{FAILED}, \quad C \rightarrow \text{COMPLETE}, \quad D \rightarrow \text{READY}]$$
+1. Completed components ($A, C$) remain `COMPLETE` and are never blindly re-executed.
+2. Failed component ($B$) enters `FAILED_RETRYABLE` (if attempts remain) or `BLOCKED`.
+3. Direct and transitive dependents of $B$ are marked `BLOCKED_UPSTREAM`.
+4. Independent components ($D$) proceed to execution if all upstream dependencies are satisfied.
+5. Orchestrator recalculates DAG readiness dynamically.
+
+### Interruption Reconciliation Matrix
+If execution is interrupted (e.g. SIGINT, crash, runner timeout):
+- **Before agent begins**: Component status remains `READY`; dispatched on resume.
+- **During agent execution**: Component was left in `IN_PROGRESS`. On resume, Orchestrator inspects disk against `logs/file-change-log/` and reconciles status to `READY` or `FAILED_RETRYABLE`.
+- **After target writes but before `agent_result`**: Uncommitted changes are verified against file logs; incomplete modifications are reverted or scheduled for re-execution.
+- **After `agent_result` written but before state commit**: Orchestrator detects persisted result artifact, executes validation gate, and commits authoritative state.
+- **After state commit but before next wave dispatch**: Orchestrator reloads state, computes next topological wave, and continues execution.
+
+---
+
+## 15. State Corruption Fail-Safe Protocol
+
+If `state/migration-state.yml` is missing, unparseable, incomplete, or internally contradictory:
+1. **Fail-Safe Halt**: Trigger immediate `GLOBAL_BLOCK` (`global_block: true`, `execution_health: CORRUPTED_STATE`).
+2. **Preserve Evidence**: Copy corrupted state file to `logs/state-corruption-<TIMESTAMP>.yml` for diagnosis.
+3. **No Blind Overwrite**: The framework will **NEVER** silently overwrite or guess state without verification.
+4. **Human Escalation**: Request developer inspection.
+5. **Reconciliation**: State is reconstructed deterministically by scanning:
+   - `state/migration-manifest.yml` (Scope & Inventory)
+   - `reports/` (Completed milestone reports)
+   - `logs/file-change-log/` (Verified file modifications)
+6. **Resume After Validation**: Pipeline resumes only after reconstructed state passes full schema validation.
+
+---
+
+## 16. Deterministic Safe Resume Algorithm
+
+When `/orchestrate` is executed on an existing migration workspace, it executes the following deterministic 9-step algorithm:
+
+```text
+Step 1: Load and parse migration.config.yml
+Step 2: Validate state file (state/migration-state.yml) schema and integrity
+Step 3: Verify required artifacts (reports, manifest, DAG) and check freshness
+Step 4: Verify global safety conditions (D7 read-only check, path overlap check, global_block == false)
+Step 5: Reconcile incomplete components (reconcile IN_PROGRESS to READY / FAILED_RETRYABLE)
+Step 6: Load canonical dependency DAG and evaluate upstream statuses
+Step 7: Verify human decision gates (ensure zero PENDING gates in candidate wave)
+Step 8: Calculate executable topological wave (in-degree 0 among uncompleted, unblocked components)
+Step 9: Dispatch only eligible, verified components to specialist agents
+```
+
+---
+
+## 17. Production Safety Checklist
+
+### Phase 1: Pre-Execution Gate
+- [ ] Preflight status is `PASS` with zero blocking errors.
+- [ ] Source path (`source.path`) and target path (`target.path`) are strictly non-overlapping.
+- [ ] Source Drupal 7 codebase is verified read-only and unmounted from write permissions.
+- [ ] No API keys, passwords, or tokens are present in configuration or reports.
+- [ ] Migration scope is finalized in `state/migration-manifest.yml`.
+- [ ] Dependency DAG is acyclic and verified.
+
+### Phase 2: Runtime Wave Execution Gate
+- [ ] Orchestrator remains the sole authoritative writer of `migration-state.yml`.
+- [ ] Write permissions strictly match individual agent authorized scopes.
+- [ ] Shared file modifications are serialized to prevent race conditions.
+- [ ] All file mutations are recorded in `logs/file-change-log/` prior to disk write.
+- [ ] Failed components are isolated; downstream dependents marked `BLOCKED_UPSTREAM`.
+- [ ] Retry counters are enforced with strict thresholds (`max_retries`).
+
+### Phase 3: Post-Interruption Recovery Gate
+- [ ] State file integrity verified against schema and file change logs.
+- [ ] Unfinished components reconciled from `IN_PROGRESS`.
+- [ ] Stale artifacts identified and marked for regeneration.
+- [ ] Human decision gates re-checked before dispatching next wave.
+- [ ] Dynamic wave scheduler computes lowest incomplete wave without repeating completed work.
+
+### Phase 4: Final Sign-Off Gate
+- [ ] Zero active `GLOBAL_BLOCK` or safety violations.
+- [ ] Zero unresolved component blockers (`BLOCKED` or `BLOCKED_UPSTREAM`).
+- [ ] 100% of in-scope manifest components resolved to `COMPLETE` or approved `SKIPPED`.
+- [ ] Automated tests executed with verified `TEST_PASSED` results.
+- [ ] 12-dimensional behavioral validation completed with zero unhandled discrepancies.
+- [ ] Final audit report signed off and archived.
