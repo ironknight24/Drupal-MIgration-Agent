@@ -30,9 +30,7 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
 - Discovering field definitions, field instances, field types, widgets, formatters, cardinalities, and custom storage engines.
 - Discovering revision tables, revision flags, log fields, timestamps, and revision tracking logic.
 - Discovering multilingual configuration, `$language`, `LANGUAGE_NONE`, translation tables, and field translation setups.
-- Discovering entity reference topologies (`entityreference`, `taxonomy_term_reference`, `user_reference`, `node_reference`).
-- Populating static component scope in `state/migration-manifest.yml` (including `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, and `entities_fields_items`).
-- Authoring baseline discovery reports in `reports/discovery/`.
+- Populating static component scope in `state/migration-manifest.yml` (including `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, and `dynamic_dependency_items`).
 - Classifying observed facts (`[OBSERVED FACT]`) vs inferences (`[INFERENCE]`) vs unverified results (`[UNVERIFIED RESULT]`).
 
 ---
@@ -176,19 +174,27 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
     - Trace template suggestions (`theme_hook_suggestions_*`, `hook_theme_suggestions_HOOK_alter()`) and identify dynamic suggestions.
     - Discover theme settings forms (`theme-settings.php`, `theme_get_setting()`, `theme_set_setting()`) and map to CMI config schemas.
     - Map entity/field templates (Step 16), form templates (Step 17), frontend assets (Step 18), and Views templates (Step 19).
-17. **Database API & Static SQL Query Discovery**:
+17. **Dynamic, Runtime & Data-Driven Dependency Discovery (Step 21)**:
+    - Recursively scan all D7 source files for dynamic callables (`$func()`, `call_user_func`, `call_user_func_array`), dynamic method calls, and dynamic class instantiations (`new $class()`).
+    - Discover dynamic hook invocations (`module_invoke`, `module_invoke_all`, dynamic hook names) and custom event dispatches.
+    - Detect dynamic entity types, bundles, field names, and display modes loaded via configuration or request variables.
+    - Discover dynamic template names, suggestions, Views IDs, display IDs, form IDs, and AJAX commands.
+    - Discover dynamic include/require paths, dynamic variable/state keys, and dynamically built SQL queries.
+    - Recursively analyze serialized data payloads, JSON blobs, environment variables (`getenv()`), reflection APIs, and `eval()` constructs.
+    - Assign explicit resolution confidence (6 levels: `RESOLVED_STATICALLY`, `RESOLVED_WITH_HIGH_CONFIDENCE`, `PARTIALLY_RESOLVED`, `RUNTIME_DEPENDENT`, `UNRESOLVED`, `OPAQUE`) and generate deterministic runtime probe specifications.
+18. **Database API & Static SQL Query Discovery**:
     - Inventory procedural database calls: `db_query()`, `db_query_range()`, `db_select()`, `db_insert()`, `db_update()`, `db_delete()`, `db_merge()`, `db_transaction()`.
     - Detect dynamically constructed SQL (e.g. `$table = $config['table']; db_query("SELECT ... FROM {$table}")`) and flag as `[UNVERIFIED RESULT]` / `HUMAN_DECISION_REQUIRED`.
     - Perform SQL safety analysis identifying user inputs, missing placeholders, and raw SQL concatenations.
-18. **Data Semantics, Serialization & Entity Relationships**:
+19. **Data Semantics, Serialization & Entity Relationships**:
     - Classify custom tables into the 17 semantic categories: `CONTENT`, `CONFIGURATION`, `STATE`, `USER_DATA`, `ENTITY_DATA`, `FIELD_DATA`, `RELATIONSHIP_DATA`, `TRANSACTION_DATA`, `AUDIT_DATA`, `CACHE_DATA`, `QUEUE_DATA`, `TEMPORARY_DATA`, `INTEGRATION_DATA`, `LOOKUP_DATA`, `REFERENCE_DATA`, `LEGACY_DATA`, `UNKNOWN`.
     - Detect serialized data payloads (PHP serialize/unserialize, JSON, encoded objects, HTML).
     - Detect entity references (`uid`, `nid`, `tid`, `fid`, `entity_id`, `delta`) and cross-table entity relationships.
     - Map complete CRUD call trees (CREATE, READ, UPDATE, DELETE callers) across all services, forms, controllers, queue workers, cron, and Drush.
-19. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
-20. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, and `theme_items` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
-21. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
-22. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
+20. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
+21. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, and `dynamic_dependency_items` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
+22. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
+23. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
 
 ---
 

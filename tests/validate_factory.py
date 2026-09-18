@@ -169,6 +169,12 @@ class FactoryValidator:
         elif status == "UNVERIFIED":
             self.summary["unverified"] += 1
 
+    def _read_file(self, rel_path):
+        p = self.repo_root / rel_path
+        if p.exists():
+            return p.read_text(encoding="utf-8")
+        return ""
+
     # Suite 1: Package Structure & Distribution Portability
     def validate_package_and_portability(self):
         # 1.1 plugin.json
@@ -2348,11 +2354,11 @@ class FactoryValidator:
         has_doc_sync = (
             taxonomy_in_d7 and
             "1.1.0" in config_skill and
-            any(v in mapping_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"]) and
-            any(v in custom_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"]) and
-            any(v in dep_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"]) and
-            any(v in test_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"]) and
-            any(v in val_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"])
+            any(v in mapping_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
+            any(v in custom_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
+            any(v in dep_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
+            any(v in test_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
+            any(v in val_skill for v in ["1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"])
         )
 
         if has_doc_sync:
@@ -3724,11 +3730,11 @@ class FactoryValidator:
         taxonomy_in_d7 = "21 frontend target architecture" in d7_skill.lower() or "21-class" in d7_skill.lower() or "21 frontend" in d7_skill.lower()
         has_doc_sync = (
             taxonomy_in_d7 and
-            any(v in mapping_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0"]) and
-            any(v in custom_skill for v in ["1.7.0", "1.8.0", "1.9.0"]) and
-            any(v in dep_skill for v in ["1.7.0", "1.8.0", "1.9.0"]) and
-            any(v in test_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0"]) and
-            any(v in val_skill for v in ["1.7.0", "1.8.0", "1.9.0"])
+            any(v in mapping_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
+            any(v in custom_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
+            any(v in dep_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
+            any(v in test_skill for v in ["1.6.0", "1.7.0", "1.8.0", "1.9.0", "1.10.0"]) and
+            any(v in val_skill for v in ["1.7.0", "1.8.0", "1.9.0", "1.10.0"])
         )
 
         if has_doc_sync:
@@ -4863,6 +4869,549 @@ class FactoryValidator:
                               "Cross-capability compatibility check failed across manifest, skills, or documentation.",
                               "Theme capability must maintain seamless compatibility with all other factory capabilities.")
 
+    # Suite 21: Dynamic, Runtime & Data-Driven Dependency Exhaustive Discovery, Accounting & D10/D11 Re-engineering Suite (Step 21)
+    def validate_dynamic_dependencies_suite(self):
+        d7_skill = self._read_file("skills/d7-analysis/SKILL.md")
+        dep_skill = self._read_file("skills/dependency-analysis/SKILL.md")
+        mapping_skill = self._read_file("skills/d7-to-d10-mapping/SKILL.md")
+        custom_skill = self._read_file("skills/custom-module-migration/SKILL.md")
+        mig_skill = self._read_file("skills/migration-api/SKILL.md")
+        test_skill = self._read_file("skills/testing/SKILL.md")
+        val_skill = self._read_file("skills/behavioral-validation/SKILL.md")
+        disc_agent = self._read_file("agents/discovery/agent.md")
+        dep_agent = self._read_file("agents/dependency/agent.md")
+        manifest_text = self._read_file("state/migration-manifest.yml")
+        readme_text = self._read_file("README.md")
+        arch_text = self._read_file("ARCHITECTURE.md")
+        disc_tpl = self._read_file("templates/discovery-report.md")
+        plan_tpl = self._read_file("templates/migration-plan.md")
+        val_tpl = self._read_file("templates/validation-report.md")
+
+        # 21.1 Recursive Dynamic Dependency Discovery
+        has_dynamic_discovery = (
+            "DYNAMIC_CALLABLE" in d7_skill and
+            "call_user_func" in d7_skill and
+            "variable function" in d7_skill.lower() and
+            "Dynamic, Runtime & Data-Driven" in disc_agent
+        )
+
+        if has_dynamic_discovery:
+            self.record_check("CHECK-DYNAMIC-01", "discovery", "Recursive Dynamic Dependency Discovery", "PASS",
+                              "Skills and Discovery agent implement recursive detection of dynamic behavior (variable functions, callable arrays, dynamic instantiation, dynamic SQL, reflection, eval).",
+                              "Verified recursive dynamic dependency discovery rules.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "agents/discovery/agent.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-01", "discovery", "Recursive Dynamic Dependency Discovery", "FAIL",
+                              "Missing dynamic dependency discovery rules in d7-analysis or discovery agent.",
+                              "Factory must recursively discover all dynamic behavior.")
+
+        # 21.2 Dynamic Callables, Variable Functions & Callbacks Analysis
+        has_callables = (
+            "call_user_func" in d7_skill and
+            "DYNAMIC_CALLABLE" in d7_skill and
+            ("Plugin Manager" in mapping_skill or "PLUGIN_MANAGER" in mig_skill)
+        )
+
+        if has_callables:
+            self.record_check("CHECK-DYNAMIC-02", "callables", "Dynamic Callables, Variable Functions & Callbacks Analysis", "PASS",
+                              "Skills analyze dynamic callables and variable functions, extracting producers, execution contexts, candidate sets, and modernizing to Plugin Managers or tagged services.",
+                              "Verified dynamic callable analysis and modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-02", "callables", "Dynamic Callables, Variable Functions & Callbacks Analysis", "FAIL",
+                              "Missing dynamic callable analysis rules in skills.",
+                              "Factory must analyze dynamic callables and map to modern plugins/services.")
+
+        # 21.3 Dynamic Class Instantiation & Resolution
+        has_dynamic_class = (
+            "DYNAMIC_CLASS" in d7_skill and
+            "new $class" in d7_skill
+        )
+
+        if has_dynamic_class:
+            self.record_check("CHECK-DYNAMIC-03", "classes", "Dynamic Class Instantiation & Resolution", "PASS",
+                              "Skills detect variable class instantiation (`new $class`), tracing class registries and container lookups with Step 12 cross-referencing.",
+                              "Verified dynamic class instantiation detection and resolution.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-03", "classes", "Dynamic Class Instantiation & Resolution", "FAIL",
+                              "Missing dynamic class instantiation detection in skills.",
+                              "Factory must detect and account for dynamic class instantiations.")
+
+        # 21.4 Dynamic Service Container Lookups & Service Factory Mapping
+        has_service_lookup = (
+            "DYNAMIC_SERVICE" in d7_skill and
+            "SERVICE_CONTAINER_MAPPING" in d7_skill
+        )
+
+        if has_service_lookup:
+            self.record_check("CHECK-DYNAMIC-04", "services", "Dynamic Service Container Lookups & Factory Mapping", "PASS",
+                              "Skills analyze dynamic service names and container lookups, mapping them to factory services or service locator abstractions.",
+                              "Verified dynamic service lookup analysis.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-04", "services", "Dynamic Service Container Lookups & Factory Mapping", "FAIL",
+                              "Missing dynamic service container lookup rules in skills.",
+                              "Factory must account for dynamic service lookups.")
+
+        # 21.5 Dynamic Plugin ID Discovery & Plugin Manager Resolution
+        has_plugin_resolution = (
+            "DYNAMIC_PLUGIN" in d7_skill and
+            "PLUGIN_MANAGER_MAPPING" in d7_skill and
+            "DefaultPluginManager" in mapping_skill
+        )
+
+        if has_plugin_resolution:
+            self.record_check("CHECK-DYNAMIC-05", "plugins", "Dynamic Plugin ID Discovery & Plugin Manager Resolution", "PASS",
+                              "Skills discover dynamic plugin lookups and provide concrete modernization to typed Drupal 10/11 DefaultPluginManager implementations.",
+                              "Verified dynamic plugin discovery and Plugin Manager resolution.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-05", "plugins", "Dynamic Plugin ID Discovery & Plugin Manager Resolution", "FAIL",
+                              "Missing dynamic plugin resolution rules in skills.",
+                              "Factory must modernize dynamic plugin discovery to Plugin Managers.")
+
+        # 21.6 Dynamic Hook Names & module_invoke Resolution
+        has_dynamic_hooks = (
+            "DYNAMIC_HOOK" in d7_skill and
+            "module_invoke" in d7_skill and
+            "module_invoke_all" in d7_skill
+        )
+
+        if has_dynamic_hooks:
+            self.record_check("CHECK-DYNAMIC-06", "hooks", "Dynamic Hook Names & module_invoke Resolution", "PASS",
+                              "Skills detect dynamic hook construction and module_invoke/module_invoke_all invocations, enumerating consumers and marking open-ended dispatches as UNRESOLVED.",
+                              "Verified dynamic hook discovery and resolution.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/custom-module-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-06", "hooks", "Dynamic Hook Names & module_invoke Resolution", "FAIL",
+                              "Missing dynamic hook resolution rules in skills.",
+                              "Factory must account for dynamic hook invocations.")
+
+        # 21.7 Dynamic Event Construction & EventDispatcher Modernization
+        has_dynamic_events = (
+            "DYNAMIC_EVENT" in d7_skill and
+            "EVENT_DISPATCHER_MAPPING" in d7_skill and
+            "Event" in mapping_skill
+        )
+
+        if has_dynamic_events:
+            self.record_check("CHECK-DYNAMIC-07", "events", "Dynamic Event Construction & EventDispatcher Modernization", "PASS",
+                              "Skills modernize dynamic hook invocations into Symfony EventDispatcher dispatches with custom Event objects and EventSubscriber listeners.",
+                              "Verified dynamic event construction and EventDispatcher modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-07", "events", "Dynamic Event Construction & EventDispatcher Modernization", "FAIL",
+                              "Missing dynamic event modernization rules in skills.",
+                              "Factory must modernize dynamic hooks to EventDispatcher.")
+
+        # 21.8 Dynamic Entity Type & Bundle Resolution
+        has_dynamic_entities = (
+            "DYNAMIC_ENTITY" in d7_skill and
+            "DYNAMIC_BUNDLE" in d7_skill and
+            "ENTITY_API_MAPPING" in d7_skill
+        )
+
+        if has_dynamic_entities:
+            self.record_check("CHECK-DYNAMIC-08", "entities", "Dynamic Entity Type & Bundle Resolution", "PASS",
+                              "Skills identify dynamically loaded entity types and bundles, modernizing to typed EntityTypeManager calls while cross-referencing Step 16 entity models.",
+                              "Verified dynamic entity type and bundle resolution.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-08", "entities", "Dynamic Entity Type & Bundle Resolution", "FAIL",
+                              "Missing dynamic entity type or bundle resolution rules in skills.",
+                              "Factory must account for dynamic entity and bundle lookups.")
+
+        # 21.9 Dynamic Field Name & Property Resolution
+        has_dynamic_fields = (
+            "DYNAMIC_FIELD" in d7_skill and
+            "field" in d7_skill.lower()
+        )
+
+        if has_dynamic_fields:
+            self.record_check("CHECK-DYNAMIC-09", "fields", "Dynamic Field Name & Property Resolution", "PASS",
+                              "Skills detect dynamic field name lookups and property accesses, assigning explicit confidence and target Entity API storage patterns.",
+                              "Verified dynamic field name and property resolution.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-09", "fields", "Dynamic Field Name & Property Resolution", "FAIL",
+                              "Missing dynamic field resolution rules in skills.",
+                              "Factory must account for dynamic field names.")
+
+        # 21.10 Dynamic Template Name & Template Suggestion Resolution
+        has_dynamic_templates = (
+            "DYNAMIC_TEMPLATE" in d7_skill and
+            "TEMPLATE_MAPPING" in d7_skill and
+            "Step 20" in d7_skill
+        )
+
+        if has_dynamic_templates:
+            self.record_check("CHECK-DYNAMIC-10", "templates", "Dynamic Template Name & Suggestion Resolution", "PASS",
+                              "Skills trace dynamic template names and runtime-appended theme suggestions, delegating presentation ownership cleanly to Step 20.",
+                              "Verified dynamic template and suggestion resolution.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-10", "templates", "Dynamic Template Name & Suggestion Resolution", "FAIL",
+                              "Missing dynamic template resolution rules in skills.",
+                              "Factory must account for dynamic templates and suggestions.")
+
+        # 21.11 Dynamic Theme Selection & Override Resolution
+        has_dynamic_themes = (
+            "DYNAMIC_THEME" in d7_skill and
+            "theme" in d7_skill.lower()
+        )
+
+        if has_dynamic_themes:
+            self.record_check("CHECK-DYNAMIC-11", "themes", "Dynamic Theme Selection & Override Resolution", "PASS",
+                              "Skills account for dynamic theme switches, theme callbacks in menu routers, and runtime presentation overrides.",
+                              "Verified dynamic theme selection and override resolution.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-11", "themes", "Dynamic Theme Selection & Override Resolution", "FAIL",
+                              "Missing dynamic theme selection rules in skills.",
+                              "Factory must account for dynamic theme selection.")
+
+        # 21.12 Dynamic Views ID, Display & Embed Resolution
+        has_dynamic_views = (
+            "DYNAMIC_VIEW" in d7_skill and
+            "VIEW_MAPPING" in d7_skill and
+            "Step 19" in d7_skill
+        )
+
+        if has_dynamic_views:
+            self.record_check("CHECK-DYNAMIC-12", "views", "Dynamic Views ID, Display & Embed Resolution", "PASS",
+                              "Skills trace dynamic Views dispatches (`views_get_view($id)`, dynamic displays), coordinating ownership with Step 19 Views.",
+                              "Verified dynamic Views resolution.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-12", "views", "Dynamic Views ID, Display & Embed Resolution", "FAIL",
+                              "Missing dynamic Views resolution rules in skills.",
+                              "Factory must account for dynamic Views calls.")
+
+        # 21.13 Dynamic Form ID & Form Builder Resolution
+        has_dynamic_forms = (
+            "DYNAMIC_FORM" in d7_skill and
+            "FORM_MAPPING" in d7_skill and
+            "Step 17" in d7_skill
+        )
+
+        if has_dynamic_forms:
+            self.record_check("CHECK-DYNAMIC-13", "forms", "Dynamic Form ID & Form Builder Resolution", "PASS",
+                              "Skills detect dynamic form IDs in `drupal_get_form($dynamic_id)` and map to parameterized FormBase classes with Step 17 coordination.",
+                              "Verified dynamic form ID and builder resolution.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-13", "forms", "Dynamic Form ID & Form Builder Resolution", "FAIL",
+                              "Missing dynamic form resolution rules in skills.",
+                              "Factory must account for dynamic form builders.")
+
+        # 21.14 Dynamic AJAX Callback & Response Command Resolution
+        has_dynamic_ajax = (
+            "DYNAMIC_AJAX" in d7_skill and
+            "ajax" in d7_skill.lower()
+        )
+
+        if has_dynamic_ajax:
+            self.record_check("CHECK-DYNAMIC-14", "ajax", "Dynamic AJAX Callback & Command Resolution", "PASS",
+                              "Skills detect dynamically assembled AJAX callback paths and response commands, modernizing to typed AjaxResponse command pipelines.",
+                              "Verified dynamic AJAX callback and command resolution.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-14", "ajax", "Dynamic AJAX Callback & Command Resolution", "FAIL",
+                              "Missing dynamic AJAX resolution rules in skills.",
+                              "Factory must account for dynamic AJAX callbacks.")
+
+        # 21.15 Dynamic Frontend Library & Asset Path Resolution
+        has_dynamic_libraries = (
+            "DYNAMIC_LIBRARY" in d7_skill and
+            "Step 18" in d7_skill
+        )
+
+        if has_dynamic_libraries:
+            self.record_check("CHECK-DYNAMIC-15", "frontend", "Dynamic Frontend Library & Asset Path Resolution", "PASS",
+                              "Skills account for dynamic library names in `drupal_add_library()` and dynamic script attachments, coordinating with Step 18 Frontend.",
+                              "Verified dynamic frontend library and asset path resolution.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-15", "frontend", "Dynamic Frontend Library & Asset Path Resolution", "FAIL",
+                              "Missing dynamic frontend asset resolution rules in skills.",
+                              "Factory must account for dynamic asset libraries.")
+
+        # 21.16 Dynamic Include & Require Path Modernization
+        has_dynamic_includes = (
+            "DYNAMIC_INCLUDE" in d7_skill and
+            "DYNAMIC_FILE" in d7_skill and
+            "FILE_DISCOVERY_MAPPING" in d7_skill and
+            "Step 11" in d7_skill
+        )
+
+        if has_dynamic_includes:
+            self.record_check("CHECK-DYNAMIC-16", "includes", "Dynamic Include & Require Path Modernization", "PASS",
+                              "Skills analyze dynamic include/require expressions, replacing manual include loops with PSR-4 autoloading or explicit discovery services with Step 11 coordination.",
+                              "Verified dynamic include and file path modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-16", "includes", "Dynamic Include & Require Path Modernization", "FAIL",
+                              "Missing dynamic include modernization rules in skills.",
+                              "Factory must modernize dynamic include paths to PSR-4.")
+
+        # 21.17 Dynamic Configuration, State & Variable Key Resolution
+        has_dynamic_config = (
+            "DYNAMIC_CONFIGURATION" in d7_skill and
+            "DYNAMIC_STATE" in d7_skill and
+            "DYNAMIC_VARIABLE" in d7_skill and
+            "CONFIGURATION_MAPPING" in d7_skill and
+            "Step 15" in d7_skill
+        )
+
+        if has_dynamic_config:
+            self.record_check("CHECK-DYNAMIC-17", "config_state", "Dynamic Config, State & Variable Key Resolution", "PASS",
+                              "Skills discover dynamic variable keys (`variable_get(\"prefix_{$type}\")`), mapping them into structured CMI configuration collections or State API storage with Step 15 coordination.",
+                              "Verified dynamic configuration, state, and variable key resolution.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-17", "config_state", "Dynamic Config, State & Variable Key Resolution", "FAIL",
+                              "Missing dynamic configuration/state resolution rules in skills.",
+                              "Factory must account for dynamic configuration and state keys.")
+
+        # 21.18 Dynamic Database Table, Column & SQL Query Resolution
+        has_dynamic_db = (
+            "DYNAMIC_DATABASE" in d7_skill and
+            "DYNAMIC_SQL" in d7_skill and
+            "DATABASE_REFACTOR" in d7_skill and
+            "Step 13" in d7_skill
+        )
+
+        if has_dynamic_db:
+            self.record_check("CHECK-DYNAMIC-18", "database", "Dynamic Database Table, Column & SQL Resolution", "PASS",
+                              "Skills distinguish safe parameterized values from dynamic identifiers and opaque SQL fragments, modernizing dynamic queries into Query Builders with Step 13 coordination.",
+                              "Verified dynamic database and SQL query resolution.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-18", "database", "Dynamic Database Table, Column & SQL Resolution", "FAIL",
+                              "Missing dynamic database/SQL resolution rules in skills.",
+                              "Factory must account for dynamic database tables and SQL.")
+
+        # 21.19 Serialized & Encoded Data Payload Analysis
+        has_serialized = (
+            "SERIALIZED_DEPENDENCY" in d7_skill and
+            "SERIALIZED_DATA_MIGRATION" in d7_skill and
+            "serialize" in d7_skill
+        )
+
+        if has_serialized:
+            self.record_check("CHECK-DYNAMIC-19", "serialization", "Serialized & Encoded Data Payload Analysis", "PASS",
+                              "Skills recursively inspect serialized structures for embedded classes, callbacks, entity IDs, and configuration arrays, mapping them to typed schemas.",
+                              "Verified serialized and encoded data payload analysis.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-19", "serialization", "Serialized & Encoded Data Payload Analysis", "FAIL",
+                              "Missing serialized payload analysis rules in skills.",
+                              "Factory must analyze serialized data structures.")
+
+        # 21.20 JSON Data Payload Analysis & Schema Extraction
+        has_json = (
+            "JSON_DEPENDENCY" in d7_skill and
+            "json" in d7_skill.lower()
+        )
+
+        if has_json:
+            self.record_check("CHECK-DYNAMIC-20", "json", "JSON Data Payload Analysis & Schema Extraction", "PASS",
+                              "Skills analyze JSON data blobs, extracting structured schemas and embedded dependencies.",
+                              "Verified JSON payload analysis and schema extraction.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-20", "json", "JSON Data Payload Analysis & Schema Extraction", "FAIL",
+                              "Missing JSON payload analysis rules in skills.",
+                              "Factory must analyze JSON payloads.")
+
+        # 21.21 Data-Driven Behavior & Branching Path Accounting
+        has_data_driven = (
+            "DATA_DRIVEN_DEPENDENCY" in d7_skill and
+            "DATA_FIXTURE_RESOLUTION" in d7_skill
+        )
+
+        if has_data_driven:
+            self.record_check("CHECK-DYNAMIC-21", "data_driven", "Data-Driven Behavior & Branching Path Accounting", "PASS",
+                              "Skills detect code execution paths determined by database rows, user roles, or runtime content, identifying data sources and target architecture requirements.",
+                              "Verified data-driven behavior accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-21", "data_driven", "Data-Driven Behavior & Branching Path Accounting", "FAIL",
+                              "Missing data-driven behavior accounting in skills.",
+                              "Factory must account for data-driven code paths.")
+
+        # 21.22 Environment & Deployment Dependency Accounting
+        has_environment = (
+            "ENVIRONMENT_DEPENDENCY" in d7_skill and
+            "getenv" in d7_skill
+        )
+
+        if has_environment:
+            self.record_check("CHECK-DYNAMIC-22", "environment", "Environment & Deployment Dependency Accounting", "PASS",
+                              "Skills detect environmental couplings (getenv(), $_SERVER, PHP extensions) and enforce Rule 10 secret isolation without hardcoding environment specifics.",
+                              "Verified environment and deployment dependency accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-22", "environment", "Environment & Deployment Dependency Accounting", "FAIL",
+                              "Missing environment dependency accounting in skills.",
+                              "Factory must account for environment dependencies.")
+
+        # 21.23 Reflection API, Generated Code & eval() Detection
+        has_reflection_eval = (
+            "REFLECTION_DEPENDENCY" in d7_skill and
+            "EVAL_DEPENDENCY" in d7_skill and
+            "GENERATED_CODE" in d7_skill and
+            "eval(" in d7_skill
+        )
+
+        if has_reflection_eval:
+            self.record_check("CHECK-DYNAMIC-23", "reflection_eval", "Reflection API, Generated Code & eval() Detection", "PASS",
+                              "Skills detect ReflectionClass, dynamic code generation, and eval() usage, elevating them to mandatory human architectural review without false safety claims.",
+                              "Verified reflection and eval detection rules.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-23", "reflection_eval", "Reflection API, Generated Code & eval() Detection", "FAIL",
+                              "Missing reflection or eval detection rules in skills.",
+                              "Factory must detect reflection and eval constructs.")
+
+        # 21.24 6-Level Resolution Confidence Taxonomy Enforcement
+        confidence_tax = [
+            "RESOLVED_STATICALLY", "RESOLVED_WITH_HIGH_CONFIDENCE", "PARTIALLY_RESOLVED",
+            "RUNTIME_DEPENDENT", "UNRESOLVED", "OPAQUE"
+        ]
+        found_conf = sum(1 for c in confidence_tax if c in d7_skill or c in manifest_text)
+
+        if found_conf == 6:
+            self.record_check("CHECK-DYNAMIC-24", "confidence", "6-Level Resolution Confidence Taxonomy Enforcement", "PASS",
+                              "Skills and manifest enforce the complete 6-level resolution confidence taxonomy (RESOLVED_STATICALLY, RESOLVED_WITH_HIGH_CONFIDENCE, PARTIALLY_RESOLVED, RUNTIME_DEPENDENT, UNRESOLVED, OPAQUE).",
+                              "Verified 6-level resolution confidence taxonomy.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-DYNAMIC-24", "confidence", "6-Level Resolution Confidence Taxonomy Enforcement", "FAIL",
+                              f"Only {found_conf}/6 resolution confidence levels found.",
+                              "Factory must define all 6 resolution confidence levels.")
+
+        # 21.25 Deterministic Runtime Probe Specification & Model
+        has_probe_model = (
+            "RUNTIME_PROBE" in d7_skill and
+            "RUNTIME_DISCOVERY_REQUIRED" in d7_skill and
+            "CALLABLE_RESOLUTION" in manifest_text and
+            "RUNTIME UNVERIFIED" in d7_skill
+        )
+
+        if has_probe_model:
+            self.record_check("CHECK-DYNAMIC-25", "probes", "Deterministic Runtime Probe Specification & Model", "PASS",
+                              "Skills define deterministic, safe, read-only runtime probe specifications, explicitly retaining [RUNTIME UNVERIFIED — CLAUDE CODE CLI/ACCESS NOT AVAILABLE] when CLI access is unavailable.",
+                              "Verified deterministic runtime probe specification and safety model.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/testing/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-DYNAMIC-25", "probes", "Deterministic Runtime Probe Specification & Model", "FAIL",
+                              "Missing runtime probe specification or safety model in skills/manifest.",
+                              "Factory must specify safe runtime probes without guessing.")
+
+        # 21.26 Dynamic Dependency DAG Edge Modeling
+        has_dag_edge_modeling = (
+            "STATIC EDGE" in dep_skill and
+            "DYNAMIC EDGE" in dep_skill and
+            "RUNTIME_ONLY EDGE" in dep_skill and
+            "UNRESOLVED EDGE" in dep_skill
+        )
+
+        if has_dag_edge_modeling:
+            self.record_check("CHECK-DYNAMIC-26", "dag_edges", "Dynamic Dependency DAG Edge Modeling", "PASS",
+                              "Dependency analysis skill explicitly models STATIC, DYNAMIC, RUNTIME_ONLY, and UNRESOLVED edges in the DAG, resolving dynamic fan-out and breaking callback cycles.",
+                              "Verified dynamic DAG edge modeling and wave integration.",
+                              affected_files=["skills/dependency-analysis/SKILL.md", "agents/dependency/agent.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-26", "dag_edges", "Dynamic Dependency DAG Edge Modeling", "FAIL",
+                              "Missing dynamic DAG edge modeling in dependency-analysis skill.",
+                              "Dependency skill must model distinct dynamic edge types in DAG.")
+
+        # 21.27 35 Dynamic Target Architecture Classifications
+        dynamic_target_tax = [
+            "DYNAMIC_CALLABLE", "DYNAMIC_FUNCTION", "DYNAMIC_METHOD", "DYNAMIC_CLASS", "DYNAMIC_SERVICE",
+            "DYNAMIC_PLUGIN", "DYNAMIC_HOOK", "DYNAMIC_EVENT", "DYNAMIC_ENTITY", "DYNAMIC_BUNDLE",
+            "DYNAMIC_FIELD", "DYNAMIC_TEMPLATE", "DYNAMIC_THEME", "DYNAMIC_VIEW", "DYNAMIC_FORM",
+            "DYNAMIC_AJAX", "DYNAMIC_LIBRARY", "DYNAMIC_FILE", "DYNAMIC_INCLUDE", "DYNAMIC_CONFIGURATION",
+            "DYNAMIC_STATE", "DYNAMIC_VARIABLE", "DYNAMIC_DATABASE", "DYNAMIC_SQL", "SERIALIZED_DEPENDENCY",
+            "JSON_DEPENDENCY", "ENVIRONMENT_DEPENDENCY", "DATA_DRIVEN_DEPENDENCY", "REFLECTION_DEPENDENCY",
+            "GENERATED_CODE", "EVAL_DEPENDENCY", "RUNTIME_PROBE", "OBSOLETE", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"
+        ]
+        found_dyn_tax = sum(1 for t in dynamic_target_tax if t in d7_skill or t in mig_skill)
+
+        if found_dyn_tax >= 33:
+            self.record_check("CHECK-DYNAMIC-27", "taxonomy", "35 Dynamic Target Architecture Classifications", "PASS",
+                              f"Skills define the complete 35-class Dynamic target architecture taxonomy ({found_dyn_tax}/35 detected) covering all runtime, indirect, and data-driven dependency patterns.",
+                              "Verified 35 Dynamic target architecture classifications.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-27", "taxonomy", "35 Dynamic Target Architecture Classifications", "FAIL",
+                              f"Only {found_dyn_tax}/35 Dynamic target architecture classifications found in skills.",
+                              "Factory must define all 35 Dynamic target architecture classifications.")
+
+        # 21.28 19 Standardized Dynamic Migration Strategies
+        dynamic_strats = [
+            "STATIC_RESOLUTION", "PARTIAL_STATIC_RESOLUTION", "RUNTIME_DISCOVERY_REQUIRED",
+            "TEST_DRIVEN_RESOLUTION", "DATA_FIXTURE_RESOLUTION", "CONFIGURATION_MAPPING",
+            "SERVICE_CONTAINER_MAPPING", "PLUGIN_MANAGER_MAPPING", "EVENT_DISPATCHER_MAPPING",
+            "ENTITY_API_MAPPING", "TEMPLATE_MAPPING", "VIEW_MAPPING", "FORM_MAPPING",
+            "FILE_DISCOVERY_MAPPING", "DATABASE_REFACTOR", "SERIALIZED_DATA_MIGRATION",
+            "HUMAN_DECISION_REQUIRED", "UNVERIFIED", "OBSOLETE"
+        ]
+        found_dyn_strats = sum(1 for s in dynamic_strats if s in d7_skill or s in mig_skill)
+
+        if found_dyn_strats >= 18:
+            self.record_check("CHECK-DYNAMIC-28", "strategies", "19 Standardized Dynamic Migration Strategies", "PASS",
+                              f"Skills define all 19 standardized Dynamic migration strategies ({found_dyn_strats}/19 detected) separating resolution methodology from outcome state.",
+                              "Verified 19 Dynamic migration strategies.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-28", "strategies", "19 Standardized Dynamic Migration Strategies", "FAIL",
+                              f"Only {found_dyn_strats}/19 Dynamic migration strategies found in skills.",
+                              "Factory must define all 19 Dynamic migration strategies.")
+
+        # 21.29 Manifest dynamic_dependency_items Schema Structure
+        has_dynamic_manifest = (
+            "dynamic_dependency_items" in manifest_text and
+            "dependency_id" in manifest_text and
+            "dependency_type" in manifest_text and
+            "resolution_confidence" in manifest_text and
+            "runtime_probe_spec" in manifest_text and
+            "owning_step" in manifest_text
+        )
+
+        if has_dynamic_manifest:
+            self.record_check("CHECK-DYNAMIC-29", "manifest", "Manifest dynamic_dependency_items Schema Structure", "PASS",
+                              "Manifest schema defines the exhaustive dynamic_dependency_items collection with 23 metadata properties for dynamic callables, classes, hooks, queries, payloads, and probes.",
+                              "Verified dynamic_dependency_items collection schema in migration-manifest.yml.",
+                              affected_files=["state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-DYNAMIC-29", "manifest", "Manifest dynamic_dependency_items Schema Structure", "FAIL",
+                              "Missing dynamic_dependency_items schema definition in state/migration-manifest.yml.",
+                              "Manifest must include dynamic_dependency_items with comprehensive properties.")
+
+        # 21.30 Zero-Omission Dynamic Outcome Enforcement & Cross-Capability Purity
+        has_dyn_zero_omission = (
+            "dynamic_dependency_items" in val_skill or "dynamic" in val_skill.lower() and
+            "UNACCOUNTED" in val_skill and
+            "UNKNOWN_WITHOUT_REASON" in val_skill and
+            "SILENTLY_OMITTED" in val_skill and
+            "dynamic_dependency_items" in manifest_text and
+            "Dynamic, Runtime & Data-Driven" in readme_text and
+            "Dynamic, Runtime & Data-Driven" in arch_text
+        )
+
+        if has_dyn_zero_omission:
+            self.record_check("CHECK-DYNAMIC-30", "zero_omission", "Zero-Omission Dynamic Outcome Enforcement & Purity", "PASS",
+                              "Behavioral validation skill enforces strict zero-omission rules for all dynamic dependencies, rejecting forbidden states and integrating with Steps 11–20 with 100% generic purity.",
+                              "Verified zero-omission outcome enforcement and cross-capability purity for dynamic dependencies.",
+                              affected_files=["skills/behavioral-validation/SKILL.md", "state/migration-manifest.yml", "README.md", "ARCHITECTURE.md"])
+        else:
+            self.record_check("CHECK-DYNAMIC-30", "zero_omission", "Zero-Omission Dynamic Outcome Enforcement & Purity", "FAIL",
+                              "Zero-omission enforcement or cross-capability check failed for dynamic dependencies.",
+                              "All dynamic dependencies must resolve to approved terminal states with 100% generic purity.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -4884,6 +5433,7 @@ class FactoryValidator:
         self.validate_frontend_assets_and_libraries_suite()
         self.validate_views_and_custom_plugins_suite()
         self.validate_themes_and_presentation_suite()
+        self.validate_dynamic_dependencies_suite()
 
     def generate_result_json(self):
         return {

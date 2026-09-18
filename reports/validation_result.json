@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260918222940",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260918224226",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T22:29:40.923637+00:00",
+  "executed_at": "2026-09-18T22:42:26.631109+00:00",
   "summary": {
-    "checks_total": 297,
-    "passed": 296,
+    "checks_total": 327,
+    "passed": 326,
     "failed": 0,
     "warnings": 0,
     "unverified": 1
@@ -3767,6 +3767,398 @@
         "README.md",
         "ARCHITECTURE.md",
         "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-01",
+      "category": "discovery",
+      "name": "Recursive Dynamic Dependency Discovery",
+      "status": "PASS",
+      "evidence": "Skills and Discovery agent implement recursive detection of dynamic behavior (variable functions, callable arrays, dynamic instantiation, dynamic SQL, reflection, eval).",
+      "details": "Verified recursive dynamic dependency discovery rules.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "agents/discovery/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-02",
+      "category": "callables",
+      "name": "Dynamic Callables, Variable Functions & Callbacks Analysis",
+      "status": "PASS",
+      "evidence": "Skills analyze dynamic callables and variable functions, extracting producers, execution contexts, candidate sets, and modernizing to Plugin Managers or tagged services.",
+      "details": "Verified dynamic callable analysis and modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-03",
+      "category": "classes",
+      "name": "Dynamic Class Instantiation & Resolution",
+      "status": "PASS",
+      "evidence": "Skills detect variable class instantiation (`new $class`), tracing class registries and container lookups with Step 12 cross-referencing.",
+      "details": "Verified dynamic class instantiation detection and resolution.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-04",
+      "category": "services",
+      "name": "Dynamic Service Container Lookups & Factory Mapping",
+      "status": "PASS",
+      "evidence": "Skills analyze dynamic service names and container lookups, mapping them to factory services or service locator abstractions.",
+      "details": "Verified dynamic service lookup analysis.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-05",
+      "category": "plugins",
+      "name": "Dynamic Plugin ID Discovery & Plugin Manager Resolution",
+      "status": "PASS",
+      "evidence": "Skills discover dynamic plugin lookups and provide concrete modernization to typed Drupal 10/11 DefaultPluginManager implementations.",
+      "details": "Verified dynamic plugin discovery and Plugin Manager resolution.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-06",
+      "category": "hooks",
+      "name": "Dynamic Hook Names & module_invoke Resolution",
+      "status": "PASS",
+      "evidence": "Skills detect dynamic hook construction and module_invoke/module_invoke_all invocations, enumerating consumers and marking open-ended dispatches as UNRESOLVED.",
+      "details": "Verified dynamic hook discovery and resolution.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/custom-module-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-07",
+      "category": "events",
+      "name": "Dynamic Event Construction & EventDispatcher Modernization",
+      "status": "PASS",
+      "evidence": "Skills modernize dynamic hook invocations into Symfony EventDispatcher dispatches with custom Event objects and EventSubscriber listeners.",
+      "details": "Verified dynamic event construction and EventDispatcher modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-08",
+      "category": "entities",
+      "name": "Dynamic Entity Type & Bundle Resolution",
+      "status": "PASS",
+      "evidence": "Skills identify dynamically loaded entity types and bundles, modernizing to typed EntityTypeManager calls while cross-referencing Step 16 entity models.",
+      "details": "Verified dynamic entity type and bundle resolution.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-09",
+      "category": "fields",
+      "name": "Dynamic Field Name & Property Resolution",
+      "status": "PASS",
+      "evidence": "Skills detect dynamic field name lookups and property accesses, assigning explicit confidence and target Entity API storage patterns.",
+      "details": "Verified dynamic field name and property resolution.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-10",
+      "category": "templates",
+      "name": "Dynamic Template Name & Suggestion Resolution",
+      "status": "PASS",
+      "evidence": "Skills trace dynamic template names and runtime-appended theme suggestions, delegating presentation ownership cleanly to Step 20.",
+      "details": "Verified dynamic template and suggestion resolution.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-11",
+      "category": "themes",
+      "name": "Dynamic Theme Selection & Override Resolution",
+      "status": "PASS",
+      "evidence": "Skills account for dynamic theme switches, theme callbacks in menu routers, and runtime presentation overrides.",
+      "details": "Verified dynamic theme selection and override resolution.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-12",
+      "category": "views",
+      "name": "Dynamic Views ID, Display & Embed Resolution",
+      "status": "PASS",
+      "evidence": "Skills trace dynamic Views dispatches (`views_get_view($id)`, dynamic displays), coordinating ownership with Step 19 Views.",
+      "details": "Verified dynamic Views resolution.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-13",
+      "category": "forms",
+      "name": "Dynamic Form ID & Form Builder Resolution",
+      "status": "PASS",
+      "evidence": "Skills detect dynamic form IDs in `drupal_get_form($dynamic_id)` and map to parameterized FormBase classes with Step 17 coordination.",
+      "details": "Verified dynamic form ID and builder resolution.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-14",
+      "category": "ajax",
+      "name": "Dynamic AJAX Callback & Command Resolution",
+      "status": "PASS",
+      "evidence": "Skills detect dynamically assembled AJAX callback paths and response commands, modernizing to typed AjaxResponse command pipelines.",
+      "details": "Verified dynamic AJAX callback and command resolution.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-15",
+      "category": "frontend",
+      "name": "Dynamic Frontend Library & Asset Path Resolution",
+      "status": "PASS",
+      "evidence": "Skills account for dynamic library names in `drupal_add_library()` and dynamic script attachments, coordinating with Step 18 Frontend.",
+      "details": "Verified dynamic frontend library and asset path resolution.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-16",
+      "category": "includes",
+      "name": "Dynamic Include & Require Path Modernization",
+      "status": "PASS",
+      "evidence": "Skills analyze dynamic include/require expressions, replacing manual include loops with PSR-4 autoloading or explicit discovery services with Step 11 coordination.",
+      "details": "Verified dynamic include and file path modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-17",
+      "category": "config_state",
+      "name": "Dynamic Config, State & Variable Key Resolution",
+      "status": "PASS",
+      "evidence": "Skills discover dynamic variable keys (`variable_get(\"prefix_{$type}\")`), mapping them into structured CMI configuration collections or State API storage with Step 15 coordination.",
+      "details": "Verified dynamic configuration, state, and variable key resolution.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-18",
+      "category": "database",
+      "name": "Dynamic Database Table, Column & SQL Resolution",
+      "status": "PASS",
+      "evidence": "Skills distinguish safe parameterized values from dynamic identifiers and opaque SQL fragments, modernizing dynamic queries into Query Builders with Step 13 coordination.",
+      "details": "Verified dynamic database and SQL query resolution.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-19",
+      "category": "serialization",
+      "name": "Serialized & Encoded Data Payload Analysis",
+      "status": "PASS",
+      "evidence": "Skills recursively inspect serialized structures for embedded classes, callbacks, entity IDs, and configuration arrays, mapping them to typed schemas.",
+      "details": "Verified serialized and encoded data payload analysis.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-20",
+      "category": "json",
+      "name": "JSON Data Payload Analysis & Schema Extraction",
+      "status": "PASS",
+      "evidence": "Skills analyze JSON data blobs, extracting structured schemas and embedded dependencies.",
+      "details": "Verified JSON payload analysis and schema extraction.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-21",
+      "category": "data_driven",
+      "name": "Data-Driven Behavior & Branching Path Accounting",
+      "status": "PASS",
+      "evidence": "Skills detect code execution paths determined by database rows, user roles, or runtime content, identifying data sources and target architecture requirements.",
+      "details": "Verified data-driven behavior accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-22",
+      "category": "environment",
+      "name": "Environment & Deployment Dependency Accounting",
+      "status": "PASS",
+      "evidence": "Skills detect environmental couplings (getenv(), $_SERVER, PHP extensions) and enforce Rule 10 secret isolation without hardcoding environment specifics.",
+      "details": "Verified environment and deployment dependency accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-23",
+      "category": "reflection_eval",
+      "name": "Reflection API, Generated Code & eval() Detection",
+      "status": "PASS",
+      "evidence": "Skills detect ReflectionClass, dynamic code generation, and eval() usage, elevating them to mandatory human architectural review without false safety claims.",
+      "details": "Verified reflection and eval detection rules.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-24",
+      "category": "confidence",
+      "name": "6-Level Resolution Confidence Taxonomy Enforcement",
+      "status": "PASS",
+      "evidence": "Skills and manifest enforce the complete 6-level resolution confidence taxonomy (RESOLVED_STATICALLY, RESOLVED_WITH_HIGH_CONFIDENCE, PARTIALLY_RESOLVED, RUNTIME_DEPENDENT, UNRESOLVED, OPAQUE).",
+      "details": "Verified 6-level resolution confidence taxonomy.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-25",
+      "category": "probes",
+      "name": "Deterministic Runtime Probe Specification & Model",
+      "status": "PASS",
+      "evidence": "Skills define deterministic, safe, read-only runtime probe specifications, explicitly retaining [RUNTIME UNVERIFIED \u2014 CLAUDE CODE CLI/ACCESS NOT AVAILABLE] when CLI access is unavailable.",
+      "details": "Verified deterministic runtime probe specification and safety model.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/testing/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-26",
+      "category": "dag_edges",
+      "name": "Dynamic Dependency DAG Edge Modeling",
+      "status": "PASS",
+      "evidence": "Dependency analysis skill explicitly models STATIC, DYNAMIC, RUNTIME_ONLY, and UNRESOLVED edges in the DAG, resolving dynamic fan-out and breaking callback cycles.",
+      "details": "Verified dynamic DAG edge modeling and wave integration.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md",
+        "agents/dependency/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-27",
+      "category": "taxonomy",
+      "name": "35 Dynamic Target Architecture Classifications",
+      "status": "PASS",
+      "evidence": "Skills define the complete 35-class Dynamic target architecture taxonomy (35/35 detected) covering all runtime, indirect, and data-driven dependency patterns.",
+      "details": "Verified 35 Dynamic target architecture classifications.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-28",
+      "category": "strategies",
+      "name": "19 Standardized Dynamic Migration Strategies",
+      "status": "PASS",
+      "evidence": "Skills define all 19 standardized Dynamic migration strategies (19/19 detected) separating resolution methodology from outcome state.",
+      "details": "Verified 19 Dynamic migration strategies.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-29",
+      "category": "manifest",
+      "name": "Manifest dynamic_dependency_items Schema Structure",
+      "status": "PASS",
+      "evidence": "Manifest schema defines the exhaustive dynamic_dependency_items collection with 23 metadata properties for dynamic callables, classes, hooks, queries, payloads, and probes.",
+      "details": "Verified dynamic_dependency_items collection schema in migration-manifest.yml.",
+      "affected_files": [
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-DYNAMIC-30",
+      "category": "zero_omission",
+      "name": "Zero-Omission Dynamic Outcome Enforcement & Purity",
+      "status": "PASS",
+      "evidence": "Behavioral validation skill enforces strict zero-omission rules for all dynamic dependencies, rejecting forbidden states and integrating with Steps 11\u201320 with 100% generic purity.",
+      "details": "Verified zero-omission outcome enforcement and cross-capability purity for dynamic dependencies.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "state/migration-manifest.yml",
+        "README.md",
+        "ARCHITECTURE.md"
       ],
       "remediation": ""
     }

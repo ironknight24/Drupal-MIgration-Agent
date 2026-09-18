@@ -579,10 +579,96 @@ Audit presentation security, accessibility compliance, and cache dependencies:
 - **Approved Terminal Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
 - **Forbidden Terminal States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`.
 
+### 71. Exhaustive Dynamic Dependency Discovery & Source Pattern Detection (Step 21)
+Recursively scan all Drupal 7 source files (`*.module`, `*.inc`, `*.php`, `*.install`, `*.profile`, `*.drush.inc`, `*.info`, templates, themes) to detect dynamic behavior and indirect dependencies:
+- **Dynamic Invocations & Callables**:
+  - Variable function calls: `$func()`, `$callback($arg1, $arg2)`.
+  - Callable arrays: `call_user_func($callable, ...)`, `call_user_func_array($callable, $args)`.
+  - Static invocations: `forward_static_call($callback, ...)`, `$class::$method()`.
+  - Dynamic object methods: `$object->$method()`, `$object->{$property}()`.
+- **Dynamic Instantiation & Class/Service Discovery**:
+  - Variable class instantiation: `new $class_name()`, `new $class($args)`.
+  - Dynamic service lookups and plugin manager lookups.
+- **Dynamic Inclusions & Paths**:
+  - Dynamic include/require: `include $path`, `require_once DRUPAL_ROOT . '/' . $dynamic_path`.
+  - Concatenated or computed include targets: `module_load_include($type, $module, $dynamic_name)`.
+- **Dynamic State, Config & Database Queries**:
+  - Dynamic variable keys: `variable_get("my_module_{$type}_setting", $default)`.
+  - Dynamic SQL and identifiers: `db_query("SELECT * FROM {" . $dynamic_table . "} WHERE " . $where_clause)`.
+- **Opaque & Encoded Payloads**:
+  - Serialized data structures (`serialize()`, `unserialize()`), JSON decoding (`drupal_json_decode()`), base64 decoding.
+  - Reflection APIs (`new ReflectionClass($name)`, `ReflectionMethod`), generated code, and `eval()` constructs.
+
+### 72. Dynamic Callables, Callbacks & Variable Functions Analysis
+Analyze every dynamic callable discovered in the codebase:
+- **Attributes Captured**: Source location, callable expression, producer of the callable string/array, execution context, caller hierarchy, and possible target candidate set.
+- **Static Resolution Gating**:
+  - *Statically Bounded*: If the callable variable is derived from a closed enum, switch statement, or explicit mapping array, resolve statically with high confidence.
+  - *Unresolvable Statically*: If the callable string originates from database content, request parameters, or unconstrained user input, mark as `RUNTIME_DEPENDENT` or `UNVERIFIED`.
+- **Modern Target Modernization**:
+  - Re-engineer variable functions into modern Drupal 10/11 Plugin Types (`PluginManagerInterface`), tagged Symfony services (`@my_module.handler`), or Event Subscribers (`EventSubscriberInterface`).
+
+### 73. Dynamic Class, Service & Plugin Resolution
+Trace and account for all runtime class lookups and instantiations:
+- **Dynamic Instantiation Patterns**: Detect `new $class_name()`, class registries, CTools plugin discovery arrays, and factory callbacks.
+- **Cross-Capability Ownership**: Step 21 owns the *dynamic resolution dependency* and *uncertainty classification*; Step 12 retains ownership of class and OOP definitions.
+- **Modern Target Architecture**: Map dynamic class instantiation to the Drupal 10/11 Plugin API (`DefaultPluginManager`, Annotated Class Discovery) or Symfony Service Container factories (`factory: ['@factory_service', 'create']`).
+
+### 74. Dynamic Hook & Event Resolution
+Discover and account for dynamically generated hook names and dispatches:
+- **Dynamic Invocations Detected**: `module_invoke($dynamic_module, $hook)`, `module_invoke_all($dynamic_hook, ...)`, `drupal_alter("{$dynamic_prefix}_alter", ...)`.
+- **Consumer Analysis**: Enumerate all statically discoverable implementations matching pattern `{module}_{dynamic_hook}`. Record any open-ended dispatch patterns as `UNRESOLVED` with probe specifications.
+- **Modern Target Architecture**: Map dynamic hooks to Symfony Event Dispatcher dispatches with typed `Event` objects or custom Plugin managers.
+
+### 75. Dynamic Entity, Field & Bundle Resolution
+Identify code paths where entity types, bundles, IDs, or field names are computed dynamically at runtime:
+- **Dynamic Sources**: Configuration variables, database columns, request parameters (`$_GET`, `arg(2)`), URL route arguments, or serialized settings.
+- **Cross-Capability Ownership**: Step 21 owns the *dynamic dependency edge*; Step 16 retains ownership of entity schemas, field storage, and bundle definitions.
+- **Modern Target Architecture**: Modernize to typed `EntityTypeManagerInterface::getStorage($dynamic_type)` with explicit entity type validation constraints and parameter upcasting (`ParamConverterInterface`).
+
+### 76. Dynamic Template, View, Form & Frontend Resolution
+Trace dynamic references across presentation, Views, forms, and frontend layers:
+- **Dynamic Templates & Suggestions**: `theme($dynamic_hook, $variables)`, dynamically appended `$variables['theme_hook_suggestions'][]` (Step 20 Handoff).
+- **Dynamic Views & Displays**: `views_get_view($dynamic_view_id)`, dynamic display IDs (Step 19 Handoff).
+- **Dynamic Forms & AJAX**: `drupal_get_form($dynamic_form_id)`, dynamically generated AJAX callback functions (Step 17 Handoff).
+- **Dynamic Frontend Assets**: Dynamically constructed JS setting namespaces, dynamic library names in `drupal_add_library()` (Step 18 Handoff).
+- **Uncertainty Classification**: Every dynamic presentation or UI edge is explicitly cataloged with confidence scoring and fallback behavior.
+
+### 77. Dynamic Include, File, Config, State & Database/SQL Resolution
+Discover and account for runtime file paths, variable keys, and query fragments:
+- **Dynamic Includes**: `module_load_include($type, $module, $dynamic_name)` $\rightarrow$ modernized to PSR-4 autoloading or explicit file discovery services (Step 11 Handoff).
+- **Dynamic Configuration & State Keys**: `variable_get("my_module_{$bundle}_enabled")` $\rightarrow$ classified into typed CMI configuration collections or State API key/value storage (Step 15 Handoff).
+- **Dynamic Database & SQL**: Dynamic table names, concatenated WHERE clauses $\rightarrow$ modernized to `\Drupal::database()->select()` with dynamic conditions (`ConditionInterface`) or entity queries (Step 13 Handoff).
+
+### 78. Serialized, JSON, Data-Driven, Environment & Reflection/Eval Analysis
+Exhaustively analyze opaque payloads, environment couplings, and runtime execution constructs:
+- **Serialized & JSON Payloads**: Recursively inspect serialized strings and JSON blobs for embedded class names, callback references, entity IDs, or configuration arrays. Flag unparseable payloads as `HUMAN_DECISION_REQUIRED`.
+- **Data-Driven & Environment Couplings**: Detect code behavior branching on database rows, user roles, environment variables (`getenv()`, `$_ENV`, `$_SERVER`), or deployment settings.
+- **Reflection & `eval()`**: Detect PHP `ReflectionClass`, `ReflectionMethod`, `eval()`, `create_function()`, and dynamic code generators. Flag all instances as elevated risk requiring architectural decisions.
+
+### 79. Runtime Resolution Model, Confidence Taxonomy & Probes
+Apply an explicit, deterministic resolution model to every discovered dynamic dependency:
+- **6 Resolution Confidence Levels**:
+  1. `RESOLVED_STATICALLY`: Statically proven constant/literal value with 100% certainty.
+  2. `RESOLVED_WITH_HIGH_CONFIDENCE`: Deterministically bounded candidate set (e.g., closed switch/enum).
+  3. `PARTIALLY_RESOLVED`: Statically bounded candidate set requiring runtime confirmation.
+  4. `RUNTIME_DEPENDENT`: Requires runtime inspection (CMI/State/DB probe) to resolve actual value.
+  5. `UNRESOLVED`: Open-ended dynamic expression without static bounds.
+  6. `OPAQUE`: Encrypted, binary, or unparseable reflection/`eval()` construct.
+- **Deterministic Runtime Probe Model**:
+  - For items requiring runtime confirmation, specify safe, non-destructive, read-only probe specifications (`CALLABLE_RESOLUTION`, `PLUGIN_RESOLUTION`, `SERVICE_RESOLUTION`, `TEMPLATE_RESOLUTION`, `FORM_RESOLUTION`, `VIEW_RESOLUTION`, `CONFIG_DISCOVERY`, `FILE_DISCOVERY`, `ENTITY_RESOLUTION`, `DATABASE_RESOLUTION`).
+  - When runtime CLI/environment is unavailable, mark verification status as `[RUNTIME UNVERIFIED — CLAUDE CODE CLI/ACCESS NOT AVAILABLE]` without guessing.
+
+### 80. 35 Dynamic Target Architecture Taxonomy & 19 Migration Strategies
+- **35 Dynamic Target Architecture Classifications**: `DYNAMIC_CALLABLE`, `DYNAMIC_FUNCTION`, `DYNAMIC_METHOD`, `DYNAMIC_CLASS`, `DYNAMIC_SERVICE`, `DYNAMIC_PLUGIN`, `DYNAMIC_HOOK`, `DYNAMIC_EVENT`, `DYNAMIC_ENTITY`, `DYNAMIC_BUNDLE`, `DYNAMIC_FIELD`, `DYNAMIC_TEMPLATE`, `DYNAMIC_THEME`, `DYNAMIC_VIEW`, `DYNAMIC_FORM`, `DYNAMIC_AJAX`, `DYNAMIC_LIBRARY`, `DYNAMIC_FILE`, `DYNAMIC_INCLUDE`, `DYNAMIC_CONFIGURATION`, `DYNAMIC_STATE`, `DYNAMIC_VARIABLE`, `DYNAMIC_DATABASE`, `DYNAMIC_SQL`, `SERIALIZED_DEPENDENCY`, `JSON_DEPENDENCY`, `ENVIRONMENT_DEPENDENCY`, `DATA_DRIVEN_DEPENDENCY`, `REFLECTION_DEPENDENCY`, `GENERATED_CODE`, `EVAL_DEPENDENCY`, `RUNTIME_PROBE`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **19 Standardized Dynamic Migration Strategies**: `STATIC_RESOLUTION`, `PARTIAL_STATIC_RESOLUTION`, `RUNTIME_DISCOVERY_REQUIRED`, `TEST_DRIVEN_RESOLUTION`, `DATA_FIXTURE_RESOLUTION`, `CONFIGURATION_MAPPING`, `SERVICE_CONTAINER_MAPPING`, `PLUGIN_MANAGER_MAPPING`, `EVENT_DISPATCHER_MAPPING`, `ENTITY_API_MAPPING`, `TEMPLATE_MAPPING`, `VIEW_MAPPING`, `FORM_MAPPING`, `FILE_DISCOVERY_MAPPING`, `DATABASE_REFACTOR`, `SERIALIZED_DATA_MIGRATION`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`, `OBSOLETE`.
+- **Approved Terminal Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Forbidden Terminal States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`.
+
 ---
 
 ## Output Reporting Standard
 All discovery outputs must:
-1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, JavaScript behavior names, library identifiers, view IDs, display IDs, plugin IDs, theme names, template names, and line numbers (`[OBSERVED FACT]`).
-2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, and `theme_items` in `state/migration-manifest.yml`.
-3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback / dynamic JS setting / dynamic View ID / dynamic template suggestion as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.
+1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, JavaScript behavior names, library identifiers, view IDs, display IDs, plugin IDs, theme names, template names, dynamic expressions, probe targets, and line numbers (`[OBSERVED FACT]`).
+2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, and `dynamic_dependency_items` in `state/migration-manifest.yml`.
+3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback / dynamic JS setting / dynamic View ID / dynamic template suggestion / dynamic callable as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.

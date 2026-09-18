@@ -142,7 +142,16 @@ evidence_summary:
 
 ---
 
-## 14. Contributed Modules Inventory
+## 14. Dynamic, Runtime & Data-Driven Dependencies Inventory (Step 21)
+
+| Module | Dependency ID | Source Location | Dynamic Expression | Dependency Type (35 Types) | Resolution Confidence (6 Levels) | Runtime Probe Target | Target Architecture (35 Types) | Migration Strategy (19 Strategies) | Status |
+|---|---|---|---|---|---|---|---|---|---|
+| `example_module` | `DYN-001` | `example.module:142` | `call_user_func($handler_func, $context)` | `DYNAMIC_CALLABLE` | `RESOLVED_WITH_HIGH_CONFIDENCE` | `example_module.handler` | `PLUGIN_MANAGER` | `PLUGIN_MANAGER_MAPPING` | `MIGRATED` |
+| `example_module` | `DYN-002` | `example.module:89` | `new $class_name($config)` | `DYNAMIC_CLASS` | `PARTIALLY_RESOLVED` | `example_module.service_factory` | `SERVICE_CONTAINER` | `SERVICE_CONTAINER_MAPPING` | `MIGRATED` |
+
+---
+
+## 15. Contributed Modules Inventory
 
 | Contrib Module | D7 Version | Core in D10? | D10 Available? | Community Replacement | Action Plan |
 |---|---|---|---|---|---|

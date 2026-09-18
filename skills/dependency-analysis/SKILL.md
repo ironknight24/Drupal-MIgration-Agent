@@ -1,7 +1,7 @@
 ---
 name: dependency-analysis
-description: Topological sorting, circular dependency detection, and execution wave planning across custom PHP files, classes, procedural hooks, database models, configuration variables, entities, forms, AJAX interactions, frontend JavaScript/CSS/libraries, Views/custom plugins, and theme presentation layers.
-version: 1.9.0
+description: Topological sorting, circular dependency detection, dynamic DAG edge modeling, and execution wave planning across custom PHP files, classes, procedural hooks, database models, configuration variables, entities, forms, AJAX interactions, frontend JavaScript/CSS/libraries, Views/custom plugins, theme presentation layers, and dynamic runtime dependencies.
+version: 1.10.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Dependency Analysis & Wave Scheduling Skill
 
 ## Overview
-This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, configuration, state, procedural hook execution ordering, module weights (`{system}.weight`), alter sequencing (`hook_module_implements_alter`), custom PHP class instantiations, entity reference graphs, revision/translation hierarchies, form builders, form alters, AJAX callbacks, legacy `.inc` function couplings, Views / custom plugin dependencies, and theme / presentation layer inheritance across legacy Drupal 7 components. It constructs a Directed Acyclic Graph (DAG), detects circular dependencies, and organizes components into executable topological waves.
+This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, configuration, state, procedural hook execution ordering, module weights (`{system}.weight`), alter sequencing (`hook_module_implements_alter`), custom PHP class instantiations, entity reference graphs, revision/translation hierarchies, form builders, form alters, AJAX callbacks, legacy `.inc` function couplings, Views / custom plugin dependencies, theme / presentation layer inheritance, and dynamic runtime dependencies across legacy Drupal 7 components. It constructs a Directed Acyclic Graph (DAG) with explicit edge types (STATIC vs DYNAMIC vs RUNTIME_ONLY vs UNRESOLVED), detects circular dependencies, resolves dynamic fan-out, and organizes components into executable topological waves.
 
 ---
 
@@ -20,9 +20,9 @@ This skill provides the procedural playbook and algorithms for discovering code,
 
 ---
 
-## 10-Dimensional Coupling Detection Heuristics
+## 11-Dimensional Coupling Detection Heuristics
 
-To establish an accurate DAG, inspect source assets across 10 distinct coupling vectors:
+To establish an accurate DAG, inspect source assets across 11 distinct coupling vectors:
 
 ### 1. Declared Dependencies
 - Parse `dependencies[]` declarations in source `.info` files (`[OBSERVED FACT]`).
@@ -107,6 +107,17 @@ To establish an accurate DAG, inspect source assets across 10 distinct coupling 
   - Entities $\rightarrow$ Custom Dependent Database Records $\rightarrow$ Serialized Payloads $\rightarrow$ Revisions & Comments
 - Circular database or entity dependencies must be detected, flagged, and mapped to two-pass migration pipelines (stubbing references in pass 1, populating relations in pass 2).
 
+### 11. Dynamic, Runtime & Data-Driven Dependency DAG Edge Modeling (Step 21)
+- Explicitly integrate dynamic dependencies into the DAG:
+  - **Edge Classification**:
+    - `STATIC EDGE`: Deterministic, compile-time/static coupling verified by code analysis.
+    - `DYNAMIC EDGE`: Statically bounded candidate set (e.g. switch/lookup table) linking producer to potential consumers.
+    - `RUNTIME_ONLY EDGE`: Runtime-dependent coupling (e.g. database-stored callable, State API flag) requiring probe resolution.
+    - `UNRESOLVED EDGE`: Open-ended dynamic dependency flagged for human architectural decision.
+  - **Dynamic Fan-Out & Cycle Breaking**:
+    - Where dynamic callables or plugins produce many possible consumer edges, create an intermediate abstraction node (Plugin Manager / Service Container / Event Dispatcher) to prevent artificial DAG cycles.
+    - Unresolved dynamic dependencies do NOT halt DAG creation; they are scheduled with `RUNTIME_DISCOVERY_REQUIRED` or `HUMAN_DECISION_REQUIRED` gates.
+
 ---
 
 ## Directed Acyclic Graph (DAG) Construction & Cycle Resolution
@@ -118,7 +129,7 @@ To establish an accurate DAG, inspect source assets across 10 distinct coupling 
 
 ### Circular Dependency Resolution Strategy
 When a cycle is detected ($A \to B \to A$):
-1. **Analyze Interface Coupling**: Determine if the cycle is caused by an implicit hook alter, utility function, circular class instantiation, or bi-directional entity references.
+1. **Analyze Interface Coupling**: Determine if the cycle is caused by an implicit hook alter, utility function, circular class instantiation, bi-directional entity references, or dynamic callback loops.
 2. **Refactor / Extract Shared Service or Two-Pass Migration**: Propose extracting the shared functionality into a standalone Wave 0 utility service or configuring a two-pass migration process plugin.
 3. **Escalate Blocker**: If the cycle cannot be decoupled without modifying source code, raise a `BLOCKED-DEP-CYCLIC-<MODULES>.md` ticket.
 
@@ -136,3 +147,4 @@ Components are scheduled into ordered execution waves:
 | **Wave 3** | **Data Pipelines & Content Migration** | Migration API configurations transferring base entities, revisions, and translations. | Target entities & fields exist in D10. |
 | **Wave 4** | **Complex Integrations & AJAX Endpoints** | Webhooks, third-party sync, bi-directional entity reference resolution, complex AJAX forms. | Core module services & entities operational. |
 | **Wave 5** | **Presentation Layer & Entity View Builders** | Themes, Twig templates, UI asset libraries, custom formatters/widgets. | Final entity render structures finalized. |
+| **Wave 6** | **Dynamic Runtime Probes & Re-engineering** | Modernized plugin managers, dynamic callable services, runtime probe verification. | Target components operational. |

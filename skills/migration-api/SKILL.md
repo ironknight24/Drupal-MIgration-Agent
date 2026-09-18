@@ -400,6 +400,71 @@ Every discovered theme artifact is categorized into one of 30 standard target ar
 
 ---
 
+## 35 Dynamic, Runtime & Data-Driven Target Architecture Classifications (Step 21)
+
+Every discovered dynamic dependency is categorized into one of 35 standard target architectures:
+1. **`DYNAMIC_CALLABLE`**: General variable callback or variable function invocation.
+2. **`DYNAMIC_FUNCTION`**: Variable procedural function call (`$func($arg)`).
+3. **`DYNAMIC_METHOD`**: Dynamic method call on object or class (`$object->$method()`).
+4. **`DYNAMIC_CLASS`**: Dynamic class resolution or variable instantiation (`new $class()`).
+5. **`DYNAMIC_SERVICE`**: Dynamic service container identifier or variable service call.
+6. **`DYNAMIC_PLUGIN`**: Dynamically determined plugin ID resolved via Plugin Manager.
+7. **`DYNAMIC_HOOK`**: Dynamically constructed hook name invoked via `module_invoke()`.
+8. **`DYNAMIC_EVENT`**: Runtime-constructed Symfony event name dispatched via EventDispatcher.
+9. **`DYNAMIC_ENTITY`**: Dynamic entity type identifier resolved via `EntityTypeManager`.
+10. **`DYNAMIC_BUNDLE`**: Runtime-determined bundle machine name.
+11. **`DYNAMIC_FIELD`**: Runtime-determined field machine name or field property.
+12. **`DYNAMIC_TEMPLATE`**: Dynamically resolved Twig template name or path.
+13. **`DYNAMIC_THEME`**: Runtime-selected active theme or theme override.
+14. **`DYNAMIC_VIEW`**: Runtime-selected View ID or embed call (`views_embed_view($dynamic_id)`).
+15. **`DYNAMIC_FORM`**: Dynamically generated form ID or builder callback.
+16. **`DYNAMIC_AJAX`**: Runtime-determined AJAX callback function or dynamic response command.
+17. **`DYNAMIC_LIBRARY`**: Dynamically attached asset library name (`#attached['library']`).
+18. **`DYNAMIC_FILE`**: Dynamically constructed file path for reading or writing.
+19. **`DYNAMIC_INCLUDE`**: Dynamically constructed require/include path.
+20. **`DYNAMIC_CONFIGURATION`**: Dynamically computed CMI configuration key or collection.
+21. **`DYNAMIC_STATE`**: Dynamically constructed State API key.
+22. **`DYNAMIC_VARIABLE`**: Legacy variable key computed dynamically at runtime.
+23. **`DYNAMIC_DATABASE`**: Dynamically selected database target or connection key.
+24. **`DYNAMIC_SQL`**: Dynamically assembled SQL string, table identifier, or query fragment.
+25. **`SERIALIZED_DEPENDENCY`**: Serialized data structure containing embedded class or handler references.
+26. **`JSON_DEPENDENCY`**: JSON payload containing embedded callbacks or configuration references.
+27. **`ENVIRONMENT_DEPENDENCY`**: Logic branching on environment variables (`getenv()`) or server settings.
+28. **`DATA_DRIVEN_DEPENDENCY`**: Logic determining code paths based on database rows or content values.
+29. **`REFLECTION_DEPENDENCY`**: ReflectionClass/ReflectionMethod usage for dynamic introspection.
+30. **`GENERATED_CODE`**: Dynamically evaluated or generated PHP code scripts.
+31. **`EVAL_DEPENDENCY`**: `eval()` or `create_function()` dynamic code execution.
+32. **`RUNTIME_PROBE`**: Explicit probe target requiring runtime CLI/environment verification.
+33. **`OBSOLETE`**: Obsolete dynamic behavior removed during modernization.
+34. **`HUMAN_DECISION_REQUIRED`**: Unresolvable dynamic pattern flagged for architect review.
+35. **`UNVERIFIED`**: Dynamic dependency awaiting runtime staging verification.
+
+---
+
+## 19 Standardized Dynamic Migration Strategies (Step 21)
+
+1. **`STATIC_RESOLUTION`**: Statically proven constant/literal value mapped directly to target artifact.
+2. **`PARTIAL_STATIC_RESOLUTION`**: Statically bounded candidate set mapped with explicit conditional branching.
+3. **`RUNTIME_DISCOVERY_REQUIRED`**: Dynamic dependency requiring controlled staging probe to discover values.
+4. **`TEST_DRIVEN_RESOLUTION`**: Behavior verified and locked via automated PHPUnit / Kernel test suite.
+5. **`DATA_FIXTURE_RESOLUTION`**: Resolution verified against representative legacy database fixtures.
+6. **`CONFIGURATION_MAPPING`**: Dynamic keys mapped to structured CMI schema collections.
+7. **`SERVICE_CONTAINER_MAPPING`**: Dynamic callables converted to tagged service collector pattern.
+8. **`PLUGIN_MANAGER_MAPPING`**: Dynamic functions/classes converted to typed Drupal 10/11 Plugin Manager.
+9. **`EVENT_DISPATCHER_MAPPING`**: Dynamic hooks converted to Symfony Event Dispatcher with custom Event objects.
+10. **`ENTITY_API_MAPPING`**: Dynamic entity/field lookups modernized via `EntityTypeManagerInterface`.
+11. **`TEMPLATE_MAPPING`**: Dynamic templates modernized to `hook_theme_suggestions_HOOK_alter()`.
+12. **`VIEW_MAPPING`**: Dynamic Views converted to standard `\Drupal\views\Views` API calls with valid IDs.
+13. **`FORM_MAPPING`**: Dynamic form IDs converted to parameterized `FormBase` classes.
+14. **`FILE_DISCOVERY_MAPPING`**: Dynamic file includes replaced with PSR-4 autoloading or discovery services.
+15. **`DATABASE_REFACTOR`**: Dynamic SQL queries refactored into parameterized Query Builders.
+16. **`SERIALIZED_DATA_MIGRATION`**: Serialized payloads unpacked and migrated to typed schema fields.
+17. **`HUMAN_DECISION_REQUIRED`**: Unconstrained dynamic behavior escalated for architect review.
+18. **`UNVERIFIED`**: Dynamic dependency retained in unverified state pending runtime environment.
+19. **`OBSOLETE`**: Deprecated dynamic behavior safely removed with documented rationale.
+
+---
+
 ## Data Integrity Verification & Checksums
 
 Before certifying a data migration pipeline as complete:

@@ -1,7 +1,7 @@
 ---
 name: custom-module-migration
-description: End-to-end modernization methodology for migrating Drupal 7 custom modules, procedural hooks, database schemas, configuration variables, entities, forms, AJAX interactions, frontend assets, Views/custom plugins, and theme presentation layers into PSR-4 Drupal 10/11 modules.
-version: 1.9.0
+description: End-to-end modernization methodology for migrating Drupal 7 custom modules, procedural hooks, database schemas, configuration variables, entities, forms, AJAX interactions, frontend assets, Views/custom plugins, theme presentation layers, and dynamic runtime dependencies into PSR-4 Drupal 10/11 modules.
+version: 1.10.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Custom Module Modernization Playbook Skill
 
 ## Overview
-This skill provides the operational engineering playbook for re-engineering Drupal 7 custom modules into modern, object-oriented Drupal 10 and Drupal 11 modules without altering source files. It enforces exhaustive discovery and re-engineering of legacy procedural hook implementations (core, contrib, custom, alter, entity, form, theme, install/update), `hook_menu()` decomposition, configuration and state variables (`variable_get/set/del`), custom entities, field definitions, revisions, translations, forms (`FormBase`, `ConfigFormBase`, `ConfirmFormBase`), Form API structures, AJAX commands, custom event dispatching, legacy custom PHP source files, OOP classes, constructors, interfaces, traits, `.inc` files, inclusion trees, Drush commands, frontend JavaScript/CSS/libraries, Views definitions (`views.view.*.yml`), custom Views plugins, `hook_views_data`, and theme presentation layers into modern PSR-4 architectures.
+This skill provides the operational engineering playbook for re-engineering Drupal 7 custom modules into modern, object-oriented Drupal 10 and Drupal 11 modules without altering source files. It enforces exhaustive discovery and re-engineering of legacy procedural hook implementations (core, contrib, custom, alter, entity, form, theme, install/update), `hook_menu()` decomposition, configuration and state variables (`variable_get/set/del`), custom entities, field definitions, revisions, translations, forms (`FormBase`, `ConfigFormBase`, `ConfirmFormBase`), Form API structures, AJAX commands, custom event dispatching, legacy custom PHP source files, OOP classes, constructors, interfaces, traits, `.inc` files, inclusion trees, Drush commands, frontend JavaScript/CSS/libraries, Views definitions (`views.view.*.yml`), custom Views plugins, `hook_views_data`, theme presentation layers, and dynamic runtime dependencies into modern PSR-4 architectures.
 
 ---
 
@@ -65,7 +65,7 @@ Determine target version from project configuration (`target.core_version`):
    - Audit all procedural database queries (`db_query()`, `db_select()`, `db_insert()`, `db_update()`, `db_delete()`, `db_merge()`, `db_transaction()`, `EntityFieldQuery`, `hook_views_query_alter()`) for dynamic SQL and parameter safety.
 
 5. **Step 5: Modern Architecture Design (Non-1:1 Mapping, Data Models, Entities, Forms, AJAX, CMI, Views & PSR-4)**
-   - Re-engineer functionality into modern Symfony/Drupal OOP architectures rather than 1:1 file renaming:
+   - Re-engineer functionality into modern Symfony/Drupal OOP architectures rather than 1:1 file renaming, fully supporting non-1:1 mappings (one-to-many transformations where a single legacy hook/table decomposes into multiple routes, services, or forms; and many-to-one transformations where multiple procedural hooks or tables consolidate into a unified service or entity repository):
      - D7 custom entity with tables $\rightarrow$ D10 Content Entity in `src/Entity/` (`@ContentEntityType`) with base field definitions, revision support, translation support, and access handler
      - D7 bundle / type configuration $\rightarrow$ D10 Config Entity (`@ConfigEntityType`) in `src/Entity/`
      - D7 fields $\rightarrow$ D10 Base Fields (`baseFieldDefinitions`) or Config Fields (`field.storage.*.yml`, `field.field.*.yml`)
@@ -87,41 +87,68 @@ Determine target version from project configuration (`target.core_version`):
      - D7 runtime state / flag / timestamp $\rightarrow$ D10 State API (`StateInterface` / `\Drupal::state()`)
      - D7 secrets / credentials / environment values $\rightarrow$ `settings.php` overrides / `getenv()` / Key module (Rule 10: zero secrets in CMI)
      - D7 custom hook invocation (`module_invoke_all`) $\rightarrow$ Symfony EventDispatcher event dispatching with custom `Event` class and `EventSubscriberInterface`
-     - D7 lifecycle / request hook (`hook_init`, `hook_exit`, `hook_boot`, `hook_node_*`) $\rightarrow$ Event Subscriber (`src/EventSubscriber/`) or Entity Hook / Post-save handler
-     - D7 block hooks (`hook_block_info`, `hook_block_view`) $\rightarrow$ Block Plugin (`src/Plugin/Block/`)
-     - D7 Drush command $\rightarrow$ modern Drush Command class in `src/Drush/Commands/`
-     - D7 access callback / `hook_permission` / `hook_node_access` $\rightarrow$ `permissions.yml` + Custom Access Check service in `src/Access/`
-     - D7 batch/queue callback $\rightarrow$ D10 Batch API / QueueWorker plugin in `src/Plugin/QueueWorker/`
-     - D7 value / domain object $\rightarrow$ PSR-4 typed class in `src/Model/` or `src/ValueObject/`
-     - D7 custom database table $\rightarrow$ Content Entity (`src/Entity/`), Config Entity, Config API (`config.factory`), State API (`\Drupal::state()`), KeyValue store, or dedicated Repository Service (`src/Repository/`).
-   - Support One-to-Many and Many-to-One transformations.
+## Module Migration Lifecycle: 12-Step Execution Methodology
 
-6. **Step 6: Target-Ready Design Review, Constructor DI & Entity/Form/Views Schema Verification**
-   - Enforce constructor Dependency Injection, typehints, strict return types, and interface contracts; eliminate static `\Drupal::*` calls.
-   - Refactor constructors to modern `public function __construct(...)` injecting only genuinely utilized dependencies (`entity_type.manager`, `config.factory`, `state`, `database`, `current_user`).
-   - Modernize database, entity, and Views plugin access into repository classes or storage handlers injecting `\Drupal\Core\Entity\EntityTypeManagerInterface`.
-   - Validate CMI schema definitions in `config/schema/*.schema.yml`, field storage YAMLs, and Views YAMLs against typed configuration standards.
+For every custom module assigned in an execution wave, execute the following 12-step playbook:
+
+1. **Step 1: Context Ingestion & Read-Only Source Introspection**
+   - Read module declaration and static inventory in `state/migration-manifest.yml`.
+   - Inspect all module files in `source.path` (`.module`, `.info`, `.install`, `.inc`, `.php`, `.drush.inc`, `templates/`, `js/`, `css/`).
+   - Parse all procedural functions, custom OOP classes, constructors, methods, hooks, database tables, variables, entities, fields, forms, AJAX callbacks, frontend scripts/styles, Views definitions, displays, custom Views plugins, and dynamic dependencies.
+
+2. **Step 2: Dependency & Wave Verification**
+   - Verify all upstream dependencies assigned in earlier waves are in state `COMPLETED` or `CODE_COMPLETE` in `state/migration-state.yml`.
+   - Re-verify cross-module services, shared database tables, and entity reference integrity.
+
+3. **Step 3: Procedural Hook & Custom Class Deconstruction**
+   - Deconstruct procedural hooks into modern architectural destinations:
+     - `hook_menu()` $\rightarrow$ `<module>.routing.yml`, `src/Controller/`, `src/Form/`, `<module>.links.menu.yml`, `<module>.permissions.yml`, `src/Access/`.
+     - Procedural forms $\rightarrow$ `src/Form/<FormName>.php` (`FormBase`, `ConfigFormBase`, `ConfirmFormBase`).
+     - Entity hooks $\rightarrow$ Modern entity hooks or Event Subscribers (`src/EventSubscriber/`).
+     - Custom hooks $\rightarrow$ Symfony Event classes (`src/Event/`) and Event Subscribers (`src/EventSubscriber/`).
+     - Procedural blocks $\rightarrow$ Modern Block Plugins (`src/Plugin/Block/`).
+     - Procedural Views hooks $\rightarrow$ `hook_views_data()` in `<module>.views.inc` and custom Views plugins under `src/Plugin/views/`.
+     - Drush commands $\rightarrow$ Drush 12/13 command classes under `src/Drush/Commands/`.
+   - Deconstruct custom PHP classes, interfaces, traits, and constructors:
+     - Move legacy classes to PSR-4 `src/` hierarchy.
+     - Extract legacy constructor dependencies into DI constructor parameters.
+     - Eliminate global variable references (`$user`, `$language`, `variable_get()`, `db_query()`).
+
+4. **Step 4: Configuration, State & Entity Architecture Alignment**
+   - Map `variable_get()` administrative settings to CMI schemas (`config/schema/<module>.schema.yml`) and install files (`config/install/<module>.settings.yml`).
+   - Map runtime flags/timestamps to State API (`\Drupal::state()`).
+   - Define custom Content Entities (`src/Entity/<Entity>.php`) and Config Entities (`src/Entity/<ConfigEntity>.php`) with complete field definitions and annotations/attributes.
+
+5. **Step 5: Frontend Assets, Forms & Views Architecture Alignment**
+   - Map Form API structures, validation/submit handlers, `#states`, and `#ajax` callbacks to `FormStateInterface` and `AjaxResponse` commands.
+   - Package JavaScript behaviors with `@drupal/once` and CSS stylesheets into `<module>.libraries.yml` per SMACSS standards.
+   - Map default Views to `config/install/views.view.<view_id>.yml` and custom Views plugins to `src/Plugin/views/`.
+
+6. **Step 6: Dynamic, Runtime & Data-Driven Dependency Alignment (Step 21)**
+   - Account for all dynamic callables, variable functions, dynamic class instantiations, dynamic hooks, dynamic entity/field types, and serialized payloads.
+   - Re-engineer dynamic function dispatches to Plugin Managers (`DefaultPluginManager`) or tagged service collections.
+   - Specify deterministic, safe runtime probes for runtime-dependent artifacts and mark unverified probes with explicit boundary markers.
 
 7. **Step 7: Migration Plan Formulation & Complete Accounting Matrix**
    - Generate `reports/custom-modules/PLAN-<MODULE>.md` using `templates/migration-plan.md`.
-   - Maintain an explicit File/Class/Hook/Database/Configuration/Entity/Form/Frontend/Views Accounting Table showing the exact target class, service, entity, field config, form class, AJAX handler, library definition, JavaScript behavior, View configuration, custom Views plugin, config object, state key, event subscriber, plugin, or routing artifact for every legacy item.
+   - Maintain an explicit File/Class/Hook/Database/Configuration/Entity/Form/Frontend/Views/Dynamic Accounting Table showing the exact target class, service, entity, field config, form class, AJAX handler, library definition, JavaScript behavior, View configuration, custom Views plugin, dynamic plugin manager, config object, state key, event subscriber, plugin, or routing artifact for every legacy item.
 
 8. **Step 8: Controlled Implementation & Modernization**
    - Scaffold module metadata (`.info.yml`, `.services.yml`, `.routing.yml`, `.permissions.yml`, `.links.menu.yml`, `.links.task.yml`, `drush.services.yml`, `.libraries.yml`, `.views.inc`).
    - Generate default configuration (`config/install/<module>.settings.yml`), schema (`config/schema/<module>.schema.yml`), field definitions (`config/install/field.storage.*`, `field.field.*`), and Views definitions (`config/install/views.view.*.yml`).
-   - Implement entity classes (`src/Entity/`), access handlers, storage handlers, services, controllers, form classes (`FormBase`, `ConfigFormBase`, `ConfirmFormBase`), AJAX handlers, JavaScript `once()` behaviors (`js/`), SMACSS stylesheets (`css/`), `.libraries.yml` definitions, custom Views plugins (`src/Plugin/views/`), event subscribers, plugins, repository classes, and Drush classes strictly inside `target.path/web/modules/custom/<MODULE>/`.
+   - Implement entity classes (`src/Entity/`), access handlers, storage handlers, services, controllers, form classes (`FormBase`, `ConfigFormBase`, `ConfirmFormBase`), AJAX handlers, JavaScript `once()` behaviors (`js/`), SMACSS stylesheets (`css/`), `.libraries.yml` definitions, custom Views plugins (`src/Plugin/views/`), dynamic plugin managers (`src/Plugin/`), event subscribers, plugins, repository classes, and Drush classes strictly inside `target.path/web/modules/custom/<MODULE>/`.
    - Delegate scoped complex service authoring, DI modernization, and database query modernization to `api-modernization` where required.
    - Log all file creations and modifications in `logs/file-change-log/`.
 
 9. **Step 9: Automated Testing**
-   - Author PHPUnit Unit and Kernel tests targeting modernized entities (CRUD, revisions, translations), field storage, services, controllers, form submissions (`submitForm()`), form validation (`validateForm()`), AJAX response commands, JavaScript/CSS library registrations, Views configuration schemas, custom Views plugin executions, query alterations, configuration schemas, state persistence, event subscribers, repositories, and entities using `skills/testing`.
+   - Author PHPUnit Unit and Kernel tests targeting modernized entities (CRUD, revisions, translations), field storage, services, controllers, form submissions (`submitForm()`), form validation (`validateForm()`), AJAX response commands, JavaScript/CSS library registrations, Views configuration schemas, custom Views plugin executions, query alterations, configuration schemas, state persistence, event subscribers, dynamic plugin managers, runtime probes, repositories, and entities using `skills/testing`.
 
 10. **Step 10: Behavioral Validation**
     - Execute comparative audit against D7 baseline specifications using `skills/behavioral-validation`.
-    - Verify that every discovered custom PHP file, class, method, function, procedural hook, custom database table, configuration/state variable, entity type, field, form builder, form alter, AJAX callback, JavaScript behavior, CSS asset, View definition, and custom Views plugin has an explicit modern equivalent or valid reason.
+    - Verify that every discovered custom PHP file, class, method, function, procedural hook, custom database table, configuration/state variable, entity type, field, form builder, form alter, AJAX callback, JavaScript behavior, CSS asset, View definition, custom Views plugin, and dynamic dependency has an explicit modern equivalent or valid reason.
 
 11. **Step 11: Gap Analysis & Outcome Accounting**
-    - Verify that every custom PHP file, class, function, procedural hook implementation, custom database table, configuration/state artifact, entity type, field, form, AJAX callback, frontend asset, View definition, and Views plugin ends in an approved outcome state:
+    - Verify that every custom PHP file, class, function, procedural hook implementation, custom database table, configuration/state artifact, entity type, field, form, AJAX callback, frontend asset, View definition, Views plugin, and dynamic dependency ends in an approved outcome state:
       `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, or `UNVERIFIED`.
     - Reject any `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, or `SILENTLY_OMITTED` items.
 

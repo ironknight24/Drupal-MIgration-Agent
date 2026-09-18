@@ -55,6 +55,7 @@ evidence_summary:
 | D7 Source File / Key / Schema / Entity / Form | Legacy Artifact / Hook / Table / Variable / Field / Form ID | Classification / Semantics | Target D10 Class / Storage Destination | Migration Strategy / Injected Services | Planned Outcome Status |
 |---|---|---|---|---|---|
 | `lib/ExampleProcessor.php` | `class ExampleProcessor` | `SERVICE_BUSINESS_LOGIC` | `src/Service/ExampleProcessor.php` | `@database`, `@config.factory` | `MIGRATED` |
+| `{{ COMPONENT }}.module:L142` | `call_user_func($handler_func)` | `DYNAMIC_CALLABLE` | `src/Plugin/HandlerManager.php` | `PLUGIN_MANAGER_MAPPING` | `MIGRATED` |
 | `{{ COMPONENT }}.module:hook_entity_info` | `entity: {{ COMPONENT }}_record` | `CONTENT_ENTITY` | `src/Entity/RecordEntity.php` | `ENTITY_TYPE_REBUILD` | `MIGRATED` |
 | `{{ COMPONENT }}.install:hook_schema` | `table: {{ COMPONENT }}_record_revision` | `REVISIONABLE_ENTITY` | `src/Entity/RecordEntity.php` (`revision_table`) | `REVISION_MIGRATION` | `MIGRATED` |
 | `{{ COMPONENT }}.module:hook_field_info` | `field: field_related_item` | `ENTITY_REFERENCE` | `core.base_field_override` / `field.storage` | `REFERENCE_REMAP` | `MIGRATED` |

@@ -487,6 +487,49 @@ target_system:
 #       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
 #       exclusion_reason: null
 #       notes: "Converted PHPTemplate print statements to Twig expressions and attached asset library"
+#   # Comprehensive Dynamic, Runtime & Data-Driven Dependencies Accounting (Step 21)
+#   dynamic_dependency_items:
+#     - dependency_id: "DYN-001"
+#       source_path: "my_module.module"
+#       source_location: "my_module.module:L142"
+#       expression: "call_user_func($handler_func, $context)"
+#       dependency_type: "DYNAMIC_CALLABLE" # 35-Type Dynamic Taxonomy:
+#       # DYNAMIC_CALLABLE | DYNAMIC_FUNCTION | DYNAMIC_METHOD | DYNAMIC_CLASS | DYNAMIC_SERVICE |
+#       # DYNAMIC_PLUGIN | DYNAMIC_HOOK | DYNAMIC_EVENT | DYNAMIC_ENTITY | DYNAMIC_BUNDLE |
+#       # DYNAMIC_FIELD | DYNAMIC_TEMPLATE | DYNAMIC_THEME | DYNAMIC_VIEW | DYNAMIC_FORM |
+#       # DYNAMIC_AJAX | DYNAMIC_LIBRARY | DYNAMIC_FILE | DYNAMIC_INCLUDE | DYNAMIC_CONFIGURATION |
+#       # DYNAMIC_STATE | DYNAMIC_VARIABLE | DYNAMIC_DATABASE | DYNAMIC_SQL | SERIALIZED_DEPENDENCY |
+#       # JSON_DEPENDENCY | ENVIRONMENT_DEPENDENCY | DATA_DRIVEN_DEPENDENCY | REFLECTION_DEPENDENCY |
+#       # GENERATED_CODE | EVAL_DEPENDENCY | RUNTIME_PROBE | OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       producer: "my_module_register_handler()"
+#       consumer: "my_module_process_item()"
+#       possible_values: ["my_module_default_handler", "my_module_custom_handler"]
+#       resolution_method: "STATIC_CODE_ANALYSIS" # STATIC_CODE_ANALYSIS | CONTROLLED_RUNTIME_PROBE | DATA_PAYLOAD_DECODE | HUMAN_REVIEW
+#       static_resolution: "Resolved to 2 statically bounded candidate callback functions in my_module.inc"
+#       runtime_resolution: "Runtime probe confirms handler configuration in Drupal state"
+#       resolution_confidence: "RESOLVED_WITH_HIGH_CONFIDENCE" # 6 Confidence Levels:
+#       # RESOLVED_STATICALLY | RESOLVED_WITH_HIGH_CONFIDENCE | PARTIALLY_RESOLVED |
+#       # RUNTIME_DEPENDENT | UNRESOLVED | OPAQUE
+#       evidence: "my_module.module:L142 variable function invocation with fallback to default handler"
+#       target_architecture: "PLUGIN_MANAGER" # 35 Target Architectures
+#       migration_strategy: "PLUGIN_MANAGER_MAPPING" # 19 Migration Strategies:
+#       # STATIC_RESOLUTION | PARTIAL_STATIC_RESOLUTION | RUNTIME_DISCOVERY_REQUIRED |
+#       # TEST_DRIVEN_RESOLUTION | DATA_FIXTURE_RESOLUTION | CONFIGURATION_MAPPING |
+#       # SERVICE_CONTAINER_MAPPING | PLUGIN_MANAGER_MAPPING | EVENT_DISPATCHER_MAPPING |
+#       # ENTITY_API_MAPPING | TEMPLATE_MAPPING | VIEW_MAPPING | FORM_MAPPING |
+#       # FILE_DISCOVERY_MAPPING | DATABASE_REFACTOR | SERIALIZED_DATA_MIGRATION |
+#       # HUMAN_DECISION_REQUIRED | UNVERIFIED | OBSOLETE
+#       runtime_probe_spec:
+#         probe_type: "CALLABLE_RESOLUTION" # CALLABLE_RESOLUTION | PLUGIN_RESOLUTION | SERVICE_RESOLUTION | TEMPLATE_RESOLUTION | FORM_RESOLUTION | VIEW_RESOLUTION | CONFIG_DISCOVERY | FILE_DISCOVERY | ENTITY_RESOLUTION | DATABASE_RESOLUTION
+#         probe_target: "my_module.handler"
+#         safety_guarantee: "READ_ONLY_DETERMINISTIC"
+#       runtime_required: true
+#       human_decision_required: false
+#       owning_step: "STEP_21_DYNAMIC_DEPENDENCIES"
+#       cross_references: ["STEP_12_PHP_OOP", "STEP_14_PROCEDURAL_HOOKS"]
+#       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       exclusion_reason: null
+#       notes: "Modernized dynamic function dispatch to Drupal 10/11 Plugin Manager pattern with @MyModuleHandler plugins"
 custom_modules: []
 
 # ------------------------------------------------------------------------------

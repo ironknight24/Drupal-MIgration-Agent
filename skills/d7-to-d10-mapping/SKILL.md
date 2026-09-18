@@ -1,7 +1,7 @@
 ---
 name: d7-to-d10-mapping
-description: Exhaustive pattern mapping rules for converting Drupal 7 procedural code, inc files, custom database schemas, procedural hooks, configuration variables, entities, forms, and frontend assets into modern Drupal 10/11 object-oriented architecture.
-version: 1.9.0
+description: Exhaustive pattern mapping rules for converting Drupal 7 procedural code, inc files, custom database schemas, procedural hooks, configuration variables, entities, forms, frontend assets, Views/plugins, theme layers, and dynamic runtime dependencies into modern Drupal 10/11 object-oriented architecture.
+version: 1.10.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep
@@ -298,3 +298,32 @@ In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual li
   - Procedural `theme_*()` functions generating markup are rewritten into dedicated `.html.twig` templates or custom render elements (`#type`).
 - **Theme Settings Modernization**:
   - `theme-settings.php` forms are migrated to modern CMI configuration schemas (`config/schema/<theme>.schema.yml`) and default settings (`config/install/<theme>.settings.yml`).
+
+## 13. Dynamic, Runtime & Data-Driven Pattern Modernization (Step 21)
+- **Variable Functions & Callables $\rightarrow$ Plugin Architecture / Tagged Services**:
+  - Legacy `$func = $type . '_handler'; $func($context);` is modernized to a typed Plugin Manager:
+    ```php
+    namespace Drupal\my_module\Plugin;
+
+    use Drupal\Core\Plugin\DefaultPluginManager;
+    use Drupal\Core\Cache\CacheBackendInterface;
+    use Drupal\Core\Extension\ModuleHandlerInterface;
+
+    class HandlerPluginManager extends DefaultPluginManager {
+      public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+        parent::__construct('Plugin/Handler', $namespaces, $module_handler, 'Drupal\my_module\Plugin\HandlerInterface', 'Drupal\my_module\Annotation\Handler');
+        $this->alterInfo('my_module_handler_info');
+        $this->setCacheBackend($cache_backend, 'my_module_handler_plugins');
+      }
+    }
+    ```
+- **Dynamic Instantiation $\rightarrow$ Service Factory / Service Container**:
+  - Legacy `new $class_name()` is modernized to Container injection or a dedicated factory service (`src/Service/HandlerFactory.php`).
+- **Dynamic Hooks $\rightarrow$ Event Dispatcher / Custom Plugin Alter**:
+  - Legacy `module_invoke_all($dynamic_event, ...)` is modernized to Symfony Event Dispatcher with typed Event classes (`src/Event/<EventName>Event.php`).
+- **Dynamic SQL & Variable Tables $\rightarrow$ Query Builder / Entity Queries**:
+  - Legacy `db_query("SELECT * FROM {" . $table . "} ...")` is modernized to `\Drupal::database()->select($table)` with parameterized conditions or `\Drupal::entityTypeManager()->getStorage($entity_type)->getQuery()`.
+- **Serialized Data Payloads $\rightarrow$ Typed Configuration / JSON Field Storage**:
+  - Legacy `serialize()` payloads stored in databases are normalized into structured columns or typed JSON schema fields.
+- **Dynamic Include Paths $\rightarrow$ PSR-4 Autoloading / Plugin Discovery**:
+  - Manual include loops (`module_load_include()`) are eliminated in favor of Composer PSR-4 class loading and Drupal plugin discovery mechanisms.
