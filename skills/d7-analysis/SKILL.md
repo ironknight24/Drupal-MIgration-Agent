@@ -373,10 +373,60 @@ Exhaustively analyze multilingual entity behavior:
 - **Approved Terminal Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
 - **Forbidden Terminal States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`.
 
+### 38. Exhaustive Form & Form Builder Discovery
+Discover all Drupal 7 forms, builders, and callbacks across `.module`, `.inc`, `.php`, `.install`, `.profile`, and `.drush.inc` files:
+- **Form Builder Functions**: Detect standard form builders (`function module_form($form, &$form_state)`), named form builders, and form constructor functions.
+- **Form Invocation APIs**: `drupal_get_form()`, `drupal_build_form()`, `drupal_form_submit()`, `drupal_execute()`, `drupal_rebuild_form()`, and programmatic form dispatches.
+- **Entry Points & Routing**: Menu callbacks (`hook_menu()` with `drupal_get_form`), controller callbacks, entity edit/create operations, admin settings pages, and AJAX callback endpoints.
+- **Dynamic & Programmatic Forms**: Detect dynamically constructed form IDs, variable builder callbacks, and render array form inclusions (`$form['#type'] = 'form'`). Flag dynamic form IDs with unknown builders as `UNVERIFIED` or `HUMAN_DECISION_REQUIRED`.
+
+### 39. Drupal 7 Form API Structures & Property Taxonomy
+Exhaustively parse Form API element structures and property declarations:
+- **Element Types**: `#type` (`textfield`, `textarea`, `select`, `checkbox`, `checkboxes`, `radios`, `value`, `hidden`, `submit`, `button`, `file`, `managed_file`, `fieldset`, `container`, `vertical_tabs`, `markup`, `item`, `tableselect`, `date`, `password`, etc.).
+- **Core Form Properties**: `#title`, `#description`, `#required`, `#default_value`, `#value`, `#return_value`, `#options`, `#tree`, `#parents`, `#weight`, `#access`, `#disabled`, `#attributes`, `#prefix`, `#suffix`, `#markup`, `#theme`, `#theme_wrappers`, `#states`, `#ajax`, `#validate`, `#submit`, `#element_validate`, `#after_build`, `#pre_render`, `#process`, `#attached`, `#limit_validation_errors`, `#executes_submit_callback`, `#value_callback`, `#input`.
+- **Attached Assets**: `#attached` arrays defining JavaScript (`js`), CSS stylesheets (`css`), settings (`js` settings array), and library attachments (`library`).
+
+### 40. Form Validation & Submission Call Graph
+Trace the complete validation and submission execution paths:
+- **Validation Handlers**: Form-level validation (`#validate`, `hook_form_validate`, `hook_form_FORM_ID_validate`), element-level validation (`#element_validate`), custom validation callbacks, `form_set_error()`, `form_error()`, cross-field validation rules, and entity validation invocations.
+- **Submission Handlers**: Form-level submit callbacks (`#submit`, `hook_form_submit`, `hook_form_FORM_ID_submit`), button-specific submit callbacks, database transactions, entity saves, configuration writes (`variable_set()`), state updates, file operations, queue insertions, email dispatches, and cache clearing.
+- **Side Effect & Call Graph Tracing**: Map `Form -> Validation -> Submit -> Database / Config / Entity / Service / Redirect / Message`.
+
+### 41. Form Alteration Analysis
+Discover and map all procedural form alteration hooks:
+- **Hook Form Alter Implementations**: `hook_form_alter()`, `hook_form_FORM_ID_alter()`, theme form alters, and module-specific alteration pipelines.
+- **Alter Execution Semantics**: Identify target form IDs, added/modified/removed form elements, custom validation/submit injections, `#states` overrides, access restrictions, and hook execution weight ordering.
+- **Modern Target Mapping**: Map D7 form alters to modern `hook_form_alter()`, `hook_form_FORM_ID_alter()`, or Symfony Event Subscribers where decoupled alter events are utilized.
+
+### 42. AJAX Behavior, Callbacks & Commands Analysis
+Exhaustively analyze Drupal 7 AJAX Form API interactions and command structures:
+- **Form `#ajax` Declarations**: `#ajax['callback']`, `#ajax['wrapper']`, `#ajax['method']`, `#ajax['effect']`, `#ajax['event']`, `#ajax['path']`, `#ajax['progress']`.
+- **AJAX Delivery & Rendering**: `ajax_render()`, `ajax_deliver()`, `ajax_prepare_response()`, `ajax_process_form()`, partial form rebuilds, wrapper replacement, and custom AJAX response builders.
+- **AJAX Command Inventory**: `ajax_command_replace()`, `ajax_command_html()`, `ajax_command_append()`, `ajax_command_prepend()`, `ajax_command_after()`, `ajax_command_before()`, `ajax_command_remove()`, `ajax_command_changed()`, `ajax_command_alert()`, `ajax_command_css()`, `ajax_command_settings()`, `ajax_command_data()`, `ajax_command_invoke()`, `ajax_command_restripe()`, and custom AJAX commands.
+- **Modern Target Mapping**: Map D7 AJAX callbacks to modern `AjaxResponse` returning objects implementing `CommandInterface` (`ReplaceCommand`, `HtmlCommand`, `AppendCommand`, `InvokeCommand`, `SettingsCommand`, `MessageCommand`, `RedirectCommand`).
+
+### 43. `$form_state` Lifecycle, Rebuilds & Multistep Flows
+Analyze `$form_state` internal state management and multi-step lifecycle:
+- **`$form_state` Property Analysis**: `$form_state['values']`, `$form_state['storage']`, `$form_state['rebuild']`, `$form_state['redirect']`, `$form_state['submitted']`, `$form_state['triggering_element']`, `$form_state['clicked_button']`, `$form_state['build_info']`, `$form_state['input']`, `$form_state['cache']`.
+- **Multistep & Wizard Flows**: Detect step counters in `$form_state['storage']['step']`, wizard branch logic, back/next/finish button handling, temporary state persistence across rebuilds, and multi-step validation.
+- **Modern Target Mapping**: Modernize to `FormStateInterface` methods (`getValue()`, `setValue()`, `getStorage()`, `setStorage()`, `setRebuild()`, `setRedirect()`, `isSubmitted()`, `getTriggeringElement()`).
+
+### 44. Form Security, Access, File Uploads & Confirmation Forms
+Audit form security and specialized form types:
+- **Form Security & Access**: CSRF token validation (`#token`), permission checks, entity access validation, custom access callbacks (`#access`), input sanitization, output escaping, and open redirect validation (`drupal_redirect_form()`, `drupal_get_destination()`, `drupal_set_message()`). Flag insecure redirect patterns as `HUMAN_DECISION_REQUIRED`.
+- **File Upload Forms**: Identify `#type => 'file'`, `#type => 'managed_file'`, `#upload_validators`, destination URI schemes (`public://`, `private://`), permanent file status transitions, and `file_save_upload()` calls $\rightarrow$ modern `managed_file` element and `FileInterface` storage.
+- **Confirmation Forms**: Identify `confirm_form()` calls, cancel paths, question prompts, and description texts $\rightarrow$ modern `ConfirmFormBase` classes implementing `getQuestion()`, `getCancelUrl()`, and `getConfirmText()`.
+
+### 45. Forms & AJAX Target Architecture Taxonomy & Migration Strategies
+- **Target Architecture Classifications (19 Classes)**: `FORM_BASE`, `CONFIG_FORM_BASE`, `CONFIRM_FORM_BASE`, `ENTITY_FORM`, `CONTENT_ENTITY_FORM`, `CONFIG_ENTITY_FORM`, `PLUGIN_FORM`, `ROUTED_FORM`, `AJAX_FORM`, `AJAX_CALLBACK`, `AJAX_COMMAND`, `FORM_ALTER`, `FORM_VALIDATOR`, `FORM_SUBMIT_HANDLER`, `SERVICE_BACKED_FORM`, `MULTISTEP_FORM`, `FILE_UPLOAD_FORM`, `OBSOLETE`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Standardized Migration Strategies (15 Strategies)**: `DIRECT_MODERNIZATION`, `FORM_API_REWRITE`, `FORMBASE_REWRITE`, `CONFIG_FORM_REWRITE`, `ENTITY_FORM_REWRITE`, `AJAX_REWRITE`, `CONTROLLER_PLUS_FORM`, `SERVICE_BACKED_REWRITE`, `MULTISTEP_REWRITE`, `CALLBACK_REFACTOR`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Approved Terminal Outcomes**: `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`.
+- **Forbidden Terminal States**: `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, `SILENTLY_OMITTED`.
+
 ---
 
 ## Output Reporting Standard
 All discovery outputs must:
-1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, and line numbers (`[OBSERVED FACT]`).
-2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, and `entities_fields_items` in `state/migration-manifest.yml`.
-3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.
+1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, and line numbers (`[OBSERVED FACT]`).
+2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, and `forms_ajax_items` in `state/migration-manifest.yml`.
+3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.

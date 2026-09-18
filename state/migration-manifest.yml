@@ -283,6 +283,59 @@ target_system:
 #       confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
 #       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
 #       exclusion_reason: null
+#   # Comprehensive Forms, AJAX & Form API Accounting
+#   forms_ajax_items:
+#     - item_id: "my_module_filter_form"
+#       form_id: "my_module_filter_form"
+#       builder: "my_module_filter_form"
+#       defining_module: "my_module"
+#       source_file: "my_module.module"
+#       source_line: 45
+#       function_or_class: "my_module_filter_form"
+#       item_type: "FORM_DEFINITION" # FORM_DEFINITION | FORM_BUILDER | FORM_ALTER | AJAX_CALLBACK | AJAX_COMMAND | CUSTOM_VALIDATOR | CUSTOM_SUBMIT | MULTISTEP_WIZARD | CONFIRMATION_FORM
+#       invocation_mechanism: "DRUPAL_GET_FORM" # DRUPAL_GET_FORM | DRUPAL_BUILD_FORM | MENU_CALLBACK | HOOK_FORM_ALTER | AJAX_EVENT | PROGRAMMATIC
+#       callers: ["my_module_page_callback()"]
+#       validation_callbacks: ["my_module_filter_form_validate"]
+#       submission_callbacks: ["my_module_filter_form_submit"]
+#       ajax_callbacks: ["my_module_ajax_filter_callback"]
+#       ajax_commands: ["ajax_command_replace", "ajax_command_html"]
+#       form_state_usage:
+#         storage: ["current_step", "cached_results"]
+#         values: ["filter_category", "filter_keyword"]
+#         rebuild: true
+#         redirect: false
+#       rebuild_behavior: "REBUILD_ON_AJAX_OR_MULTISTEP"
+#       multistep_flow: "STEP_1_FILTER -> VALIDATE -> REBUILD_STEP_2 -> SUBMIT"
+#       redirect_behavior: "REDIRECT_TO_RESULTS_ROUTE"
+#       access_behavior: "Custom Access Check with permission 'access my module content'"
+#       security_checks:
+#         csrf_token: true
+#         file_validation: false
+#         input_sanitization: true
+#       file_upload:
+#         has_upload: false
+#         validators: []
+#       attached_libraries: ["core/drupal.ajax", "my_module/filter_assets"]
+#       entity_dependency: ["node", "taxonomy_term"]
+#       configuration_dependency: ["my_module.settings"]
+#       state_dependency: null
+#       database_dependency: ["custom_filter_cache"]
+#       target_architecture: "FORM_BASE" # 19 Target Architectures:
+#       # FORM_BASE | CONFIG_FORM_BASE | CONFIRM_FORM_BASE | ENTITY_FORM | CONTENT_ENTITY_FORM |
+#       # CONFIG_ENTITY_FORM | PLUGIN_FORM | ROUTED_FORM | AJAX_FORM | AJAX_CALLBACK | AJAX_COMMAND |
+#       # FORM_ALTER | FORM_VALIDATOR | FORM_SUBMIT_HANDLER | SERVICE_BACKED_FORM | MULTISTEP_FORM |
+#       # FILE_UPLOAD_FORM | OBSOLETE | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       target_artifacts:
+#         - "src/Form/FilterForm.php"
+#       migration_strategy: "FORMBASE_REWRITE" # 15 Migration Strategies:
+#       # DIRECT_MODERNIZATION | FORM_API_REWRITE | FORMBASE_REWRITE | CONFIG_FORM_REWRITE |
+#       # ENTITY_FORM_REWRITE | AJAX_REWRITE | CONTROLLER_PLUS_FORM | SERVICE_BACKED_REWRITE |
+#       # MULTISTEP_REWRITE | CALLBACK_REFACTOR | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON |
+#       # HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       validation_strategy: "FORM_SUBMIT_AND_VALIDATION_TEST" # FORM_SUBMIT_AND_VALIDATION_TEST | AJAX_RESPONSE_COMMAND_TEST | MULTISTEP_REBUILD_TEST | CSRF_AND_ACCESS_TEST | UNIT_TEST
+#       confidence: "CONFIRMED" # CONFIRMED | INFERRED | UNCERTAIN
+#       status: "MIGRATED" # MIGRATED | REPLACED | OBSOLETE | EXCLUDED_WITH_REASON | HUMAN_DECISION_REQUIRED | UNVERIFIED
+#       exclusion_reason: null
 custom_modules: []
 
 # ------------------------------------------------------------------------------

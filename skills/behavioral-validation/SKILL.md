@@ -1,7 +1,7 @@
 ---
 name: behavioral-validation
-description: 12-Dimensional Comparative Behavioral Validation Playbook with exhaustive custom PHP file, class, constructor, procedural hook, custom hook, database schema, configuration, state, entity, bundle, field, revision, and translation outcome auditing.
-version: 1.5.0
+description: 12-Dimensional Comparative Behavioral Validation Playbook with exhaustive custom PHP file, class, constructor, procedural hook, custom hook, database schema, configuration, state, entity, bundle, field, revision, translation, form, and AJAX outcome auditing.
+version: 1.6.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # 12-Dimensional Comparative Behavioral Validation Skill
 
 ## Overview
-This skill provides the operational audit methodology and evidence standards for conducting rigorous side-by-side behavioral comparisons between the Drupal 7 baseline and the migrated Drupal 10/11 implementation across 12 distinct functional dimensions, including exhaustive accounting and outcome verification for legacy custom PHP files, OOP classes, constructors, methods, procedural hooks, custom hooks, custom database schemas, configuration, state, persistent variables, custom entities, bundles, fields, revisions, translations, and `.inc` files.
+This skill provides the operational audit methodology and evidence standards for conducting rigorous side-by-side behavioral comparisons between the Drupal 7 baseline and the migrated Drupal 10/11 implementation across 12 distinct functional dimensions, including exhaustive accounting and outcome verification for legacy custom PHP files, OOP classes, constructors, methods, procedural hooks, custom hooks, alter hooks, custom database schemas, configuration, state, persistent variables, custom entities, bundles, fields, revisions, translations, forms, form alters, AJAX callbacks, and `.inc` files.
 
 ---
 
@@ -41,22 +41,22 @@ Every evaluated component must be audited across the following 12 dimensions:
 
 ---
 
-## Mandatory Custom Code, Hook, Database, Configuration & Entity Outcome Accounting
+## Mandatory Custom Code, Hook, Database, Configuration, Entity & Form Outcome Accounting
 
-In addition to the 12 functional dimensions, validate that every custom PHP source file, class, interface, trait, constructor, method, procedural hook implementation, custom hook, alter hook, `.inc` file, custom database table, stored data-model artifact, configuration/state/variable artifact, custom entity type, bundle, field definition, revision table, and translation artifact discovered in the D7 source has reached an approved, certified outcome:
+In addition to the 12 functional dimensions, validate that every custom PHP source file, class, interface, trait, constructor, method, procedural hook implementation, custom hook, alter hook, `.inc` file, custom database table, stored data-model artifact, configuration/state/variable artifact, custom entity type, bundle, field definition, revision table, translation artifact, form builder, form alter, and AJAX callback discovered in the D7 source has reached an approved, certified outcome:
 
 ### Approved Outcome States
-- **`MIGRATED`**: The class/function/hook/table/variable/entity/field has been re-engineered into a target D10 PSR-4 class, service, repository, event subscriber, controller, form, plugin, Config Object, State API key, `@ContentEntityType`, `@ConfigEntityType`, or CMI field configuration with verified tests.
-- **`REPLACED`**: The legacy behavior/hook/table/variable/entity/field is superseded by a modern Drupal 10 core API (e.g. Media, Workflows), contrib module, or service with documented mapping.
-- **`OBSOLETE`**: The functionality/hook/table/variable/entity/field is dead code, temporary cache, or deprecated API with documented evidence.
+- **`MIGRATED`**: The class/function/hook/table/variable/entity/field/form/AJAX callback has been re-engineered into a target D10 PSR-4 class, service, repository, event subscriber, controller, `FormBase`, `ConfigFormBase`, `ConfirmFormBase`, `ContentEntityForm`, plugin, Config Object, State API key, `@ContentEntityType`, `@ConfigEntityType`, or CMI field configuration with verified tests.
+- **`REPLACED`**: The legacy behavior/hook/table/variable/entity/field/form is superseded by a modern Drupal 10 core API (e.g. Media, Workflows, Views exposed forms), contrib module, or service with documented mapping.
+- **`OBSOLETE`**: The functionality/hook/table/variable/entity/field/form is dead code, temporary cache, or deprecated API with documented evidence.
 - **`EXCLUDED_WITH_REASON`**: Explicitly excluded from migration scope with documented business/architectural rationale.
-- **`HUMAN_DECISION_REQUIRED`**: Unresolved business logic, ambiguous hook semantics, ambiguous schema relationships, entity architecture decisions, credentials/secrets, or unverified dynamic SQL flagged for human decision in `reports/blocked/`.
-- **`UNVERIFIED`**: Dynamic behavior, dynamic variable keys, dynamic field types, or runtime database state that cannot be statically verified, explicitly marked with `[UNVERIFIED RESULT]`.
+- **`HUMAN_DECISION_REQUIRED`**: Unresolved business logic, ambiguous hook semantics, ambiguous schema relationships, entity architecture decisions, dynamic form IDs, ambiguous security flows, credentials/secrets, or unverified dynamic SQL flagged for human decision in `reports/blocked/`.
+- **`UNVERIFIED`**: Dynamic behavior, dynamic variable keys, dynamic field types, dynamic form builders, unverified AJAX endpoints, or runtime database state that cannot be statically verified, explicitly marked with `[UNVERIFIED RESULT]`.
 
 ### Forbidden States (Immediate Validation `FAIL`)
-- **`UNACCOUNTED`**: Any custom PHP file, class, constructor, method, procedural hook, custom hook, `.inc` file, custom database table, configuration/state variable, entity type, bundle, or field present in discovery but missing from the migration plan or report.
-- **`UNKNOWN_WITHOUT_REASON`**: Any excluded or omitted code, hook, database table, variable, entity, or field lacking documented technical or business rationale.
-- **`SILENTLY_OMITTED`**: Any code, hook, database table, variable, entity, or field dropped during refactoring without an explicit record.
+- **`UNACCOUNTED`**: Any custom PHP file, class, constructor, method, procedural hook, custom hook, `.inc` file, custom database table, configuration/state variable, entity type, bundle, field, form, form alter, or AJAX callback present in discovery but missing from the migration plan or report.
+- **`UNKNOWN_WITHOUT_REASON`**: Any excluded or omitted code, hook, database table, variable, entity, field, form, or AJAX callback lacking documented technical or business rationale.
+- **`SILENTLY_OMITTED`**: Any code, hook, database table, variable, entity, field, form, or AJAX callback dropped during refactoring without an explicit record.
 
 ---
 
@@ -64,8 +64,8 @@ In addition to the 12 functional dimensions, validate that every custom PHP sour
 
 Assign strictly one verdict per dimension:
 
-- **`PASS`**: Feature is fully equivalent to the D7 baseline and all custom PHP files, classes, procedural hooks, database tables, variables, and entities/fields are accounted for. **Mandatory**: Must cite an empirical terminal log, test result, or code diff.
+- **`PASS`**: Feature is fully equivalent to the D7 baseline and all custom PHP files, classes, procedural hooks, database tables, variables, entities/fields, forms, and AJAX callbacks are accounted for. **Mandatory**: Must cite an empirical terminal log, test result, or code diff.
 - **`PARTIAL`**: Core behavior works, but minor non-blocking divergence is noted. **Mandatory**: Discrepancy must be documented with impact assessed as low.
-- **`FAIL`**: Functional divergence, data corruption, broken calculation, access vulnerability, or unaccounted custom code/hooks/entities/fields detected. **Mandatory**: Detailed reproduction steps and failing output must be documented.
+- **`FAIL`**: Functional divergence, data corruption, broken calculation, access vulnerability, or unaccounted custom code/hooks/entities/fields/forms detected. **Mandatory**: Detailed reproduction steps and failing output must be documented.
 - **`BLOCKED`**: An upstream missing dependency or environmental failure prevented verification. **Mandatory**: Upstream ticket reference must be cited.
 - **`N/A`**: Dimension does not apply to this specific component. **Mandatory**: Architectural rationale must be stated.

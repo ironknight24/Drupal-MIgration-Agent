@@ -1,7 +1,7 @@
 ---
 name: dependency-analysis
-description: Dependency Graph Solver & Wave Scheduling Playbook. Analyzes inter-module couplings, custom PHP class instantiations, .inc function call trees, procedural hook execution ordering, module weights, alter dependencies, configuration/state couplings, entity reference topologies, revision/translation hierarchies, constructs migration DAGs, detects cycles, and generates dynamic execution waves.
-version: 1.5.0
+description: Dependency Graph Solver & Wave Scheduling Playbook. Analyzes inter-module couplings, custom PHP class instantiations, .inc function call trees, procedural hook execution ordering, module weights, alter dependencies, configuration/state couplings, entity reference topologies, revision/translation hierarchies, form & AJAX call graphs, constructs migration DAGs, detects cycles, and generates dynamic execution waves.
+version: 1.6.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Dependency Analysis & Wave Scheduling Skill
 
 ## Overview
-This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, configuration, state, procedural hook execution ordering, module weights (`{system}.weight`), alter sequencing (`hook_module_implements_alter`), custom PHP class instantiations, entity reference graphs, revision/translation hierarchies, and legacy `.inc` function couplings across legacy Drupal 7 components. It constructs a Directed Acyclic Graph (DAG), detects circular dependencies, and organizes components into executable topological waves.
+This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, configuration, state, procedural hook execution ordering, module weights (`{system}.weight`), alter sequencing (`hook_module_implements_alter`), custom PHP class instantiations, entity reference graphs, revision/translation hierarchies, form builders, form alters, AJAX callbacks, and legacy `.inc` function couplings across legacy Drupal 7 components. It constructs a Directed Acyclic Graph (DAG), detects circular dependencies, and organizes components into executable topological waves.
 
 ---
 
@@ -20,9 +20,9 @@ This skill provides the procedural playbook and algorithms for discovering code,
 
 ---
 
-## 7-Dimensional Coupling Detection Heuristics
+## 8-Dimensional Coupling Detection Heuristics
 
-To establish an accurate DAG, inspect source assets across 7 distinct coupling vectors:
+To establish an accurate DAG, inspect source assets across 8 distinct coupling vectors:
 
 ### 1. Declared Dependencies
 - Parse `dependencies[]` declarations in source `.info` files (`[OBSERVED FACT]`).
@@ -63,11 +63,18 @@ To establish an accurate DAG, inspect source assets across 7 distinct coupling v
   - `PARENT ENTITY -> CHILD/PARAGRAPH ENTITY`: Container entities depend on nested item definitions.
   - `COMPUTED FIELD -> SOURCE FIELD`: Derived field calculations depend on referenced entity properties.
 
-### 6. Presentation & Theme Couplings
+### 6. Form, Form Alter & AJAX Couplings (Step 17)
+- Map form-level dependencies and interaction call graphs:
+  - `MODULE A (Form Builder) -> MODULE B (hook_form_FORM_ID_alter)`: Form alterations dependent on upstream form definitions and module weight execution order.
+  - `FORM -> VALIDATION / SUBMIT CALLBACKS`: Custom validation and submit callbacks invoking cross-module services, database writes, or entity mutations.
+  - `FORM -> AJAX ENDPOINT -> CONTROLLER / SERVICE`: Form `#ajax` callbacks invoking asynchronous response handlers.
+  - `FORM -> ATTACHED ASSET LIBRARIES`: Forms declaring `#attached` dependencies on core or custom CSS/JS asset libraries.
+
+### 7. Presentation & Theme Couplings
 - Identify custom theme templates (`.tpl.php`) or preprocess functions invoking custom module APIs.
 - Custom modules that provide default themes or template suggestions via `hook_theme()`.
 
-### 7. Data Migration Hierarchy & Database Ordering Couplings
+### 8. Data Migration Hierarchy & Database Ordering Couplings
 - Relational entity and custom table hierarchies where dependent data cannot be migrated before parent entities:
   - Roles & Permissions $\rightarrow$ Users
   - Users $\rightarrow$ Taxonomy Vocabularies $\rightarrow$ Taxonomy Terms
@@ -101,7 +108,7 @@ Components are scheduled into ordered execution waves:
 | :---: | :--- | :--- | :--- |
 | **Wave 0** | **Foundation** | Core configuration entities, base utility services, independent schemas, base entity interfaces. | 0 custom dependencies. |
 | **Wave 1** | **Leaf Modules & Base Entities** | Custom modules and base entity types with zero custom dependencies. | All dependencies satisfied in Wave 0. |
-| **Wave 2** | **Intermediate Modules & Bundles** | Custom modules, bundles, and dependent entity types. | All upstream custom modules completed. |
+| **Wave 2** | **Intermediate Modules, Bundles & Forms** | Custom modules, bundles, dependent entity types, and interactive Form API classes. | All upstream custom modules completed. |
 | **Wave 3** | **Data Pipelines & Content Migration** | Migration API configurations transferring base entities, revisions, and translations. | Target entities & fields exist in D10. |
-| **Wave 4** | **Complex Integrations & Entity References** | Webhooks, third-party sync, bi-directional entity reference resolution. | Core module services & entities operational. |
+| **Wave 4** | **Complex Integrations & AJAX Endpoints** | Webhooks, third-party sync, bi-directional entity reference resolution, complex AJAX forms. | Core module services & entities operational. |
 | **Wave 5** | **Presentation Layer & Entity View Builders** | Themes, Twig templates, UI asset libraries, custom formatters/widgets. | Final entity render structures finalized. |

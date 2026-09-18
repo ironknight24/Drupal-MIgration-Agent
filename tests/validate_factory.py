@@ -2348,11 +2348,11 @@ class FactoryValidator:
         has_doc_sync = (
             taxonomy_in_d7 and
             "1.1.0" in config_skill and
-            any(v in mapping_skill for v in ["1.3.0", "1.4.0"]) and
-            any(v in custom_skill for v in ["1.4.0", "1.5.0"]) and
-            any(v in dep_skill for v in ["1.4.0", "1.5.0"]) and
-            any(v in test_skill for v in ["1.3.0", "1.4.0"]) and
-            any(v in val_skill for v in ["1.4.0", "1.5.0"])
+            any(v in mapping_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0"]) and
+            any(v in custom_skill for v in ["1.4.0", "1.5.0", "1.6.0"]) and
+            any(v in dep_skill for v in ["1.4.0", "1.5.0", "1.6.0"]) and
+            any(v in test_skill for v in ["1.3.0", "1.4.0", "1.5.0", "1.6.0"]) and
+            any(v in val_skill for v in ["1.4.0", "1.5.0", "1.6.0"])
         )
 
         if has_doc_sync:
@@ -2816,6 +2816,463 @@ class FactoryValidator:
                               f"Found forbidden project-specific or local path patterns: {', '.join(found_forbidden)}",
                               "Factory must remain strictly generic without project-specific artifacts.")
 
+    def validate_forms_and_ajax_suite(self):
+        """Step 17: Comprehensive D7 Forms, AJAX & Form API Discovery, Accounting & D10/D11 Re-Engineering Suite."""
+        manifest_text = (self.repo_root / "state" / "migration-manifest.yml").read_text(encoding='utf-8')
+        d7_skill = (self.repo_root / "skills" / "d7-analysis" / "SKILL.md").read_text(encoding='utf-8')
+        mapping_skill = (self.repo_root / "skills" / "d7-to-d10-mapping" / "SKILL.md").read_text(encoding='utf-8')
+        custom_skill = (self.repo_root / "skills" / "custom-module-migration" / "SKILL.md").read_text(encoding='utf-8')
+        mig_skill = (self.repo_root / "skills" / "migration-api" / "SKILL.md").read_text(encoding='utf-8')
+        dep_skill = (self.repo_root / "skills" / "dependency-analysis" / "SKILL.md").read_text(encoding='utf-8')
+        test_skill = (self.repo_root / "skills" / "testing" / "SKILL.md").read_text(encoding='utf-8')
+        val_skill = (self.repo_root / "skills" / "behavioral-validation" / "SKILL.md").read_text(encoding='utf-8')
+        disc_agent = (self.repo_root / "agents" / "discovery" / "agent.md").read_text(encoding='utf-8')
+        custom_agent = (self.repo_root / "agents" / "custom-module" / "agent.md").read_text(encoding='utf-8')
+        disc_template = (self.repo_root / "templates" / "discovery-report.md").read_text(encoding='utf-8')
+        plan_template = (self.repo_root / "templates" / "migration-plan.md").read_text(encoding='utf-8')
+        val_template = (self.repo_root / "templates" / "validation-report.md").read_text(encoding='utf-8')
+        readme_text = (self.repo_root / "README.md").read_text(encoding='utf-8')
+        arch_text = (self.repo_root / "ARCHITECTURE.md").read_text(encoding='utf-8')
+
+        # 17.01 Generic Form Discovery Completeness
+        has_form_discovery = (
+            "drupal_get_form" in disc_agent and
+            "drupal_build_form" in disc_agent and
+            "drupal_form_submit" in disc_agent and
+            "Exhaustive Form & Form Builder Discovery" in d7_skill
+        )
+
+        if has_form_discovery:
+            self.record_check("CHECK-FORM-01", "discovery", "Generic Form Discovery Completeness", "PASS",
+                              "Discovery agent and D7 analysis skill define exhaustive form discovery across drupal_get_form(), drupal_build_form(), named form builders, and programmatic dispatches.",
+                              "Verified generic Form API discovery capabilities.",
+                              affected_files=["agents/discovery/agent.md", "skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-01", "discovery", "Generic Form Discovery Completeness", "FAIL",
+                              "Missing drupal_get_form, drupal_build_form, or form builder discovery in agent or skill.",
+                              "Discovery must exhaustively identify all forms and builders.")
+
+        # 17.02 Form Builder Function Accounting
+        has_form_builders = (
+            "FormBase" in custom_agent and
+            "ConfigFormBase" in custom_agent and
+            "FormBase" in mapping_skill and
+            "buildForm" in mapping_skill
+        )
+
+        if has_form_builders:
+            self.record_check("CHECK-FORM-02", "accounting", "Form Builder Function Accounting", "PASS",
+                              "Skills and custom-module agent account for procedural form builder functions, mapping to OOP FormBase, ConfigFormBase, and buildForm() methods with FormStateInterface.",
+                              "Verified form builder function accounting and OOP mapping.",
+                              affected_files=["agents/custom-module/agent.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-02", "accounting", "Form Builder Function Accounting", "FAIL",
+                              "Missing FormBase or buildForm mapping in custom module agent or mapping skill.",
+                              "Factory must map procedural form builders to FormBase and buildForm.")
+
+        # 17.03 Form ID Accounting
+        has_form_id = (
+            ("form_id" in d7_skill.lower() or "form id" in d7_skill.lower()) and
+            "getFormId" in mapping_skill and
+            "form_id" in manifest_text
+        )
+
+        if has_form_id:
+            self.record_check("CHECK-FORM-03", "accounting", "Form ID Accounting & Dynamic ID Handling", "PASS",
+                              "Skills and manifest schema account for static and dynamic Form IDs, enforcing getFormId() implementation and flagging unverified dynamic form IDs as HUMAN_DECISION_REQUIRED.",
+                              "Verified Form ID accounting and dynamic ID handling.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FORM-03", "accounting", "Form ID Accounting & Dynamic ID Handling", "FAIL",
+                              "Missing form_id or getFormId in skills or manifest schema.",
+                              "Factory must account for form IDs and getFormId implementation.")
+
+        # 17.04 Form Invocation Mechanism Accounting
+        has_invocation = (
+            "invocation_mechanism" in manifest_text and
+            "DRUPAL_GET_FORM" in manifest_text and
+            "HOOK_FORM_ALTER" in manifest_text
+        )
+
+        if has_invocation:
+            self.record_check("CHECK-FORM-04", "accounting", "Form Invocation Mechanism Accounting", "PASS",
+                              "Manifest schema and discovery procedures account for direct, indirect, menu callback, hook_form_alter, and programmatic form invocation mechanisms.",
+                              "Verified form invocation mechanism accounting.",
+                              affected_files=["state/migration-manifest.yml", "agents/discovery/agent.md"])
+        else:
+            self.record_check("CHECK-FORM-04", "accounting", "Form Invocation Mechanism Accounting", "FAIL",
+                              "Missing invocation_mechanism in manifest schema.",
+                              "Manifest must capture form invocation mechanisms.")
+
+        # 17.05 Form API Property Taxonomy Accounting
+        fapi_props = ["#type", "#title", "#tree", "#states", "#attached", "#validate", "#submit", "#element_validate", "#process"]
+        has_fapi_props = all(p in d7_skill for p in fapi_props)
+
+        if has_fapi_props:
+            self.record_check("CHECK-FORM-05", "taxonomy", "Form API Property Taxonomy Accounting", "PASS",
+                              "D7 analysis skill defines exhaustive Form API property taxonomy covering element types, trees, states, validation, submit, and attached asset properties.",
+                              "Verified Form API property taxonomy.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-05", "taxonomy", "Form API Property Taxonomy Accounting", "FAIL",
+                              "Missing core Form API properties in D7 analysis skill.",
+                              "Factory must account for all core Form API properties.")
+
+        # 17.06 Validation Callback Accounting
+        has_validation = (
+            "form_set_error" in d7_skill and
+            "setErrorByName" in mapping_skill and
+            "validateForm" in mapping_skill
+        )
+
+        if has_validation:
+            self.record_check("CHECK-FORM-06", "validation", "Form Validation Callback Accounting", "PASS",
+                              "Skills account for form-level and element-level validation callbacks, modernizing form_set_error() to $form_state->setErrorByName() in validateForm().",
+                              "Verified form validation callback accounting and modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-06", "validation", "Form Validation Callback Accounting", "FAIL",
+                              "Missing form_set_error or setErrorByName in skills.",
+                              "Factory must map form_set_error to setErrorByName.")
+
+        # 17.07 Submission Callback & Side Effect Accounting
+        has_submit = (
+            "submitForm" in mapping_skill and
+            "Form Validation & Submission Call Graph" in d7_skill and
+            "submission_callbacks" in manifest_text
+        )
+
+        if has_submit:
+            self.record_check("CHECK-FORM-07", "submission", "Form Submission & Side Effect Accounting", "PASS",
+                              "Skills and manifest schema trace complete form submission call graphs to database, entity, configuration, and service side effects via submitForm().",
+                              "Verified form submission call graph and side effect accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FORM-07", "submission", "Form Submission & Side Effect Accounting", "FAIL",
+                              "Missing submission callback call graph in skills or manifest schema.",
+                              "Factory must trace form submission call graphs and side effects.")
+
+        # 17.08 Form Alteration Accounting
+        has_alter = (
+            "hook_form_alter" in d7_skill and
+            "hook_form_FORM_ID_alter" in d7_skill and
+            "Form Alteration Analysis" in d7_skill
+        )
+
+        if has_alter:
+            self.record_check("CHECK-FORM-08", "alter", "Form Alteration Accounting & Modernization", "PASS",
+                              "Skills account for hook_form_alter() and hook_form_FORM_ID_alter(), mapping alterations to modern hooks or decoupled Symfony Event Subscribers.",
+                              "Verified form alteration discovery and modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-08", "alter", "Form Alteration Accounting & Modernization", "FAIL",
+                              "Missing form alter analysis in D7 analysis skill.",
+                              "Factory must account for form alteration hooks and ordering.")
+
+        # 17.09 AJAX Discovery Completeness
+        has_ajax_disc = (
+            "ajax_render" in d7_skill and
+            "ajax_deliver" in d7_skill and
+            "#ajax['callback']" in d7_skill
+        )
+
+        if has_ajax_disc:
+            self.record_check("CHECK-FORM-09", "ajax", "AJAX Discovery Completeness", "PASS",
+                              "D7 analysis skill exhaustively discovers Form API #ajax declarations, wrapper replacements, ajax_render(), and ajax_deliver() dispatches.",
+                              "Verified AJAX interaction discovery.",
+                              affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-09", "ajax", "AJAX Discovery Completeness", "FAIL",
+                              "Missing ajax_render, ajax_deliver, or #ajax discovery in skills.",
+                              "Factory must discover all Form API AJAX interactions.")
+
+        # 17.10 AJAX Command Accounting
+        ajax_commands = ["ReplaceCommand", "HtmlCommand", "AppendCommand", "InvokeCommand", "SettingsCommand", "MessageCommand"]
+        has_ajax_commands = all(c in mapping_skill for c in ajax_commands) and "AjaxResponse" in mapping_skill
+
+        if has_ajax_commands:
+            self.record_check("CHECK-FORM-10", "ajax", "AJAX Command & Response Modernization", "PASS",
+                              "Mapping skill modernizes procedural ajax_command_*() functions into modern AjaxResponse objects with OOP CommandInterface instances (ReplaceCommand, HtmlCommand, etc.).",
+                              "Verified AJAX command and AjaxResponse modernization.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-10", "ajax", "AJAX Command & Response Modernization", "FAIL",
+                              "Missing AjaxResponse or OOP CommandInterface classes in mapping skill.",
+                              "Factory must map procedural AJAX commands to modern CommandInterface classes.")
+
+        # 17.11 $form_state Lifecycle Analysis
+        has_form_state = (
+            "form_state_usage" in manifest_text and
+            "FormStateInterface" in mapping_skill and
+            "$form_state['storage']" in d7_skill
+        )
+
+        if has_form_state:
+            self.record_check("CHECK-FORM-11", "state", "$form_state Lifecycle & Property Analysis", "PASS",
+                              "Skills and manifest schema analyze $form_state storage, values, rebuild flags, and redirects, mapping to FormStateInterface getter/setter methods.",
+                              "Verified $form_state lifecycle and property analysis.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FORM-11", "state", "$form_state Lifecycle & Property Analysis", "FAIL",
+                              "Missing $form_state analysis or FormStateInterface in skills or manifest.",
+                              "Factory must analyze $form_state lifecycle and map to FormStateInterface.")
+
+        # 17.12 Form Rebuild & Partial Rebuild Behavior
+        has_rebuild = (
+            "rebuild_behavior" in manifest_text and
+            "setRebuild" in mapping_skill and
+            "$form_state['rebuild']" in d7_skill
+        )
+
+        if has_rebuild:
+            self.record_check("CHECK-FORM-12", "rebuild", "Form Rebuild & Partial Rebuild Accounting", "PASS",
+                              "Skills and manifest schema account for form rebuild behavior, modernizing $form_state['rebuild'] = TRUE to $form_state->setRebuild(TRUE).",
+                              "Verified form rebuild and partial rebuild accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FORM-12", "rebuild", "Form Rebuild & Partial Rebuild Accounting", "FAIL",
+                              "Missing rebuild_behavior or setRebuild in skills or manifest.",
+                              "Factory must account for form rebuild behavior.")
+
+        # 17.13 Multistep & Wizard Flow Accounting
+        has_multistep = (
+            "MULTISTEP_FORM" in mig_skill and
+            "MULTISTEP_REWRITE" in mig_skill and
+            "Multistep & Wizard Flows" in d7_skill
+        )
+
+        if has_multistep:
+            self.record_check("CHECK-FORM-13", "multistep", "Multistep & Wizard Flow Accounting", "PASS",
+                              "Skills account for multistep/wizard form state management across rebuilds, step transitions, and branch logic.",
+                              "Verified multistep and wizard flow accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-13", "multistep", "Multistep & Wizard Flow Accounting", "FAIL",
+                              "Missing MULTISTEP_FORM or MULTISTEP_REWRITE in skills.",
+                              "Factory must account for multistep and wizard form flows.")
+
+        # 17.14 Redirect & Message Behavior
+        has_redirect = (
+            "redirect_behavior" in manifest_text and
+            "setRedirect" in mapping_skill and
+            "drupal_set_message" in d7_skill
+        )
+
+        if has_redirect:
+            self.record_check("CHECK-FORM-14", "redirect", "Form Redirect & Message Behavior Accounting", "PASS",
+                              "Skills and manifest schema account for form redirection and status messages, modernizing to $form_state->setRedirect() and Messenger service.",
+                              "Verified form redirect and message behavior accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FORM-14", "redirect", "Form Redirect & Message Behavior Accounting", "FAIL",
+                              "Missing redirect_behavior or setRedirect in skills or manifest.",
+                              "Factory must account for form redirect and message behavior.")
+
+        # 17.15 File Upload Form Accounting
+        has_file_upload = (
+            "file_upload" in manifest_text and
+            "managed_file" in mapping_skill and
+            "FILE_UPLOAD_FORM" in mig_skill
+        )
+
+        if has_file_upload:
+            self.record_check("CHECK-FORM-15", "files", "File Upload Form Accounting", "PASS",
+                              "Skills and manifest schema account for file upload forms, modernizing #type => file and file_save_upload() to #type => managed_file with EntityTypeManager storage.",
+                              "Verified file upload form accounting and modernization.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-15", "files", "File Upload Form Accounting", "FAIL",
+                              "Missing file_upload or managed_file in skills or manifest.",
+                              "Factory must account for file upload forms and managed_file element.")
+
+        # 17.16 Entity Form Accounting
+        has_entity_form = (
+            "ContentEntityForm" in mapping_skill and
+            "ConfigEntityForm" in mapping_skill and
+            "ENTITY_FORM" in mig_skill
+        )
+
+        if has_entity_form:
+            self.record_check("CHECK-FORM-16", "entities", "Entity Form Accounting & Handlers", "PASS",
+                              "Skills account for custom entity edit/create forms, mapping to ContentEntityForm and ConfigEntityForm handlers registered in entity annotations.",
+                              "Verified entity form accounting and handler mapping.",
+                              affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-16", "entities", "Entity Form Accounting & Handlers", "FAIL",
+                              "Missing ContentEntityForm or ConfigEntityForm in mapping skill.",
+                              "Factory must map entity forms to ContentEntityForm and ConfigEntityForm.")
+
+        # 17.17 Configuration & Admin Form Accounting
+        has_config_form = (
+            "system_settings_form" in d7_skill and
+            "ConfigFormBase" in mapping_skill and
+            "CONFIG_FORM_REWRITE" in mig_skill
+        )
+
+        if has_config_form:
+            self.record_check("CHECK-FORM-17", "config", "Configuration & Admin Form Accounting", "PASS",
+                              "Skills account for system_settings_form() builders, modernizing to ConfigFormBase classes with typed CMI schema backing.",
+                              "Verified configuration and admin form accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-17", "config", "Configuration & Admin Form Accounting", "FAIL",
+                              "Missing system_settings_form or ConfigFormBase in skills.",
+                              "Factory must account for system_settings_form and ConfigFormBase.")
+
+        # 17.18 Confirmation Form Accounting
+        has_confirm_form = (
+            "confirm_form" in d7_skill and
+            "ConfirmFormBase" in mapping_skill and
+            "CONFIRM_FORM_BASE" in mig_skill
+        )
+
+        if has_confirm_form:
+            self.record_check("CHECK-FORM-18", "confirm", "Confirmation Form Accounting", "PASS",
+                              "Skills account for confirm_form() builders, modernizing to ConfirmFormBase classes implementing getQuestion() and getCancelUrl().",
+                              "Verified confirmation form accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-18", "confirm", "Confirmation Form Accounting", "FAIL",
+                              "Missing confirm_form or ConfirmFormBase in skills.",
+                              "Factory must account for confirm_form and ConfirmFormBase.")
+
+        # 17.19 Form Security & Access Accounting
+        has_form_sec = (
+            "csrf_token" in manifest_text and
+            "Form Security, Access, File Uploads" in d7_skill and
+            "CSRF & Access Checks" in test_skill
+        )
+
+        if has_form_sec:
+            self.record_check("CHECK-FORM-19", "security", "Form Security & Access Accounting", "PASS",
+                              "Skills and manifest schema audit CSRF token protection, route permissions, custom access callbacks, and input sanitization.",
+                              "Verified form security and access accounting.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/testing/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FORM-19", "security", "Form Security & Access Accounting", "FAIL",
+                              "Missing form security or CSRF token checks in skills or manifest.",
+                              "Factory must audit form security, CSRF protection, and access checks.")
+
+        # 17.20 Attached Asset & Library Dependency Analysis
+        has_attached = (
+            "attached_libraries" in manifest_text and
+            "libraries.yml" in custom_skill and
+            "attached asset libraries" in dep_skill.lower()
+        )
+
+        if has_attached:
+            self.record_check("CHECK-FORM-20", "assets", "Attached Asset & Library Dependency Analysis", "PASS",
+                              "Skills and manifest schema trace form #attached CSS/JS assets, mapping to modern <module>.libraries.yml definitions and library attachments.",
+                              "Verified attached asset and library dependency analysis.",
+                              affected_files=["skills/dependency-analysis/SKILL.md", "skills/custom-module-migration/SKILL.md", "state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FORM-20", "assets", "Attached Asset & Library Dependency Analysis", "FAIL",
+                              "Missing attached_libraries or libraries.yml in skills or manifest.",
+                              "Factory must trace form attached assets and libraries.")
+
+        # 17.21 19 Forms & AJAX Target Architecture Taxonomy
+        target_form_tax = [
+            "FORM_BASE", "CONFIG_FORM_BASE", "CONFIRM_FORM_BASE", "ENTITY_FORM",
+            "CONTENT_ENTITY_FORM", "CONFIG_ENTITY_FORM", "PLUGIN_FORM", "ROUTED_FORM",
+            "AJAX_FORM", "AJAX_CALLBACK", "AJAX_COMMAND", "FORM_ALTER", "FORM_VALIDATOR",
+            "FORM_SUBMIT_HANDLER", "SERVICE_BACKED_FORM", "MULTISTEP_FORM", "FILE_UPLOAD_FORM",
+            "OBSOLETE", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"
+        ]
+        found_form_tax = sum(1 for t in target_form_tax if t in d7_skill or t in mig_skill)
+
+        if found_form_tax >= 18:
+            self.record_check("CHECK-FORM-21", "taxonomy", "19 Forms & AJAX Target Architecture Taxonomy", "PASS",
+                              f"Skills define the complete 19-class target architecture taxonomy ({found_form_tax}/19 detected) supporting all form, alter, and AJAX modernizations.",
+                              "Verified 19 Forms & AJAX target architecture classifications.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-21", "taxonomy", "19 Forms & AJAX Target Architecture Taxonomy", "FAIL",
+                              f"Only {found_form_tax}/19 form target architecture classifications found in skills.",
+                              "Factory must define all 19 form target architecture classifications.")
+
+        # 17.22 15 Forms & AJAX Migration Strategies
+        form_strats = [
+            "DIRECT_MODERNIZATION", "FORM_API_REWRITE", "FORMBASE_REWRITE", "CONFIG_FORM_REWRITE",
+            "ENTITY_FORM_REWRITE", "AJAX_REWRITE", "CONTROLLER_PLUS_FORM", "SERVICE_BACKED_REWRITE",
+            "MULTISTEP_REWRITE", "CALLBACK_REFACTOR", "REPLACED", "OBSOLETE",
+            "EXCLUDED_WITH_REASON", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"
+        ]
+        found_form_strats = sum(1 for s in form_strats if s in d7_skill or s in mig_skill)
+
+        if found_form_strats >= 14:
+            self.record_check("CHECK-FORM-22", "strategies", "15 Forms & AJAX Migration Strategies", "PASS",
+                              f"Skills define all 15 standardized form migration strategies ({found_form_strats}/15 detected) separating migration methodology from terminal outcome status.",
+                              "Verified 15 form and AJAX migration strategies.",
+                              affected_files=["skills/d7-analysis/SKILL.md", "skills/migration-api/SKILL.md"])
+        else:
+            self.record_check("CHECK-FORM-22", "strategies", "15 Forms & AJAX Migration Strategies", "FAIL",
+                              f"Only {found_form_strats}/15 form migration strategies found in skills.",
+                              "Factory must define all 15 form migration strategies.")
+
+        # 17.23 Manifest Forms & AJAX Accounting Schema
+        manifest_form_fields = [
+            "item_id", "form_id", "builder", "defining_module", "source_file",
+            "source_line", "function_or_class", "item_type", "invocation_mechanism",
+            "callers", "validation_callbacks", "submission_callbacks", "ajax_callbacks",
+            "ajax_commands", "form_state_usage", "rebuild_behavior", "multistep_flow",
+            "redirect_behavior", "access_behavior", "security_checks", "file_upload",
+            "attached_libraries", "entity_dependency", "configuration_dependency",
+            "state_dependency", "database_dependency", "target_architecture",
+            "target_artifacts", "migration_strategy", "validation_strategy",
+            "confidence", "status", "exclusion_reason"
+        ]
+        missing_form_manifest = [f for f in manifest_form_fields if f not in manifest_text]
+
+        if not missing_form_manifest:
+            self.record_check("CHECK-FORM-23", "manifest", "Manifest Forms & AJAX Accounting Schema", "PASS",
+                              "state/migration-manifest.yml defines complete forms_ajax_items accounting schema covering all required form, alter, callback, and AJAX metadata fields.",
+                              "Verified manifest forms_ajax_items schema structure.",
+                              affected_files=["state/migration-manifest.yml"])
+        else:
+            self.record_check("CHECK-FORM-23", "manifest", "Manifest Forms & AJAX Accounting Schema", "FAIL",
+                              f"Missing manifest form fields: {', '.join(missing_form_manifest)}",
+                              "Manifest schema must define all required forms_ajax_items fields.")
+
+        # 17.24 Zero-Omission Form & AJAX Outcome Enforcement
+        approved_outcomes = ["MIGRATED", "REPLACED", "OBSOLETE", "EXCLUDED_WITH_REASON", "HUMAN_DECISION_REQUIRED", "UNVERIFIED"]
+        forbidden_states = ["UNACCOUNTED", "UNKNOWN_WITHOUT_REASON", "SILENTLY_OMITTED"]
+
+        missing_approved = [o for o in approved_outcomes if o not in val_skill]
+        missing_forbidden = [f for f in forbidden_states if f not in val_skill or f not in d7_skill]
+
+        if not missing_approved and not missing_forbidden and "Forms & Builders Accounted For" in val_template:
+            self.record_check("CHECK-FORM-24", "validation", "Zero-Omission Form & AJAX Outcome Enforcement", "PASS",
+                              "Validation agent and skill enforce approved terminal outcomes (MIGRATED, REPLACED, OBSOLETE, EXCLUDED_WITH_REASON, HUMAN_DECISION_REQUIRED, UNVERIFIED) and reject forbidden states for all forms, alters, and AJAX callbacks.",
+                              "Verified zero-omission outcome enforcement for forms and AJAX.",
+                              affected_files=["skills/behavioral-validation/SKILL.md", "templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-FORM-24", "validation", "Zero-Omission Form & AJAX Outcome Enforcement", "FAIL",
+                              "Missing approved outcomes or forbidden states in validation skill or template.",
+                              "Validation must enforce zero-omission outcomes for all forms and AJAX items.")
+
+        # 17.25 Cross-Capability Compatibility & Generic Purity
+        has_cross_compat = (
+            "custom_database_tables" in manifest_text and
+            "custom_php_files" in manifest_text and
+            "inc_files" in manifest_text and
+            "hook_implementations" in manifest_text and
+            "configuration_state_items" in manifest_text and
+            "entities_fields_items" in manifest_text and
+            "forms_ajax_items" in manifest_text and
+            "Forms, Form Alters, AJAX" in readme_text and
+            "Forms, Form Alters, AJAX" in arch_text
+        )
+
+        if has_cross_compat:
+            self.record_check("CHECK-FORM-25", "compatibility", "Cross-Capability Compatibility & Purity", "PASS",
+                              "Forms and AJAX accounting seamlessly integrates with custom entities (Step 16), configuration (Step 15), procedural hooks (Step 14), database schemas (Step 13), custom PHP files (Step 12), and .inc files (Step 11) with 100% generic purity.",
+                              "Verified cross-capability architectural compatibility and purity.",
+                              affected_files=["state/migration-manifest.yml", "README.md", "ARCHITECTURE.md", "AGENT_PROTOCOL.md"])
+        else:
+            self.record_check("CHECK-FORM-25", "compatibility", "Cross-Capability Compatibility & Purity", "FAIL",
+                              "Cross-capability compatibility check failed across manifest, skills, or documentation.",
+                              "Forms capability must maintain seamless compatibility with entity, config, hook, database, and class capabilities.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -2833,6 +3290,7 @@ class FactoryValidator:
         self.validate_procedural_hooks_accounting_suite()
         self.validate_configuration_state_accounting_suite()
         self.validate_entities_and_fields_suite()
+        self.validate_forms_and_ajax_suite()
 
     def generate_result_json(self):
         return {

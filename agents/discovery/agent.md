@@ -145,19 +145,26 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
     - Map entity reference hierarchies and relational targets (`entityreference`, `taxonomy_term_reference`, `user_reference`, `node_reference`).
     - Audit revision mechanisms: revision tables, log fields, timestamps, and revision tracking code.
     - Audit translation mechanics: `$language`, `LANGUAGE_NONE`, translation tables, and multilingual configuration.
-13. **Database API & Static SQL Query Discovery**:
+13. **Forms, Form API, Form Alters & AJAX Discovery (Step 17)**:
+    - Exhaustively discover all forms, form builder functions (`function module_form()`), named form builders, and programmatic form invocations (`drupal_get_form()`, `drupal_build_form()`, `drupal_form_submit()`).
+    - Parse Form API structures, element types (`#type`), core properties (`#title`, `#tree`, `#states`, `#attached`), and attached asset libraries.
+    - Trace validation handlers (`#validate`, `hook_form_validate`, `form_set_error`) and submission handlers (`#submit`, `hook_form_submit`, database/entity writes, redirects, messages).
+    - Map form alterations: `hook_form_alter()`, `hook_form_FORM_ID_alter()`, theme form alters, and hook ordering weights.
+    - Discover AJAX behaviors: `#ajax['callback']`, `#ajax['wrapper']`, `ajax_render()`, `ajax_deliver()`, `ajax_command_*()` command calls, and partial form rebuilds.
+    - Audit `$form_state` usage (`storage`, `values`, `rebuild`, `redirect`, `triggering_element`), multistep wizard flows, file uploads (`#type => file`, `file_save_upload`), and confirmation forms (`confirm_form()`).
+14. **Database API & Static SQL Query Discovery**:
     - Inventory procedural database calls: `db_query()`, `db_query_range()`, `db_select()`, `db_insert()`, `db_update()`, `db_delete()`, `db_merge()`, `db_transaction()`.
     - Detect dynamically constructed SQL (e.g. `$table = $config['table']; db_query("SELECT ... FROM {$table}")`) and flag as `[UNVERIFIED RESULT]` / `HUMAN_DECISION_REQUIRED`.
     - Perform SQL safety analysis identifying user inputs, missing placeholders, and raw SQL concatenations.
-14. **Data Semantics, Serialization & Entity Relationships**:
+15. **Data Semantics, Serialization & Entity Relationships**:
     - Classify custom tables into the 17 semantic categories: `CONTENT`, `CONFIGURATION`, `STATE`, `USER_DATA`, `ENTITY_DATA`, `FIELD_DATA`, `RELATIONSHIP_DATA`, `TRANSACTION_DATA`, `AUDIT_DATA`, `CACHE_DATA`, `QUEUE_DATA`, `TEMPORARY_DATA`, `INTEGRATION_DATA`, `LOOKUP_DATA`, `REFERENCE_DATA`, `LEGACY_DATA`, `UNKNOWN`.
     - Detect serialized data payloads (PHP serialize/unserialize, JSON, encoded objects, HTML).
     - Detect entity references (`uid`, `nid`, `tid`, `fid`, `entity_id`, `delta`) and cross-table entity relationships.
     - Map complete CRUD call trees (CREATE, READ, UPDATE, DELETE callers) across all services, forms, controllers, queue workers, cron, and Drush.
-15. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
-16. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, and `entities_fields_items` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
-17. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
-18. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
+16. **Integration Discovery**: Detect SOAP/REST client calls (`drupal_http_request`, `cURL`), inbound webhooks, and SSO endpoints.
+17. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, `entities_fields_items`, and `forms_ajax_items` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
+18. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
+19. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
 
 ---
 

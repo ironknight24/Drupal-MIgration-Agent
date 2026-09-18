@@ -186,6 +186,48 @@ Apply one of the 16 explicit strategies to every discovered entity and field ite
 
 ---
 
+## Form & AJAX Target Architecture Taxonomy & Migration Strategies
+
+### 19 Form & AJAX Target Architecture Classifications
+1. **`FORM_BASE`**: Standard interactive form extending `FormBase` (`src/Form/`).
+2. **`CONFIG_FORM_BASE`**: Administrative configuration form extending `ConfigFormBase` with CMI integration.
+3. **`CONFIRM_FORM_BASE`**: Interactive confirmation dialog form extending `ConfirmFormBase`.
+4. **`ENTITY_FORM`**: Generic entity CRUD form handler.
+5. **`CONTENT_ENTITY_FORM`**: Fieldable content entity form extending `ContentEntityForm`.
+6. **`CONFIG_ENTITY_FORM`**: Configuration entity form extending `ConfigEntityForm`.
+7. **`PLUGIN_FORM`**: Reusable plugin configuration sub-form implementing `PluginFormInterface`.
+8. **`ROUTED_FORM`**: Standalone form rendered directly via route entry in `<module>.routing.yml`.
+9. **`AJAX_FORM`**: Interactive form with asynchronous element rebuilds or sub-element updates.
+10. **`AJAX_CALLBACK`**: Controller or Form class method returning an `AjaxResponse`.
+11. **`AJAX_COMMAND`**: OOP command implementing `CommandInterface` (`ReplaceCommand`, `HtmlCommand`, etc.).
+12. **`FORM_ALTER`**: Form alteration implementation via `hook_form_alter()` or EventSubscriber.
+13. **`FORM_VALIDATOR`**: Dedicated form or element validation handler / Constraint Validator.
+14. **`FORM_SUBMIT_HANDLER`**: Dedicated form submit callback or injected service handler.
+15. **`SERVICE_BACKED_FORM`**: Form class delegating complex processing to injected services.
+16. **`MULTISTEP_FORM`**: Multi-page or step-based wizard form utilizing `FormStateInterface` storage.
+17. **`FILE_UPLOAD_FORM`**: Form handling managed file uploads with `#type => managed_file`.
+18. **`OBSOLETE`**: Deprecated or superseded legacy form structures.
+19. **`HUMAN_DECISION_REQUIRED` / `UNVERIFIED`**: Unresolved dynamic form constructions or unverified callbacks.
+
+### 15 Form & AJAX Migration Strategies
+1. **`DIRECT_MODERNIZATION`**: Direct 1:1 conversion of standard Form API array to modern `FormBase` methods.
+2. **`FORM_API_REWRITE`**: Complete restructuring of legacy element tree into modern render array and typed data elements.
+3. **`FORMBASE_REWRITE`**: Re-engineering procedural form builders into OOP `FormBase` classes.
+4. **`CONFIG_FORM_REWRITE`**: Re-engineering `system_settings_form()` into `ConfigFormBase` with CMI schema.
+5. **`ENTITY_FORM_REWRITE`**: Re-engineering procedural entity edit forms into `ContentEntityForm` handlers.
+6. **`AJAX_REWRITE`**: Converting procedural `ajax_render()` and `#ajax` callbacks to `AjaxResponse` with `CommandInterface` objects.
+7. **`CONTROLLER_PLUS_FORM`**: Decoupling complex page callback forms into dedicated Controller + Form combinations.
+8. **`SERVICE_BACKED_REWRITE`**: Extracting procedural business logic from submit/validate callbacks into injectable services.
+9. **`MULTISTEP_REWRITE`**: Converting `$form_state['storage']` wizards into modern `FormStateInterface` step managers.
+10. **`CALLBACK_REFACTOR`**: Modernizing custom validation/element callbacks into class methods or plugins.
+11. **`REPLACED`**: Legacy custom form replaced by modern Core (Views exposed forms, Media, Workflows) or Contrib.
+12. **`OBSOLETE`**: Obsolete administrative or dead forms excluded with documented justification.
+13. **`EXCLUDED_WITH_REASON`**: Deliberately excluded forms with explicit rationale.
+14. **`HUMAN_DECISION_REQUIRED`**: Dynamic form IDs or ambiguous security flows requiring human review.
+15. **`UNVERIFIED`**: Dynamic or unverified form structures requiring runtime validation.
+
+---
+
 ## Data Integrity Verification & Checksums
 
 Before certifying a data migration pipeline as complete:

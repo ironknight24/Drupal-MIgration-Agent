@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260918213243",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260918214605",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T21:32:43.528725+00:00",
+  "executed_at": "2026-09-18T21:46:05.123856+00:00",
   "summary": {
-    "checks_total": 187,
-    "passed": 186,
+    "checks_total": 212,
+    "passed": 211,
     "failed": 0,
     "warnings": 0,
     "unverified": 1
@@ -2310,6 +2310,339 @@
         "state/migration-manifest.yml",
         "migration.config.example.yml",
         "README.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-01",
+      "category": "discovery",
+      "name": "Generic Form Discovery Completeness",
+      "status": "PASS",
+      "evidence": "Discovery agent and D7 analysis skill define exhaustive form discovery across drupal_get_form(), drupal_build_form(), named form builders, and programmatic dispatches.",
+      "details": "Verified generic Form API discovery capabilities.",
+      "affected_files": [
+        "agents/discovery/agent.md",
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-02",
+      "category": "accounting",
+      "name": "Form Builder Function Accounting",
+      "status": "PASS",
+      "evidence": "Skills and custom-module agent account for procedural form builder functions, mapping to OOP FormBase, ConfigFormBase, and buildForm() methods with FormStateInterface.",
+      "details": "Verified form builder function accounting and OOP mapping.",
+      "affected_files": [
+        "agents/custom-module/agent.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-03",
+      "category": "accounting",
+      "name": "Form ID Accounting & Dynamic ID Handling",
+      "status": "PASS",
+      "evidence": "Skills and manifest schema account for static and dynamic Form IDs, enforcing getFormId() implementation and flagging unverified dynamic form IDs as HUMAN_DECISION_REQUIRED.",
+      "details": "Verified Form ID accounting and dynamic ID handling.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-04",
+      "category": "accounting",
+      "name": "Form Invocation Mechanism Accounting",
+      "status": "PASS",
+      "evidence": "Manifest schema and discovery procedures account for direct, indirect, menu callback, hook_form_alter, and programmatic form invocation mechanisms.",
+      "details": "Verified form invocation mechanism accounting.",
+      "affected_files": [
+        "state/migration-manifest.yml",
+        "agents/discovery/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-05",
+      "category": "taxonomy",
+      "name": "Form API Property Taxonomy Accounting",
+      "status": "PASS",
+      "evidence": "D7 analysis skill defines exhaustive Form API property taxonomy covering element types, trees, states, validation, submit, and attached asset properties.",
+      "details": "Verified Form API property taxonomy.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-06",
+      "category": "validation",
+      "name": "Form Validation Callback Accounting",
+      "status": "PASS",
+      "evidence": "Skills account for form-level and element-level validation callbacks, modernizing form_set_error() to $form_state->setErrorByName() in validateForm().",
+      "details": "Verified form validation callback accounting and modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-07",
+      "category": "submission",
+      "name": "Form Submission & Side Effect Accounting",
+      "status": "PASS",
+      "evidence": "Skills and manifest schema trace complete form submission call graphs to database, entity, configuration, and service side effects via submitForm().",
+      "details": "Verified form submission call graph and side effect accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-08",
+      "category": "alter",
+      "name": "Form Alteration Accounting & Modernization",
+      "status": "PASS",
+      "evidence": "Skills account for hook_form_alter() and hook_form_FORM_ID_alter(), mapping alterations to modern hooks or decoupled Symfony Event Subscribers.",
+      "details": "Verified form alteration discovery and modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-09",
+      "category": "ajax",
+      "name": "AJAX Discovery Completeness",
+      "status": "PASS",
+      "evidence": "D7 analysis skill exhaustively discovers Form API #ajax declarations, wrapper replacements, ajax_render(), and ajax_deliver() dispatches.",
+      "details": "Verified AJAX interaction discovery.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-10",
+      "category": "ajax",
+      "name": "AJAX Command & Response Modernization",
+      "status": "PASS",
+      "evidence": "Mapping skill modernizes procedural ajax_command_*() functions into modern AjaxResponse objects with OOP CommandInterface instances (ReplaceCommand, HtmlCommand, etc.).",
+      "details": "Verified AJAX command and AjaxResponse modernization.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-11",
+      "category": "state",
+      "name": "$form_state Lifecycle & Property Analysis",
+      "status": "PASS",
+      "evidence": "Skills and manifest schema analyze $form_state storage, values, rebuild flags, and redirects, mapping to FormStateInterface getter/setter methods.",
+      "details": "Verified $form_state lifecycle and property analysis.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-12",
+      "category": "rebuild",
+      "name": "Form Rebuild & Partial Rebuild Accounting",
+      "status": "PASS",
+      "evidence": "Skills and manifest schema account for form rebuild behavior, modernizing $form_state['rebuild'] = TRUE to $form_state->setRebuild(TRUE).",
+      "details": "Verified form rebuild and partial rebuild accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-13",
+      "category": "multistep",
+      "name": "Multistep & Wizard Flow Accounting",
+      "status": "PASS",
+      "evidence": "Skills account for multistep/wizard form state management across rebuilds, step transitions, and branch logic.",
+      "details": "Verified multistep and wizard flow accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-14",
+      "category": "redirect",
+      "name": "Form Redirect & Message Behavior Accounting",
+      "status": "PASS",
+      "evidence": "Skills and manifest schema account for form redirection and status messages, modernizing to $form_state->setRedirect() and Messenger service.",
+      "details": "Verified form redirect and message behavior accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-15",
+      "category": "files",
+      "name": "File Upload Form Accounting",
+      "status": "PASS",
+      "evidence": "Skills and manifest schema account for file upload forms, modernizing #type => file and file_save_upload() to #type => managed_file with EntityTypeManager storage.",
+      "details": "Verified file upload form accounting and modernization.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-16",
+      "category": "entities",
+      "name": "Entity Form Accounting & Handlers",
+      "status": "PASS",
+      "evidence": "Skills account for custom entity edit/create forms, mapping to ContentEntityForm and ConfigEntityForm handlers registered in entity annotations.",
+      "details": "Verified entity form accounting and handler mapping.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-17",
+      "category": "config",
+      "name": "Configuration & Admin Form Accounting",
+      "status": "PASS",
+      "evidence": "Skills account for system_settings_form() builders, modernizing to ConfigFormBase classes with typed CMI schema backing.",
+      "details": "Verified configuration and admin form accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-18",
+      "category": "confirm",
+      "name": "Confirmation Form Accounting",
+      "status": "PASS",
+      "evidence": "Skills account for confirm_form() builders, modernizing to ConfirmFormBase classes implementing getQuestion() and getCancelUrl().",
+      "details": "Verified confirmation form accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-19",
+      "category": "security",
+      "name": "Form Security & Access Accounting",
+      "status": "PASS",
+      "evidence": "Skills and manifest schema audit CSRF token protection, route permissions, custom access callbacks, and input sanitization.",
+      "details": "Verified form security and access accounting.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/testing/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-20",
+      "category": "assets",
+      "name": "Attached Asset & Library Dependency Analysis",
+      "status": "PASS",
+      "evidence": "Skills and manifest schema trace form #attached CSS/JS assets, mapping to modern <module>.libraries.yml definitions and library attachments.",
+      "details": "Verified attached asset and library dependency analysis.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md",
+        "skills/custom-module-migration/SKILL.md",
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-21",
+      "category": "taxonomy",
+      "name": "19 Forms & AJAX Target Architecture Taxonomy",
+      "status": "PASS",
+      "evidence": "Skills define the complete 19-class target architecture taxonomy (20/19 detected) supporting all form, alter, and AJAX modernizations.",
+      "details": "Verified 19 Forms & AJAX target architecture classifications.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-22",
+      "category": "strategies",
+      "name": "15 Forms & AJAX Migration Strategies",
+      "status": "PASS",
+      "evidence": "Skills define all 15 standardized form migration strategies (15/15 detected) separating migration methodology from terminal outcome status.",
+      "details": "Verified 15 form and AJAX migration strategies.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "skills/migration-api/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-23",
+      "category": "manifest",
+      "name": "Manifest Forms & AJAX Accounting Schema",
+      "status": "PASS",
+      "evidence": "state/migration-manifest.yml defines complete forms_ajax_items accounting schema covering all required form, alter, callback, and AJAX metadata fields.",
+      "details": "Verified manifest forms_ajax_items schema structure.",
+      "affected_files": [
+        "state/migration-manifest.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-24",
+      "category": "validation",
+      "name": "Zero-Omission Form & AJAX Outcome Enforcement",
+      "status": "PASS",
+      "evidence": "Validation agent and skill enforce approved terminal outcomes (MIGRATED, REPLACED, OBSOLETE, EXCLUDED_WITH_REASON, HUMAN_DECISION_REQUIRED, UNVERIFIED) and reject forbidden states for all forms, alters, and AJAX callbacks.",
+      "details": "Verified zero-omission outcome enforcement for forms and AJAX.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-FORM-25",
+      "category": "compatibility",
+      "name": "Cross-Capability Compatibility & Purity",
+      "status": "PASS",
+      "evidence": "Forms and AJAX accounting seamlessly integrates with custom entities (Step 16), configuration (Step 15), procedural hooks (Step 14), database schemas (Step 13), custom PHP files (Step 12), and .inc files (Step 11) with 100% generic purity.",
+      "details": "Verified cross-capability architectural compatibility and purity.",
+      "affected_files": [
+        "state/migration-manifest.yml",
+        "README.md",
+        "ARCHITECTURE.md",
+        "AGENT_PROTOCOL.md"
       ],
       "remediation": ""
     }

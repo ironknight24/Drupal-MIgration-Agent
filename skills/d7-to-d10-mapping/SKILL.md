@@ -1,7 +1,7 @@
 ---
 name: d7-to-d10-mapping
-description: Behavioral and architectural mapping rules for converting procedural Drupal 7 APIs, hooks, variables, custom entities, fields, revisions, translations, and legacy custom PHP classes into modern Drupal 10/11 object-oriented patterns.
-version: 1.4.0
+description: Behavioral and architectural mapping rules for converting procedural Drupal 7 APIs, hooks, variables, custom entities, fields, revisions, translations, forms, AJAX interactions, and legacy custom PHP classes into modern Drupal 10/11 object-oriented patterns.
+version: 1.5.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep
 # Drupal 7 to Drupal 10/11 Architectural Mapping Skill
 
 ## Overview
-This skill provides the architectural mapping rules required to translate Drupal 7 procedural constructs, hooks (core, contrib, custom, alter, entity, form, theme, install/update), persistent variables, configuration forms, runtime state, custom entities, fields, bundles, revisions, translations, legacy custom PHP classes, constructors, interfaces, traits, and `.inc` files into modern Symfony/Drupal 10 and Drupal 11 object-oriented paradigms, prioritizing Dependency Injection, PSR-4 autoloading, service containers, event subscribers, typed configuration, and testability.
+This skill provides the architectural mapping rules required to translate Drupal 7 procedural constructs, hooks (core, contrib, custom, alter, entity, form, theme, install/update), persistent variables, configuration forms, runtime state, custom entities, fields, bundles, revisions, translations, forms, Form API elements, AJAX commands, legacy custom PHP classes, constructors, interfaces, traits, and `.inc` files into modern Symfony/Drupal 10 and Drupal 11 object-oriented paradigms, prioritizing Dependency Injection, PSR-4 autoloading, service containers, event subscribers, typed configuration, and testability.
 
 ---
 
@@ -124,3 +124,32 @@ In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual li
 - **Serialized Data Modernization**:
   - Migrate legacy PHP serialized strings (`serialize()` / `unserialize()`) to modern structured formats (JSON, typed entity properties, or typed arrays).
   - Explicitly flag serialized PHP objects requiring custom migration process plugins.
+
+### 9. Forms, AJAX & Form API Modernization
+- **Form Class Hierarchy Mapping**:
+  - *Standard Forms*: Procedural `drupal_get_form()` builders map to OOP form classes extending `FormBase` (`src/Form/<FormName>.php`), implementing `getFormId()`, `buildForm()`, `validateForm()`, and `submitForm()`.
+  - *Configuration Settings Forms*: `system_settings_form()` builders map to classes extending `ConfigFormBase` (`src/Form/<FormName>SettingsForm.php`) implementing `getEditableConfigNames()`.
+  - *Confirmation Forms*: `confirm_form()` builders map to classes extending `ConfirmFormBase` (`src/Form/<FormName>ConfirmForm.php`) implementing `getQuestion()`, `getCancelUrl()`, and `getConfirmText()`.
+  - *Entity Forms*: Procedural entity edit/create forms map to `ContentEntityForm` or `ConfigEntityForm` registered in the entity annotation `handlers['form']`.
+  - *Plugin Forms*: Reusable plugin configuration sub-forms map to classes implementing `PluginFormInterface` or extending `PluginFormBase`.
+- **Form API Element & Property Modernization**:
+  - Procedural element properties (`#type`, `#title`, `#description`, `#required`, `#default_value`, `#options`, `#tree`, `#states`) map directly to Form API render arrays in `buildForm(array $form, FormStateInterface $form_state)`.
+  - `#attached`: Assets modernize to library attachments (`$form['#attached']['library'][] = '<module>/<library_name>'`) defined in `<module>.libraries.yml`.
+  - File Elements: `#type => 'file'` and `file_save_upload()` modernize to `#type => 'managed_file'` with `#upload_validators` and injected `EntityTypeManagerInterface` file storage.
+- **Validation & Submission Modernization**:
+  - Validation: Procedural `form_set_error($name, $message)` modernizes to `$form_state->setErrorByName($name, $message)` in `validateForm()`.
+  - Submission: Submit callbacks modernize to `submitForm()`, using `$form_state->getValue()`, `$form_state->setRedirect()`, `$form_state->setRebuild()`, and injected services for database/entity/state mutations.
+- **Form Alteration Modernization**:
+  - `hook_form_alter()` and `hook_form_FORM_ID_alter()` retained in `<module>.module` for simple alterations or converted to Symfony Event Subscribers for complex, decoupled form alter pipelines.
+- **AJAX Behavior & Command Modernization**:
+  - `#ajax['callback']`: Modernizes to public methods on the form class or controller returning `AjaxResponse` objects.
+  - AJAX Commands: Procedural `ajax_command_*()` functions modernize to OOP command classes implementing `CommandInterface`:
+    - `ajax_command_replace()` $\rightarrow$ `new ReplaceCommand($selector, $content)`
+    - `ajax_command_html()` $\rightarrow$ `new HtmlCommand($selector, $content)`
+    - `ajax_command_append()` $\rightarrow$ `new AppendCommand($selector, $content)`
+    - `ajax_command_invoke()` $\rightarrow$ `new InvokeCommand($selector, $method, $args)`
+    - `ajax_command_settings()` $\rightarrow$ `new SettingsCommand($settings, $merge)`
+    - `drupal_set_message()` in AJAX $\rightarrow$ `new MessageCommand($message)`
+- **Multistep & Wizard Modernization**:
+  - Multi-step state persisted via `FormStateInterface` storage (`$form_state->set('step', $step)`, `$form_state->get('step')`).
+  - Step transitions trigger `$form_state->setRebuild(TRUE)` to re-invoke `buildForm()` with the updated step state.

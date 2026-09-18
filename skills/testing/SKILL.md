@@ -1,7 +1,7 @@
 ---
 name: testing
-description: Test Strategy & Automated Quality Assurance Playbook. Configures and validates PHPUnit test suites, custom class autoloading, constructor DI verification, hook replacement testing, event subscriber assertions, config schema validation, state persistence testing, entity CRUD/revision/translation testing, entity access handler verification, PHPStan static analysis, and PHPCS coding standards.
-version: 1.4.0
+description: Test Strategy & Automated Quality Assurance Playbook. Configures and validates PHPUnit test suites, custom class autoloading, constructor DI verification, hook replacement testing, event subscriber assertions, config schema validation, state persistence testing, entity CRUD/revision/translation testing, form validation/submit testing, AJAX response command testing, PHPStan static analysis, and PHPCS coding standards.
+version: 1.5.0
 user-invocable: true
 disable-model-invocation: false
 allowed-tools: Read, Grep, Find
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Find
 # Automated Testing & Quality Assurance Playbook Skill
 
 ## Overview
-This skill provides the procedural guidelines and runner configurations for establishing automated testing pipelines, static code analysis, custom PHP class testing, procedural hook replacement testing, event subscriber assertions, configuration schema validation, state API assertions, entity CRUD / revision / translation testing, entity access control verification, and coding standards compliance across migrated Drupal 10 and Drupal 11 custom modules and themes.
+This skill provides the procedural guidelines and runner configurations for establishing automated testing pipelines, static code analysis, custom PHP class testing, procedural hook replacement testing, event subscriber assertions, configuration schema validation, state API assertions, entity CRUD / revision / translation testing, entity access control verification, form validation & submission testing, AJAX response command verification, and coding standards compliance across migrated Drupal 10 and Drupal 11 custom modules and themes.
 
 ---
 
@@ -19,9 +19,9 @@ This skill provides the procedural guidelines and runner configurations for esta
 
 ---
 
-## Test Expectations for Modernized Code & Entities (Step 16)
+## Test Expectations for Modernized Code, Entities & Forms (Step 17)
 
-When testing modernized custom OOP classes, services, procedural hook replacements, configuration/state artifacts, and custom entities, configure tests appropriate to their architectural responsibility:
+When testing modernized custom OOP classes, services, procedural hook replacements, configuration/state artifacts, custom entities, and Form API classes, configure tests appropriate to their architectural responsibility:
 
 1. **Class Autoloading & Container Construction**:
    - Verify class is discoverable via Composer PSR-4 without manual includes.
@@ -46,15 +46,22 @@ When testing modernized custom OOP classes, services, procedural hook replacemen
    - **Revision Management**: Assert that saving entities with `$entity->setNewRevision(TRUE)` creates valid revision records, preserves revision logs, timestamps, and authors, and supports loading specific revision IDs.
    - **Content Translation**: Assert that adding and updating translations (`$entity->addTranslation('es', ...)->save()`) persists translatable field values while leaving untranslatable fields synchronized.
    - **Entity Queries**: Test that Entity Queries correctly filter by base fields, bundle, language, access conditions, and reference targets.
-6. **Public API & Business Logic Parity**:
+6. **Form & AJAX Validation (Step 17)**:
+   - **Form Build & Render**: Assert `buildForm()` generates expected form element render array with required properties and `#attached` libraries.
+   - **Form Validation Handlers**: Assert `validateForm()` flags invalid inputs via `$form_state->setErrorByName()` and rejects malicious/corrupt input.
+   - **Form Submission Handlers**: Assert `submitForm()` executes expected database/entity/config mutations and sets expected redirects (`$form_state->setRedirect()`).
+   - **AJAX Response & Commands**: Assert AJAX callbacks return valid `AjaxResponse` objects containing expected `CommandInterface` instances (`ReplaceCommand`, `HtmlCommand`, `InvokeCommand`, `MessageCommand`).
+   - **Multistep Rebuild State**: Assert multi-step forms correctly transition across steps using `$form_state->setRebuild(TRUE)` and persist state across rebuild requests.
+   - **CSRF & Access Checks**: Assert forms validate CSRF tokens on submission and enforce route/entity permission constraints.
+7. **Public API & Business Logic Parity**:
    - Author PHPUnit Unit tests targeting domain calculations, validation algorithms, and state transitions.
-7. **Integration, Custom Database & Repository Operations**:
+8. **Integration, Custom Database & Repository Operations**:
    - Author PHPUnit Kernel tests targeting custom entity CRUD, custom database table repository queries, dynamic SQL filters, and configuration schema adherence.
    - Verify transaction rollback semantics: ensure failed operations rollback completely without leaving orphaned records.
-8. **Data Migration ETL Pipeline Tests**:
+9. **Data Migration ETL Pipeline Tests**:
    - Author Kernel migration tests verifying source-to-destination mappings, serialized payload transformations, entity reference lookups, revision transfers, translation mappings, and rollback behavior.
-9. **Error Handling & Edge Cases**:
-   - Assert exception throwing on invalid inputs, missing dependencies, database constraint violations, or failed external requests.
+10. **Error Handling & Edge Cases**:
+    - Assert exception throwing on invalid inputs, missing dependencies, database constraint violations, or failed external requests.
 
 ---
 

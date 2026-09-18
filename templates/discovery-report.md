@@ -105,7 +105,16 @@ evidence_summary:
 
 ---
 
-## 10. Contributed Modules Inventory
+## 10. Forms, Form Alters & AJAX Inventory (Step 17)
+
+| Module | Form ID | Builder / Callback | Item Type (8 Types) | Invocation | Validation & Submit | AJAX Commands | Rebuild & Multistep | Target Architecture (19 Types) | Migration Strategy (15 Strategies) | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `example_module` | `example_filter_form` | `example_filter_form` | `FORM_DEFINITION` | `drupal_get_form` | V: `_validate`, S: `_submit` | `ReplaceCommand` | Rebuild on filter change | `FORM_BASE` | `FORMBASE_REWRITE` | `MIGRATED` |
+| `example_module` | `user_profile_form` | `example_form_user_profile_form_alter` | `FORM_ALTER` | `hook_form_FORM_ID_alter` | Custom validation attached | N/A | No rebuild | `FORM_ALTER` | `DIRECT_MODERNIZATION` | `MIGRATED` |
+
+---
+
+## 11. Contributed Modules Inventory
 
 | Contrib Module | D7 Version | Core in D10? | D10 Available? | Community Replacement | Action Plan |
 |---|---|---|---|---|---|

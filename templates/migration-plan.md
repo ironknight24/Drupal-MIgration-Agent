@@ -50,22 +50,24 @@ evidence_summary:
 
 ---
 
-## 3. File, Class, Hook, Database, Entity & Configuration Accounting & D10 Architectural Mapping
+## 3. File, Class, Hook, Database, Entity, Form & Configuration Accounting & D10 Architectural Mapping
 
-| D7 Source File / Key / Schema / Entity | Legacy Artifact / Hook / Table / Variable / Field | Classification / Semantics | Target D10 Class / Storage Destination | Migration Strategy / Injected Services | Planned Outcome Status |
+| D7 Source File / Key / Schema / Entity / Form | Legacy Artifact / Hook / Table / Variable / Field / Form ID | Classification / Semantics | Target D10 Class / Storage Destination | Migration Strategy / Injected Services | Planned Outcome Status |
 |---|---|---|---|---|---|
 | `lib/ExampleProcessor.php` | `class ExampleProcessor` | `SERVICE_BUSINESS_LOGIC` | `src/Service/ExampleProcessor.php` | `@database`, `@config.factory` | `MIGRATED` |
 | `{{ COMPONENT }}.module:hook_entity_info` | `entity: {{ COMPONENT }}_record` | `CONTENT_ENTITY` | `src/Entity/RecordEntity.php` | `ENTITY_TYPE_REBUILD` | `MIGRATED` |
 | `{{ COMPONENT }}.install:hook_schema` | `table: {{ COMPONENT }}_record_revision` | `REVISIONABLE_ENTITY` | `src/Entity/RecordEntity.php` (`revision_table`) | `REVISION_MIGRATION` | `MIGRATED` |
 | `{{ COMPONENT }}.module:hook_field_info` | `field: field_related_item` | `ENTITY_REFERENCE` | `core.base_field_override` / `field.storage` | `REFERENCE_REMAP` | `MIGRATED` |
+| `{{ COMPONENT }}.module` | `form: {{ COMPONENT }}_filter_form` | `FORM_BASE` | `src/Form/FilterForm.php` | `FORMBASE_REWRITE` (`@entity_type.manager`) | `MIGRATED` |
+| `{{ COMPONENT }}.module` | `ajax: {{ COMPONENT }}_ajax_filter_callback` | `AJAX_CALLBACK` | `src/Form/FilterForm.php::ajaxFilterCallback` | `AJAX_REWRITE` (returns `AjaxResponse`) | `MIGRATED` |
 | `{{ COMPONENT }}.install` | `table: {{ COMPONENT }}_records` | `USER_DATA` | `src/Entity/RecordEntity.php` | `ENTITY_MIGRATION` | `MIGRATED` |
 | `includes/admin.inc:24` | `variable: {{ COMPONENT }}_endpoint` | `D7_ADMIN_SETTING` | `config/install/{{ COMPONENT }}.settings.yml` | `DIRECT_CONFIG_MIGRATION` (`@config.factory`) | `MIGRATED` |
 | `{{ COMPONENT }}.module:110` | `variable: {{ COMPONENT }}_last_sync` | `D7_PERSISTENT_STATE` | `State API` (`{{ COMPONENT }}.last_sync`) | `STATE_MIGRATION` (`@state`) | `MIGRATED` |
 | `includes/admin.inc:48` | `variable: {{ COMPONENT }}_api_key` | `D7_ENVIRONMENT_VALUE` | `settings.php` override / Key module | `SETTINGS_MIGRATION` (Rule 10: No Secrets in CMI) | `MIGRATED` |
 | `{{ COMPONENT }}.module` | `{{ COMPONENT }}_menu()` | `CORE_HOOK` | `.routing.yml`, `src/Controller/`, `src/Form/`, `.links.menu.yml` | `DECOMPOSE_TO_ROUTES_AND_CONTROLLER` | `MIGRATED` |
-| `{{ COMPONENT }}.module` | `{{ COMPONENT }}_form_alter()` | `ALTER_HOOK` | `src/Service/FormAlterService.php` | `@entity_type.manager` | `MIGRATED` |
+| `{{ COMPONENT }}.module` | `{{ COMPONENT }}_form_alter()` | `FORM_ALTER` | `src/Service/FormAlterService.php` | `@entity_type.manager` | `MIGRATED` |
 | `{{ COMPONENT }}.module` | `{{ COMPONENT }}_view()` | `CONTROLLER` | `src/Controller/ViewController.php` | `@current_user` | `MIGRATED` |
-| `includes/admin.inc` | `{{ COMPONENT }}_admin_settings()` | `FORM` | `src/Form/SettingsForm.php` | `@config.factory` | `MIGRATED` |
+| `includes/admin.inc` | `{{ COMPONENT }}_admin_settings()` | `CONFIG_FORM_BASE` | `src/Form/SettingsForm.php` | `CONFIG_FORM_REWRITE` (`@config.factory`) | `MIGRATED` |
 | `includes/helper.inc` | `{{ COMPONENT }}_calculate_tax()` | `SERVICE_BUSINESS_LOGIC` | `src/Service/CalculationService.php` | N/A | `MIGRATED` |
 | `includes/drush.inc` | `drush_{{ COMPONENT }}_sync()` | `DRUSH_COMMAND` | `src/Drush/Commands/SyncCommands.php` | `@entity_type.manager` | `MIGRATED` |
 | `lib/LegacyCompat.php` | `class LegacyCompat` | `LEGACY_OBSOLETE` | N/A | N/A | `OBSOLETE` |
@@ -89,6 +91,7 @@ evidence_summary:
 | CREATED | `{{ COMPONENT }}.services.yml` | N/A | Service container definitions |
 | CREATED | `{{ COMPONENT }}.routing.yml` | `hook_menu()` | Route definitions |
 | CREATED | `src/Entity/RecordEntity.php` | `hook_entity_info()` | Modern Content Entity class |
+| CREATED | `src/Form/FilterForm.php` | `{{ COMPONENT }}_filter_form` | Modern FormBase class with AJAX handlers |
 | CREATED | `src/Service/ExampleProcessor.php` | `lib/ExampleProcessor.php` | Modernized PSR-4 service class with constructor DI |
 
 ---
@@ -97,6 +100,7 @@ evidence_summary:
 - **Unit Test**: `tests/src/Unit/ExampleProcessorTest.php`
 - **Kernel Test**: `tests/src/Kernel/IntegrationTest.php`
 - **Entity Test**: `tests/src/Kernel/RecordEntityTest.php`
+- **Form Test**: `tests/src/Kernel/FilterFormTest.php`
 
 ---
 
