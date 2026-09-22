@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260922121111",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260922185639",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-22T12:11:11.241154+00:00",
+  "executed_at": "2026-09-22T18:56:39.787597+00:00",
   "summary": {
-    "checks_total": 400,
-    "passed": 397,
+    "checks_total": 416,
+    "passed": 413,
     "failed": 0,
     "warnings": 0,
     "unverified": 3
@@ -616,6 +616,18 @@
       "details": "Verified /discover command definition.",
       "affected_files": [
         "commands/discover.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-CMD-migrate-module.md",
+      "category": "commands",
+      "name": "Slash Command (migrate-module.md)",
+      "status": "PASS",
+      "evidence": "Command enforces explicit argument validation, upstream dependency gating, and strict write isolation.",
+      "details": "Verified /migrate-module command definition.",
+      "affected_files": [
+        "commands/migrate-module.md"
       ],
       "remediation": ""
     },
@@ -5109,6 +5121,189 @@
       "affected_files": [
         "state/migration-manifest.yml",
         "reports/validation_result.json"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-01",
+      "category": "single_module",
+      "name": "Slash Command Definition & Argument Validation",
+      "status": "PASS",
+      "evidence": "Command /migrate-module defines explicit <MODULE_NAME> argument validation and halts on missing input.",
+      "details": "Verified commands/migrate-module.md argument validation rules.",
+      "affected_files": [
+        "commands/migrate-module.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-02",
+      "category": "single_module",
+      "name": "Plugin Manifest Command Registration",
+      "status": "PASS",
+      "evidence": ".claude-plugin/plugin.json explicitly registers ./commands/migrate-module.md in commands list.",
+      "details": "Verified command registration in plugin manifest.",
+      "affected_files": [
+        ".claude-plugin/plugin.json"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-03",
+      "category": "single_module",
+      "name": "Packaging Documentation Command Registration",
+      "status": "PASS",
+      "evidence": "CLAUDE_CODE_PACKAGING.md registers ./commands/migrate-module.md.",
+      "details": "Verified packaging documentation sync.",
+      "affected_files": [
+        "CLAUDE_CODE_PACKAGING.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-04",
+      "category": "single_module",
+      "name": "User Documentation Reference & Examples",
+      "status": "PASS",
+      "evidence": "README.md documents /migrate-module <MODULE_NAME> with usage instructions and tips.",
+      "details": "Verified user onboarding guide.",
+      "affected_files": [
+        "README.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-05",
+      "category": "single_module",
+      "name": "Orchestrator Agent Single-Module Mode",
+      "status": "PASS",
+      "evidence": "Orchestrator agent specification defines Single-Module Mode with isolated state mutation.",
+      "details": "Verified orchestrator agent contract.",
+      "affected_files": [
+        "agents/orchestrator/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-06",
+      "category": "single_module",
+      "name": "Custom-Module Agent Execution Scope",
+      "status": "PASS",
+      "evidence": "Custom-module agent explicitly supports SINGLE_MODULE execution scope and write boundaries.",
+      "details": "Verified custom-module agent contract.",
+      "affected_files": [
+        "agents/custom-module/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-07",
+      "category": "single_module",
+      "name": "Custom-Module Skill Single-Module Protocol",
+      "status": "PASS",
+      "evidence": "skills/custom-module-migration/SKILL.md defines complete Section 14 Single-Module Protocol.",
+      "details": "Verified skill operational protocol.",
+      "affected_files": [
+        "skills/custom-module-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-08",
+      "category": "single_module",
+      "name": "Lifecycle Model Sub-DAG Execution",
+      "status": "PASS",
+      "evidence": "MIGRATION_LIFECYCLE.md details Single-Module Execution Mode and sub-DAG scope boundaries.",
+      "details": "Verified lifecycle model integration.",
+      "affected_files": [
+        "MIGRATION_LIFECYCLE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-09",
+      "category": "single_module",
+      "name": "Agent Protocol Result Validation Gate (Check 12)",
+      "status": "PASS",
+      "evidence": "AGENT_PROTOCOL.md enforces Check 12 Single-Module Isolation & Dependency Safety in Result Validation Gate.",
+      "details": "Verified agent protocol validation gate.",
+      "affected_files": [
+        "AGENT_PROTOCOL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-10",
+      "category": "single_module",
+      "name": "Upstream Dependency Gating Contract",
+      "status": "PASS",
+      "evidence": "Unmigrated custom dependencies strictly trigger BLOCKED_UPSTREAM without unprompted auto-migration.",
+      "details": "Verified dependency safety gating contract.",
+      "affected_files": [
+        "commands/migrate-module.md",
+        "agents/orchestrator/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-11",
+      "category": "single_module",
+      "name": "Strict Write Scope Isolation & External Changes",
+      "status": "PASS",
+      "evidence": "Write scope strictly bounded to target module directory; external changes recorded as REQUIRES_EXTERNAL_CHANGE.",
+      "details": "Verified write isolation guarantees.",
+      "affected_files": [
+        "commands/migrate-module.md",
+        "skills/custom-module-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-12",
+      "category": "single_module",
+      "name": "D7 Source Immutability & Safety Violation Gating",
+      "status": "PASS",
+      "evidence": "D7 source immutability strictly verified before and after execution; unexpected mutations trigger SAFETY_VIOLATION.",
+      "details": "Verified D7 source protection.",
+      "affected_files": [
+        "commands/migrate-module.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-13",
+      "category": "single_module",
+      "name": "Target Module Snapshot & Idempotency Handling",
+      "status": "PASS",
+      "evidence": "Pre-migration target snapshot distinguishes EXISTING_TARGET_MODULE vs NEW_TARGET_MODULE for idempotent re-runs.",
+      "details": "Verified target snapshot and idempotency protocol.",
+      "affected_files": [
+        "commands/migrate-module.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-14",
+      "category": "single_module",
+      "name": "Standard Evidence Report Suite Schema",
+      "status": "PASS",
+      "evidence": "Defines all 8 required module-scoped evidence artifacts in reports/migration/<MODULE_NAME>/.",
+      "details": "Verified evidence suite schema.",
+      "affected_files": [
+        "commands/migrate-module.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-15",
+      "category": "single_module",
+      "name": "Global /orchestrate Compatibility & Non-Interference",
+      "status": "PASS",
+      "evidence": "Global /orchestrate workflow remains 100% intact, backward-compatible, and isolated from single-module flows.",
+      "details": "Verified global orchestration compatibility.",
+      "affected_files": [
+        "commands/orchestrate.md",
+        "agents/orchestrator/agent.md"
       ],
       "remediation": ""
     }

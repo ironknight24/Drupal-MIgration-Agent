@@ -178,12 +178,24 @@ This inventories all D7 custom modules, contrib modules, themes, hooks, database
 
 ---
 
-### 5. Orchestrate End-to-End Migration
+### 5. Orchestrate End-to-End Migration or Migrate a Single Module
 
-To initiate or resume the full, dynamic wave-by-wave migration workflow:
+**Option A: Full-Workspace Migration (`/orchestrate`)**
+To initiate or resume the full, dynamic wave-by-wave migration workflow across all custom modules, themes, configuration, and data:
 ```text
 /orchestrate
 ```
+
+**Option B: Single-Module Migration (`/migrate-module <MODULE_NAME>`)**
+To migrate exactly **ONE** selected custom module with upstream dependency checking, strict write isolation, and module-scoped forensic reporting:
+```text
+/migrate-module ariba_helper
+```
+*(Or with full namespace: `/drupal-migration-agent:migrate-module ariba_helper`)*
+
+> [!TIP]
+> Single-module migration validates that all upstream custom module dependencies are already migrated before proceeding. If an upstream dependency is missing, it marks the module `BLOCKED_UPSTREAM` and prevents partial/broken code generation.
+
 To check progress, active wave, component statuses, and blockers at any time:
 ```text
 /status
@@ -197,6 +209,7 @@ To check progress, active wave, component statuses, and blockers at any time:
 |:---|:---|:---|
 | `/preflight` | `/drupal-migration-agent:preflight` | Non-destructive validation of configuration, paths, permissions, and Drupal markers. |
 | `/discover` | `/drupal-migration-agent:discover` | Runs a standalone, read-only baseline audit on D7/D10 environments. |
+| `/migrate-module` | `/drupal-migration-agent:migrate-module` | Migrates exactly ONE selected custom module with dependency gating and isolated write boundaries. |
 | `/orchestrate` | `/drupal-migration-agent:orchestrate` | Gated by Preflight; guides setup and initiates the full end-to-end migration lifecycle. |
 | `/status` | `/drupal-migration-agent:status` | Displays real-time phase progress, manifest statistics, and blockers. |
 

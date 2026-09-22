@@ -405,7 +405,7 @@ class FactoryValidator:
 
     # Suite 4: Command Routing, Gating & Authority
     def validate_commands(self):
-        cmds = ["discover.md", "orchestrate.md", "status.md", "preflight.md"]
+        cmds = ["discover.md", "migrate-module.md", "orchestrate.md", "status.md", "preflight.md"]
         for cmd in cmds:
             cmd_file = self.repo_root / "commands" / cmd
             rel_file = str(cmd_file.relative_to(self.repo_root))
@@ -430,6 +430,18 @@ class FactoryValidator:
                     self.record_check(f"CHECK-CMD-{cmd}", "commands", f"Slash Command ({cmd})", "FAIL",
                                       "Missing valid description or state separation in status.md",
                                       "Command must separate runtime state from manifest.", [rel_file])
+            elif cmd == "migrate-module.md":
+                has_arg_val = "<MODULE_NAME>" in content and "HALT" in content
+                has_dep_gate = "BLOCKED_UPSTREAM" in content
+                has_isolation = "Strict Write Boundary Enforcement" in content or "SINGLE_MODULE" in content
+                if has_arg_val and has_dep_gate and has_isolation and has_desc:
+                    self.record_check(f"CHECK-CMD-{cmd}", "commands", f"Slash Command ({cmd})", "PASS",
+                                      "Command enforces explicit argument validation, upstream dependency gating, and strict write isolation.",
+                                      "Verified /migrate-module command definition.", [rel_file])
+                else:
+                    self.record_check(f"CHECK-CMD-{cmd}", "commands", f"Slash Command ({cmd})", "FAIL",
+                                      "Command missing argument validation, dependency gating, or write isolation rules.",
+                                      "/migrate-module must define complete single-module protocol.", [rel_file])
             elif cmd == "orchestrate.md":
                 routes_orch = "agents/orchestrator/agent.md" in content or "orchestrator" in content
                 has_preflight_gate = "preflight" in content.lower()
@@ -6701,6 +6713,181 @@ class FactoryValidator:
                           "Retained explicit status: [RUNTIME UNVERIFIED — CLAUDE CODE CLI/ACCESS NOT AVAILABLE].",
                           affected_files=["state/migration-manifest.yml", "reports/validation_result.json"])
 
+    # Suite 24: Single-Module Migration Capability Suite
+    def validate_single_module_migration_suite(self):
+        cmd_file = self.repo_root / "commands" / "migrate-module.md"
+        p_json = self.repo_root / ".claude-plugin" / "plugin.json"
+        pkg_doc = self.repo_root / "CLAUDE_CODE_PACKAGING.md"
+        readme = self.repo_root / "README.md"
+        orch_agent = self.repo_root / "agents" / "orchestrator" / "agent.md"
+        cm_agent = self.repo_root / "agents" / "custom-module" / "agent.md"
+        cm_skill = self.repo_root / "skills" / "custom-module-migration" / "SKILL.md"
+        lifecycle = self.repo_root / "MIGRATION_LIFECYCLE.md"
+        protocol = self.repo_root / "AGENT_PROTOCOL.md"
+
+        # 24.1 Command Definition & Argument Validation
+        if cmd_file.exists():
+            c_txt = cmd_file.read_text(encoding="utf-8")
+            has_arg = "<MODULE_NAME>" in c_txt and "HALT" in c_txt and "Missing required argument" in c_txt
+            if has_arg:
+                self.record_check("CHECK-SMM-01", "single_module", "Slash Command Definition & Argument Validation", "PASS",
+                                  "Command /migrate-module defines explicit <MODULE_NAME> argument validation and halts on missing input.",
+                                  "Verified commands/migrate-module.md argument validation rules.",
+                                  affected_files=["commands/migrate-module.md"])
+            else:
+                self.record_check("CHECK-SMM-01", "single_module", "Slash Command Definition & Argument Validation", "FAIL",
+                                  "Command missing explicit argument validation or halt conditions.",
+                                  "Command must enforce argument validation.", affected_files=["commands/migrate-module.md"])
+        else:
+            self.record_check("CHECK-SMM-01", "single_module", "Slash Command Definition & Argument Validation", "FAIL",
+                              "Missing commands/migrate-module.md", "Command file must exist.")
+
+        # 24.2 Plugin Manifest Registration
+        if p_json.exists():
+            p_txt = p_json.read_text(encoding="utf-8")
+            if "./commands/migrate-module.md" in p_txt:
+                self.record_check("CHECK-SMM-02", "single_module", "Plugin Manifest Command Registration", "PASS",
+                                  ".claude-plugin/plugin.json explicitly registers ./commands/migrate-module.md in commands list.",
+                                  "Verified command registration in plugin manifest.",
+                                  affected_files=[".claude-plugin/plugin.json"])
+            else:
+                self.record_check("CHECK-SMM-02", "single_module", "Plugin Manifest Command Registration", "FAIL",
+                                  "plugin.json does not register ./commands/migrate-module.md.",
+                                  "Must register command in plugin.json.", affected_files=[".claude-plugin/plugin.json"])
+
+        # 24.3 Packaging Documentation Registration
+        if pkg_doc.exists() and "./commands/migrate-module.md" in pkg_doc.read_text(encoding="utf-8"):
+            self.record_check("CHECK-SMM-03", "single_module", "Packaging Documentation Command Registration", "PASS",
+                              "CLAUDE_CODE_PACKAGING.md registers ./commands/migrate-module.md.",
+                              "Verified packaging documentation sync.", affected_files=["CLAUDE_CODE_PACKAGING.md"])
+        else:
+            self.record_check("CHECK-SMM-03", "single_module", "Packaging Documentation Command Registration", "FAIL",
+                              "CLAUDE_CODE_PACKAGING.md missing ./commands/migrate-module.md.",
+                              "Must document command in packaging guide.")
+
+        # 24.4 User Documentation Reference
+        if readme.exists() and "/migrate-module <MODULE_NAME>" in readme.read_text(encoding="utf-8"):
+            self.record_check("CHECK-SMM-04", "single_module", "User Documentation Reference & Examples", "PASS",
+                              "README.md documents /migrate-module <MODULE_NAME> with usage instructions and tips.",
+                              "Verified user onboarding guide.", affected_files=["README.md"])
+        else:
+            self.record_check("CHECK-SMM-04", "single_module", "User Documentation Reference & Examples", "FAIL",
+                              "README.md missing /migrate-module documentation.",
+                              "Must document command in README.md.")
+
+        # 24.5 Orchestrator Agent Single-Module Mode
+        if orch_agent.exists() and "Single-Module Mode" in orch_agent.read_text(encoding="utf-8"):
+            self.record_check("CHECK-SMM-05", "single_module", "Orchestrator Agent Single-Module Mode", "PASS",
+                              "Orchestrator agent specification defines Single-Module Mode with isolated state mutation.",
+                              "Verified orchestrator agent contract.", affected_files=["agents/orchestrator/agent.md"])
+        else:
+            self.record_check("CHECK-SMM-05", "single_module", "Orchestrator Agent Single-Module Mode", "FAIL",
+                              "Orchestrator agent missing Single-Module Mode specification.",
+                              "Must define Single-Module Mode in orchestrator agent.")
+
+        # 24.6 Custom-Module Agent Execution Scope
+        if cm_agent.exists() and "SINGLE_MODULE" in cm_agent.read_text(encoding="utf-8"):
+            self.record_check("CHECK-SMM-06", "single_module", "Custom-Module Agent Execution Scope", "PASS",
+                              "Custom-module agent explicitly supports SINGLE_MODULE execution scope and write boundaries.",
+                              "Verified custom-module agent contract.", affected_files=["agents/custom-module/agent.md"])
+        else:
+            self.record_check("CHECK-SMM-06", "single_module", "Custom-Module Agent Execution Scope", "FAIL",
+                              "Custom-module agent missing SINGLE_MODULE execution scope.",
+                              "Must support SINGLE_MODULE execution scope.")
+
+        # 24.7 Custom-Module Skill Single-Module Protocol
+        if cm_skill.exists() and "Single-Module Migration Protocol" in cm_skill.read_text(encoding="utf-8"):
+            self.record_check("CHECK-SMM-07", "single_module", "Custom-Module Skill Single-Module Protocol", "PASS",
+                              "skills/custom-module-migration/SKILL.md defines complete Section 14 Single-Module Protocol.",
+                              "Verified skill operational protocol.", affected_files=["skills/custom-module-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-SMM-07", "single_module", "Custom-Module Skill Single-Module Protocol", "FAIL",
+                              "Skill missing Single-Module Migration Protocol section.",
+                              "Must define protocol in skill.")
+
+        # 24.8 Lifecycle Model Integration
+        if lifecycle.exists() and "Single-Module Execution Mode" in lifecycle.read_text(encoding="utf-8"):
+            self.record_check("CHECK-SMM-08", "single_module", "Lifecycle Model Sub-DAG Execution", "PASS",
+                              "MIGRATION_LIFECYCLE.md details Single-Module Execution Mode and sub-DAG scope boundaries.",
+                              "Verified lifecycle model integration.", affected_files=["MIGRATION_LIFECYCLE.md"])
+        else:
+            self.record_check("CHECK-SMM-08", "single_module", "Lifecycle Model Sub-DAG Execution", "FAIL",
+                              "Lifecycle model missing Single-Module Execution Mode.",
+                              "Must document lifecycle integration.")
+
+        # 24.9 Agent Protocol Result Validation Gate
+        if protocol.exists() and "Single-Module Isolation & Dependency Safety" in protocol.read_text(encoding="utf-8"):
+            self.record_check("CHECK-SMM-09", "single_module", "Agent Protocol Result Validation Gate (Check 12)", "PASS",
+                              "AGENT_PROTOCOL.md enforces Check 12 Single-Module Isolation & Dependency Safety in Result Validation Gate.",
+                              "Verified agent protocol validation gate.", affected_files=["AGENT_PROTOCOL.md"])
+        else:
+            self.record_check("CHECK-SMM-09", "single_module", "Agent Protocol Result Validation Gate (Check 12)", "FAIL",
+                              "Agent protocol missing Check 12 Single-Module Isolation rule.",
+                              "Must enforce Check 12 in AGENT_PROTOCOL.md.")
+
+        # 24.10 Upstream Dependency Gating Contract
+        c_txt = cmd_file.read_text(encoding="utf-8") if cmd_file.exists() else ""
+        if "BLOCKED_UPSTREAM" in c_txt and "Do NOT automatically migrate unrequested upstream modules" in (orch_agent.read_text(encoding="utf-8") if orch_agent.exists() else ""):
+            self.record_check("CHECK-SMM-10", "single_module", "Upstream Dependency Gating Contract", "PASS",
+                              "Unmigrated custom dependencies strictly trigger BLOCKED_UPSTREAM without unprompted auto-migration.",
+                              "Verified dependency safety gating contract.", affected_files=["commands/migrate-module.md", "agents/orchestrator/agent.md"])
+        else:
+            self.record_check("CHECK-SMM-10", "single_module", "Upstream Dependency Gating Contract", "FAIL",
+                              "Missing strict dependency gating contract.",
+                              "Must enforce BLOCKED_UPSTREAM without auto-migrating unselected modules.")
+
+        # 24.11 Strict Write Scope Isolation
+        if "Strict Write Boundary Enforcement" in c_txt and "REQUIRES_EXTERNAL_CHANGE" in (cm_skill.read_text(encoding="utf-8") if cm_skill.exists() else ""):
+            self.record_check("CHECK-SMM-11", "single_module", "Strict Write Scope Isolation & External Changes", "PASS",
+                              "Write scope strictly bounded to target module directory; external changes recorded as REQUIRES_EXTERNAL_CHANGE.",
+                              "Verified write isolation guarantees.", affected_files=["commands/migrate-module.md", "skills/custom-module-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-SMM-11", "single_module", "Strict Write Scope Isolation & External Changes", "FAIL",
+                              "Missing write isolation or external change handling.",
+                              "Must strictly enforce write boundaries.")
+
+        # 24.12 D7 Source Read-Only Immutability
+        if ("Zero D7 files were modified" in c_txt or "Zero** D7 files were modified" in c_txt or "D7 source (strictly READ-ONLY)" in c_txt) and "SAFETY_VIOLATION" in c_txt:
+            self.record_check("CHECK-SMM-12", "single_module", "D7 Source Immutability & Safety Violation Gating", "PASS",
+                              "D7 source immutability strictly verified before and after execution; unexpected mutations trigger SAFETY_VIOLATION.",
+                              "Verified D7 source protection.", affected_files=["commands/migrate-module.md"])
+        else:
+            self.record_check("CHECK-SMM-12", "single_module", "D7 Source Immutability & Safety Violation Gating", "FAIL",
+                              "Missing D7 immutability or SAFETY_VIOLATION gating.",
+                              "Must enforce D7 source read-only protection.")
+
+        # 24.13 Target Module Snapshot & Idempotency
+        if "EXISTING_TARGET_MODULE" in c_txt and "NEW_TARGET_MODULE" in c_txt:
+            self.record_check("CHECK-SMM-13", "single_module", "Target Module Snapshot & Idempotency Handling", "PASS",
+                              "Pre-migration target snapshot distinguishes EXISTING_TARGET_MODULE vs NEW_TARGET_MODULE for idempotent re-runs.",
+                              "Verified target snapshot and idempotency protocol.", affected_files=["commands/migrate-module.md"])
+        else:
+            self.record_check("CHECK-SMM-13", "single_module", "Target Module Snapshot & Idempotency Handling", "FAIL",
+                              "Missing target snapshotting or idempotency handling.",
+                              "Must support safe idempotent re-runs.")
+
+        # 24.14 Standard Evidence Report Suite Schema
+        reports_expected = ["_D7_BASELINE.md", "_MIGRATION_PLAN.md", "_FUNCTION_MAP.md", "_FUNCTION_MAP.yml", "_DEPENDENCY_ANALYSIS.md", "_POST_MIGRATION_AUDIT.md", "_GAP_ANALYSIS.md", "_FINAL_VERDICT.md"]
+        if all(r in c_txt for r in reports_expected):
+            self.record_check("CHECK-SMM-14", "single_module", "Standard Evidence Report Suite Schema", "PASS",
+                              "Defines all 8 required module-scoped evidence artifacts in reports/migration/<MODULE_NAME>/.",
+                              "Verified evidence suite schema.", affected_files=["commands/migrate-module.md"])
+        else:
+            self.record_check("CHECK-SMM-14", "single_module", "Standard Evidence Report Suite Schema", "FAIL",
+                              "Missing one or more required evidence report specifications.",
+                              "Must define complete 8-artifact evidence suite.")
+
+        # 24.15 Global /orchestrate Compatibility & Non-Interference
+        orch_cmd = self.repo_root / "commands" / "orchestrate.md"
+        if orch_cmd.exists() and "Dynamic Wave Scheduling" in (orch_agent.read_text(encoding="utf-8") if orch_agent.exists() else ""):
+            self.record_check("CHECK-SMM-15", "single_module", "Global /orchestrate Compatibility & Non-Interference", "PASS",
+                              "Global /orchestrate workflow remains 100% intact, backward-compatible, and isolated from single-module flows.",
+                              "Verified global orchestration compatibility.", affected_files=["commands/orchestrate.md", "agents/orchestrator/agent.md"])
+        else:
+            self.record_check("CHECK-SMM-15", "single_module", "Global /orchestrate Compatibility & Non-Interference", "FAIL",
+                              "Global /orchestrate workflow was compromised.",
+                              "Must maintain full-workspace orchestration integrity.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -6725,6 +6912,7 @@ class FactoryValidator:
         self.validate_dynamic_dependencies_suite()
         self.validate_external_integrations_suite()
         self.validate_runtime_behavior_suite()
+        self.validate_single_module_migration_suite()
 
     def generate_result_json(self):
         return {

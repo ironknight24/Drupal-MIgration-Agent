@@ -124,13 +124,14 @@ Before committing any proposed state transition to `state/migration-state.yml`, 
 2. **Agent Authorization**: `agent_name` matches the agent dispatched for this phase and component.
 3. **Component In-Scope**: `component_id` is registered and in-scope in `state/migration-manifest.yml`.
 4. **Valid State Transition**: `from_state` matches current runtime state; `proposed_to_state` is a valid forward transition in the 15 canonical states.
-5. **Write Boundary Compliance**: All paths in `files_changed` fall strictly within the agent's authorized write scope derived from `migration.config.yml`.
+5. **Write Boundary Compliance**: All paths in `files_changed` fall strictly within the agent's authorized write scope derived from `migration.config.yml` (for `SINGLE_MODULE` mode, strictly `<target_custom_modules_path>/<MODULE_NAME>/**/*`).
 6. **Source Immutability (Rule 1 & 2)**: Zero files in `source.path` were touched or modified.
 7. **Secret Protection (Rule 10)**: No credentials, tokens, or private keys committed to config or code.
 8. **Evidence Citation**: `evidence` cites empirical facts (`[OBSERVED FACT]`, `[VERIFIED RESULT]`, test logs).
 9. **Blocker Classification**: If `execution_status` is `BLOCKED` or `STOPPED`, blocker record exists with valid `remediation_stage`.
 10. **Target Version Consistency**: Modern code patterns conform to configured `target.core_version`.
 11. **Custom Database, Schema, Procedural Hook, PHP File, Class & `.inc` Accounting Integrity**: For custom module components, all custom database tables, schemas (`hook_schema`), procedural hook implementations, custom hook invocations (`module_invoke_all`), alter hooks, `hook_menu` routes, custom PHP source files, OOP classes, interfaces, traits, constructors, methods, and `.inc` files cataloged in discovery must have an explicit outcome status (`MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`) with zero unaccounted or silently omitted functionality.
+12. **Single-Module Isolation & Dependency Safety**: In `SINGLE_MODULE` mode, confirms that zero unrelated modules were modified and all upstream dependencies are verified as `COMPLETED` / `VALIDATED`. If an external change outside the module is required, it must be flagged as `REQUIRES_EXTERNAL_CHANGE` rather than directly writing to unowned files.
 
 *On Validation Failure*: The Orchestrator rejects the result, generates an `EVIDENCE_GAP` or `STATE_INCONSISTENCY` blocker, and does NOT commit the proposed state change.
 

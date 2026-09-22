@@ -127,6 +127,13 @@ A component's upstream dependency requirement is satisfied if:
    - All transitive dependents transition to `BLOCKED_UPSTREAM`.
    - Independent components continue execution uninterrupted.
 
+### Single-Module Execution Mode (`/migrate-module <MODULE>`)
+When the user requests single-module migration:
+1. **Scope Boundary**: Execution is restricted to the sub-DAG for `<MODULE>`.
+2. **Upstream Dependency Check**: The Orchestrator inspects declared/implicit custom module dependencies of `<MODULE>`. If any upstream dependency is not `COMPLETED`, execution halts with status `BLOCKED_UPSTREAM` and a blocker ticket.
+3. **Write Scope**: The specialist agent write scope is strictly `<target_module_dir>/<MODULE>/**/*`.
+4. **State Update**: Only `component_states.<MODULE>` is updated in `state/migration-state.yml`. All other components remain unaffected.
+
 ---
 
 ## 5. Parallelism & Concurrency Serialization Gates

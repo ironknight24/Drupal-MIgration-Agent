@@ -136,3 +136,33 @@ Determine target version from project configuration (`target.core_version`):
     - Reject any `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, or `SILENTLY_OMITTED` items.
     - Generate `reports/custom-modules/REPORT-<MODULE>.md`.
     - Propose updating component status to `CODE_COMPLETE` via `agent_result`.
+
+---
+
+## 14. Single-Module Migration Protocol (`/migrate-module <MODULE>`)
+
+When invoked in single-module mode via `/drupal-migration-agent:migrate-module <MODULE>`:
+
+1. **Target Module Identification & Manifest Validation**:
+   - The agent strictly validates that `<MODULE>` exists in `state/migration-manifest.yml` as a `custom_module`.
+2. **Upstream Custom Dependency Check**:
+   - Inspect all declared and implicit custom module dependencies for `<MODULE>`.
+   - If any upstream custom module dependency is unmigrated (not `COMPLETED` / `VALIDATED`), the agent **MUST NOT** silently migrate it. The agent halts with status `BLOCKED_UPSTREAM` and generates `reports/blocked/BLOCKED-<MODULE>-001-UPSTREAM.md`.
+3. **Pre-Migration Target Snapshot**:
+   - If `<target_module_dir>/<MODULE>/` already exists, capture file inventory, line counts, and checksums, tagging the run as `EXISTING_TARGET_MODULE` (vs `NEW_TARGET_MODULE`).
+4. **Strict Write Scope & Boundary Enforcement**:
+   - Authorized write target is strictly `<target_module_dir>/<MODULE>/**/*` and `reports/migration/<MODULE>/*`.
+   - Zero writes to D7 source (strictly read-only). Zero writes to other custom modules, contrib modules, themes, core, or global config.
+   - If a supporting change outside the module is required, record it as `REQUIRES_EXTERNAL_CHANGE` in the plan and gap analysis without modifying external files.
+5. **Standard Evidence Artifacts**:
+   - In single-module mode, generate the comprehensive evidence suite under `reports/migration/<MODULE>/`:
+     - `<MODULE>_D7_BASELINE.md`
+     - `<MODULE>_MIGRATION_PLAN.md`
+     - `<MODULE>_FUNCTION_MAP.md`
+     - `<MODULE>_FUNCTION_MAP.yml`
+     - `<MODULE>_DEPENDENCY_ANALYSIS.md`
+     - `<MODULE>_POST_MIGRATION_AUDIT.md`
+     - `<MODULE>_GAP_ANALYSIS.md`
+     - `<MODULE>_FINAL_VERDICT.md`
+6. **State Mutation**:
+   - The Orchestrator updates only `component_states.<MODULE>` in `state/migration-state.yml`, leaving all unrelated components unchanged.

@@ -27,7 +27,7 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 - Re-engineering custom entities into modern Drupal 10/11 `@ContentEntityType` or `@ConfigEntityType` definitions (`src/Entity/`), interfaces (`src/Entity/<CustomEntity>Interface.php`), custom access control handlers (`src/Access/<CustomEntity>AccessControlHandler.php`), view builders (`src/Entity/<CustomEntity>ViewBuilder.php`), and storage handlers (`src/Storage/`).
 - Re-engineering legacy field instances into modern base field definitions (`baseFieldDefinitions()`) or CMI field configurations (`config/sync/field.storage.*.yml`, `config/sync/field.field.*.yml`).
 - Re-engineering custom database schemas and tables into appropriate D10/D11 targets: Content Entities (`src/Entity/`), Config Entities, Config API (`config.factory`), State API (`\Drupal::state()`), KeyValue stores, or dedicated Repository Services (`src/Repository/`) utilizing `\Drupal\Core\Database\Connection`.
-- Authoring module migration plans in `reports/custom-modules/PLAN-<MODULE>.md` with exhaustive file-to-class/function, hook-to-architecture, database table, and entity/field accounting.
+- Authoring module migration plans in `reports/custom-modules/PLAN-<MODULE>.md` (and `reports/migration/<MODULE>/<MODULE>_MIGRATION_PLAN.md`) with exhaustive file-to-class/function, hook-to-architecture, database table, and entity/field accounting.
 - Scaffolding modern module architecture in `<target_module_dir>/<MODULE>/`.
 - Generating `.info.yml`, `.services.yml`, `.routing.yml`, `.permissions.yml`, `.links.menu.yml`, `.links.task.yml`, `.links.action.yml`, `.links.contextual.yml`, and `drush.services.yml`.
 - Authoring modern PSR-4 OOP classes (`src/Service/`, `src/Controller/`, `src/Form/`, `src/Plugin/`, `src/EventSubscriber/`, `src/Access/`, `src/Drush/Commands/`, `src/Entity/`, `src/Repository/`).
@@ -36,6 +36,8 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 - Scaffolding Unit and Kernel test suites in `<target_module_dir>/<MODULE>/tests/`.
 - Logging all mutations in `logs/file-change-log/`.
 - Proposing component state transitions via `agent_result` with explicit outcome statuses for all files, classes, callables, procedural hooks, database tables, and entity/field definitions.
+- Supporting both `FULL_WORKSPACE` orchestration waves and explicit `SINGLE_MODULE` execution (`/migrate-module <MODULE>`), enforcing strict write boundaries exclusively to `<target_module_dir>/<MODULE>/`.
+- Flagging any required cross-boundary modifications outside `<target_module_dir>/<MODULE>/` as `REQUIRES_EXTERNAL_CHANGE` rather than silently mutating external files.
 
 ---
 
@@ -46,6 +48,7 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 - Directly mutating `state/migration-state.yml` (proposes via `agent_result`).
 - Executing Git operations (Rule 4).
 - Modifying themes, global CMI configs, or data pipelines outside the module scope.
+- Modifying other custom or contrib modules during `SINGLE_MODULE` execution.
 
 ---
 

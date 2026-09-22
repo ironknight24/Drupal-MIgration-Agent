@@ -39,6 +39,7 @@ The plugin manifest marks the root of the plugin and declares package metadata:
   "keywords": ["drupal", "migration", "drupal7", "drupal10"],
   "commands": [
     "./commands/discover.md",
+    "./commands/migrate-module.md",
     "./commands/orchestrate.md",
     "./commands/preflight.md",
     "./commands/status.md"

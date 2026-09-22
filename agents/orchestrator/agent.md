@@ -112,18 +112,30 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
    - If `phase_0_setup` -> advance to `phase_1_discovery` and dispatch `discovery`.
    - If `phase_1_discovery` complete -> advance to `phase_2_dependencies` and dispatch `dependency`.
    - If `phase_2_dependencies` complete -> advance to `phase_3_contrib_strategy` and dispatch `contrib-module`.
-5. **Dynamic Wave Scheduling (`phase_4_implementation`)**:
-   - Read dependency DAG from `reports/dependencies/`.
-   - Calculate in-degrees for unmigrated components.
-   - Assign components with in-degree 0 to `current_wave` (`wave_{N}`).
-   - Check file-lock and concurrency serialization constraints across active components.
-6. **Dispatch Specialist Agents**: Dispatch assigned specialist agent for each ready component.
-7. **Result Validation Gate**: Receive worker `agent_result` payload. Validate schema, agent authorization, write boundary compliance, evidence citations, and blocker classifications.
-8. **Authoritative State Mutation**: Update `component_states` in `state/migration-state.yml`.
-9. **Blocker Propagation**: If a component reports `BLOCKED`, mark all transitive downstream dependents in subsequent waves as `BLOCKED_UPSTREAM`.
-10. **Wave Advance**: When all components in `current_wave` reach terminal states (`COMPLETED`, `BLOCKED`, `SKIPPED`), advance to `wave_{N+1}`.
-11. **Testing & Validation Dispatch**: Dispatch `testing` and `validation` post-implementation.
-12. **Final Audit Dispatch**: When 100% of in-scope components reach terminal state, advance to `phase_8_final_audit` and dispatch `final-audit`.
+5. **Execution Mode Determination**:
+   - **Global Workspace Mode (`/orchestrate`)**:
+     - Dynamic Wave Scheduling (`phase_4_implementation`): Read dependency DAG from `reports/dependencies/`, calculate in-degrees for unmigrated components, assign components with in-degree 0 to `current_wave` (`wave_{N}`).
+     - Dispatch specialist agents for each ready component in wave.
+     - Advance waves until 100% of workspace components reach terminal states (`COMPLETED`, `BLOCKED`, `SKIPPED`).
+   - **Single-Module Mode (`/migrate-module <MODULE_NAME>`)**:
+     - Validate `<MODULE_NAME>` exists in `state/migration-manifest.yml` under `custom_modules`.
+     - Inspect upstream custom dependencies for `<MODULE_NAME>`:
+       - If any upstream custom module dependency is NOT in `COMPLETED` or `VALIDATED` state:
+         - Mark `<MODULE_NAME>` as `BLOCKED_UPSTREAM` in `state/migration-state.yml`.
+         - Generate `reports/blocked/BLOCKED-<MODULE_NAME>-001-UPSTREAM.md`.
+         - Do NOT automatically migrate unrequested upstream modules; halt and report the blocking dependency.
+       - If all upstream dependencies are satisfied:
+         - Dispatch `custom-module` specialist with `component_id: <MODULE_NAME>` and `execution_scope: SINGLE_MODULE`.
+         - Receive worker `agent_result` via Result Validation Gate.
+         - Authoritatively update `component_states.<MODULE_NAME>` in `state/migration-state.yml` (leaving all unrelated components unchanged).
+         - Dispatch `testing` and `validation` specifically scoped to `<MODULE_NAME>`.
+         - Generate module evidence artifacts in `reports/migration/<MODULE_NAME>/`.
+6. **Result Validation Gate**: Receive worker `agent_result` payload. Validate schema, agent authorization, write boundary compliance (ensuring single-module mode writes strictly to `<target_module_dir>/<MODULE_NAME>/`), evidence citations, and blocker classifications.
+7. **Authoritative State Mutation**: Update `component_states` in `state/migration-state.yml`.
+8. **Blocker Propagation**: If a component reports `BLOCKED`, mark all transitive downstream dependents in subsequent waves as `BLOCKED_UPSTREAM`.
+9. **Wave Advance**: In global mode, when all components in `current_wave` reach terminal states, advance to `wave_{N+1}`.
+10. **Testing & Validation Dispatch**: Dispatch `testing` and `validation` post-implementation.
+11. **Final Audit Dispatch**: In global mode, advance to `phase_8_final_audit` when all components complete; in single-module mode, sign off on the module-scoped audit report.
 
 ---
 
