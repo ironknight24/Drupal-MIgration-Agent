@@ -37,9 +37,41 @@ The plugin manifest marks the root of the plugin and declares package metadata:
   "repository": "https://github.com/ironknight24/Drupal-MIgration-Agent",
   "license": "MIT",
   "keywords": ["drupal", "migration", "drupal7", "drupal10"],
-  "commands": ["./commands/"],
-  "agents": ["./agents/"],
-  "skills": ["./skills/"]
+  "commands": [
+    "./commands/discover.md",
+    "./commands/orchestrate.md",
+    "./commands/preflight.md",
+    "./commands/status.md"
+  ],
+  "agents": [
+    "./agents/api-modernization.md",
+    "./agents/configuration.md",
+    "./agents/contrib-module.md",
+    "./agents/custom-module.md",
+    "./agents/custom-theme.md",
+    "./agents/data-migration.md",
+    "./agents/dependency.md",
+    "./agents/discovery.md",
+    "./agents/final-audit.md",
+    "./agents/integration.md",
+    "./agents/orchestrator.md",
+    "./agents/testing.md",
+    "./agents/validation.md"
+  ],
+  "skills": [
+    "./skills/behavioral-validation",
+    "./skills/configuration-migration",
+    "./skills/contrib-evaluation",
+    "./skills/custom-module-migration",
+    "./skills/d10-architecture",
+    "./skills/d7-analysis",
+    "./skills/d7-to-d10-mapping",
+    "./skills/dependency-analysis",
+    "./skills/integration-modernization",
+    "./skills/migration-api",
+    "./skills/testing",
+    "./skills/theme-modernization"
+  ]
 }
 ```
 

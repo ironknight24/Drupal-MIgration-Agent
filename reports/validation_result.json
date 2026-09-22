@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260918231734",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260922121111",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-18T23:17:34.643410+00:00",
+  "executed_at": "2026-09-22T12:11:11.241154+00:00",
   "summary": {
     "checks_total": 400,
     "passed": 397,
