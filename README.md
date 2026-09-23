@@ -62,7 +62,13 @@ Configure (migration.config.yml)
 
 ## Consumer Onboarding & Installation
 
-### Step 1: Install the Plugin
+### Option A: Antigravity IDE (Native Workspace Support)
+The framework natively supports **Antigravity IDE** via the `.agents/` workspace configuration.
+1. Open this repository or link it as a workspace in Antigravity IDE.
+2. The agent automatically loads instructions from [AGENTS.md](AGENTS.md), rules from `.agents/rules/`, and skills from `.agents/skills/`.
+3. Trigger workflows via conversational prompts or commands: `preflight`, `discover`, `orchestrate`, `migrate-module <MODULE>`, `status`.
+
+### Option B: Claude Code / MCP
 ```bash
 # Install via Claude Code Marketplace
 /plugin install drupal-migration-agent

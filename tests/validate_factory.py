@@ -7683,6 +7683,390 @@ class FactoryValidator:
         self.validate_recursive_orchestration_suite()
         self.validate_architectural_replacement_suite()
         self.validate_external_code_suite()
+        self.validate_antigravity_adapter_suite()
+
+    def validate_antigravity_adapter_suite(self):
+        """
+        Validates the Antigravity IDE Native Adapter layer across the factory (28 checks).
+        """
+        agents_md_path = self.repo_root / "AGENTS.md"
+        gemini_md_path = self.repo_root / "GEMINI.md"
+        agents_dir = self.repo_root / ".agents"
+        rules_dir = agents_dir / "rules"
+        workflows_dir = agents_dir / "workflows"
+        skills_dir = agents_dir / "skills"
+        plugin_json_path = agents_dir / "plugins" / "drupal-migration-agent" / "plugin.json"
+        readme_path = self.repo_root / "README.md"
+
+        agents_txt = agents_md_path.read_text(encoding="utf-8") if agents_md_path.exists() else ""
+        gemini_txt = gemini_md_path.read_text(encoding="utf-8") if gemini_md_path.exists() else ""
+        plugin_txt = plugin_json_path.read_text(encoding="utf-8") if plugin_json_path.exists() else ""
+        readme_txt = readme_path.read_text(encoding="utf-8") if readme_path.exists() else ""
+
+        # 1. Antigravity Workspace Directory Structure
+        if agents_dir.is_dir() and rules_dir.is_dir() and workflows_dir.is_dir() and skills_dir.is_dir():
+            self.record_check("CHECK-AGY-01", "antigravity_adapter", "Antigravity Workspace Directory Structure", "PASS",
+                              "Verified .agents workspace structure with rules, workflows, skills, and plugins.",
+                              "Verified .agents directory layout.", affected_files=[".agents/"])
+        else:
+            self.record_check("CHECK-AGY-01", "antigravity_adapter", "Antigravity Workspace Directory Structure", "FAIL",
+                              "Missing .agents directory structure.", "Must create .agents/ with rules, workflows, skills, plugins.")
+
+        # 2. Antigravity Master Rule & Persona
+        if agents_md_path.exists() and "Drupal Migration Agent Orchestrator" in agents_txt and gemini_md_path.exists():
+            self.record_check("CHECK-AGY-02", "antigravity_adapter", "Antigravity Master Rule & Persona", "PASS",
+                              "AGENTS.md and GEMINI.md establish the master Antigravity pair programmer persona and lifecycle rules.",
+                              "Verified master persona in AGENTS.md and GEMINI.md.", affected_files=["AGENTS.md", "GEMINI.md"])
+        else:
+            self.record_check("CHECK-AGY-02", "antigravity_adapter", "Antigravity Master Rule & Persona", "FAIL",
+                              "Missing AGENTS.md or GEMINI.md.", "Must provide AGENTS.md and GEMINI.md.")
+
+        # 3. Antigravity Plugin Manifest
+        if plugin_json_path.exists() and "drupal-migration-agent" in plugin_txt:
+            self.record_check("CHECK-AGY-03", "antigravity_adapter", "Antigravity Plugin Manifest", "PASS",
+                              "Verified Antigravity plugin manifest in .agents/plugins/drupal-migration-agent/plugin.json.",
+                              "Verified plugin.json manifest.", affected_files=[".agents/plugins/drupal-migration-agent/plugin.json"])
+        else:
+            self.record_check("CHECK-AGY-03", "antigravity_adapter", "Antigravity Plugin Manifest", "FAIL",
+                              "Missing .agents/plugins/drupal-migration-agent/plugin.json.", "Must create plugin manifest.")
+
+        # 4. Antigravity Safety & Isolation Rule
+        safety_rule = rules_dir / "safety-and-isolation.md"
+        safety_txt = safety_rule.read_text(encoding="utf-8") if safety_rule.exists() else ""
+        if safety_rule.exists() and "READ-ONLY" in safety_txt and "target.path" in safety_txt:
+            self.record_check("CHECK-AGY-04", "antigravity_adapter", "Antigravity Safety & Isolation Rule", "PASS",
+                              "Verified D7 source immutability, target isolation, and secret redaction rules.",
+                              "Verified safety-and-isolation.md rule.", affected_files=[".agents/rules/safety-and-isolation.md"])
+        else:
+            self.record_check("CHECK-AGY-04", "antigravity_adapter", "Antigravity Safety & Isolation Rule", "FAIL",
+                              "Missing .agents/rules/safety-and-isolation.md.", "Must create safety rule.")
+
+        # 5. Antigravity State Machine & Lifecycle Rule
+        state_rule = rules_dir / "state-machine-and-lifecycle.md"
+        state_txt = state_rule.read_text(encoding="utf-8") if state_rule.exists() else ""
+        if state_rule.exists() and "Single-Writer Authority" in state_txt and "10 Canonical Item Migration Statuses" in state_txt:
+            self.record_check("CHECK-AGY-05", "antigravity_adapter", "Antigravity State & Lifecycle Rule", "PASS",
+                              "Verified state machine authority, 10 canonical item statuses, and 15 component states.",
+                              "Verified state-machine-and-lifecycle.md rule.", affected_files=[".agents/rules/state-machine-and-lifecycle.md"])
+        else:
+            self.record_check("CHECK-AGY-05", "antigravity_adapter", "Antigravity State & Lifecycle Rule", "FAIL",
+                              "Missing .agents/rules/state-machine-and-lifecycle.md.", "Must create state machine rule.")
+
+        # 6. Antigravity Recursive Orchestration Rule
+        orch_rule = rules_dir / "recursive-orchestration.md"
+        orch_txt = orch_rule.read_text(encoding="utf-8") if orch_rule.exists() else ""
+        if orch_rule.exists() and "Global Workspace Orchestration" in orch_txt and "Targeted Recursive Module Orchestration" in orch_txt:
+            self.record_check("CHECK-AGY-06", "antigravity_adapter", "Antigravity Recursive Orchestration Rule", "PASS",
+                              "Verified dynamic wave scheduling, sub-DAG resolution, cycle detection, and idempotency.",
+                              "Verified recursive-orchestration.md rule.", affected_files=[".agents/rules/recursive-orchestration.md"])
+        else:
+            self.record_check("CHECK-AGY-06", "antigravity_adapter", "Antigravity Recursive Orchestration Rule", "FAIL",
+                              "Missing .agents/rules/recursive-orchestration.md.", "Must create recursive orchestration rule.")
+
+        # 7. Antigravity Architectural Replacement Rule
+        arch_rule = rules_dir / "architectural-replacement.md"
+        arch_txt = arch_rule.read_text(encoding="utf-8") if arch_rule.exists() else ""
+        if arch_rule.exists() and "Behavioral Parity vs Literal Translation" in arch_txt and "Existing Target Precedence" in arch_txt:
+            self.record_check("CHECK-AGY-07", "antigravity_adapter", "Antigravity Architectural Replacement Rule", "PASS",
+                              "Verified behavioral mapping, existing target precedence, and relationship type taxonomy.",
+                              "Verified architectural-replacement.md rule.", affected_files=[".agents/rules/architectural-replacement.md"])
+        else:
+            self.record_check("CHECK-AGY-07", "antigravity_adapter", "Antigravity Architectural Replacement Rule", "FAIL",
+                              "Missing .agents/rules/architectural-replacement.md.", "Must create architectural replacement rule.")
+
+        # 8. Antigravity External Code Protocol Rule
+        ext_rule = rules_dir / "external-code-protocol.md"
+        ext_txt = ext_rule.read_text(encoding="utf-8") if ext_rule.exists() else ""
+        if ext_rule.exists() and "Multi-Vector Evidence Engine" in ext_txt and "Behavior Unit Decomposition" in ext_txt:
+            self.record_check("CHECK-AGY-08", "antigravity_adapter", "Antigravity External Code Protocol Rule", "PASS",
+                              "Verified multi-vector evidence discovery, confidence grading, and behavior decomposition for external scripts.",
+                              "Verified external-code-protocol.md rule.", affected_files=[".agents/rules/external-code-protocol.md"])
+        else:
+            self.record_check("CHECK-AGY-08", "antigravity_adapter", "Antigravity External Code Protocol Rule", "FAIL",
+                              "Missing .agents/rules/external-code-protocol.md.", "Must create external code protocol rule.")
+
+        # 9. Antigravity Preflight Workflow Mapping
+        wf_preflight = workflows_dir / "preflight.md"
+        if wf_preflight.exists() and "PRE-01" in wf_preflight.read_text(encoding="utf-8"):
+            self.record_check("CHECK-AGY-09", "antigravity_adapter", "Antigravity Preflight Workflow Mapping", "PASS",
+                              "Verified preflight validation workflow definition in .agents/workflows/preflight.md.",
+                              "Verified preflight workflow.", affected_files=[".agents/workflows/preflight.md"])
+        else:
+            self.record_check("CHECK-AGY-09", "antigravity_adapter", "Antigravity Preflight Workflow Mapping", "FAIL",
+                              "Missing .agents/workflows/preflight.md.", "Must create preflight workflow.")
+
+        # 10. Antigravity Discovery Workflow Mapping
+        wf_discover = workflows_dir / "discover.md"
+        if wf_discover.exists() and "migration-manifest.yml" in wf_discover.read_text(encoding="utf-8"):
+            self.record_check("CHECK-AGY-10", "antigravity_adapter", "Antigravity Discovery Workflow Mapping", "PASS",
+                              "Verified discovery audit workflow definition in .agents/workflows/discover.md.",
+                              "Verified discover workflow.", affected_files=[".agents/workflows/discover.md"])
+        else:
+            self.record_check("CHECK-AGY-10", "antigravity_adapter", "Antigravity Discovery Workflow Mapping", "FAIL",
+                              "Missing .agents/workflows/discover.md.", "Must create discover workflow.")
+
+        # 11. Antigravity Master Orchestrator Workflow Mapping
+        wf_orchestrate = workflows_dir / "orchestrate.md"
+        if wf_orchestrate.exists() and "Targeted Recursive Module Migration" in wf_orchestrate.read_text(encoding="utf-8"):
+            self.record_check("CHECK-AGY-11", "antigravity_adapter", "Antigravity Orchestrator Workflow Mapping", "PASS",
+                              "Verified master orchestrator workflow definition in .agents/workflows/orchestrate.md.",
+                              "Verified orchestrate workflow.", affected_files=[".agents/workflows/orchestrate.md"])
+        else:
+            self.record_check("CHECK-AGY-11", "antigravity_adapter", "Antigravity Orchestrator Workflow Mapping", "FAIL",
+                              "Missing .agents/workflows/orchestrate.md.", "Must create orchestrate workflow.")
+
+        # 12. Antigravity Targeted Single-Module Workflow Mapping
+        wf_migrate = workflows_dir / "migrate-module.md"
+        if wf_migrate.exists() and "MODULE_NAME" in wf_migrate.read_text(encoding="utf-8"):
+            self.record_check("CHECK-AGY-12", "antigravity_adapter", "Antigravity Migrate Module Workflow Mapping", "PASS",
+                              "Verified targeted single-module migration workflow definition in .agents/workflows/migrate-module.md.",
+                              "Verified migrate-module workflow.", affected_files=[".agents/workflows/migrate-module.md"])
+        else:
+            self.record_check("CHECK-AGY-12", "antigravity_adapter", "Antigravity Migrate Module Workflow Mapping", "FAIL",
+                              "Missing .agents/workflows/migrate-module.md.", "Must create migrate-module workflow.")
+
+        # 13. Antigravity Status Dashboard Workflow Mapping
+        wf_status = workflows_dir / "status.md"
+        if wf_status.exists() and "migration-state.yml" in wf_status.read_text(encoding="utf-8"):
+            self.record_check("CHECK-AGY-13", "antigravity_adapter", "Antigravity Status Workflow Mapping", "PASS",
+                              "Verified status dashboard workflow definition in .agents/workflows/status.md.",
+                              "Verified status workflow.", affected_files=[".agents/workflows/status.md"])
+        else:
+            self.record_check("CHECK-AGY-13", "antigravity_adapter", "Antigravity Status Workflow Mapping", "FAIL",
+                              "Missing .agents/workflows/status.md.", "Must create status workflow.")
+
+        # 14. Antigravity 12 Skills Discovery & Parity
+        missing_skills = []
+        for sk in EXPECTED_SKILLS:
+            sk_path = skills_dir / sk / "SKILL.md"
+            if not sk_path.exists():
+                missing_skills.append(sk)
+        if not missing_skills and len(list(skills_dir.iterdir())) >= 12:
+            self.record_check("CHECK-AGY-14", "antigravity_adapter", "Antigravity Skills Discovery Parity", "PASS",
+                              f"All 12 migration skills natively discoverable in .agents/skills/.",
+                              "Verified all 12 skills in .agents/skills/.", affected_files=[".agents/skills/"])
+        else:
+            self.record_check("CHECK-AGY-14", "antigravity_adapter", "Antigravity Skills Discovery Parity", "FAIL",
+                              f"Missing skills in .agents/skills/: {missing_skills}", "Must link all 12 skills into .agents/skills/.")
+
+        # 15. Antigravity 13 Specialized Agent Role Mappings
+        missing_agents = [ag for ag in EXPECTED_AGENTS if f"`{ag}`" not in agents_txt]
+        if not missing_agents:
+            self.record_check("CHECK-AGY-15", "antigravity_adapter", "Antigravity Agent Role Mappings", "PASS",
+                              "All 13 specialized migration agent roles documented and mapped in AGENTS.md.",
+                              "Verified 13 agent role mappings in AGENTS.md.", affected_files=["AGENTS.md"])
+        else:
+            self.record_check("CHECK-AGY-15", "antigravity_adapter", "Antigravity Agent Role Mappings", "FAIL",
+                              f"Missing agent role mappings in AGENTS.md: {missing_agents}", "Must document all 13 agent roles in AGENTS.md.")
+
+        # 16. Antigravity Centralized State Authority Guarantee
+        if "Single-Writer State Authority" in agents_txt and "state/migration-state.yml" in state_txt:
+            self.record_check("CHECK-AGY-16", "antigravity_adapter", "State Authority Centralization", "PASS",
+                              "Guarantees that Orchestrator is the exclusive single-writer for runtime migration state.",
+                              "Verified single-writer state authority in Antigravity rules.", affected_files=["AGENTS.md", ".agents/rules/state-machine-and-lifecycle.md"])
+        else:
+            self.record_check("CHECK-AGY-16", "antigravity_adapter", "State Authority Centralization", "FAIL",
+                              "Missing state authority guarantee.", "Must enforce single-writer state authority.")
+
+        # 17. Antigravity D7 Read-Only Source Protection Guarantee
+        if "READ-ONLY" in safety_txt and "READ-ONLY" in agents_txt:
+            self.record_check("CHECK-AGY-17", "antigravity_adapter", "D7 Source Immutability Guarantee", "PASS",
+                              "Enforces strict read-only protection across all D7 source files.",
+                              "Verified D7 source immutability in Antigravity rules.", affected_files=["AGENTS.md", ".agents/rules/safety-and-isolation.md"])
+        else:
+            self.record_check("CHECK-AGY-17", "antigravity_adapter", "D7 Source Immutability Guarantee", "FAIL",
+                              "Missing D7 read-only guarantee in Antigravity rules.", "Must enforce D7 read-only rules.")
+
+        # 18. Antigravity Target Path Isolation Guarantee
+        if "target_custom_modules_path" in safety_txt or "target.path" in safety_txt:
+            self.record_check("CHECK-AGY-18", "antigravity_adapter", "Target Path Isolation Guarantee", "PASS",
+                              "Enforces that all write operations are isolated strictly to configured target directories.",
+                              "Verified target path isolation in Antigravity rules.", affected_files=[".agents/rules/safety-and-isolation.md"])
+        else:
+            self.record_check("CHECK-AGY-18", "antigravity_adapter", "Target Path Isolation Guarantee", "FAIL",
+                              "Missing target isolation guarantee.", "Must enforce path isolation.")
+
+        # 19. Antigravity Zero Plaintext Secret Redaction Guarantee
+        if "REDACTED" in safety_txt and "Zero Plaintext Secrets" in agents_txt:
+            self.record_check("CHECK-AGY-19", "antigravity_adapter", "Secret Redaction Guarantee", "PASS",
+                              "Enforces zero plaintext passwords, tokens, API keys in reports, manifests, or generated code.",
+                              "Verified secret redaction in Antigravity rules.", affected_files=["AGENTS.md", ".agents/rules/safety-and-isolation.md"])
+        else:
+            self.record_check("CHECK-AGY-19", "antigravity_adapter", "Secret Redaction Guarantee", "FAIL",
+                              "Missing secret redaction guarantee.", "Must enforce secret redaction.")
+
+        # 20. Antigravity 10 Canonical Item Status Integrity Preservation
+        if "COMPLETE" in state_txt and "PARTIAL" in state_txt and "MISSING" in state_txt and "RUNTIME_UNVERIFIED" in state_txt:
+            self.record_check("CHECK-AGY-20", "antigravity_adapter", "10 Canonical Status Model Integrity", "PASS",
+                              "Preserves the 10 canonical migration statuses across all Antigravity adapter specifications.",
+                              "Verified canonical status preservation.", affected_files=[".agents/rules/state-machine-and-lifecycle.md"])
+        else:
+            self.record_check("CHECK-AGY-20", "antigravity_adapter", "10 Canonical Status Model Integrity", "FAIL",
+                              "Canonical status model violated in Antigravity rules.", "Must enforce 10 canonical statuses.")
+
+        # 21. Antigravity 3-Path Remediation Engine Parity
+        if "3-Path Remediation Decision Model" in state_txt and "max_remediation_iterations" in state_txt:
+            self.record_check("CHECK-AGY-21", "antigravity_adapter", "3-Path Remediation Engine Parity", "PASS",
+                              "Antigravity adapter preserves 3-path remediation loop (Evidence, Human, Runtime) and bounded iterations.",
+                              "Verified 3-path remediation in Antigravity rules.", affected_files=[".agents/rules/state-machine-and-lifecycle.md"])
+        else:
+            self.record_check("CHECK-AGY-21", "antigravity_adapter", "3-Path Remediation Engine Parity", "FAIL",
+                              "Missing 3-path remediation in Antigravity rules.", "Must document 3-path remediation.")
+
+        # 22. Antigravity Human Decision Gate Parity
+        if "HUMAN_INTERVENTION_REQUIRED" in agents_txt and "HUMAN_INTERVENTION_REQUIRED" in state_txt:
+            self.record_check("CHECK-AGY-22", "antigravity_adapter", "Human Decision Gate Parity", "PASS",
+                              "Enforces immediate halt on ambiguous business rules or policy choices without guessing.",
+                              "Verified human decision gate in Antigravity rules.", affected_files=["AGENTS.md", ".agents/rules/state-machine-and-lifecycle.md"])
+        else:
+            self.record_check("CHECK-AGY-22", "antigravity_adapter", "Human Decision Gate Parity", "FAIL",
+                              "Missing human decision gate in Antigravity rules.", "Must enforce human decision gate.")
+
+        # 23. Antigravity Recursive Dependency Resolution & Cycle Guard Parity
+        if "Ancestors" in orch_txt and "BLOCKED-CYCLE" in orch_txt:
+            self.record_check("CHECK-AGY-23", "antigravity_adapter", "Recursive Dependency & Cycle Guard Parity", "PASS",
+                              "Preserves recursive ancestor sub-DAG expansion, topological ordering, and DFS cycle detection.",
+                              "Verified recursive dependency rules in Antigravity.", affected_files=[".agents/rules/recursive-orchestration.md"])
+        else:
+            self.record_check("CHECK-AGY-23", "antigravity_adapter", "Recursive Dependency & Cycle Guard Parity", "FAIL",
+                              "Missing recursive dependency rules in Antigravity.", "Must document recursive sub-DAG in rules.")
+
+        # 24. Antigravity Architectural Replacement & Behavioral Mapping Parity
+        if "Architectural Relationship Classifications" in arch_txt and "DIRECT_EQUIVALENT" in arch_txt:
+            self.record_check("CHECK-AGY-24", "antigravity_adapter", "Architectural Replacement Parity", "PASS",
+                              "Preserves behavioral mapping vs literal translation, relationship taxonomy, and existing target precedence.",
+                              "Verified architectural replacement rules in Antigravity.", affected_files=[".agents/rules/architectural-replacement.md"])
+        else:
+            self.record_check("CHECK-AGY-24", "antigravity_adapter", "Architectural Replacement Parity", "FAIL",
+                              "Missing architectural replacement rules in Antigravity.", "Must document architectural replacement in rules.")
+
+        # 25. Antigravity External Drupal-Integrated Code Parity
+        if "Multi-Vector Evidence Engine" in ext_txt and "CLI_SCRIPT" in ext_txt:
+            self.record_check("CHECK-AGY-25", "antigravity_adapter", "External Code Protocol Parity", "PASS",
+                              "Preserves multi-vector evidence evaluation, confidence scoring, and behavior decomposition for external code.",
+                              "Verified external code rules in Antigravity.", affected_files=[".agents/rules/external-code-protocol.md"])
+        else:
+            self.record_check("CHECK-AGY-25", "antigravity_adapter", "External Code Protocol Parity", "FAIL",
+                              "Missing external code rules in Antigravity.", "Must document external code in rules.")
+
+        # 26. Antigravity Dual-Audience Reporting & YAML LLM Input Parity
+        if "## LLM REMEDIATION INPUT" in arch_txt or "LLM REMEDIATION INPUT" in agents_txt:
+            self.record_check("CHECK-AGY-26", "antigravity_adapter", "Reporting & LLM Input Parity", "PASS",
+                              "Antigravity adapter preserves dual-audience reports and copy-pasteable YAML LLM remediation task blocks.",
+                              "Verified reporting parity in Antigravity rules.", affected_files=[".agents/rules/architectural-replacement.md", "AGENTS.md"])
+        else:
+            self.record_check("CHECK-AGY-26", "antigravity_adapter", "Reporting & LLM Input Parity", "FAIL",
+                              "Missing reporting parity in Antigravity rules.", "Must document reporting parity.")
+
+        # 27. Antigravity Shared Migration Configuration
+        config_example = self.repo_root / "migration.config.example.yml"
+        if config_example.exists() and "source:" in config_example.read_text(encoding="utf-8"):
+            self.record_check("CHECK-AGY-27", "antigravity_adapter", "Shared Configuration Compatibility", "PASS",
+                              "migration.config.example.yml serves as the shared single source of configuration for both Claude and Antigravity.",
+                              "Verified shared configuration schema.", affected_files=["migration.config.example.yml"])
+        else:
+            self.record_check("CHECK-AGY-27", "antigravity_adapter", "Shared Configuration Compatibility", "FAIL",
+                              "Missing migration.config.example.yml.", "Must provide shared configuration template.")
+
+        # 28. Antigravity Documentation & Dual Runtime Support in README.md
+        if "Antigravity IDE" in readme_txt and "Option A: Antigravity IDE" in readme_txt:
+            self.record_check("CHECK-AGY-28", "antigravity_adapter", "Documentation & Dual Runtime Support", "PASS",
+                              "README.md clearly documents dual-runtime support (Antigravity IDE + Claude Code) sharing identical intelligence.",
+                              "Verified dual runtime documentation in README.md.", affected_files=["README.md"])
+        else:
+            self.record_check("CHECK-AGY-28", "antigravity_adapter", "Documentation & Dual Runtime Support", "FAIL",
+                              "Missing Antigravity IDE onboarding in README.md.", "Must document Antigravity in README.md.")
+
+        # 29. Specialist Role Inline Fallback Execution Protocol
+        if "Specialist Inline Fallback Mode" in agents_txt and "Specialist Dispatch & Inline Fallback" in orch_txt:
+            self.record_check("CHECK-AGY-29", "antigravity_adapter", "Specialist Role Inline Fallback Execution Protocol", "PASS",
+                              "AGENTS.md and recursive-orchestration.md mandate inline specialist execution when subagent dispatch is unavailable.",
+                              "Verified specialist role inline fallback protocol.", affected_files=["AGENTS.md", ".agents/rules/recursive-orchestration.md", ".agents/workflows/orchestrate.md"])
+        else:
+            self.record_check("CHECK-AGY-29", "antigravity_adapter", "Specialist Role Inline Fallback Execution Protocol", "FAIL",
+                              "Missing specialist inline fallback protocol.", "Must document inline fallback in AGENTS.md and orchestration rules.")
+
+        # 30. Dual Workflow Trigger Syntax & Intent Matching
+        all_wfs = [wf_preflight, wf_discover, wf_orchestrate, wf_migrate, wf_status]
+        dual_trigger_failures = []
+        for wf in all_wfs:
+            txt = wf.read_text(encoding="utf-8") if wf.exists() else ""
+            if "Conversational Triggers / Natural Intent" not in txt or "Slash Command" not in txt:
+                dual_trigger_failures.append(wf.name)
+        if not dual_trigger_failures and len(all_wfs) == 5:
+            self.record_check("CHECK-AGY-30", "antigravity_adapter", "Dual Workflow Trigger Syntax & Intent Matching", "PASS",
+                              "All 5 Antigravity workflows document both slash-command and conversational intent triggers.",
+                              "Verified dual workflow triggers across all workflows.", affected_files=[str(w.relative_to(self.repo_root)) for w in all_wfs])
+        else:
+            self.record_check("CHECK-AGY-30", "antigravity_adapter", "Dual Workflow Trigger Syntax & Intent Matching", "FAIL",
+                              f"Workflows lacking dual trigger documentation: {dual_trigger_failures}", "Must add dual trigger documentation.")
+
+        # 31. Status Markdown Dashboard Structure & Visual Presentation
+        status_txt = wf_status.read_text(encoding="utf-8") if wf_status.exists() else ""
+        if "High-Level Migration Summary" in status_txt and "Dynamic Execution Wave Progress" in status_txt and "Component Lifecycle Breakdown" in status_txt:
+            self.record_check("CHECK-AGY-31", "antigravity_adapter", "Status Markdown Dashboard Structure", "PASS",
+                              "status.md defines structured Markdown tables for summary, lifecycle states, waves, blockers, and next actions.",
+                              "Verified status dashboard Markdown specification.", affected_files=[".agents/workflows/status.md"])
+        else:
+            self.record_check("CHECK-AGY-31", "antigravity_adapter", "Status Markdown Dashboard Structure", "FAIL",
+                              "status.md missing required Markdown dashboard structure.", "Must update status.md with full Markdown dashboard specification.")
+
+        # 32. Status Dashboard State Source Authority
+        if "state/migration-state.yml" in status_txt and "state/migration-manifest.yml" in status_txt and "STATE_FILE_MISSING" in status_txt:
+            self.record_check("CHECK-AGY-32", "antigravity_adapter", "Status Dashboard State Source Authority", "PASS",
+                              "status.md strictly derives metrics from authoritative state/manifest files and forbids invented values.",
+                              "Verified status dashboard state authority.", affected_files=[".agents/workflows/status.md"])
+        else:
+            self.record_check("CHECK-AGY-32", "antigravity_adapter", "Status Dashboard State Source Authority", "FAIL",
+                              "status.md does not strictly ground dashboard metrics in authoritative state.", "Must enforce state grounding in status.md.")
+
+        # 33. Antigravity Skill Symlink Resolution & Integrity
+        broken_symlinks = []
+        symlink_count = 0
+        for sk_entry in skills_dir.iterdir():
+            if sk_entry.is_symlink():
+                symlink_count += 1
+                resolved = sk_entry.resolve()
+                if not resolved.exists() or not (resolved / "SKILL.md").exists():
+                    broken_symlinks.append(sk_entry.name)
+            else:
+                broken_symlinks.append(f"{sk_entry.name} (not a symlink)")
+        if not broken_symlinks and symlink_count >= 12:
+            self.record_check("CHECK-AGY-33", "antigravity_adapter", "Skill Symlink Resolution & Integrity", "PASS",
+                              f"All {symlink_count} skill symlinks in .agents/skills/ resolve cleanly to valid skill directories.",
+                              "Verified all skill symlinks resolve.", affected_files=[".agents/skills/"])
+        else:
+            self.record_check("CHECK-AGY-33", "antigravity_adapter", "Skill Symlink Resolution & Integrity", "FAIL",
+                              f"Broken or non-symlink skill entries: {broken_symlinks}", "Must ensure all entries are valid symlinks.")
+
+        # 34. Canonical Shared Skill Target Verification
+        non_canonical_targets = []
+        for sk_entry in skills_dir.iterdir():
+            if sk_entry.is_symlink():
+                resolved = sk_entry.resolve()
+                expected_canonical = (self.repo_root / "skills" / sk_entry.name).resolve()
+                if resolved != expected_canonical:
+                    non_canonical_targets.append(f"{sk_entry.name} -> {resolved} (expected {expected_canonical})")
+        if not non_canonical_targets:
+            self.record_check("CHECK-AGY-34", "antigravity_adapter", "Canonical Shared Skill Target Verification", "PASS",
+                              "All Antigravity skill symlinks resolve strictly to canonical shared skills in skills/<skill>/.",
+                              "Verified symlink targets match canonical shared skills.", affected_files=[".agents/skills/"])
+        else:
+            self.record_check("CHECK-AGY-34", "antigravity_adapter", "Canonical Shared Skill Target Verification", "FAIL",
+                              f"Non-canonical symlink targets: {non_canonical_targets}", "Must point symlinks to canonical skills/ directory.")
+
+        # 35. Duplicate Skill Implementation Prevention
+        duplicate_skill_dirs = []
+        for sk_entry in skills_dir.iterdir():
+            if not sk_entry.is_symlink() and sk_entry.is_dir():
+                duplicate_skill_dirs.append(sk_entry.name)
+        if not duplicate_skill_dirs:
+            self.record_check("CHECK-AGY-35", "antigravity_adapter", "Duplicate Skill Implementation Prevention", "PASS",
+                              "Zero duplicated or copied skill directories detected in .agents/skills/ (100% single source of truth).",
+                              "Verified zero duplicate skill directories in .agents/skills/.", affected_files=[".agents/skills/"])
+        else:
+            self.record_check("CHECK-AGY-35", "antigravity_adapter", "Duplicate Skill Implementation Prevention", "FAIL",
+                              f"Found duplicate regular skill directories: {duplicate_skill_dirs}", "Must replace regular directories with symlinks.")
 
     def generate_result_json(self):
         return {

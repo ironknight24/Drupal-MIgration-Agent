@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260923134502",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260923154059",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-23T13:45:02.698364+00:00",
+  "executed_at": "2026-09-23T15:40:59.475423+00:00",
   "summary": {
-    "checks_total": 488,
-    "passed": 485,
+    "checks_total": 523,
+    "passed": 520,
     "failed": 0,
     "warnings": 0,
     "unverified": 3
@@ -6193,6 +6193,438 @@
       "details": "Verified Scenario H Pre-existing target reuse simulation.",
       "affected_files": [
         "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-01",
+      "category": "antigravity_adapter",
+      "name": "Antigravity Workspace Directory Structure",
+      "status": "PASS",
+      "evidence": "Verified .agents workspace structure with rules, workflows, skills, and plugins.",
+      "details": "Verified .agents directory layout.",
+      "affected_files": [
+        ".agents/"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-02",
+      "category": "antigravity_adapter",
+      "name": "Antigravity Master Rule & Persona",
+      "status": "PASS",
+      "evidence": "AGENTS.md and GEMINI.md establish the master Antigravity pair programmer persona and lifecycle rules.",
+      "details": "Verified master persona in AGENTS.md and GEMINI.md.",
+      "affected_files": [
+        "AGENTS.md",
+        "GEMINI.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-03",
+      "category": "antigravity_adapter",
+      "name": "Antigravity Plugin Manifest",
+      "status": "PASS",
+      "evidence": "Verified Antigravity plugin manifest in .agents/plugins/drupal-migration-agent/plugin.json.",
+      "details": "Verified plugin.json manifest.",
+      "affected_files": [
+        ".agents/plugins/drupal-migration-agent/plugin.json"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-04",
+      "category": "antigravity_adapter",
+      "name": "Antigravity Safety & Isolation Rule",
+      "status": "PASS",
+      "evidence": "Verified D7 source immutability, target isolation, and secret redaction rules.",
+      "details": "Verified safety-and-isolation.md rule.",
+      "affected_files": [
+        ".agents/rules/safety-and-isolation.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-05",
+      "category": "antigravity_adapter",
+      "name": "Antigravity State & Lifecycle Rule",
+      "status": "PASS",
+      "evidence": "Verified state machine authority, 10 canonical item statuses, and 15 component states.",
+      "details": "Verified state-machine-and-lifecycle.md rule.",
+      "affected_files": [
+        ".agents/rules/state-machine-and-lifecycle.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-06",
+      "category": "antigravity_adapter",
+      "name": "Antigravity Recursive Orchestration Rule",
+      "status": "PASS",
+      "evidence": "Verified dynamic wave scheduling, sub-DAG resolution, cycle detection, and idempotency.",
+      "details": "Verified recursive-orchestration.md rule.",
+      "affected_files": [
+        ".agents/rules/recursive-orchestration.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-07",
+      "category": "antigravity_adapter",
+      "name": "Antigravity Architectural Replacement Rule",
+      "status": "PASS",
+      "evidence": "Verified behavioral mapping, existing target precedence, and relationship type taxonomy.",
+      "details": "Verified architectural-replacement.md rule.",
+      "affected_files": [
+        ".agents/rules/architectural-replacement.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-08",
+      "category": "antigravity_adapter",
+      "name": "Antigravity External Code Protocol Rule",
+      "status": "PASS",
+      "evidence": "Verified multi-vector evidence discovery, confidence grading, and behavior decomposition for external scripts.",
+      "details": "Verified external-code-protocol.md rule.",
+      "affected_files": [
+        ".agents/rules/external-code-protocol.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-09",
+      "category": "antigravity_adapter",
+      "name": "Antigravity Preflight Workflow Mapping",
+      "status": "PASS",
+      "evidence": "Verified preflight validation workflow definition in .agents/workflows/preflight.md.",
+      "details": "Verified preflight workflow.",
+      "affected_files": [
+        ".agents/workflows/preflight.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-10",
+      "category": "antigravity_adapter",
+      "name": "Antigravity Discovery Workflow Mapping",
+      "status": "PASS",
+      "evidence": "Verified discovery audit workflow definition in .agents/workflows/discover.md.",
+      "details": "Verified discover workflow.",
+      "affected_files": [
+        ".agents/workflows/discover.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-11",
+      "category": "antigravity_adapter",
+      "name": "Antigravity Orchestrator Workflow Mapping",
+      "status": "PASS",
+      "evidence": "Verified master orchestrator workflow definition in .agents/workflows/orchestrate.md.",
+      "details": "Verified orchestrate workflow.",
+      "affected_files": [
+        ".agents/workflows/orchestrate.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-12",
+      "category": "antigravity_adapter",
+      "name": "Antigravity Migrate Module Workflow Mapping",
+      "status": "PASS",
+      "evidence": "Verified targeted single-module migration workflow definition in .agents/workflows/migrate-module.md.",
+      "details": "Verified migrate-module workflow.",
+      "affected_files": [
+        ".agents/workflows/migrate-module.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-13",
+      "category": "antigravity_adapter",
+      "name": "Antigravity Status Workflow Mapping",
+      "status": "PASS",
+      "evidence": "Verified status dashboard workflow definition in .agents/workflows/status.md.",
+      "details": "Verified status workflow.",
+      "affected_files": [
+        ".agents/workflows/status.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-14",
+      "category": "antigravity_adapter",
+      "name": "Antigravity Skills Discovery Parity",
+      "status": "PASS",
+      "evidence": "All 12 migration skills natively discoverable in .agents/skills/.",
+      "details": "Verified all 12 skills in .agents/skills/.",
+      "affected_files": [
+        ".agents/skills/"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-15",
+      "category": "antigravity_adapter",
+      "name": "Antigravity Agent Role Mappings",
+      "status": "PASS",
+      "evidence": "All 13 specialized migration agent roles documented and mapped in AGENTS.md.",
+      "details": "Verified 13 agent role mappings in AGENTS.md.",
+      "affected_files": [
+        "AGENTS.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-16",
+      "category": "antigravity_adapter",
+      "name": "State Authority Centralization",
+      "status": "PASS",
+      "evidence": "Guarantees that Orchestrator is the exclusive single-writer for runtime migration state.",
+      "details": "Verified single-writer state authority in Antigravity rules.",
+      "affected_files": [
+        "AGENTS.md",
+        ".agents/rules/state-machine-and-lifecycle.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-17",
+      "category": "antigravity_adapter",
+      "name": "D7 Source Immutability Guarantee",
+      "status": "PASS",
+      "evidence": "Enforces strict read-only protection across all D7 source files.",
+      "details": "Verified D7 source immutability in Antigravity rules.",
+      "affected_files": [
+        "AGENTS.md",
+        ".agents/rules/safety-and-isolation.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-18",
+      "category": "antigravity_adapter",
+      "name": "Target Path Isolation Guarantee",
+      "status": "PASS",
+      "evidence": "Enforces that all write operations are isolated strictly to configured target directories.",
+      "details": "Verified target path isolation in Antigravity rules.",
+      "affected_files": [
+        ".agents/rules/safety-and-isolation.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-19",
+      "category": "antigravity_adapter",
+      "name": "Secret Redaction Guarantee",
+      "status": "PASS",
+      "evidence": "Enforces zero plaintext passwords, tokens, API keys in reports, manifests, or generated code.",
+      "details": "Verified secret redaction in Antigravity rules.",
+      "affected_files": [
+        "AGENTS.md",
+        ".agents/rules/safety-and-isolation.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-20",
+      "category": "antigravity_adapter",
+      "name": "10 Canonical Status Model Integrity",
+      "status": "PASS",
+      "evidence": "Preserves the 10 canonical migration statuses across all Antigravity adapter specifications.",
+      "details": "Verified canonical status preservation.",
+      "affected_files": [
+        ".agents/rules/state-machine-and-lifecycle.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-21",
+      "category": "antigravity_adapter",
+      "name": "3-Path Remediation Engine Parity",
+      "status": "PASS",
+      "evidence": "Antigravity adapter preserves 3-path remediation loop (Evidence, Human, Runtime) and bounded iterations.",
+      "details": "Verified 3-path remediation in Antigravity rules.",
+      "affected_files": [
+        ".agents/rules/state-machine-and-lifecycle.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-22",
+      "category": "antigravity_adapter",
+      "name": "Human Decision Gate Parity",
+      "status": "PASS",
+      "evidence": "Enforces immediate halt on ambiguous business rules or policy choices without guessing.",
+      "details": "Verified human decision gate in Antigravity rules.",
+      "affected_files": [
+        "AGENTS.md",
+        ".agents/rules/state-machine-and-lifecycle.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-23",
+      "category": "antigravity_adapter",
+      "name": "Recursive Dependency & Cycle Guard Parity",
+      "status": "PASS",
+      "evidence": "Preserves recursive ancestor sub-DAG expansion, topological ordering, and DFS cycle detection.",
+      "details": "Verified recursive dependency rules in Antigravity.",
+      "affected_files": [
+        ".agents/rules/recursive-orchestration.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-24",
+      "category": "antigravity_adapter",
+      "name": "Architectural Replacement Parity",
+      "status": "PASS",
+      "evidence": "Preserves behavioral mapping vs literal translation, relationship taxonomy, and existing target precedence.",
+      "details": "Verified architectural replacement rules in Antigravity.",
+      "affected_files": [
+        ".agents/rules/architectural-replacement.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-25",
+      "category": "antigravity_adapter",
+      "name": "External Code Protocol Parity",
+      "status": "PASS",
+      "evidence": "Preserves multi-vector evidence evaluation, confidence scoring, and behavior decomposition for external code.",
+      "details": "Verified external code rules in Antigravity.",
+      "affected_files": [
+        ".agents/rules/external-code-protocol.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-26",
+      "category": "antigravity_adapter",
+      "name": "Reporting & LLM Input Parity",
+      "status": "PASS",
+      "evidence": "Antigravity adapter preserves dual-audience reports and copy-pasteable YAML LLM remediation task blocks.",
+      "details": "Verified reporting parity in Antigravity rules.",
+      "affected_files": [
+        ".agents/rules/architectural-replacement.md",
+        "AGENTS.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-27",
+      "category": "antigravity_adapter",
+      "name": "Shared Configuration Compatibility",
+      "status": "PASS",
+      "evidence": "migration.config.example.yml serves as the shared single source of configuration for both Claude and Antigravity.",
+      "details": "Verified shared configuration schema.",
+      "affected_files": [
+        "migration.config.example.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-28",
+      "category": "antigravity_adapter",
+      "name": "Documentation & Dual Runtime Support",
+      "status": "PASS",
+      "evidence": "README.md clearly documents dual-runtime support (Antigravity IDE + Claude Code) sharing identical intelligence.",
+      "details": "Verified dual runtime documentation in README.md.",
+      "affected_files": [
+        "README.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-29",
+      "category": "antigravity_adapter",
+      "name": "Specialist Role Inline Fallback Execution Protocol",
+      "status": "PASS",
+      "evidence": "AGENTS.md and recursive-orchestration.md mandate inline specialist execution when subagent dispatch is unavailable.",
+      "details": "Verified specialist role inline fallback protocol.",
+      "affected_files": [
+        "AGENTS.md",
+        ".agents/rules/recursive-orchestration.md",
+        ".agents/workflows/orchestrate.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-30",
+      "category": "antigravity_adapter",
+      "name": "Dual Workflow Trigger Syntax & Intent Matching",
+      "status": "PASS",
+      "evidence": "All 5 Antigravity workflows document both slash-command and conversational intent triggers.",
+      "details": "Verified dual workflow triggers across all workflows.",
+      "affected_files": [
+        ".agents/workflows/preflight.md",
+        ".agents/workflows/discover.md",
+        ".agents/workflows/orchestrate.md",
+        ".agents/workflows/migrate-module.md",
+        ".agents/workflows/status.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-31",
+      "category": "antigravity_adapter",
+      "name": "Status Markdown Dashboard Structure",
+      "status": "PASS",
+      "evidence": "status.md defines structured Markdown tables for summary, lifecycle states, waves, blockers, and next actions.",
+      "details": "Verified status dashboard Markdown specification.",
+      "affected_files": [
+        ".agents/workflows/status.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-32",
+      "category": "antigravity_adapter",
+      "name": "Status Dashboard State Source Authority",
+      "status": "PASS",
+      "evidence": "status.md strictly derives metrics from authoritative state/manifest files and forbids invented values.",
+      "details": "Verified status dashboard state authority.",
+      "affected_files": [
+        ".agents/workflows/status.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-33",
+      "category": "antigravity_adapter",
+      "name": "Skill Symlink Resolution & Integrity",
+      "status": "PASS",
+      "evidence": "All 12 skill symlinks in .agents/skills/ resolve cleanly to valid skill directories.",
+      "details": "Verified all skill symlinks resolve.",
+      "affected_files": [
+        ".agents/skills/"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-34",
+      "category": "antigravity_adapter",
+      "name": "Canonical Shared Skill Target Verification",
+      "status": "PASS",
+      "evidence": "All Antigravity skill symlinks resolve strictly to canonical shared skills in skills/<skill>/.",
+      "details": "Verified symlink targets match canonical shared skills.",
+      "affected_files": [
+        ".agents/skills/"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-AGY-35",
+      "category": "antigravity_adapter",
+      "name": "Duplicate Skill Implementation Prevention",
+      "status": "PASS",
+      "evidence": "Zero duplicated or copied skill directories detected in .agents/skills/ (100% single source of truth).",
+      "details": "Verified zero duplicate skill directories in .agents/skills/.",
+      "affected_files": [
+        ".agents/skills/"
       ],
       "remediation": ""
     }

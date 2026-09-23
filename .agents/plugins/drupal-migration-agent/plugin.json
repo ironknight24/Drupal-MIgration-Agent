@@ -1,0 +1,9 @@
+{
+  "name": "drupal-migration-agent",
+  "version": "1.0.0",
+  "description": "Antigravity IDE native plugin for Drupal 7 to Drupal 10/11 migration agent framework. Orchestrates discovery, dependency analysis, custom module re-engineering, theme modernization, configuration, data pipelines, testing, and behavioral validation.",
+  "author": {
+    "name": "Drupal Migration Agent Team"
+  },
+  "license": "MIT"
+}
