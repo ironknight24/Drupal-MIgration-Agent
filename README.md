@@ -145,7 +145,7 @@ Evidence Sign-Off        ──► COMPLETED (or PARTIAL/BLOCKED) in state/migra
 
 ## Recursive Orchestration
 
-When a targeted module is orchestrated (e.g. `/orchestrate ariba_helper`):
+When a targeted module is orchestrated (e.g. `/orchestrate custom_booking`):
 1. **Sub-DAG Construction**: The orchestrator extracts $\text{Ancestors}(M) \cup \{M\}$.
 2. **Cycle Detection**: Traverses dependency edges. If a circular dependency is detected ($A \to B \to A$), execution halts with a blocker ticket (`BLOCKED-<MODULE>-001-CYCLE.md`).
 3. **Bottom-Up Dependency Processing**: Unmigrated upstream custom dependencies are migrated and validated before the parent module begins.
@@ -196,9 +196,9 @@ The factory recursively discovers, accounts for, and modernizes all Drupal 7 arc
 
 ---
 
-## Case Study: Real-World `ariba_helper` Lessons
+## Case Study: Enterprise Modernization Lessons
 
-The architecture of this factory directly reflects lessons learned during the migration of the real-world enterprise `ariba_helper` module:
+The architecture of this factory directly reflects lessons learned during the migration of real-world enterprise modules:
 - **Missing Controller Gaps**: Static syntax checkers reported no failures, but menu links referenced non-existent controllers; comparative completeness audits caught these missing classes and auto-remediated them.
 - **GDPR Policy Gating**: Legacy purchase order retention rules were ambiguous; rather than inventing a retention period, the agent safely escalated to `HUMAN_INTERVENTION_REQUIRED`.
 - **Superseded Integrations**: Legacy KeyVault encryption functions were recognized as `SUPERSEDED` by the modern D10 Key module.
@@ -223,13 +223,13 @@ All migration reports are generated under `reports/` following the [Reporting St
 ### LLM Remediation Input
 Every report contains a dedicated `## LLM REMEDIATION INPUT` section with copy-pasteable YAML tasks for use in Claude or ChatGPT:
 ```yaml
-- task_id: "ARIBA-HELPER-SERVICE-004"
+- task_id: "BOOKING-SERVICE-004"
   status: "MISSING"
   priority: "HIGH"
-  d7_behavior: "Procedural function in ariba_helper.admin.inc querying external SOAP endpoint."
+  d7_behavior: "Procedural function in booking.admin.inc querying external SOAP endpoint."
   d10_current_state: "Service class missing in target src/Service/."
-  evidence: "reports/migration/ariba_helper/ariba_helper_GAP_ANALYSIS.md#L45"
-  required_change: "Create AribaOrderSyncService in src/Service/ with method syncOrders()."
+  evidence: "reports/migration/booking/booking_GAP_ANALYSIS.md#L45"
+  required_change: "Create BookingSyncService in src/Service/ with method syncBookings()."
   dependencies: ["core/http_client"]
   human_decision_required: false
 ```
@@ -271,7 +271,7 @@ Every report contains a dedicated `## LLM REMEDIATION INPUT` section with copy-p
 | **Specialist Agents** | 13 autonomous migration agents | [agents/orchestrator/agent.md](agents/orchestrator/agent.md), [agents/custom-module/agent.md](agents/custom-module/agent.md), [agents/](agents/) |
 | **Skills** | 12 modular domain skills | [skills/custom-module-migration/SKILL.md](skills/custom-module-migration/SKILL.md), [skills/](skills/) |
 | **References** | D7 & D10 API catalogs and conversion patterns | [references/](references/) |
-| **History & Evidence**| Implementation report from real-world `ariba_helper` lessons | [reports/factory/RECURSIVE-ORCHESTRATION-IMPLEMENTATION-REPORT.md](reports/factory/RECURSIVE-ORCHESTRATION-IMPLEMENTATION-REPORT.md) |
+| **History & Evidence**| Implementation report for recursive orchestration and validation | [reports/factory/RECURSIVE-ORCHESTRATION-IMPLEMENTATION-REPORT.md](reports/factory/RECURSIVE-ORCHESTRATION-IMPLEMENTATION-REPORT.md) |
 
 ---
 

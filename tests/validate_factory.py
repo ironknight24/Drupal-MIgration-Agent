@@ -7062,10 +7062,10 @@ class FactoryValidator:
                               "README.md missing one or more required sections.",
                               "Must document all sections in README.md.")
 
-        # 25.15 Real-World Case Study (Ariba Helper Lessons) in Documentation
-        if "ariba_helper" in readme_txt and "GDPR" in readme_txt and "KeyVault" in readme_txt:
+        # 25.15 Real-World Case Study (Enterprise Modernization Lessons) in Documentation
+        if "GDPR" in readme_txt and "KeyVault" in readme_txt and "Case Study" in readme_txt:
             self.record_check("CHECK-REC-15", "recursive_orchestration", "Real-World Case Study & Empirical Edge Cases", "PASS",
-                              "README.md documents empirical edge cases from real-world ariba_helper migration experience.",
+                              "README.md documents empirical edge cases from real-world enterprise migration experience.",
                               "Verified real-world case study documentation.", affected_files=["README.md"])
         else:
             self.record_check("CHECK-REC-15", "recursive_orchestration", "Real-World Case Study & Empirical Edge Cases", "FAIL",

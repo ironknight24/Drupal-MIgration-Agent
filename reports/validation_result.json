@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260923053641",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260923110643",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-23T05:36:41.822691+00:00",
+  "executed_at": "2026-09-23T11:06:43.501970+00:00",
   "summary": {
     "checks_total": 431,
     "passed": 428,
@@ -5482,7 +5482,7 @@
       "category": "recursive_orchestration",
       "name": "Real-World Case Study & Empirical Edge Cases",
       "status": "PASS",
-      "evidence": "README.md documents empirical edge cases from real-world ariba_helper migration experience.",
+      "evidence": "README.md documents empirical edge cases from real-world enterprise migration experience.",
       "details": "Verified real-world case study documentation.",
       "affected_files": [
         "README.md"
