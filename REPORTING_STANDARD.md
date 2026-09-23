@@ -122,24 +122,33 @@ Items requiring live execution (e.g. live database queries, cron hooks, session 
 ## 10. Superseded / Replaced Items
 Items replaced by modern Drupal core or contrib services with architectural justifications.
 
-## 11. Obsolete & Excluded Items
+## 11. Architectural Replacement & Behavioral Analysis
+For components involving subsystem architectural replacements:
+- **Architectural Replacement Analysis Table**:
+  | Source Technology / Subsystem | Target Technology / Architecture | Relationship | Evidence | Status |
+- **Behavioral Replacement Matrix**:
+  | ID | Source Behavior | Target Behavior | Evidence | Status | Remediation |
+- **Replacement Gaps**:
+  Detailed classification across `MISSING`, `PARTIAL`, `BLOCKED`, `HUMAN_INTERVENTION_REQUIRED`, and `RUNTIME_UNVERIFIED`.
+
+## 12. Obsolete & Excluded Items
 Dead code, legacy D7 shims, or out-of-scope utilities with proof of zero live callers.
 
-## 12. Remediation Tasks
+## 13. Remediation Tasks
 Numbered list of actionable remediation tasks with stable IDs.
 
-## 13. Dependency Analysis
+## 14. Dependency Analysis
 Inbound and outbound dependency mappings across custom, contrib, and core modules.
 
-## 14. Validation Requirements
+## 15. Validation Requirements
 Required PHPUnit tests, PHPStan levels, linting, and behavioral assertion checks.
 
-## 15. Final Status & Verdict
+## 16. Final Status & Verdict
 Exactly one of: `PASS`, `PASS_WITH_GAPS`, `FAIL`, `BLOCKED`, `HUMAN_INTERVENTION_REQUIRED`, `UNVERIFIED`.
 
 ---
 
-## 16. LLM REMEDIATION INPUT
+## 17. LLM REMEDIATION INPUT
 Structured, copy-pasteable task specifications for consumption by standard LLM chats.
 ```
 

@@ -169,3 +169,13 @@ Components are scheduled into ordered execution waves:
 | **Wave 5** | **Presentation Layer & Entity View Builders** | Themes, Twig templates, UI asset libraries, custom formatters/widgets. | Final entity render structures finalized. |
 | **Wave 6** | **Dynamic Runtime Probes & Re-engineering** | Modernized plugin managers, dynamic callable services, runtime probe verification. | Target components operational. |
 | **Wave 7** | **Runtime Lifecycle & Security Orchestration** | Cache invalidation subscribers, access checks, session managers, lock handlers. | Core services, themes, and plugins in place. |
+
+---
+
+## Architectural Replacement Dependency Discovery
+
+When an architectural replacement is detected for a source module or subsystem:
+1. **Target Subsystem Dependency Resolution**: Identify target module and service dependencies introduced by the replacement architecture (e.g. target core/contrib modules or existing custom services required by the modern implementation).
+2. **Recursive Sub-DAG Expansion**: If the target replacement architecture relies on unmigrated upstream custom modules or services, expand the dependency sub-DAG to include those upstream components.
+3. **Cycle Guard**: Run standard DFS cycle detection over the combined dependency graph. If the replacement creates a dependency loop, emit a `BLOCKED-CYCLE` ticket and pause for human architectural resolution.
+4. **Topological Precedence**: Upstream dependencies of the target replacement architecture must be validated and completed before the dependent replacement behaviors are remediated.

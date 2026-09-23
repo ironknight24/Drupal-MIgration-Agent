@@ -98,7 +98,15 @@ evidence_summary:
 
 ---
 
-## 5. File Mapping & Scaffolding Checklist
+## 5. Subsystem Architectural Replacement Plan
+
+| Source Subsystem / Technology | Target Modern Architecture | Relationship Type | Evidence | Target Reuse vs New Class |
+|---|---|---|---|---|
+| `{{ SOURCE_SUBSYSTEM }}` | `{{ TARGET_ARCHITECTURE }}` | `ARCHITECTURAL_REPLACEMENT` | `{{ EVIDENCE }}` | `EXTEND_EXISTING_TARGET` |
+
+---
+
+## 6. File Mapping & Scaffolding Checklist
 
 | Action | Target D10 File | Source D7 Origin | Architectural Purpose |
 |---|---|---|---|

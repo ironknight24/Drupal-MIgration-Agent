@@ -104,7 +104,32 @@ evidence_summary:
 
 ---
 
-## 4. Detailed Evidence Logs
+## 4. Architectural Replacement Analysis
+
+| Source Technology / Subsystem | Target Technology / Architecture | Relationship | Evidence | Status |
+|---|---|---|---|---|
+| `{{ SOURCE_SUBSYSTEM }}` | `{{ TARGET_ARCHITECTURE }}` | `ARCHITECTURAL_REPLACEMENT` | `{{ EVIDENCE }}` | `{{ STATUS }}` |
+
+---
+
+## 5. Behavioral Replacement Matrix
+
+| ID | Source Behavior | Target Behavior / Implementation | Evidence | Status | Remediation |
+|---|---|---|---|---|---|
+| `BEH-001` | `{{ SOURCE_BEHAVIOR }}` | `{{ TARGET_IMPLEMENTATION }}` | `{{ EVIDENCE }}` | `COMPLETE` | Done |
+
+---
+
+## 6. Replacement Gaps
+- **MISSING**:
+- **PARTIAL**:
+- **BLOCKED**:
+- **HUMAN_INTERVENTION_REQUIRED**:
+- **RUNTIME_UNVERIFIED**:
+
+---
+
+## 7. Detailed Evidence Logs
 
 ### Automated Test Logs
 ```
@@ -117,6 +142,6 @@ evidence_summary:
 
 ---
 
-## 5. Discrepancies & Gaps (if any)
+## 8. Discrepancies & Gaps (if any)
 - **Identified Gaps**:
 - **Action Required**:

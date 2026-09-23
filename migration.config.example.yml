@@ -122,3 +122,21 @@ testing:
     phpcs:
       enabled: false
       command: "vendor/bin/phpcs --standard=Drupal,DrupalPractice web/modules/custom"
+
+# ------------------------------------------------------------------------------
+# 9. Architectural Replacements & Subsystem Mappings (Optional)
+# ------------------------------------------------------------------------------
+# Configure explicit architectural replacement declarations or discovery hints.
+# The factory discovers replacements generically from repository evidence,
+# but explicit declarations can guide complex architectural migrations.
+architectural_replacements:
+  enabled: true
+  confidence_threshold: "medium" # high | medium | low
+  # custom_mappings:
+  #   - source_subsystem: "legacy_group"
+  #     target_subsystem: "modern_group"
+  #     relationship: "architectural_replacement"
+  #     behavior_map:
+  #       - source_behavior: "membership"
+  #         target_behavior: "group_membership"
+

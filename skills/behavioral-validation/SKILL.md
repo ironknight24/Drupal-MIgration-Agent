@@ -70,3 +70,22 @@ Assign strictly one verdict per dimension:
 - **`FAIL`**: Functional divergence, data corruption, broken calculation, access vulnerability, or unaccounted custom code/hooks/entities/fields/forms/frontend assets/Views/themes/templates/dynamic dependencies/external integrations detected. **Mandatory**: Detailed reproduction steps and failing output must be documented.
 - **`BLOCKED`**: An upstream missing dependency or environmental failure prevented verification. **Mandatory**: Upstream ticket reference must be cited.
 - **`N/A`**: Dimension does not apply to this specific component. **Mandatory**: Architectural rationale must be stated.
+
+---
+
+## Architectural Replacement & Behavioral Equivalence Validation
+
+When auditing components where the underlying architecture or subsystem was replaced rather than direct-ported:
+
+### 1. Mandatory Behavioral Replacement Matrix
+Every architectural replacement must evaluate each decomposed source behavior against the target architecture:
+| ID | Source Behavior | Target Architecture / Implementation | Status | Evidence / Verification |
+|---|---|---|---|---|
+| `BEH-001` | Source behavior description | Target service/class/plugin | `COMPLETE` / `PARTIAL` / `MISSING` / `REPLACED` | Test result / code diff |
+
+### 2. Behavioral Replacement Equivalence Rules
+1. **Behavioral Integrity over Literal Syntax**: The validator checks whether the intended business outcome (access control, entity relationships, query filters, cache invalidation) is achieved in the target architecture.
+2. **Existing Target Inspection**: If the target already contains an implementation of the replacement architecture, verify that existing code is preserved and reused rather than duplicated.
+3. **Data Model & Permission Preservation**: Ensure that custom permissions, roles, and schema relationships are preserved in the target architecture's storage and access models.
+4. **Access & Cache Modernization**: Verify that legacy cache bin clears are converted to modern cache tags/contexts, and legacy access callbacks are converted to modern access checkers or route requirements.
+5. **No False Equivalence**: Never assume similarly named classes/methods represent identical behavior without empirical verification.

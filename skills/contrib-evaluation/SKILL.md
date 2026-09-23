@@ -63,8 +63,17 @@ Assign one of the following standard statuses to each evaluated module:
 - `D10_AVAILABLE`: Official compatible port exists for Drupal 10.
 - `D11_READY`: Official compatible port exists for both Drupal 10 and Drupal 11.
 - `COMMUNITY_REPLACEMENT`: Modern community replacement module identified.
+- `ARCHITECTURAL_REPLACEMENT`: Modern architectural subsystem replacement identified requiring behavioral mapping.
 - `CUSTOM_REIMPLEMENTATION`: Bespoke code or custom service required.
 - `OBSOLETE`: No longer needed in modern Drupal architectures.
+
+---
+
+## Architectural Replacement vs Direct Port Evaluation
+When evaluating modules where the modern ecosystem has evolved beyond a 1:1 port:
+1. **Repository Evidence First**: Inspect `composer.json`, installed modules, and target custom code to discover which modern subsystem is present in the target environment.
+2. **Behavioral Scope Analysis**: Assess whether the target replacement covers all source behaviors (memberships, access, entities, forms, cache invalidation) or leaves gaps.
+3. **No Blind Porting**: Prevent literal API ports when an architectural replacement exists; route to Behavioral Mapping protocol.
 
 ---
 

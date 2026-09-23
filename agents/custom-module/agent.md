@@ -122,6 +122,8 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
    - Analyze constructor dependencies, global state usage (`$user`, `$language`, `variable_get()`), entity definitions, and call trees.
 2. **D10/D11 Architectural Mapping (Non-1:1 Transformation)**:
    - Determine modern PSR-4 Drupal 10/11 target for each class and functional unit:
+     - **Architectural Replacement vs Direct Port**: If the subsystem was replaced by a modern paradigm (e.g. legacy procedural group/community subsystem $\to$ modern entity/access architecture), decompose source behaviors and map to target architecture rather than attempting literal syntax translation.
+     - **Inspect Existing Target Implementations First**: Inspect existing classes, services, and plugins in target codebase; extend existing implementations to satisfy missing behaviors rather than creating duplicate competing classes.
      - D7 business logic class $\rightarrow$ D10 Service class in `src/Service/` registered in `.services.yml`
      - D7 custom entity $\rightarrow$ `@ContentEntityType` / `@ConfigEntityType` in `src/Entity/` with interface in `src/Entity/`
      - D7 page/router callback $\rightarrow$ D10 Controller in `src/Controller/`

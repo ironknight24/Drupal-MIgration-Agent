@@ -152,7 +152,7 @@ A standardized vocabulary governs component lifecycles in `state/migration-state
 ## 5. Recursive Dependency Resolution & Sub-DAG Ordering (Single-Module Execution Mode)
 
 ### Sub-DAG Topological Scheduler
-When a specific module or task is requested (e.g. `/orchestrate ariba_helper` or `/migrate-module ariba_helper` in Single-Module Execution Mode):
+When a specific module or task is requested (e.g. `/orchestrate custom_booking` or `/migrate-module custom_booking` in Single-Module Execution Mode):
 
 1. **Dependency Extraction**: The Orchestrator inspects the module's declared and implicit dependencies from `state/migration-manifest.yml`.
 2. **Sub-DAG Construction**: Builds the recursive ancestor set:
@@ -166,14 +166,38 @@ When a specific module or task is requested (e.g. `/orchestrate ariba_helper` or
 
 ---
 
-## 6. Task-Level Recursion & Iterative Remediation
+## 6. Architectural Replacement Detection & Behavioral Remediation Cycle
+
+When a legacy subsystem has been replaced by a modern target architecture (e.g. legacy procedural group/community subsystem $\to$ modern entity/access architecture):
+
+```text
+SOURCE SUBSYSTEM
+       ↓
+ARCHITECTURAL REPLACEMENT DISCOVERY (Evidence from composer.json, installed modules, custom classes)
+       ↓
+BEHAVIORAL DECOMPOSITION (Extract discrete source behaviors)
+       ↓
+INSPECT EXISTING TARGET IMPLEMENTATION (Extend existing target code; avoid duplicate classes)
+       ↓
+BEHAVIORAL MAPPING & GAP AUDIT (Classify 10 canonical statuses)
+       ↓
+EMIT STRUCTURED REMEDIATION TASKS (Stable IDs, YAML LLM remediation input)
+       ↓
+IMPLEMENT & VALIDATE BEHAVIORAL PARITY (Kernel assertions, access checks, cache invalidation)
+       ↓
+RE-AUDIT & CONVERGENCE (Loop 1..3 until COMPLETE or escalated)
+```
+
+---
+
+## 7. Task-Level Recursion & Iterative Remediation
 
 Within an individual component migration:
 
 1. **Initial Audit**: Forensic comparison of D7 source vs D10 target across 12 dimensions.
 2. **Gap Classification**: Every gap is assigned one of the 10 canonical statuses.
 3. **Remediation Task Generation**:
-   - Each fixable gap receives a stable ID (e.g. `ARIBA-HELPER-ROUTE-001`, `ARIBA-HELPER-SERVICE-004`).
+   - Each fixable gap receives a stable ID (e.g. `CUSTOM-BOOKING-ROUTE-001`, `CUSTOM-BOOKING-SERVICE-004`).
    - Tasks are compiled in the report's `## LLM REMEDIATION INPUT` section.
 4. **Execution & Targeted Re-validation**:
    - The specialist agent applies the fix.
@@ -186,7 +210,7 @@ Within an individual component migration:
 
 ---
 
-## 7. Loop Prevention & Guardrails
+## 8. Loop Prevention & Guardrails
 
 To prevent unbounded execution loops:
 

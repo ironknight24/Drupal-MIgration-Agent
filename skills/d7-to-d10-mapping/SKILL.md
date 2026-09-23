@@ -396,3 +396,65 @@ In Drupal 7, `hook_menu()` handled page routing, menu items, tabs, contextual li
   - Legacy `db_transaction()` calls are refactored to `$transaction = $connection->startTransaction()` utilizing RAII transaction scope management.
 - **Bootstrap & Lifecycle Hooks (`hook_boot()`, `hook_init()`, `hook_exit()`) $\rightarrow$ HttpKernel Event Subscribers**:
   - Procedural lifecycle hooks are modernized to Symfony `EventSubscriberInterface` listeners subscribing to `KernelEvents::REQUEST`, `KernelEvents::RESPONSE`, and `KernelEvents::TERMINATE`.
+
+## 16. Architectural Replacement & Behavioral Mapping Protocol
+
+When a legacy Drupal 7 subsystem, module, framework, or architectural pattern has been replaced by a **different** Drupal 10/11 architecture rather than a direct 1:1 API port, the agent must perform **Behavioral Mapping** instead of literal syntax conversion.
+
+### 1. The 6-Stage Behavioral Mapping Pipeline
+```text
+SOURCE SUBSYSTEM (D7)
+        │ (Discovery: Dependencies, Hooks, Tables, APIs, Config)
+        ▼
+ARCHITECTURAL REPLACEMENT DISCOVERY (D10)
+        │ (Inspect composer.json, installed modules, custom classes, config)
+        ▼
+BEHAVIORAL DECOMPOSITION
+        │ (Extract discrete source behaviors: entity creation, access, queries, forms, cache, etc.)
+        ▼
+INSPECT EXISTING TARGET IMPLEMENTATION
+        │ (Prefer extending existing target architecture over duplicate classes)
+        ▼
+BEHAVIORAL MAPPING & GAP CLASSIFICATION
+        │ (Classify each behavior into 10 canonical statuses: COMPLETE, PARTIAL, MISSING, etc.)
+        ▼
+REMEDIATION & RE-AUDIT
+          (Emit structured remediation tasks with stable IDs and verify behavioral equivalence)
+```
+
+### 2. Architectural Relationship Taxonomy
+Every detected relationship between a D7 subsystem and D10 architecture must be classified into one of these standard relationship types with repository evidence:
+- **`DIRECT_EQUIVALENT`**: 1:1 API or service port exists in target core/contrib.
+- **`ARCHITECTURAL_REPLACEMENT`**: Complete subsystem replacement using modern OOP/Symfony paradigms (e.g. legacy procedural group/community subsystem $\to$ modern entity/access architecture).
+- **`PARTIAL_REPLACEMENT`**: Target architecture fulfills some source behaviors; remaining behaviors require custom services/plugins.
+- **`REPLACED_BY_EXISTING_CUSTOM`**: Target codebase already contains a custom implementation fulfilling the subsystem behavior.
+- **`SUPERSEDED`**: Absorbed into modern core platform features (e.g. Media, Layout Builder, CMI).
+- **`OBSOLETE`**: Legacy D7 pattern retired with zero active callers.
+- **`NO_REPLACEMENT_FOUND`**: No target equivalent identified; requires architectural decision or custom service design.
+
+### 3. Behavioral Decomposition Categories
+Decompose discovered source code into verified behaviors:
+- Entity creation, storage & lifecycle operations
+- Entity relationships, hierarchies & references
+- Membership, roles, permissions & access control checks
+- Context handling & condition plugins
+- Database operations, custom schema & query abstractions
+- Forms, form alters, validation & submission logic
+- Routes, controllers, endpoints & parameter converters
+- Blocks, layouts, render arrays & display modes
+- Cache bin operations $\to$ bubbleable cache metadata (`tags`, `contexts`, `max-age`) and invalidation
+- Queues, cron handlers & batch operations
+- External integrations, REST/SOAP APIs & webhooks
+- Frontend behaviors, assets & templates
+
+### 4. Existing Target Architecture First Rule
+If the D10 target codebase already contains an implementation of the replacement architecture:
+1. **Discover & Inspect**: Locate existing classes, services, plugin definitions, and configuration.
+2. **Account for Implemented Behaviors**: Mark matching behaviors as `COMPLETE` or `REPLACED` citing target file lines.
+3. **Isolate Gaps**: Only generate remediation tasks for missing or partial behaviors.
+4. **Extend Existing Code**: Modify existing target classes/services rather than creating duplicate competing implementations.
+
+### 5. Evidence & Confidence Levels
+- **`HIGH`**: Direct repository evidence confirms target architecture, dependencies, and code bindings.
+- **`MEDIUM`**: Strong architectural alignment exists, but dynamic/runtime aspects require static-only verification (`RUNTIME_UNVERIFIED`).
+- **`LOW`**: Insufficient evidence or multiple conflicting candidate architectures $\to$ Escalate immediately to `HUMAN_INTERVENTION_REQUIRED` without guessing.

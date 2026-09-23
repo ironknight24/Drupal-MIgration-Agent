@@ -238,3 +238,15 @@ The factory recursively discovers and re-engineers Cache operations, cache bins/
 - Overlapping source and target paths trigger an immediate **Global Migration Block**.
 - Target paths (`target_module_dir`, `target_theme_dir`, `target_config_dir`) are dynamically derived from `migration.config.yml`.
 - Every modified, created, or deleted file in `target.path` must generate an entry in `logs/file-change-log/`.
+
+---
+
+## 8. Architectural Replacement & Behavioral Mapping Architecture
+
+When migrating subsystems where the underlying architecture has fundamentally changed (e.g. legacy procedural group/community subsystem $\to$ modern entity/access architecture):
+
+1. **Subsystem Replacement Discovery**: Analyzes evidence across D7 source (dependencies, hooks, tables, queries) and D10 target (`composer.json`, installed modules, existing custom classes, configuration) to detect replacement relationships (`DIRECT_EQUIVALENT`, `ARCHITECTURAL_REPLACEMENT`, `PARTIAL_REPLACEMENT`, `REPLACED_BY_EXISTING_CUSTOM`, `SUPERSEDED`, `OBSOLETE`, `NO_REPLACEMENT_FOUND`).
+2. **Behavioral Decomposition**: Decomposes source code into discrete behaviors (entity creation, access control, queries, forms, cache invalidation, etc.).
+3. **Existing Target Architecture First**: Discovers existing target classes/services first; extends existing code rather than creating duplicate competing classes.
+4. **Behavioral Equivalence Verification**: Audits the migrated behavior in the target architecture and validates functional equivalence without assuming identical class names or literal syntax.
+5. **Human Decision Boundary**: Escalate low-confidence or ambiguous architectural replacements to `HUMAN_INTERVENTION_REQUIRED` without inventing requirements.

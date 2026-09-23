@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260923110643",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260923130007",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-23T11:06:43.501970+00:00",
+  "executed_at": "2026-09-23T13:00:07.470458+00:00",
   "summary": {
-    "checks_total": 431,
-    "passed": 428,
+    "checks_total": 456,
+    "passed": 453,
     "failed": 0,
     "warnings": 0,
     "unverified": 3
@@ -5486,6 +5486,319 @@
       "details": "Verified real-world case study documentation.",
       "affected_files": [
         "README.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-01",
+      "category": "architectural_replacement",
+      "name": "Source Technology Detection Protocol",
+      "status": "PASS",
+      "evidence": "d7-to-d10-mapping skill establishes protocol for discovering legacy subsystem dependencies, hooks, tables, and APIs.",
+      "details": "Verified source technology discovery heuristics.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-02",
+      "category": "architectural_replacement",
+      "name": "Target Replacement Detection Protocol",
+      "status": "PASS",
+      "evidence": "Factory discovers target architecture from composer.json, installed modules, custom classes, and config.",
+      "details": "Verified target replacement discovery heuristics.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/dependency-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-03",
+      "category": "architectural_replacement",
+      "name": "Direct Equivalent Detection (Scenario A)",
+      "status": "PASS",
+      "evidence": "Classification taxonomy accounts for DIRECT_EQUIVALENT 1:1 API mappings.",
+      "details": "Verified Scenario A direct equivalent handling.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-04",
+      "category": "architectural_replacement",
+      "name": "Architectural Replacement Detection (Scenario B)",
+      "status": "PASS",
+      "evidence": "Subsystem architectural replacement relationship defined across mapping and contrib evaluation skills.",
+      "details": "Verified Scenario B architectural replacement handling.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/contrib-evaluation/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-05",
+      "category": "architectural_replacement",
+      "name": "Partial Replacement Detection (Scenario C)",
+      "status": "PASS",
+      "evidence": "PARTIAL_REPLACEMENT accounts for target architectures covering only a subset of source behaviors.",
+      "details": "Verified Scenario C partial replacement handling.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-06",
+      "category": "architectural_replacement",
+      "name": "Existing Target Implementation Discovery (Scenario G)",
+      "status": "PASS",
+      "evidence": "Enforces discovering and extending existing target architecture rather than creating duplicate classes.",
+      "details": "Verified Scenario G existing target inspection.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "agents/custom-module/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-07",
+      "category": "architectural_replacement",
+      "name": "No Replacement Found Handling (Scenario D)",
+      "status": "PASS",
+      "evidence": "NO_REPLACEMENT_FOUND handles legacy source behaviors lacking target equivalents without guessing.",
+      "details": "Verified Scenario D no replacement handling.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-08",
+      "category": "architectural_replacement",
+      "name": "Evidence & Confidence Level Protocol",
+      "status": "PASS",
+      "evidence": "Architectural replacement decisions require HIGH/MEDIUM repository evidence; LOW confidence halts with HUMAN_INTERVENTION_REQUIRED.",
+      "details": "Verified evidence and confidence level standards.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-09",
+      "category": "architectural_replacement",
+      "name": "Behavioral Decomposition Coverage",
+      "status": "PASS",
+      "evidence": "d7-to-d10-mapping skill defines exhaustive behavioral decomposition categories supported by repository evidence.",
+      "details": "Verified behavioral decomposition categories.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-10",
+      "category": "architectural_replacement",
+      "name": "Behavioral Replacement Matrix Standardization",
+      "status": "PASS",
+      "evidence": "Standardizes Behavioral Replacement Matrix schema across validation skill, reporting standards, and templates.",
+      "details": "Verified Behavioral Replacement Matrix schema.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "REPORTING_STANDARD.md",
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-11",
+      "category": "architectural_replacement",
+      "name": "Missing Behavior Detection & Classification",
+      "status": "PASS",
+      "evidence": "Canonical MISSING status applied to source behaviors absent in target architecture.",
+      "details": "Verified MISSING behavior tracking.",
+      "affected_files": [
+        "REPORTING_STANDARD.md",
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-12",
+      "category": "architectural_replacement",
+      "name": "Partial Behavior Detection & Classification",
+      "status": "PASS",
+      "evidence": "Canonical PARTIAL status applied to target architectures with incomplete method or parameter support.",
+      "details": "Verified PARTIAL behavior tracking.",
+      "affected_files": [
+        "REPORTING_STANDARD.md",
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-13",
+      "category": "architectural_replacement",
+      "name": "Remediation Task Creation Protocol",
+      "status": "PASS",
+      "evidence": "Produces structured remediation tasks with stable task IDs, target architecture, and do_not_change guardrails.",
+      "details": "Verified remediation task schema.",
+      "affected_files": [
+        "REPORTING_STANDARD.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-14",
+      "category": "architectural_replacement",
+      "name": "Human Intervention for Ambiguous Replacements (Scenario E)",
+      "status": "PASS",
+      "evidence": "Escalates ambiguous architectural choices to HUMAN_INTERVENTION_REQUIRED and halts safely.",
+      "details": "Verified Scenario E human decision gate.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "agents/orchestrator/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-15",
+      "category": "architectural_replacement",
+      "name": "Runtime-Unverified Replacement (Scenario F)",
+      "status": "PASS",
+      "evidence": "Tags dynamic or live runtime behaviors as RUNTIME_UNVERIFIED without falsely failing static re-engineering.",
+      "details": "Verified Scenario F runtime boundary handling.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "REPORTING_STANDARD.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-16",
+      "category": "architectural_replacement",
+      "name": "Recursive Dependency Interaction",
+      "status": "PASS",
+      "evidence": "Dependency skill integrates replacement architecture dependencies into the recursive sub-DAG scheduler.",
+      "details": "Verified recursive dependency integration.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-17",
+      "category": "architectural_replacement",
+      "name": "Replacement Dependency Topological Precedence",
+      "status": "PASS",
+      "evidence": "Enforces validating and completing upstream dependencies of replacement architectures before dependent tasks.",
+      "details": "Verified replacement dependency topological ordering.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-18",
+      "category": "architectural_replacement",
+      "name": "Cycle Detection in Replacement Topologies",
+      "status": "PASS",
+      "evidence": "DFS cycle detector catches circular dependencies introduced by replacement architectures and emits blocker tickets.",
+      "details": "Verified cycle detection for replacement architectures.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-19",
+      "category": "architectural_replacement",
+      "name": "Data Model & Schema Preservation",
+      "status": "PASS",
+      "evidence": "Audits data model differences (tables, fields, entity storage) and preserves structural semantics in target architecture.",
+      "details": "Verified data model replacement analysis.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-20",
+      "category": "architectural_replacement",
+      "name": "Access & Permission Mapping",
+      "status": "PASS",
+      "evidence": "Modernizes procedural access callbacks to AccessCheckInterface services and route requirements.",
+      "details": "Verified access and permission replacement mapping.",
+      "affected_files": [
+        "skills/behavioral-validation/SKILL.md",
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-21",
+      "category": "architectural_replacement",
+      "name": "Cache Modernization & Invalidation Mapping",
+      "status": "PASS",
+      "evidence": "Converts legacy procedural cache bin operations into modern bubbleable cache metadata (tags, contexts) and Cache::invalidateTags.",
+      "details": "Verified cache modernization mapping.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-22",
+      "category": "architectural_replacement",
+      "name": "Integration & External Services Mapping",
+      "status": "PASS",
+      "evidence": "Re-engineers legacy procedural HTTP and external integration calls into injectable Guzzle Gateway Services.",
+      "details": "Verified integration replacement mapping.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-23",
+      "category": "architectural_replacement",
+      "name": "LLM Remediation Output Integration",
+      "status": "PASS",
+      "evidence": "All architectural replacement gaps generate copy-pasteable YAML remediation blocks under standard reporting format.",
+      "details": "Verified LLM remediation schema integration.",
+      "affected_files": [
+        "REPORTING_STANDARD.md",
+        "agents/orchestrator/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-24",
+      "category": "architectural_replacement",
+      "name": "Post-Remediation Re-Audit & Convergence",
+      "status": "PASS",
+      "evidence": "Enforces re-auditing remediated behavioral replacement artifacts against 12 dimensions until completion or bounded exit.",
+      "details": "Verified post-remediation re-audit cycle.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "MIGRATION_LIFECYCLE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-ARCH-25",
+      "category": "architectural_replacement",
+      "name": "Configuration Extensibility & Backward Compatibility",
+      "status": "PASS",
+      "evidence": "migration.config.example.yml provides optional architectural_replacements configuration without breaking existing workflows.",
+      "details": "Verified configuration schema extensibility.",
+      "affected_files": [
+        "migration.config.example.yml"
       ],
       "remediation": ""
     }

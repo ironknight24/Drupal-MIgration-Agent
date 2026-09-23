@@ -125,15 +125,20 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
      - Construct the ancestor sub-DAG ($\text{Ancestors}(M) \cup \{M\}$) and perform cycle detection.
      - For each unmigrated custom dependency $D$ in bottom-up topological order:
        - Recursively execute targeted migration for $D$.
-       - If $D$ enters `BLOCKED` or `HUMAN_INTERVENTION_REQUIRED`, mark $<MODULE_NAME>$ as `BLOCKED_UPSTREAM`, generate blocker ticket, and halt.
+        - If $D$ enters `BLOCKED` or `HUMAN_INTERVENTION_REQUIRED`, mark $<MODULE_NAME>$ as `BLOCKED_UPSTREAM`, generate blocker ticket, and halt.
      - When all dependencies are satisfied, dispatch `custom-module` specialist with `component_id: <MODULE_NAME>` and `execution_scope: SINGLE_MODULE`.
+     - **Architectural Replacement & Behavioral Mapping**:
+       - Analyze source subsystem evidence vs target architecture evidence (`composer.json`, installed modules, existing custom classes, configuration).
+       - If an architectural replacement is detected (e.g. `ARCHITECTURAL_REPLACEMENT`, `PARTIAL_REPLACEMENT`), decompose source behaviors and map to target architecture.
+       - Inspect existing target implementations first; prefer extending existing code over creating duplicate classes.
+       - Resolve any dependencies introduced by the replacement architecture recursively.
      - Receive worker `agent_result` via Result Validation Gate.
      - Execute 3-path iterative remediation loop:
        - **Path 1 (Evidence Fix)**: Auto-remediate fixable gaps with stable IDs and re-validate (up to `max_remediation_iterations: 3`).
        - **Path 2 (Human Decision)**: Transition to `HUMAN_INTERVENTION_REQUIRED` and stop on ambiguous requirements.
        - **Path 3 (Runtime Unavailable)**: Tag dynamic items as `RUNTIME_UNVERIFIED` and continue static verification.
      - Authoritatively update `component_states.<MODULE_NAME>` in `state/migration-state.yml` (leaving unrelated components untouched).
-     - Generate module evidence artifacts in `reports/migration/<MODULE_NAME>/` including `## LLM REMEDIATION INPUT`.
+     - Generate module evidence artifacts in `reports/migration/<MODULE_NAME>/` including `## ARCHITECTURAL REPLACEMENT ANALYSIS`, `## BEHAVIORAL REPLACEMENT MATRIX`, and `## LLM REMEDIATION INPUT`.
 6. **Result Validation Gate**: Receive worker `agent_result` payload. Validate schema, agent authorization, write boundary compliance (ensuring single-module mode writes strictly to `<target_module_dir>/<MODULE_NAME>/`), evidence citations, and blocker classifications.
 7. **Authoritative State Mutation**: Update `component_states` in `state/migration-state.yml`.
 8. **Blocker Propagation**: If a component reports `BLOCKED`, mark all transitive downstream dependents in subsequent waves as `BLOCKED_UPSTREAM`.

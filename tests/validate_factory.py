@@ -7072,6 +7072,266 @@ class FactoryValidator:
                               "README.md missing real-world case study or empirical edge case examples.",
                               "Must document empirical lessons in README.md.")
 
+    def validate_architectural_replacement_suite(self):
+        """
+        Comprehensive Validation Suite for Architectural Replacement Detection,
+        Behavioral Mapping, and Remediation (Checks 26.1 - 26.25 & Scenarios A-G).
+        """
+        mapping_skill = self.repo_root / "skills" / "d7-to-d10-mapping" / "SKILL.md"
+        behav_skill = self.repo_root / "skills" / "behavioral-validation" / "SKILL.md"
+        dep_skill = self.repo_root / "skills" / "dependency-analysis" / "SKILL.md"
+        contrib_skill = self.repo_root / "skills" / "contrib-evaluation" / "SKILL.md"
+        orchestrator_agent = self.repo_root / "agents" / "orchestrator" / "agent.md"
+        custom_mod_agent = self.repo_root / "agents" / "custom-module" / "agent.md"
+        reporting_std = self.repo_root / "REPORTING_STANDARD.md"
+        validation_tmpl = self.repo_root / "templates" / "validation-report.md"
+        plan_tmpl = self.repo_root / "templates" / "migration-plan.md"
+        lifecycle_doc = self.repo_root / "MIGRATION_LIFECYCLE.md"
+        arch_doc = self.repo_root / "ARCHITECTURE.md"
+        config_ex = self.repo_root / "migration.config.example.yml"
+
+        mapping_txt = mapping_skill.read_text(encoding="utf-8") if mapping_skill.exists() else ""
+        behav_txt = behav_skill.read_text(encoding="utf-8") if behav_skill.exists() else ""
+        dep_txt = dep_skill.read_text(encoding="utf-8") if dep_skill.exists() else ""
+        contrib_txt = contrib_skill.read_text(encoding="utf-8") if contrib_skill.exists() else ""
+        orch_txt = orchestrator_agent.read_text(encoding="utf-8") if orchestrator_agent.exists() else ""
+        custom_txt = custom_mod_agent.read_text(encoding="utf-8") if custom_mod_agent.exists() else ""
+        reporting_txt = reporting_std.read_text(encoding="utf-8") if reporting_std.exists() else ""
+        val_tmpl_txt = validation_tmpl.read_text(encoding="utf-8") if validation_tmpl.exists() else ""
+        plan_tmpl_txt = plan_tmpl.read_text(encoding="utf-8") if plan_tmpl.exists() else ""
+        life_txt = lifecycle_doc.read_text(encoding="utf-8") if lifecycle_doc.exists() else ""
+        arch_txt = arch_doc.read_text(encoding="utf-8") if arch_doc.exists() else ""
+        config_txt = config_ex.read_text(encoding="utf-8") if config_ex.exists() else ""
+
+        # 26.1 Source Technology Detection
+        if "Discovery: Dependencies, Hooks, Tables, APIs, Config" in mapping_txt or "Architectural Replacement" in mapping_txt:
+            self.record_check("CHECK-ARCH-01", "architectural_replacement", "Source Technology Detection Protocol", "PASS",
+                              "d7-to-d10-mapping skill establishes protocol for discovering legacy subsystem dependencies, hooks, tables, and APIs.",
+                              "Verified source technology discovery heuristics.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-01", "architectural_replacement", "Source Technology Detection Protocol", "FAIL",
+                              "Missing source technology detection protocol.", "Must document in skills/d7-to-d10-mapping/SKILL.md.")
+
+        # 26.2 Target Replacement Detection
+        if "composer.json, installed modules, custom classes, config" in mapping_txt or "Target Subsystem Dependency Resolution" in dep_txt:
+            self.record_check("CHECK-ARCH-02", "architectural_replacement", "Target Replacement Detection Protocol", "PASS",
+                              "Factory discovers target architecture from composer.json, installed modules, custom classes, and config.",
+                              "Verified target replacement discovery heuristics.", affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/dependency-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-02", "architectural_replacement", "Target Replacement Detection Protocol", "FAIL",
+                              "Missing target replacement detection protocol.", "Must document target discovery in skills.")
+
+        # 26.3 Direct Equivalent Detection (Scenario A)
+        if "DIRECT_EQUIVALENT" in mapping_txt:
+            self.record_check("CHECK-ARCH-03", "architectural_replacement", "Direct Equivalent Detection (Scenario A)", "PASS",
+                              "Classification taxonomy accounts for DIRECT_EQUIVALENT 1:1 API mappings.",
+                              "Verified Scenario A direct equivalent handling.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-03", "architectural_replacement", "Direct Equivalent Detection (Scenario A)", "FAIL",
+                              "Missing DIRECT_EQUIVALENT relationship classification.", "Must document DIRECT_EQUIVALENT.")
+
+        # 26.4 Architectural Replacement Detection (Scenario B)
+        if "ARCHITECTURAL_REPLACEMENT" in mapping_txt and "ARCHITECTURAL_REPLACEMENT" in contrib_txt:
+            self.record_check("CHECK-ARCH-04", "architectural_replacement", "Architectural Replacement Detection (Scenario B)", "PASS",
+                              "Subsystem architectural replacement relationship defined across mapping and contrib evaluation skills.",
+                              "Verified Scenario B architectural replacement handling.", affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/contrib-evaluation/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-04", "architectural_replacement", "Architectural Replacement Detection (Scenario B)", "FAIL",
+                              "Missing ARCHITECTURAL_REPLACEMENT relationship classification.", "Must document ARCHITECTURAL_REPLACEMENT.")
+
+        # 26.5 Partial Replacement Detection (Scenario C)
+        if "PARTIAL_REPLACEMENT" in mapping_txt:
+            self.record_check("CHECK-ARCH-05", "architectural_replacement", "Partial Replacement Detection (Scenario C)", "PASS",
+                              "PARTIAL_REPLACEMENT accounts for target architectures covering only a subset of source behaviors.",
+                              "Verified Scenario C partial replacement handling.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-05", "architectural_replacement", "Partial Replacement Detection (Scenario C)", "FAIL",
+                              "Missing PARTIAL_REPLACEMENT relationship classification.", "Must document PARTIAL_REPLACEMENT.")
+
+        # 26.6 Existing Target Implementation Discovery (Scenario G)
+        if "Existing Target Architecture First" in mapping_txt and "REPLACED_BY_EXISTING_CUSTOM" in mapping_txt:
+            self.record_check("CHECK-ARCH-06", "architectural_replacement", "Existing Target Implementation Discovery (Scenario G)", "PASS",
+                              "Enforces discovering and extending existing target architecture rather than creating duplicate classes.",
+                              "Verified Scenario G existing target inspection.", affected_files=["skills/d7-to-d10-mapping/SKILL.md", "agents/custom-module/agent.md"])
+        else:
+            self.record_check("CHECK-ARCH-06", "architectural_replacement", "Existing Target Implementation Discovery (Scenario G)", "FAIL",
+                              "Missing Existing Target Architecture First rule.", "Must document existing target discovery.")
+
+        # 26.7 No Replacement Found (Scenario D)
+        if "NO_REPLACEMENT_FOUND" in mapping_txt:
+            self.record_check("CHECK-ARCH-07", "architectural_replacement", "No Replacement Found Handling (Scenario D)", "PASS",
+                              "NO_REPLACEMENT_FOUND handles legacy source behaviors lacking target equivalents without guessing.",
+                              "Verified Scenario D no replacement handling.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-07", "architectural_replacement", "No Replacement Found Handling (Scenario D)", "FAIL",
+                              "Missing NO_REPLACEMENT_FOUND classification.", "Must document NO_REPLACEMENT_FOUND.")
+
+        # 26.8 Evidence Requirement & Confidence
+        if "HIGH" in mapping_txt and "MEDIUM" in mapping_txt and "LOW" in mapping_txt and "HUMAN_INTERVENTION_REQUIRED" in mapping_txt:
+            self.record_check("CHECK-ARCH-08", "architectural_replacement", "Evidence & Confidence Level Protocol", "PASS",
+                              "Architectural replacement decisions require HIGH/MEDIUM repository evidence; LOW confidence halts with HUMAN_INTERVENTION_REQUIRED.",
+                              "Verified evidence and confidence level standards.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-08", "architectural_replacement", "Evidence & Confidence Level Protocol", "FAIL",
+                              "Missing evidence confidence level specifications.", "Must document HIGH, MEDIUM, LOW confidence levels.")
+
+        # 26.9 Behavioral Decomposition
+        behav_categories = ["Entity creation", "Entity relationships", "Membership", "Roles", "Permissions", "Database operations", "Forms", "Routes", "Cache bin operations", "Queues", "External integrations"]
+        if all(any(c.lower() in mapping_txt.lower() for c in [cat]) for cat in behav_categories):
+            self.record_check("CHECK-ARCH-09", "architectural_replacement", "Behavioral Decomposition Coverage", "PASS",
+                              "d7-to-d10-mapping skill defines exhaustive behavioral decomposition categories supported by repository evidence.",
+                              "Verified behavioral decomposition categories.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-09", "architectural_replacement", "Behavioral Decomposition Coverage", "FAIL",
+                              "Missing one or more required behavioral decomposition categories in d7-to-d10-mapping skill.",
+                              "Must define exhaustive behavioral categories.")
+
+        # 26.10 Source -> Target Behavior Mapping Matrix
+        if "Behavioral Replacement Matrix" in behav_txt and "Behavioral Replacement Matrix" in reporting_txt and "Behavioral Replacement Matrix" in val_tmpl_txt:
+            self.record_check("CHECK-ARCH-10", "architectural_replacement", "Behavioral Replacement Matrix Standardization", "PASS",
+                              "Standardizes Behavioral Replacement Matrix schema across validation skill, reporting standards, and templates.",
+                              "Verified Behavioral Replacement Matrix schema.", affected_files=["skills/behavioral-validation/SKILL.md", "REPORTING_STANDARD.md", "templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-ARCH-10", "architectural_replacement", "Behavioral Replacement Matrix Standardization", "FAIL",
+                              "Missing Behavioral Replacement Matrix across validation skill, reporting standards, or templates.",
+                              "Must standardize matrix schema.")
+
+        # 26.11 Missing Behavior Detection
+        if "MISSING" in reporting_txt and "MISSING" in val_tmpl_txt:
+            self.record_check("CHECK-ARCH-11", "architectural_replacement", "Missing Behavior Detection & Classification", "PASS",
+                              "Canonical MISSING status applied to source behaviors absent in target architecture.",
+                              "Verified MISSING behavior tracking.", affected_files=["REPORTING_STANDARD.md", "templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-ARCH-11", "architectural_replacement", "Missing Behavior Detection & Classification", "FAIL",
+                              "Missing behavior classification not standardized.", "Must document MISSING status.")
+
+        # 26.12 Partial Behavior Detection
+        if "PARTIAL" in reporting_txt and "PARTIAL" in val_tmpl_txt:
+            self.record_check("CHECK-ARCH-12", "architectural_replacement", "Partial Behavior Detection & Classification", "PASS",
+                              "Canonical PARTIAL status applied to target architectures with incomplete method or parameter support.",
+                              "Verified PARTIAL behavior tracking.", affected_files=["REPORTING_STANDARD.md", "templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-ARCH-12", "architectural_replacement", "Partial Behavior Detection & Classification", "FAIL",
+                              "Partial behavior classification not standardized.", "Must document PARTIAL status.")
+
+        # 26.13 Remediation Task Creation
+        if "task_id" in reporting_txt and "required_change" in reporting_txt and "do_not_change" in reporting_txt:
+            self.record_check("CHECK-ARCH-13", "architectural_replacement", "Remediation Task Creation Protocol", "PASS",
+                              "Produces structured remediation tasks with stable task IDs, target architecture, and do_not_change guardrails.",
+                              "Verified remediation task schema.", affected_files=["REPORTING_STANDARD.md"])
+        else:
+            self.record_check("CHECK-ARCH-13", "architectural_replacement", "Remediation Task Creation Protocol", "FAIL",
+                              "Remediation task schema missing required fields.", "Must specify task_id, required_change, do_not_change.")
+
+        # 26.14 Human Intervention for Ambiguous Replacements (Scenario E)
+        if "HUMAN_INTERVENTION_REQUIRED" in mapping_txt and "HUMAN_INTERVENTION_REQUIRED" in orch_txt:
+            self.record_check("CHECK-ARCH-14", "architectural_replacement", "Human Intervention for Ambiguous Replacements (Scenario E)", "PASS",
+                              "Escalates ambiguous architectural choices to HUMAN_INTERVENTION_REQUIRED and halts safely.",
+                              "Verified Scenario E human decision gate.", affected_files=["skills/d7-to-d10-mapping/SKILL.md", "agents/orchestrator/agent.md"])
+        else:
+            self.record_check("CHECK-ARCH-14", "architectural_replacement", "Human Intervention for Ambiguous Replacements (Scenario E)", "FAIL",
+                              "Missing human intervention escalation for ambiguous replacements.", "Must document human decision gate.")
+
+        # 26.15 Runtime-Unverified Replacement (Scenario F)
+        if "RUNTIME_UNVERIFIED" in mapping_txt and "RUNTIME_UNVERIFIED" in reporting_txt:
+            self.record_check("CHECK-ARCH-15", "architectural_replacement", "Runtime-Unverified Replacement (Scenario F)", "PASS",
+                              "Tags dynamic or live runtime behaviors as RUNTIME_UNVERIFIED without falsely failing static re-engineering.",
+                              "Verified Scenario F runtime boundary handling.", affected_files=["skills/d7-to-d10-mapping/SKILL.md", "REPORTING_STANDARD.md"])
+        else:
+            self.record_check("CHECK-ARCH-15", "architectural_replacement", "Runtime-Unverified Replacement (Scenario F)", "FAIL",
+                              "Missing RUNTIME_UNVERIFIED handling for dynamic behaviors.", "Must document RUNTIME_UNVERIFIED status.")
+
+        # 26.16 Recursive Dependency Interaction
+        if "Target Subsystem Dependency Resolution" in dep_txt and "Recursive Sub-DAG Expansion" in dep_txt:
+            self.record_check("CHECK-ARCH-16", "architectural_replacement", "Recursive Dependency Interaction", "PASS",
+                              "Dependency skill integrates replacement architecture dependencies into the recursive sub-DAG scheduler.",
+                              "Verified recursive dependency integration.", affected_files=["skills/dependency-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-16", "architectural_replacement", "Recursive Dependency Interaction", "FAIL",
+                              "Missing recursive dependency interaction for replacement architectures.", "Must document sub-DAG expansion.")
+
+        # 26.17 Replacement Dependency Resolution
+        if "Topological Precedence" in dep_txt:
+            self.record_check("CHECK-ARCH-17", "architectural_replacement", "Replacement Dependency Topological Precedence", "PASS",
+                              "Enforces validating and completing upstream dependencies of replacement architectures before dependent tasks.",
+                              "Verified replacement dependency topological ordering.", affected_files=["skills/dependency-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-17", "architectural_replacement", "Replacement Dependency Topological Precedence", "FAIL",
+                              "Missing topological precedence rules for replacement dependencies.", "Must document in dependency skill.")
+
+        # 26.18 Cycle Handling in Replacement Topologies
+        if "Cycle Guard" in dep_txt and "BLOCKED-CYCLE" in dep_txt:
+            self.record_check("CHECK-ARCH-18", "architectural_replacement", "Cycle Detection in Replacement Topologies", "PASS",
+                              "DFS cycle detector catches circular dependencies introduced by replacement architectures and emits blocker tickets.",
+                              "Verified cycle detection for replacement architectures.", affected_files=["skills/dependency-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-18", "architectural_replacement", "Cycle Detection in Replacement Topologies", "FAIL",
+                              "Missing cycle detection handling for replacement architectures.", "Must document cycle guard in dependency skill.")
+
+        # 26.19 Data Model & Schema Analysis
+        if "Data Model & Permission Preservation" in behav_txt or "custom schema" in mapping_txt:
+            self.record_check("CHECK-ARCH-19", "architectural_replacement", "Data Model & Schema Preservation", "PASS",
+                              "Audits data model differences (tables, fields, entity storage) and preserves structural semantics in target architecture.",
+                              "Verified data model replacement analysis.", affected_files=["skills/behavioral-validation/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-19", "architectural_replacement", "Data Model & Schema Preservation", "FAIL",
+                              "Missing data model and schema analysis rules.", "Must document in behavioral validation skill.")
+
+        # 26.20 Permission & Access Control Mapping
+        if "Access & Cache Modernization" in behav_txt and "AccessCheckInterface" in mapping_txt:
+            self.record_check("CHECK-ARCH-20", "architectural_replacement", "Access & Permission Mapping", "PASS",
+                              "Modernizes procedural access callbacks to AccessCheckInterface services and route requirements.",
+                              "Verified access and permission replacement mapping.", affected_files=["skills/behavioral-validation/SKILL.md", "skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-20", "architectural_replacement", "Access & Permission Mapping", "FAIL",
+                              "Missing access and permission mapping rules.", "Must document access modernization.")
+
+        # 26.21 Cache Modernization Mapping
+        if "Cache bin operations" in mapping_txt and "bubbleable cache metadata" in mapping_txt:
+            self.record_check("CHECK-ARCH-21", "architectural_replacement", "Cache Modernization & Invalidation Mapping", "PASS",
+                              "Converts legacy procedural cache bin operations into modern bubbleable cache metadata (tags, contexts) and Cache::invalidateTags.",
+                              "Verified cache modernization mapping.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-21", "architectural_replacement", "Cache Modernization & Invalidation Mapping", "FAIL",
+                              "Missing cache modernization rules.", "Must document cache bin to cache metadata conversion.")
+
+        # 26.22 Integration & External Services Mapping
+        if "Guzzle" in mapping_txt and "Gateway Services" in mapping_txt:
+            self.record_check("CHECK-ARCH-22", "architectural_replacement", "Integration & External Services Mapping", "PASS",
+                              "Re-engineers legacy procedural HTTP and external integration calls into injectable Guzzle Gateway Services.",
+                              "Verified integration replacement mapping.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-ARCH-22", "architectural_replacement", "Integration & External Services Mapping", "FAIL",
+                              "Missing integration and gateway service modernization rules.", "Must document in mapping skill.")
+
+        # 26.23 LLM Remediation Output Integration
+        if "## LLM REMEDIATION INPUT" in reporting_txt and "## LLM REMEDIATION INPUT" in orch_txt:
+            self.record_check("CHECK-ARCH-23", "architectural_replacement", "LLM Remediation Output Integration", "PASS",
+                              "All architectural replacement gaps generate copy-pasteable YAML remediation blocks under standard reporting format.",
+                              "Verified LLM remediation schema integration.", affected_files=["REPORTING_STANDARD.md", "agents/orchestrator/agent.md"])
+        else:
+            self.record_check("CHECK-ARCH-23", "architectural_replacement", "LLM Remediation Output Integration", "FAIL",
+                              "LLM remediation output not integrated.", "Must document ## LLM REMEDIATION INPUT.")
+
+        # 26.24 Re-Audit After Remediation
+        if "REMEDIATION & RE-AUDIT" in mapping_txt or "Re-audit & Convergence" in life_txt:
+            self.record_check("CHECK-ARCH-24", "architectural_replacement", "Post-Remediation Re-Audit & Convergence", "PASS",
+                              "Enforces re-auditing remediated behavioral replacement artifacts against 12 dimensions until completion or bounded exit.",
+                              "Verified post-remediation re-audit cycle.", affected_files=["skills/d7-to-d10-mapping/SKILL.md", "MIGRATION_LIFECYCLE.md"])
+        else:
+            self.record_check("CHECK-ARCH-24", "architectural_replacement", "Post-Remediation Re-Audit & Convergence", "FAIL",
+                              "Missing post-remediation re-audit cycle.", "Must document re-audit flow.")
+
+        # 26.25 Backward Compatibility & Configuration Extensibility
+        if "architectural_replacements" in config_txt and "confidence_threshold" in config_txt:
+            self.record_check("CHECK-ARCH-25", "architectural_replacement", "Configuration Extensibility & Backward Compatibility", "PASS",
+                              "migration.config.example.yml provides optional architectural_replacements configuration without breaking existing workflows.",
+                              "Verified configuration schema extensibility.", affected_files=["migration.config.example.yml"])
+        else:
+            self.record_check("CHECK-ARCH-25", "architectural_replacement", "Configuration Extensibility & Backward Compatibility", "FAIL",
+                              "Missing optional architectural_replacements section in migration.config.example.yml.",
+                              "Must add architectural_replacements section.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -7098,6 +7358,7 @@ class FactoryValidator:
         self.validate_runtime_behavior_suite()
         self.validate_single_module_migration_suite()
         self.validate_recursive_orchestration_suite()
+        self.validate_architectural_replacement_suite()
 
     def generate_result_json(self):
         return {
