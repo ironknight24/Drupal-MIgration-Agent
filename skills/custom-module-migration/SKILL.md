@@ -130,31 +130,37 @@ Determine target version from project configuration (`target.core_version`):
     - Execute comparative audit against D7 baseline specifications using `skills/behavioral-validation`.
     - Verify that every discovered custom PHP file, class, method, function, procedural hook, custom database table, configuration/state variable, entity type, field, form builder, form alter, AJAX callback, JavaScript behavior, CSS asset, View definition, custom Views plugin, dynamic dependency, external integration, and runtime behavior has an explicit modern equivalent or valid reason.
 
-13. **Step 13: Gap Analysis, Outcome Accounting & Sign-Off**
-    - Verify that every custom PHP file, class, function, procedural hook implementation, custom database table, configuration/state artifact, entity type, field, form, AJAX callback, frontend asset, View definition, Views plugin, dynamic dependency, external integration, and runtime behavior item ends in an approved outcome state:
-      `MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, or `UNVERIFIED`.
+13. **Step 13: Gap Analysis, Outcome Accounting & 3-Path Remediation**
+    - Verify that every custom PHP file, class, function, procedural hook implementation, custom database table, configuration/state artifact, entity type, field, form, AJAX callback, frontend asset, View definition, Views plugin, dynamic dependency, external integration, and runtime behavior item is classified under one of the 10 canonical item statuses:
+      `COMPLETE`, `PARTIAL`, `MISSING`, `BLOCKED`, `HUMAN_INTERVENTION_REQUIRED`, `RUNTIME_UNVERIFIED`, `SUPERSEDED`, `REPLACED`, `OBSOLETE`, or `EXCLUDED`.
     - Reject any `UNACCOUNTED`, `UNKNOWN_WITHOUT_REASON`, or `SILENTLY_OMITTED` items.
-    - Generate `reports/custom-modules/REPORT-<MODULE>.md`.
-    - Propose updating component status to `CODE_COMPLETE` via `agent_result`.
+    - Evaluate gaps via the **3-Path Remediation Engine**:
+      - **Path 1 (FIXABLE FROM EVIDENCE)**: Generate structured remediation tasks with stable IDs, implement code fixes within the module write boundary, and re-audit (up to `max_remediation_iterations: 3`).
+      - **Path 2 (REQUIRES HUMAN DECISION)**: Transition to `HUMAN_INTERVENTION_REQUIRED` for ambiguous business logic, GDPR policy, or architecture trade-offs. Never invent business requirements.
+      - **Path 3 (RUNTIME UNAVAILABLE)**: Mark dynamic behaviors as `RUNTIME_UNVERIFIED` and continue static verification.
+    - Generate `reports/custom-modules/REPORT-<MODULE>.md` and `reports/migration/<MODULE>/<MODULE>_FINAL_VERDICT.md` containing the structured `## LLM REMEDIATION INPUT` section.
+    - Propose updating component status to `COMPLETE` (or `PARTIAL`/`BLOCKED`/`HUMAN_INTERVENTION_REQUIRED`) via `agent_result`.
 
 ---
 
-## 14. Single-Module Migration Protocol (`/migrate-module <MODULE>`)
+## 14. Targeted Single-Module Migration Protocol (`/orchestrate <MODULE>` or `/migrate-module <MODULE>`)
 
-When invoked in single-module mode via `/drupal-migration-agent:migrate-module <MODULE>`:
+When invoked in targeted single-module mode:
 
 1. **Target Module Identification & Manifest Validation**:
    - The agent strictly validates that `<MODULE>` exists in `state/migration-manifest.yml` as a `custom_module`.
-2. **Upstream Custom Dependency Check**:
-   - Inspect all declared and implicit custom module dependencies for `<MODULE>`.
-   - If any upstream custom module dependency is unmigrated (not `COMPLETED` / `VALIDATED`), the agent **MUST NOT** silently migrate it. The agent halts with status `BLOCKED_UPSTREAM` and generates `reports/blocked/BLOCKED-<MODULE>-001-UPSTREAM.md`.
+2. **Recursive Upstream Custom Dependency Resolution**:
+   - Inspect all declared and implicit custom module dependencies for `<MODULE>` and construct the ancestor sub-DAG.
+   - Execute cycle detection. If a cycle is detected, halt with `BLOCKED-<MODULE>-001-CYCLE.md`.
+   - Process unmigrated upstream dependencies in bottom-up topological order.
+   - If an upstream dependency is `BLOCKED` or requires human input, mark `<MODULE>` as `BLOCKED_UPSTREAM` and halt.
 3. **Pre-Migration Target Snapshot**:
    - If `<target_module_dir>/<MODULE>/` already exists, capture file inventory, line counts, and checksums, tagging the run as `EXISTING_TARGET_MODULE` (vs `NEW_TARGET_MODULE`).
 4. **Strict Write Scope & Boundary Enforcement**:
    - Authorized write target is strictly `<target_module_dir>/<MODULE>/**/*` and `reports/migration/<MODULE>/*`.
    - Zero writes to D7 source (strictly read-only). Zero writes to other custom modules, contrib modules, themes, core, or global config.
    - If a supporting change outside the module is required, record it as `REQUIRES_EXTERNAL_CHANGE` in the plan and gap analysis without modifying external files.
-5. **Standard Evidence Artifacts**:
+5. **Standard Evidence Artifacts & LLM Remediation Input**:
    - In single-module mode, generate the comprehensive evidence suite under `reports/migration/<MODULE>/`:
      - `<MODULE>_D7_BASELINE.md`
      - `<MODULE>_MIGRATION_PLAN.md`
@@ -163,6 +169,6 @@ When invoked in single-module mode via `/drupal-migration-agent:migrate-module <
      - `<MODULE>_DEPENDENCY_ANALYSIS.md`
      - `<MODULE>_POST_MIGRATION_AUDIT.md`
      - `<MODULE>_GAP_ANALYSIS.md`
-     - `<MODULE>_FINAL_VERDICT.md`
+     - `<MODULE>_FINAL_VERDICT.md` (including standard `## LLM REMEDIATION INPUT` with stable task IDs)
 6. **State Mutation**:
    - The Orchestrator updates only `component_states.<MODULE>` in `state/migration-state.yml`, leaving all unrelated components unchanged.

@@ -156,9 +156,12 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
    - If complex procedural-to-service conversion is required, delegate scoped service authoring to `api-modernization`.
    - Author Unit and Kernel test classes in `tests/src/Unit/` and `tests/src/Kernel/`.
 7. **Log File Mutations**: Register every created file in `logs/file-change-log/`.
-8. **Author Implementation Report (Step 12)**:
-   - Generate `reports/custom-modules/REPORT-<MODULE>.md` recording explicit status for every source file, class, method, entity/field, form definition, frontend asset, View definition, and custom Views plugin (`MIGRATED`, `REPLACED`, `OBSOLETE`, `EXCLUDED_WITH_REASON`, `HUMAN_DECISION_REQUIRED`, `UNVERIFIED`).
-9. **Generate `agent_result`**: Output canonical result payload proposing transition to `CODE_COMPLETE` with class, entity, form, frontend, and Views accounting evidence and requesting downstream handoff to `testing`.
+8. **Author Implementation Report & LLM Remediation Input (Step 12)**:
+    - Generate `reports/custom-modules/REPORT-<MODULE>.md` and `reports/migration/<MODULE>/<MODULE>_FINAL_VERDICT.md` recording explicit status for every source file, class, method, entity/field, form definition, frontend asset, View definition, and custom Views plugin classified under the 10 canonical statuses:
+      `COMPLETE`, `PARTIAL`, `MISSING`, `BLOCKED`, `HUMAN_INTERVENTION_REQUIRED`, `RUNTIME_UNVERIFIED`, `SUPERSEDED`, `REPLACED`, `OBSOLETE`, `EXCLUDED`.
+    - Apply the 3-Path Remediation Engine: auto-remediate evidence-backed gaps, escalate ambiguous decisions to `HUMAN_INTERVENTION_REQUIRED` without guessing, and mark dynamic items as `RUNTIME_UNVERIFIED`.
+    - Embed the structured `## LLM REMEDIATION INPUT` section with stable Task IDs (e.g. `<MODULE>-SERVICE-001`).
+9. **Generate `agent_result`**: Output canonical result payload proposing transition to `COMPLETE` (or `PARTIAL`/`BLOCKED`/`HUMAN_INTERVENTION_REQUIRED`) with class, entity, form, frontend, and Views accounting evidence and requesting downstream handoff to `testing`.
 
 ---
 

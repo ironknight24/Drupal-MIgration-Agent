@@ -1,14 +1,79 @@
-# Migration Lifecycle & Dynamic Execution Model
+# Migration Lifecycle & Recursive Execution Model
 
 ## 1. Lifecycle Philosophy
 
-The migration from Drupal 7 to Drupal 10/11 follows a state-driven, dynamic execution lifecycle. While canonical phase milestones exist, the framework does **not** assume an immutable linear sequence.
+The Drupal 7 to Drupal 10/11 migration framework follows a **recursive, evidence-driven, dynamic execution lifecycle**. Rather than assuming an immutable linear pass, the framework implements iterative analysis, automated remediation of fixable gaps, recursive dependency resolution, and strict human decision gates.
 
-Real-world Drupal codebases have complex, interdependent architectures. Therefore, the **Orchestrator** evaluates the **Dependency Graph (DAG)** at runtime to dynamically calculate execution waves, manage parallel execution, serialize shared file modifications, and isolate blocked components.
+### Core Lifecycle Axioms:
+1. **Evidence-Driven Completion**: A component is `COMPLETE` **only** when empirical evidence proves all material functional requirements are migrated, replaced, superseded, obsolete, or explicitly excluded with justification.
+2. **"Implemented" ≠ "Complete"**: Writing PHP files or passing static linters does not constitute migration completeness.
+3. **Recursive Dependency Resolution**: When a target component is requested, the framework recursively analyzes, orders, and resolves its upstream custom dependencies before implementing the parent task.
+4. **Task-Level Recursion**: Missing or partially implemented items identified during audits are decomposed into discrete, stable remediation tasks (`TASK_ID`), fixed, and re-audited iteratively.
+5. **Three-Branch Remediation Gate**:
+   - **Fixable from Evidence** $\rightarrow$ Automatically remediate and re-audit.
+   - **Requires Human Decision** $\rightarrow$ Halt with `HUMAN_INTERVENTION_REQUIRED` (never invent business logic).
+   - **Runtime Unavailable** $\rightarrow$ Mark `RUNTIME_UNVERIFIED` and proceed with static verification without false completion claims.
 
 ---
 
-## 2. Canonical Lifecycle Phases
+## 2. Target Recursive Architecture
+
+```
+                       USER REQUEST
+                            ↓
+               COMMAND (/orchestrate [target])
+                            ↓
+                      TASK ANALYSIS
+                            ↓
+                  DEPENDENCY DISCOVERY
+                            ↓
+             RECURSIVE DEPENDENCY RESOLUTION
+                            ↓
+                  SPECIALIST EXECUTION
+                            ↓
+                   EVIDENCE COLLECTION
+                            ↓
+                     ANALYSIS REPORT
+                            ↓
+            COMPLETENESS & QUALITY ASSESSMENT
+                            ↓
+                    CLASSIFY EACH ITEM
+                            ↓
+        ┌───────────────────────────────────────┐
+        │ COMPLETE                              │
+        │ PARTIAL                               │
+        │ MISSING                               │
+        │ BLOCKED                               │
+        │ HUMAN_INTERVENTION_REQUIRED           │
+        │ RUNTIME_UNVERIFIED                    │
+        │ SUPERSEDED                            │
+        │ REPLACED                              │
+        │ OBSOLETE                              │
+        │ EXCLUDED                              │
+        └───────────────────────────────────────┘
+                            │
+       ┌────────────────────┼────────────────────┐
+       ▼                    ▼                    ▼
+[FIXABLE FROM EVIDENCE] [REQUIRES HUMAN DECISION] [RUNTIME UNAVAILABLE]
+       │                    │                    │
+  REMEDIATION PLAN    HUMAN_INTERVENTION_REQUIRED RUNTIME_UNVERIFIED
+       │                    │                    │
+  IMPLEMENT FIX            STOP            Continue Static Work
+       │                    │                    │
+   RE-ANALYZE        Decision Supplied     Runtime Test Later
+       │                    │
+  RE-VALIDATE             RESUME
+       │
+STILL HAS MATERIAL GAPS?
+     ↙          ↘
+   YES           NO
+    ↓             ↓
+RECURSIVE LOOP  COMPLETE
+```
+
+---
+
+## 3. Canonical Lifecycle Phases
 
 ```text
 INITIALIZED
@@ -19,46 +84,34 @@ DEPENDENCY_ANALYSIS
     ↓
 MIGRATION_PLANNING
     ↓
-WAVE_EXECUTION (Dynamic Batches: wave_0, wave_1, ... wave_N)
+WAVE_EXECUTION / TARGETED EXECUTION
     ↓
-TESTING (Component-Appropriate QA)
+TESTING (Component QA & Static Analysis)
     ↓
-BEHAVIORAL_VALIDATION (12-Point Comparative Parity)
+BEHAVIORAL_VALIDATION (Comparative Auditing)
     ↓
-FINAL_AUDIT (8 Acceptance Gates)
+REMEDIATION_LOOP (Iterative Gap Fixes & Re-auditing)
     ↓
-COMPLETED
+FINAL_AUDIT (Acceptance Gates)
+    ↓
+COMPLETED (or COMPLETED_WITH_GAPS)
 ```
-
-### Phase Definitions & Ownership
-
-| Phase Identifier | Managing Agent | Core Deliverable & Artifact |
-|:---|:---|:---|
-| `INITIALIZED` | Setup | Master configuration, directory structure, initialized state. |
-| `DISCOVERY` | `discovery` | `reports/discovery/`, populated `migration-manifest.yml`. |
-| `DEPENDENCY_ANALYSIS` | `dependency` | `reports/dependencies/`, dependency DAG, wave calculations. |
-| `MIGRATION_PLANNING` | `custom-module` / Specialist | Per-component migration plans in `reports/*/PLAN-*.md`. |
-| `WAVE_EXECUTION` | Specialist Agents | Modernized code in `target.path`, entries in `logs/file-change-log/`. |
-| `TESTING` | `testing` | `reports/testing/`, verified test outputs and sniffs. |
-| `BEHAVIORAL_VALIDATION` | `validation` | `reports/validation/`, 12-dimensional validation matrices. |
-| `FINAL_AUDIT` | `final-audit` | `reports/final/FINAL-AUDIT-REPORT-<DATE>.md`, gap analysis, sign-off. |
-| `COMPLETED` | `orchestrator` | Final migration summary and handoff documentation. |
 
 ---
 
-## 3. Canonical Component Status Model
+## 4. Canonical Component Status Model
 
-A standardized 15-state status vocabulary governs individual component lifecycles in `state/migration-state.yml`:
+A standardized vocabulary governs component lifecycles in `state/migration-state.yml`:
 
 ```text
                       NOT_STARTED
-                           │  (Discovery Agent)
+                           │
                            ▼
                        DISCOVERED
-                           │  (Dependency Agent)
+                           │
                            ▼
                         ANALYZED
-                           │  (Orchestrator Wave Scheduler)
+                           │
                ┌───────────┴───────────┐
                ▼                       ▼
              READY                  DEFERRED
@@ -66,10 +119,9 @@ A standardized 15-state status vocabulary governs individual component lifecycle
                │                       ▲
                ▼                       │
           IN_PROGRESS ◄────────────────┼──────── (Dependencies unblocked)
-          (Specialist)                 │
                │                       │
                ├───────────────────────┴────────► BLOCKED_UPSTREAM
-               │                                   (Upstream blocked)
+               │                                   (Upstream unmigrated)
                ▼
             MIGRATED ◄──────────────────────────┐
                │                                │
@@ -79,117 +131,86 @@ A standardized 15-state status vocabulary governs individual component lifecycle
                ▼                        │       │
            VALIDATING                   │       │
                │                        │       │
-      ┌────────┴────────┐               │       │
-      ▼                 ▼               │       │
-  VALIDATED          FAILED             │       │
+      ┌────────┴────────┬───────────────┤       │
+      ▼                 ▼               ▼       │
+   VALIDATED         PARTIAL         FAILED     │
       │                 │               │       │
-      │                 └─────────► REMEDIATION ┤ (Stage-Aware Re-entry)
-      ▼                                 ▲       │
-   COMPLETE                             │       │
-      or                                │       │
-COMPLETE_WITH_GAPS                      │       │
-                                        │       │
-   BLOCKED ─────────────────────────────┘       │
-(Direct failure)                                │
-                                                │
-   BLOCKED_UPSTREAM ────────────────────────────┘ (Upstream remediated)
+      │                 └─────────► REMEDIATING ┤ (Iterative Fix Loop)
+      │                                 ▲       │
+      ├─────────────────────────────────┘       │
+      ▼                                         │
+   COMPLETE / COMPLETE_WITH_GAPS                │
+      │                                         │
+      ├─────────────────────────────────────────┼──► HUMAN_INTERVENTION_REQUIRED
+      │                                         │     (Awaiting Human Input)
+      ▼                                         │
+   BLOCKED ─────────────────────────────────────┘
 ```
 
-### Component-Aware State Applicability
-- **Custom Modules**: Utilize full lifecycle (`NOT_STARTED` -> `DISCOVERED` -> `ANALYZED` -> `READY` -> `IN_PROGRESS` -> `MIGRATED` -> `TESTING` -> `VALIDATING` -> `VALIDATED` -> `COMPLETE`).
-- **Contrib Modules**: Utilize evaluation lifecycle (`NOT_STARTED` -> `DISCOVERED` -> `ANALYZED` -> `COMPLETE` / `DEFERRED` / `BLOCKED`).
-- **Configuration**: Utilize export lifecycle (`NOT_STARTED` -> `DISCOVERED` -> `READY` -> `IN_PROGRESS` -> `MIGRATED` -> `VALIDATING` -> `VALIDATED` -> `COMPLETE`).
-- **Data Migrations**: Utilize pipeline lifecycle (`NOT_STARTED` -> `DISCOVERED` -> `ANALYZED` -> `READY` -> `IN_PROGRESS` -> `MIGRATED` -> `VALIDATING` -> `VALIDATED` -> `COMPLETE`).
-- **Themes**: Utilize presentation lifecycle (`NOT_STARTED` -> `DISCOVERED` -> `ANALYZED` -> `READY` -> `IN_PROGRESS` -> `MIGRATED` -> `VALIDATING` -> `VALIDATED` -> `COMPLETE`).
+---
+
+## 5. Recursive Dependency Resolution & Sub-DAG Ordering (Single-Module Execution Mode)
+
+### Sub-DAG Topological Scheduler
+When a specific module or task is requested (e.g. `/orchestrate ariba_helper` or `/migrate-module ariba_helper` in Single-Module Execution Mode):
+
+1. **Dependency Extraction**: The Orchestrator inspects the module's declared and implicit dependencies from `state/migration-manifest.yml`.
+2. **Sub-DAG Construction**: Builds the recursive ancestor set:
+   $$\text{Ancestors}(M) = \{M\} \cup \text{TransitiveAncestors}(M)$$
+3. **Cycle Detection & Blocker Emission**: Performs Depth-First Search (DFS) topological sort with cycle detection. If a cyclic dependency is found (e.g., $A \rightarrow B \rightarrow A$):
+   - If resolvable via service decoupling, schedules decoupling.
+   - If architectural deadlock occurs, marks both modules `BLOCKED` with ticket `BLOCKED-CYCLE-001.md` and halts.
+4. **Bottom-Up Execution**: Upstream dependencies with in-degree 0 are scheduled and executed first.
+5. **Dependency Validation**: Each upstream dependency is validated and transitioned to `COMPLETE` or `VALIDATED`.
+6. **Parent Task Dispatch**: Once all dependencies are satisfied, the parent task is dispatched.
 
 ---
 
-## 4. Dynamic Dependency-Aware Wave Execution
+## 6. Task-Level Recursion & Iterative Remediation
 
-Waves are **dynamic execution batches** calculated at runtime from the dependency DAG, readiness state, component constraints, and ordering rules. Wave numbers (`wave_0`, `wave_1`, ... `wave_N`) represent topological tiers, NOT hardcoded global categories.
+Within an individual component migration:
 
-### Upstream Dependency Satisfaction
-A component's upstream dependency requirement is satisfied if:
-1. The dependency is a custom component whose runtime status is `COMPLETE` or `VALIDATED`.
-2. The dependency is satisfied natively by the target Drupal core version (`satisfaction_source: target_core`).
-3. The dependency is satisfied by an approved, compatible contributed module (`satisfaction_source: contrib_module`).
-4. The dependency is satisfied by an explicitly documented alternative implementation.
-
-### Dynamic Wave Dispatching Algorithm
-1. The Orchestrator queries `state/migration-state.yml` and the manifest dependency graph.
-2. In-degrees are calculated based on unfulfilled dependencies.
-3. Components with 0 unfulfilled dependencies transition to `READY` and are batched into `wave_{N}`.
-4. Specialists execute the wave. When complete:
-   - Orchestrator updates resolved dependencies.
-   - Newly eligible components transition from `DEFERRED` to `READY` and form `wave_{N+1}`.
-5. If a component transitions to `BLOCKED`:
-   - Orchestrator traverses the downstream DAG.
-   - All transitive dependents transition to `BLOCKED_UPSTREAM`.
-   - Independent components continue execution uninterrupted.
-
-### Single-Module Execution Mode (`/migrate-module <MODULE>`)
-When the user requests single-module migration:
-1. **Scope Boundary**: Execution is restricted to the sub-DAG for `<MODULE>`.
-2. **Upstream Dependency Check**: The Orchestrator inspects declared/implicit custom module dependencies of `<MODULE>`. If any upstream dependency is not `COMPLETED`, execution halts with status `BLOCKED_UPSTREAM` and a blocker ticket.
-3. **Write Scope**: The specialist agent write scope is strictly `<target_module_dir>/<MODULE>/**/*`.
-4. **State Update**: Only `component_states.<MODULE>` is updated in `state/migration-state.yml`. All other components remain unaffected.
+1. **Initial Audit**: Forensic comparison of D7 source vs D10 target across 12 dimensions.
+2. **Gap Classification**: Every gap is assigned one of the 10 canonical statuses.
+3. **Remediation Task Generation**:
+   - Each fixable gap receives a stable ID (e.g. `ARIBA-HELPER-ROUTE-001`, `ARIBA-HELPER-SERVICE-004`).
+   - Tasks are compiled in the report's `## LLM REMEDIATION INPUT` section.
+4. **Execution & Targeted Re-validation**:
+   - The specialist agent applies the fix.
+   - Targeted unit/kernel tests and static checks re-run against the modified artifact.
+5. **Re-audit & Convergence Check**:
+   - Re-evaluates completeness.
+   - If material gaps remain and the retry/iteration budget is not exhausted, loops back to Step 1.
+   - If all material items are `COMPLETE`, `SUPERSEDED`, `REPLACED`, `OBSOLETE`, or `EXCLUDED`, marks component `COMPLETE`.
+   - If non-material gaps remain and are accepted, marks component `COMPLETE_WITH_GAPS`.
 
 ---
 
-## 5. Parallelism & Concurrency Serialization Gates
+## 7. Loop Prevention & Guardrails
 
-### Safe Parallel Work (Concurrently Executable)
-- Independent components in the same dynamic wave with strictly disjoint target file sets and zero shared configuration keys.
-- Contrib module evaluation alongside custom module discovery.
-- Static theme asset conversion alongside independent custom module migrations.
+To prevent unbounded execution loops:
 
-### Mandatory Serialization Rules
-Parallel execution is strictly **PROHIBITED** and must be serialized whenever agents may concurrently modify:
-1. **Shared Files**: Modifying the same `.services.yml`, `.routing.yml`, `.permissions.yml`, or `.module` file.
-2. **Shared Configuration**: Modifying identical CMI configuration objects (e.g. `system.site.yml` or shared field storage).
-3. **Database Schemas & Data Pipelines**: Running entity schema generation and Migration API pipeline execution concurrently.
-4. **Shared State Records**: Concurrently mutating global `migration-state.yml` without an atomic merge lock.
+- `max_remediation_iterations: 3`: Maximum number of remediation cycles per module.
+- `max_retries_per_component: 2`: Maximum attempts to fix a single failing component.
+- `dependency_cycle_detection`: Strict DFS check emitting `BLOCKED-CYCLE-XXX.md`.
+- `human_decision_gate`: Immediate halt on `HUMAN_INTERVENTION_REQUIRED` with prompt in `reports/human_decisions/`.
+
+| Guardrail | Default Threshold | Configuration Key | Action on Breach |
+|:---|:---:|:---|:---|
+| **Max Remediation Iterations** | `max_remediation_iterations: 3` | `agents.max_remediation_iterations` | Halts loop, generates `GAP_ANALYSIS`, sets `COMPLETE_WITH_GAPS` or `BLOCKED`. |
+| **Max Retries Per Component** | `max_retries_per_component: 2` | `agents.max_retries_per_component` | Marks component `FAILED` / `BLOCKED`. |
+| **Dependency Cycle Detector** | Strict DFS check | Core engine | Halts on cycle with `BLOCKED-CYCLE-XXX.md`. |
+| **Human Decision Gate** | Immediate Halt | `agents.require_human_gate` | Sets `HUMAN_INTERVENTION_REQUIRED`, halts, logs prompt in `reports/human_decisions/`, resumes after decision. |
+| **D7 Read-Only Monitor** | 0 file mutations | Core safety rule | Immediate `SAFETY_VIOLATION` global halt. |
+| **Target Path Isolation** | Component folder | Core safety rule | Rejects any write outside `<target_path>/<MODULE>/`. |
 
 ---
 
-## 6. Idempotency & Safe Resumption Protocol
+## 8. Idempotency & Resumption Protocol
 
-The framework is strictly **idempotent and resumable**. When an interrupted migration resumes:
-1. **State Audit**: Orchestrator reads `state/migration-state.yml` and verifies `global_block == false`.
+1. **State Audit**: Reads `state/migration-state.yml` and verifies `global_block == false`.
 2. **Evidence Reconciliation**:
-   - Components marked `COMPLETE` or `VALIDATED` are checked for backing evidence artifacts. If evidence exists, they are skipped. If evidence is missing, they are flagged as `EVIDENCE_GAP` and scheduled for revalidation.
-   - Components marked `IN_PROGRESS` are inspected against `logs/file-change-log/`. Transient files are assessed, and the component plan is cleanly restarted.
-   - Components marked `BLOCKED` or `BLOCKED_UPSTREAM` remain paused unless explicit remediation is recorded.
-3. **Wave Recalculation**: Orchestrator recalculates dependency readiness from the current evidence baseline and schedules eligible `READY` components into the next dynamic wave.
-
----
-
-## 7. The 8 Final Acceptance Audit Gates & Outcome Model
-
-### Final Audit Readiness Condition
-The Final Audit Agent executes when **no components remain actively executing**:
-```text
-Zero components remain in:
-- NOT_STARTED
-- READY
-- IN_PROGRESS
-- TESTING
-- VALIDATING
-```
-Remaining components may include `COMPLETE`, `COMPLETE_WITH_GAPS`, `BLOCKED`, `BLOCKED_UPSTREAM`, `DEFERRED`, or `FAILED`.
-
-### The 8 Acceptance Gates
-1. **Gate 1 (Discovery & Scope Integrity)**: 100% of discovered D7 assets registered in manifest.
-2. **Gate 2 (DAG & Wave Integrity)**: Topological order respected; all dependency requirements satisfied.
-3. **Gate 3 (Implementation Accounting)**: Zero components remain in transient or undefined states.
-4. **Gate 4 (Component-Appropriate Testing Evidence)**: All completed components possess an applicable and sufficient testing strategy with results recorded.
-5. **Gate 5 (Behavioral Parity & Validation)**: 12-dimensional validation matrices generated with empirical evidence.
-6. **Gate 6 (Blocker & Exception Accounting)**: All blocked items documented in `reports/blocked/` and consolidated into a post-migration backlog.
-7. **Gate 7 (Evidence Sufficiency & Anti-Hallucination)**: Zero unearned `PASS` claims or synthetic passes; all claims backed by observed facts or verified results.
-8. **Gate 8 (Audit Log & Boundary Completeness)**: Every modified target file registered in `logs/file-change-log/`; zero writes to D7 source path.
-
-### Final Migration Outcomes
-- **`COMPLETE`**: 100% of components reached `COMPLETE`; all 8 gates satisfied with high evidence confidence (`VERIFIED`).
-- **`COMPLETE_WITH_GAPS`**: Core migration succeeded; non-blocking gaps approved and documented (`PARTIALLY_VERIFIED`).
-- **`BLOCKED`**: Critical blocking failure unresolved; actionable blocker report produced.
-- **`INCOMPLETE`**: Migration halted prematurely or required deliverables missing.
+   - Components marked `COMPLETE` or `VALIDATED` with existing backing reports are skipped.
+   - Components marked `IN_PROGRESS` or `REMEDIATING` resume at their lowest incomplete step.
+   - Components marked `HUMAN_INTERVENTION_REQUIRED` check if a human decision file exists in `reports/blocked/DECISION-<ID>.md` or `reports/human_decisions/`; if provided, transitions back to `IN_PROGRESS` and resumes.
+3. **Wave / Task Recalculation**: Resumes dynamic execution from the updated state baseline.

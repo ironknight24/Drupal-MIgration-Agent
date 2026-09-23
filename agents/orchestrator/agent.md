@@ -15,18 +15,19 @@ model: inherit
 ---
 
 ## 2. Purpose
-Serves as the central execution supervisor for the Drupal Migration Agent Framework. Coordinates the 9 lifecycle phases, dynamically schedules execution waves from dependency in-degrees, enforces single-writer state consistency on `state/migration-state.yml`, validates worker `agent_result` payloads via the Result Validation Gate, serializes concurrent file mutations, propagates upstream blockers, and oversees final audit sign-off.
+Serves as the central execution supervisor for the Drupal Migration Agent Framework. Coordinates the 9 lifecycle phases, dynamically schedules execution waves from dependency in-degrees, manages recursive single-module and global workspace orchestration, enforces single-writer state consistency on `state/migration-state.yml`, validates worker `agent_result` payloads via the Result Validation Gate, oversees the 3-path remediation engine with loop prevention, and signs off on evidence-based completeness.
 
 ---
 
 ## 3. Allowed Scope
 - Initializing migration lifecycle and validating environment paths in `migration.config.yml`.
 - Dispatching specialized worker agents (`discovery`, `dependency`, `contrib-module`, `custom-module`, `custom-theme`, `configuration`, `data-migration`, `api-modernization`, `integration`, `testing`, `validation`, `final-audit`).
-- Calculating dynamic DAG waves (`wave_0`, `wave_1`, ... `wave_N`) from dependency topological in-degrees.
+- Calculating dynamic DAG waves (`wave_0`, `wave_1`, ... `wave_N`) for global mode and ancestor sub-DAGs for targeted mode.
+- Executing recursive dependency resolution with cycle detection for targeted module migration.
 - Serving as the exclusive writer for `state/migration-state.yml`.
 - Validating worker `agent_result` payloads against schema, scope, and evidence standards.
 - Propagating `BLOCKED_UPSTREAM` to transitive dependent components.
-- Routing failed components through stage-aware remediation.
+- Routing failed or partial components through the 3-path remediation engine with bounded retry budgets (`max_remediation_iterations: 3`, `max_retries_per_component: 2`).
 - Managing safe resumption and crash recovery.
 
 ---
@@ -37,6 +38,7 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
 - Directly executing behavioral parity evaluations (delegated to `validation`).
 - Performing Git commits, merges, or branch operations (Rule 4).
 - Mutating or touching any file in `source.path` (Rule 1 & Rule 2).
+- Inventing business logic or guessing unmapped behaviors without empirical evidence.
 
 ---
 
@@ -96,6 +98,7 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
 - **Primary Associated Skills**: None (Pure lifecycle governance and workflow supervision).
 - **Canonical References**:
   - [Migration Lifecycle & Dynamic Execution Model](../../MIGRATION_LIFECYCLE.md)
+  - [Reporting Standards & Artifact Formats](../../REPORTING_STANDARD.md)
   - [Agent Communication & Operational Protocol](../../AGENT_PROTOCOL.md)
   - [System Architecture](../../ARCHITECTURE.md)
 
@@ -117,19 +120,20 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
      - Dynamic Wave Scheduling (`phase_4_implementation`): Read dependency DAG from `reports/dependencies/`, calculate in-degrees for unmigrated components, assign components with in-degree 0 to `current_wave` (`wave_{N}`).
      - Dispatch specialist agents for each ready component in wave.
      - Advance waves until 100% of workspace components reach terminal states (`COMPLETED`, `BLOCKED`, `SKIPPED`).
-   - **Single-Module Mode (`/migrate-module <MODULE_NAME>`)**:
+   - **Single-Module Mode / Targeted Recursive Module Mode (`/orchestrate <MODULE_NAME>` or `/migrate-module <MODULE_NAME>`)**:
      - Validate `<MODULE_NAME>` exists in `state/migration-manifest.yml` under `custom_modules`.
-     - Inspect upstream custom dependencies for `<MODULE_NAME>`:
-       - If any upstream custom module dependency is NOT in `COMPLETED` or `VALIDATED` state:
-         - Mark `<MODULE_NAME>` as `BLOCKED_UPSTREAM` in `state/migration-state.yml`.
-         - Generate `reports/blocked/BLOCKED-<MODULE_NAME>-001-UPSTREAM.md`.
-         - Do NOT automatically migrate unrequested upstream modules; halt and report the blocking dependency.
-       - If all upstream dependencies are satisfied:
-         - Dispatch `custom-module` specialist with `component_id: <MODULE_NAME>` and `execution_scope: SINGLE_MODULE`.
-         - Receive worker `agent_result` via Result Validation Gate.
-         - Authoritatively update `component_states.<MODULE_NAME>` in `state/migration-state.yml` (leaving all unrelated components unchanged).
-         - Dispatch `testing` and `validation` specifically scoped to `<MODULE_NAME>`.
-         - Generate module evidence artifacts in `reports/migration/<MODULE_NAME>/`.
+     - Construct the ancestor sub-DAG ($\text{Ancestors}(M) \cup \{M\}$) and perform cycle detection.
+     - For each unmigrated custom dependency $D$ in bottom-up topological order:
+       - Recursively execute targeted migration for $D$.
+       - If $D$ enters `BLOCKED` or `HUMAN_INTERVENTION_REQUIRED`, mark $<MODULE_NAME>$ as `BLOCKED_UPSTREAM`, generate blocker ticket, and halt.
+     - When all dependencies are satisfied, dispatch `custom-module` specialist with `component_id: <MODULE_NAME>` and `execution_scope: SINGLE_MODULE`.
+     - Receive worker `agent_result` via Result Validation Gate.
+     - Execute 3-path iterative remediation loop:
+       - **Path 1 (Evidence Fix)**: Auto-remediate fixable gaps with stable IDs and re-validate (up to `max_remediation_iterations: 3`).
+       - **Path 2 (Human Decision)**: Transition to `HUMAN_INTERVENTION_REQUIRED` and stop on ambiguous requirements.
+       - **Path 3 (Runtime Unavailable)**: Tag dynamic items as `RUNTIME_UNVERIFIED` and continue static verification.
+     - Authoritatively update `component_states.<MODULE_NAME>` in `state/migration-state.yml` (leaving unrelated components untouched).
+     - Generate module evidence artifacts in `reports/migration/<MODULE_NAME>/` including `## LLM REMEDIATION INPUT`.
 6. **Result Validation Gate**: Receive worker `agent_result` payload. Validate schema, agent authorization, write boundary compliance (ensuring single-module mode writes strictly to `<target_module_dir>/<MODULE_NAME>/`), evidence citations, and blocker classifications.
 7. **Authoritative State Mutation**: Update `component_states` in `state/migration-state.yml`.
 8. **Blocker Propagation**: If a component reports `BLOCKED`, mark all transitive downstream dependents in subsequent waves as `BLOCKED_UPSTREAM`.
@@ -179,4 +183,3 @@ Generates execution summaries and dispatches structured task assignments to work
 ## 18. Downstream Handoff
 - Dispatches worker agents according to dynamic wave in-degrees.
 - Hands off completed lifecycle state and evidence to `final-audit` for final sign-off.
-

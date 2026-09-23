@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260922185639",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260923053641",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-22T18:56:39.787597+00:00",
+  "executed_at": "2026-09-23T05:36:41.822691+00:00",
   "summary": {
-    "checks_total": 416,
-    "passed": 413,
+    "checks_total": 431,
+    "passed": 428,
     "failed": 0,
     "warnings": 0,
     "unverified": 3
@@ -5237,7 +5237,7 @@
       "category": "single_module",
       "name": "Upstream Dependency Gating Contract",
       "status": "PASS",
-      "evidence": "Unmigrated custom dependencies strictly trigger BLOCKED_UPSTREAM without unprompted auto-migration.",
+      "evidence": "Unmigrated custom dependencies strictly trigger BLOCKED_UPSTREAM or recursive sub-DAG resolution with cycle detection.",
       "details": "Verified dependency safety gating contract.",
       "affected_files": [
         "commands/migrate-module.md",
@@ -5304,6 +5304,188 @@
       "affected_files": [
         "commands/orchestrate.md",
         "agents/orchestrator/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-01",
+      "category": "recursive_orchestration",
+      "name": "Targeted & Global Orchestration Dual Mode",
+      "status": "PASS",
+      "evidence": "commands/orchestrate.md supports both Mode 1 (Targeted Recursive Migration) and Mode 2 (Global Workspace Orchestration).",
+      "details": "Verified command dual-mode definition.",
+      "affected_files": [
+        "commands/orchestrate.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-02",
+      "category": "recursive_orchestration",
+      "name": "Recursive Ancestor Sub-DAG Topological Scheduler",
+      "status": "PASS",
+      "evidence": "MIGRATION_LIFECYCLE.md specifies recursive sub-DAG construction and bottom-up topological execution.",
+      "details": "Verified sub-DAG scheduler in lifecycle model.",
+      "affected_files": [
+        "MIGRATION_LIFECYCLE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-03",
+      "category": "recursive_orchestration",
+      "name": "Dependency Cycle Detection & Blocker Emission",
+      "status": "PASS",
+      "evidence": "Lifecycle model and orchestrator command enforce cycle detection with BLOCKED-*-CYCLE.md blocker tickets.",
+      "details": "Verified cycle detection protocol.",
+      "affected_files": [
+        "MIGRATION_LIFECYCLE.md",
+        "commands/orchestrate.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-04",
+      "category": "recursive_orchestration",
+      "name": "3-Path Remediation Decision Model Integration",
+      "status": "PASS",
+      "evidence": "REPORTING_STANDARD.md defines 3-Path Remediation Model (Fixable from Evidence, Requires Human Decision, Runtime Unavailable).",
+      "details": "Verified 3-path remediation engine specification.",
+      "affected_files": [
+        "REPORTING_STANDARD.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-05",
+      "category": "recursive_orchestration",
+      "name": "Loop Prevention & Remediation Retry Budget",
+      "status": "PASS",
+      "evidence": "Lifecycle model enforces max_remediation_iterations: 3 and max_retries_per_component: 2.",
+      "details": "Verified loop prevention and retry budget controls.",
+      "affected_files": [
+        "MIGRATION_LIFECYCLE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-06",
+      "category": "recursive_orchestration",
+      "name": "10 Canonical Item Statuses Standardization",
+      "status": "PASS",
+      "evidence": "REPORTING_STANDARD.md exhaustively defines all 10 canonical item statuses.",
+      "details": "Verified canonical item status taxonomy.",
+      "affected_files": [
+        "REPORTING_STANDARD.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-07",
+      "category": "recursive_orchestration",
+      "name": "LLM Remediation Input Schema & Machine Readability",
+      "status": "PASS",
+      "evidence": "REPORTING_STANDARD.md specifies structured ## LLM REMEDIATION INPUT schema with stable Task IDs.",
+      "details": "Verified LLM remediation input schema.",
+      "affected_files": [
+        "REPORTING_STANDARD.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-08",
+      "category": "recursive_orchestration",
+      "name": "Human Intervention State & Gate Protocol",
+      "status": "PASS",
+      "evidence": "Reports and state model enforce HUMAN_INTERVENTION_REQUIRED gating without hallucinating business logic.",
+      "details": "Verified human intervention protocol.",
+      "affected_files": [
+        "REPORTING_STANDARD.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-09",
+      "category": "recursive_orchestration",
+      "name": "Runtime Unverified Boundary Protocol",
+      "status": "PASS",
+      "evidence": "REPORTING_STANDARD.md cleanly distinguishes runtime unavailability from implementation failure.",
+      "details": "Verified runtime unverified boundary protocol.",
+      "affected_files": [
+        "REPORTING_STANDARD.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-10",
+      "category": "recursive_orchestration",
+      "name": "Evidence-First Completion Contract",
+      "status": "PASS",
+      "evidence": "README.md and reporting standard strictly enforce evidence-first completion contract.",
+      "details": "Verified completion contract.",
+      "affected_files": [
+        "README.md",
+        "REPORTING_STANDARD.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-11",
+      "category": "recursive_orchestration",
+      "name": "State Persistence & Deterministic Resumption",
+      "status": "PASS",
+      "evidence": "state/migration-state.yml maintains authoritative lifecycle state and component transitions.",
+      "details": "Verified state persistence.",
+      "affected_files": [
+        "state/migration-state.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-12",
+      "category": "recursive_orchestration",
+      "name": "16-Section Standard Report Format Specification",
+      "status": "PASS",
+      "evidence": "REPORTING_STANDARD.md defines comprehensive 16-section standard report layout.",
+      "details": "Verified standard report format.",
+      "affected_files": [
+        "REPORTING_STANDARD.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-13",
+      "category": "recursive_orchestration",
+      "name": "Plugin Manifest Backward Compatibility",
+      "status": "PASS",
+      "evidence": ".claude-plugin/plugin.json maintains full backward compatibility registering all command surfaces.",
+      "details": "Verified plugin manifest backward compatibility.",
+      "affected_files": [
+        ".claude-plugin/plugin.json"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-14",
+      "category": "recursive_orchestration",
+      "name": "README.md Comprehensive Documentation Integrity",
+      "status": "PASS",
+      "evidence": "README.md exhaustively covers all required architecture, safety, command, and workflow sections.",
+      "details": "Verified README.md documentation integrity.",
+      "affected_files": [
+        "README.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-REC-15",
+      "category": "recursive_orchestration",
+      "name": "Real-World Case Study & Empirical Edge Cases",
+      "status": "PASS",
+      "evidence": "README.md documents empirical edge cases from real-world ariba_helper migration experience.",
+      "details": "Verified real-world case study documentation.",
+      "affected_files": [
+        "README.md"
       ],
       "remediation": ""
     }

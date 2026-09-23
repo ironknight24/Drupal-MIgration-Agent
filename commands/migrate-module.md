@@ -1,15 +1,15 @@
 ---
-description: Migrate exactly one selected Drupal 7 custom module into Drupal 10/11 with dependency gating, write isolation, and forensic verification.
+description: Migrate exactly one selected Drupal 7 custom module into Drupal 10/11 with recursive dependency resolution, 3-path remediation, write isolation, and forensic verification.
 ---
 
 # Drupal Migration: Migrate Single Module
 
-Execute an isolated, dependency-aware, forensics-backed migration for exactly **ONE** selected Drupal 7 custom module without migrating the rest of the workspace.
+Execute an isolated, recursive, dependency-aware, forensics-backed migration for exactly **ONE** selected Drupal 7 custom module.
 
 ```text
 /drupal-migration-agent:migrate-module <MODULE_NAME>
 ```
-*Alias:* `/migrate-module <MODULE_NAME>`
+*Alias:* `/migrate-module <MODULE_NAME>`, `/orchestrate <MODULE_NAME>`
 
 ---
 
@@ -23,7 +23,7 @@ Execute an isolated, dependency-aware, forensics-backed migration for exactly **
      Usage: /drupal-migration-agent:migrate-module <MODULE_NAME>
      Example: /drupal-migration-agent:migrate-module ariba_helper
      ```
-   - Do **NOT** interpret a missing argument as "migrate everything". Do **NOT** fall back to `/orchestrate`.
+   - Do **NOT** interpret a missing argument as "migrate everything". Do **NOT** fall back to global `/orchestrate`.
 2. Check if `migration.config.yml` exists. If missing, prompt user to copy `migration.config.example.yml`.
 3. Check `state/migration-manifest.yml`. Verify that `<MODULE_NAME>`:
    - Exists in the inventory.
@@ -40,30 +40,25 @@ Execute an isolated, dependency-aware, forensics-backed migration for exactly **
 
 ---
 
-### 3. Upstream Dependency Analysis & Gating
+### 3. Recursive Dependency Resolution & Ordering
 1. Read dependency metadata for `<MODULE_NAME>` from `state/migration-manifest.yml` and `reports/dependencies/`:
    - Categorize dependencies into:
      - **A. Core / Contrib dependencies**: Verify compatibility with target Drupal version.
      - **B. D7 Custom Module dependencies**: Identify all custom modules upon which `<MODULE_NAME>` depends.
-2. For every custom module dependency $D$:
-   - Check the runtime state of $D$ in `state/migration-state.yml`.
-   - If any custom dependency $D$ is **NOT** in `COMPLETED` or `VALIDATED` state:
-     - Do **NOT** silently migrate $D$.
-     - Mark `<MODULE_NAME>` as `BLOCKED_UPSTREAM` in `state/migration-state.yml`.
-     - Generate a blocker ticket in `reports/blocked/BLOCKED-<MODULE_NAME>-001-UPSTREAM.md`.
-     - Report to user:
-       ```text
-       [BLOCKED_UPSTREAM] Module '<MODULE_NAME>' cannot be migrated because upstream custom module dependency '$D' has not been migrated yet.
-       Please migrate '$D' first using: /drupal-migration-agent:migrate-module $D
-       ```
-     - **HALT** execution.
+2. Build the targeted module ancestor sub-DAG ($\text{Ancestors}(M) \cup \{M\}$):
+   - Execute cycle detection. If a cycle is detected, emit `reports/blocked/BLOCKED-<MODULE_NAME>-001-CYCLE.md` and halt.
+   - For every custom module dependency $D$:
+     - Check the runtime state of $D$ in `state/migration-state.yml`.
+     - If $D$ is in `COMPLETE` or `VALIDATED` state, skip.
+     - If $D$ is unmigrated, recursively execute targeted migration on $D$ in bottom-up topological order before migrating $<MODULE_NAME>$.
+     - If $D$ is `BLOCKED` or `HUMAN_INTERVENTION_REQUIRED`, mark $<MODULE_NAME>$ as `BLOCKED_UPSTREAM` in `state/migration-state.yml`, generate `reports/blocked/BLOCKED-<MODULE_NAME>-001-UPSTREAM.md`, and halt.
 
 ---
 
 ### 4. Target Module Snapshot & Idempotency Check
 1. Resolve target module directory: `<target_custom_modules_path>/<MODULE_NAME>/`.
 2. Check existing state in `state/migration-state.yml`:
-   - If `<MODULE_NAME>` is already `COMPLETED`:
+   - If `<MODULE_NAME>` is already `COMPLETE`:
      - If user did not pass `--force` or explicit re-run intent, notify user that module is already migrated and offer re-validation.
 3. If target module directory `<target_custom_modules_path>/<MODULE_NAME>/` already exists on disk:
    - Snapshot existing files, calculate file list and checksums.
@@ -107,22 +102,33 @@ Execute an isolated, dependency-aware, forensics-backed migration for exactly **
 
 ---
 
-### 8. Post-Migration Forensic Audit & Validation
+### 8. Forensic Completeness Audit & 3-Path Remediation Engine
 1. Execute module-scoped static checks on `<target_custom_modules_path>/<MODULE_NAME>/`:
    - Validate PHP syntax on all generated `.php` and `.module` files.
    - Validate YAML syntax on `.info.yml`, `.services.yml`, `.routing.yml`, `.permissions.yml`, `.libraries.yml`.
    - Check PSR-4 namespace compliance (`Drupal\<MODULE_NAME>\...`).
 2. Perform D7 $\to$ D10 Functional Completeness Audit:
    - Match 100% of discovered D7 functions, hooks, classes, forms, and database interactions to D10 implementations.
-   - Assign each item an evidence-based outcome: `MIGRATED`, `PARTIALLY_MIGRATED`, `NOT_MIGRATED`, `SUPERSEDED`, `INTENTIONALLY_REMOVED`, `BLOCKED`, or `UNVERIFIED`.
-   - Check cache preservation: ensure D7 cache bins and cache operations have modern D10 cache tag/invalidation equivalents.
-3. Generate evidence artifacts in `reports/migration/<MODULE_NAME>/`:
+   - Assign each item one of the 10 canonical statuses: `COMPLETE`, `PARTIAL`, `MISSING`, `BLOCKED`, `HUMAN_INTERVENTION_REQUIRED`, `RUNTIME_UNVERIFIED`, `SUPERSEDED`, `REPLACED`, `OBSOLETE`, `EXCLUDED`.
+3. Evaluate Findings via the **3-Path Remediation Engine**:
+   - **Path 1: FIXABLE FROM EVIDENCE**:
+     - Generate structured remediation tasks with stable IDs (e.g. `<MODULE>-ROUTE-001`, `<MODULE>-SERVICE-002`).
+     - Re-enter execution loop to implement targeted fixes.
+     - Re-validate and re-audit after each fix.
+     - Enforce loop limits: `max_remediation_iterations` (default 3), `max_retries_per_component` (default 2).
+   - **Path 2: REQUIRES HUMAN DECISION**:
+     - For ambiguous business logic, GDPR policy, or architecture trade-offs, transition to `HUMAN_INTERVENTION_REQUIRED`.
+     - Halt execution, document options in `reports/human_decisions/`, and await user decision. Never invent business logic.
+   - **Path 3: RUNTIME UNAVAILABLE**:
+     - If runtime/DDEV is unavailable, mark dynamic items as `RUNTIME_UNVERIFIED`.
+     - Proceed with static completion and log verification boundary.
+4. Generate evidence artifacts in `reports/migration/<MODULE_NAME>/`:
    - `<MODULE_NAME>_FUNCTION_MAP.md`
    - `<MODULE_NAME>_FUNCTION_MAP.yml`
    - `<MODULE_NAME>_DEPENDENCY_ANALYSIS.md`
    - `<MODULE_NAME>_POST_MIGRATION_AUDIT.md`
    - `<MODULE_NAME>_GAP_ANALYSIS.md`
-   - `<MODULE_NAME>_FINAL_VERDICT.md`
+   - `<MODULE_NAME>_FINAL_VERDICT.md` (including standard `## LLM REMEDIATION INPUT` section)
 
 ---
 
@@ -133,7 +139,8 @@ Execute an isolated, dependency-aware, forensics-backed migration for exactly **
    - **Zero** themes or global configs were touched.
    - If any unexpected file was modified $\to$ mark `SAFETY_VIOLATION` and halt.
 2. The Orchestrator authoritatively updates `component_states.<MODULE_NAME>` in `state/migration-state.yml`:
-   - Set status to `COMPLETED` (or `COMPLETED_WITH_GAPS` if non-material gaps documented).
+   - Set status to `COMPLETE` (only when all items are `COMPLETE`, `SUPERSEDED`, `REPLACED`, `OBSOLETE`, `EXCLUDED`, or documented `RUNTIME_UNVERIFIED`).
+   - If unfixable or blocked gaps exist, set status to `PARTIAL`, `BLOCKED`, or `HUMAN_INTERVENTION_REQUIRED`.
    - Record timestamp, files changed count, and evidence links.
    - Leave all other component states completely untouched.
 3. Present executive summary and final verdict to user.

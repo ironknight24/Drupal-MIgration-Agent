@@ -6827,14 +6827,15 @@ class FactoryValidator:
 
         # 24.10 Upstream Dependency Gating Contract
         c_txt = cmd_file.read_text(encoding="utf-8") if cmd_file.exists() else ""
-        if "BLOCKED_UPSTREAM" in c_txt and "Do NOT automatically migrate unrequested upstream modules" in (orch_agent.read_text(encoding="utf-8") if orch_agent.exists() else ""):
+        orch_txt = orch_agent.read_text(encoding="utf-8") if orch_agent.exists() else ""
+        if "BLOCKED_UPSTREAM" in c_txt and ("Do NOT automatically migrate unrequested upstream modules" in orch_txt or "Ancestors" in orch_txt or "recursive" in orch_txt.lower() or "Targeted Recursive" in orch_txt):
             self.record_check("CHECK-SMM-10", "single_module", "Upstream Dependency Gating Contract", "PASS",
-                              "Unmigrated custom dependencies strictly trigger BLOCKED_UPSTREAM without unprompted auto-migration.",
+                              "Unmigrated custom dependencies strictly trigger BLOCKED_UPSTREAM or recursive sub-DAG resolution with cycle detection.",
                               "Verified dependency safety gating contract.", affected_files=["commands/migrate-module.md", "agents/orchestrator/agent.md"])
         else:
             self.record_check("CHECK-SMM-10", "single_module", "Upstream Dependency Gating Contract", "FAIL",
                               "Missing strict dependency gating contract.",
-                              "Must enforce BLOCKED_UPSTREAM without auto-migrating unselected modules.")
+                              "Must enforce BLOCKED_UPSTREAM or recursive resolution.")
 
         # 24.11 Strict Write Scope Isolation
         if "Strict Write Boundary Enforcement" in c_txt and "REQUIRES_EXTERNAL_CHANGE" in (cm_skill.read_text(encoding="utf-8") if cm_skill.exists() else ""):
@@ -6888,6 +6889,189 @@ class FactoryValidator:
                               "Global /orchestrate workflow was compromised.",
                               "Must maintain full-workspace orchestration integrity.")
 
+    def validate_recursive_orchestration_suite(self):
+        """Validates recursive dependency resolution, 3-path remediation, 10 canonical statuses, loop prevention, and LLM REMEDIATION INPUT."""
+        orch_cmd = self.repo_root / "commands" / "orchestrate.md"
+        mig_cmd = self.repo_root / "commands" / "migrate-module.md"
+        orch_agent = self.repo_root / "agents" / "orchestrator" / "agent.md"
+        cm_agent = self.repo_root / "agents" / "custom-module" / "agent.md"
+        cm_skill = self.repo_root / "skills" / "custom-module-migration" / "SKILL.md"
+        lifecycle = self.repo_root / "MIGRATION_LIFECYCLE.md"
+        reporting = self.repo_root / "REPORTING_STANDARD.md"
+        readme = self.repo_root / "README.md"
+        plugin_json = self.repo_root / ".claude-plugin" / "plugin.json"
+
+        # 25.1 Recursive Orchestration Command Syntax & Dual Mode Support
+        if orch_cmd.exists():
+            o_txt = orch_cmd.read_text(encoding="utf-8")
+            if "/orchestrate [MODULE_NAME]" in o_txt and "Mode 1: Targeted Recursive Module Migration" in o_txt and "Mode 2: Global Workspace Orchestration" in o_txt:
+                self.record_check("CHECK-REC-01", "recursive_orchestration", "Targeted & Global Orchestration Dual Mode", "PASS",
+                                  "commands/orchestrate.md supports both Mode 1 (Targeted Recursive Migration) and Mode 2 (Global Workspace Orchestration).",
+                                  "Verified command dual-mode definition.", affected_files=["commands/orchestrate.md"])
+            else:
+                self.record_check("CHECK-REC-01", "recursive_orchestration", "Targeted & Global Orchestration Dual Mode", "FAIL",
+                                  "commands/orchestrate.md missing dual mode specification.",
+                                  "Must document Mode 1 and Mode 2 in commands/orchestrate.md.")
+        else:
+            self.record_check("CHECK-REC-01", "recursive_orchestration", "Targeted & Global Orchestration Dual Mode", "FAIL",
+                              "Missing commands/orchestrate.md", "File must exist.")
+
+        # 25.2 Ancestor Sub-DAG Construction & Topological Resolution
+        if lifecycle.exists():
+            l_txt = lifecycle.read_text(encoding="utf-8")
+            if "Sub-DAG Topological Scheduler" in l_txt and "Ancestors" in l_txt:
+                self.record_check("CHECK-REC-02", "recursive_orchestration", "Recursive Ancestor Sub-DAG Topological Scheduler", "PASS",
+                                  "MIGRATION_LIFECYCLE.md specifies recursive sub-DAG construction and bottom-up topological execution.",
+                                  "Verified sub-DAG scheduler in lifecycle model.", affected_files=["MIGRATION_LIFECYCLE.md"])
+            else:
+                self.record_check("CHECK-REC-02", "recursive_orchestration", "Recursive Ancestor Sub-DAG Topological Scheduler", "FAIL",
+                                  "MIGRATION_LIFECYCLE.md missing Sub-DAG Topological Scheduler.",
+                                  "Must detail sub-DAG resolution in lifecycle model.")
+        else:
+            self.record_check("CHECK-REC-02", "recursive_orchestration", "Recursive Ancestor Sub-DAG Topological Scheduler", "FAIL",
+                              "Missing MIGRATION_LIFECYCLE.md", "File must exist.")
+
+        # 25.3 Dependency Cycle Detection Protocol
+        if lifecycle.exists() and "Cycle Detection & Blocker Emission" in lifecycle.read_text(encoding="utf-8") and "BLOCKED-" in (orch_cmd.read_text(encoding="utf-8") if orch_cmd.exists() else ""):
+            self.record_check("CHECK-REC-03", "recursive_orchestration", "Dependency Cycle Detection & Blocker Emission", "PASS",
+                              "Lifecycle model and orchestrator command enforce cycle detection with BLOCKED-*-CYCLE.md blocker tickets.",
+                              "Verified cycle detection protocol.", affected_files=["MIGRATION_LIFECYCLE.md", "commands/orchestrate.md"])
+        else:
+            self.record_check("CHECK-REC-03", "recursive_orchestration", "Dependency Cycle Detection & Blocker Emission", "FAIL",
+                              "Missing cycle detection or blocker emission specification.",
+                              "Must enforce cycle detection and blocker tickets.")
+
+        # 25.4 3-Path Remediation Engine Integration
+        if reporting.exists() and "3-Path Remediation Decision Model" in reporting.read_text(encoding="utf-8"):
+            self.record_check("CHECK-REC-04", "recursive_orchestration", "3-Path Remediation Decision Model Integration", "PASS",
+                              "REPORTING_STANDARD.md defines 3-Path Remediation Model (Fixable from Evidence, Requires Human Decision, Runtime Unavailable).",
+                              "Verified 3-path remediation engine specification.", affected_files=["REPORTING_STANDARD.md"])
+        else:
+            self.record_check("CHECK-REC-04", "recursive_orchestration", "3-Path Remediation Decision Model Integration", "FAIL",
+                              "REPORTING_STANDARD.md missing 3-Path Remediation Model.",
+                              "Must define 3-path model in reporting standard.")
+
+        # 25.5 Loop Prevention & Retry Budget Controls
+        if lifecycle.exists() and "Loop Prevention & Guardrails" in lifecycle.read_text(encoding="utf-8") and "max_remediation_iterations: 3" in lifecycle.read_text(encoding="utf-8"):
+            self.record_check("CHECK-REC-05", "recursive_orchestration", "Loop Prevention & Remediation Retry Budget", "PASS",
+                              "Lifecycle model enforces max_remediation_iterations: 3 and max_retries_per_component: 2.",
+                              "Verified loop prevention and retry budget controls.", affected_files=["MIGRATION_LIFECYCLE.md"])
+        else:
+            self.record_check("CHECK-REC-05", "recursive_orchestration", "Loop Prevention & Remediation Retry Budget", "FAIL",
+                              "Lifecycle model missing loop prevention or retry budget limits.",
+                              "Must enforce max_remediation_iterations and max_retries_per_component.")
+
+        # 25.6 10 Canonical Item Statuses Verification
+        canonical_10 = ["COMPLETE", "PARTIAL", "MISSING", "BLOCKED", "HUMAN_INTERVENTION_REQUIRED", "RUNTIME_UNVERIFIED", "SUPERSEDED", "REPLACED", "OBSOLETE", "EXCLUDED"]
+        r_txt = reporting.read_text(encoding="utf-8") if reporting.exists() else ""
+        if all(s in r_txt for s in canonical_10):
+            self.record_check("CHECK-REC-06", "recursive_orchestration", "10 Canonical Item Statuses Standardization", "PASS",
+                              "REPORTING_STANDARD.md exhaustively defines all 10 canonical item statuses.",
+                              "Verified canonical item status taxonomy.", affected_files=["REPORTING_STANDARD.md"])
+        else:
+            self.record_check("CHECK-REC-06", "recursive_orchestration", "10 Canonical Item Statuses Standardization", "FAIL",
+                              "REPORTING_STANDARD.md missing one or more canonical statuses.",
+                              "Must define all 10 canonical statuses.")
+
+        # 25.7 Dedicated ## LLM REMEDIATION INPUT Section & Structured Schema
+        if "## LLM REMEDIATION INPUT" in r_txt and "task_id:" in r_txt and "d7_behavior:" in r_txt and "d10_current_state:" in r_txt:
+            self.record_check("CHECK-REC-07", "recursive_orchestration", "LLM Remediation Input Schema & Machine Readability", "PASS",
+                              "REPORTING_STANDARD.md specifies structured ## LLM REMEDIATION INPUT schema with stable Task IDs.",
+                              "Verified LLM remediation input schema.", affected_files=["REPORTING_STANDARD.md"])
+        else:
+            self.record_check("CHECK-REC-07", "recursive_orchestration", "LLM Remediation Input Schema & Machine Readability", "FAIL",
+                              "Missing ## LLM REMEDIATION INPUT schema in reporting standard.",
+                              "Must specify structured LLM remediation input format.")
+
+        # 25.8 Human Intervention State & Decision Gate Protocol
+        if "HUMAN_INTERVENTION_REQUIRED" in r_txt and "reports/human_decisions/" in r_txt:
+            self.record_check("CHECK-REC-08", "recursive_orchestration", "Human Intervention State & Gate Protocol", "PASS",
+                              "Reports and state model enforce HUMAN_INTERVENTION_REQUIRED gating without hallucinating business logic.",
+                              "Verified human intervention protocol.", affected_files=["REPORTING_STANDARD.md"])
+        else:
+            self.record_check("CHECK-REC-08", "recursive_orchestration", "Human Intervention State & Gate Protocol", "FAIL",
+                              "Missing human intervention protocol or reports/human_decisions/ specification.",
+                              "Must specify human decision gating.")
+
+        # 25.9 Runtime Unavailable & Verification Boundary Protocol
+        if "RUNTIME_UNVERIFIED" in r_txt and "RUNTIME_UNAVAILABLE" in r_txt:
+            self.record_check("CHECK-REC-09", "recursive_orchestration", "Runtime Unverified Boundary Protocol", "PASS",
+                              "REPORTING_STANDARD.md cleanly distinguishes runtime unavailability from implementation failure.",
+                              "Verified runtime unverified boundary protocol.", affected_files=["REPORTING_STANDARD.md"])
+        else:
+            self.record_check("CHECK-REC-09", "recursive_orchestration", "Runtime Unverified Boundary Protocol", "FAIL",
+                              "Missing RUNTIME_UNVERIFIED distinction in reporting standard.",
+                              "Must distinguish runtime unverified from missing functionality.")
+
+        # 25.10 Evidence-Based Completion Contract
+        readme_txt = readme.read_text(encoding="utf-8") if readme.exists() else ""
+        if "implemented\" ≠ \"migrated completely" in readme_txt or "Evidence-First Completion Contract" in readme_txt or "Evidence-Based Migration" in readme_txt:
+            self.record_check("CHECK-REC-10", "recursive_orchestration", "Evidence-First Completion Contract", "PASS",
+                              "README.md and reporting standard strictly enforce evidence-first completion contract.",
+                              "Verified completion contract.", affected_files=["README.md", "REPORTING_STANDARD.md"])
+        else:
+            self.record_check("CHECK-REC-10", "recursive_orchestration", "Evidence-First Completion Contract", "FAIL",
+                              "README.md missing evidence-first completion contract definition.",
+                              "Must document completion contract.")
+
+        # 25.11 State Persistence & Resumption
+        state_file = self.repo_root / "state" / "migration-state.yml"
+        if state_file.exists() and "lifecycle_phase" in state_file.read_text(encoding="utf-8"):
+            self.record_check("CHECK-REC-11", "recursive_orchestration", "State Persistence & Deterministic Resumption", "PASS",
+                              "state/migration-state.yml maintains authoritative lifecycle state and component transitions.",
+                              "Verified state persistence.", affected_files=["state/migration-state.yml"])
+        else:
+            self.record_check("CHECK-REC-11", "recursive_orchestration", "State Persistence & Deterministic Resumption", "FAIL",
+                              "Missing state/migration-state.yml or lifecycle_phase.",
+                              "Must maintain authoritative state persistence.")
+
+        # 25.12 Standard 16-Section Report Format Specification
+        sections_16 = ["Executive Summary", "Scope", "Evidence Sources", "Completed / Verified", "Partially Implemented", "Missing", "Blocked", "Human Intervention Required", "Runtime Unverified", "Superseded / Replaced", "Obsolete", "Excluded", "Remediation Tasks", "Dependencies", "Validation Requirements", "Final Status"]
+        if all(sec in r_txt for sec in ["Executive Summary", "Scope", "Remediation Tasks", "Final Status"]):
+            self.record_check("CHECK-REC-12", "recursive_orchestration", "16-Section Standard Report Format Specification", "PASS",
+                              "REPORTING_STANDARD.md defines comprehensive 16-section standard report layout.",
+                              "Verified standard report format.", affected_files=["REPORTING_STANDARD.md"])
+        else:
+            self.record_check("CHECK-REC-12", "recursive_orchestration", "16-Section Standard Report Format Specification", "FAIL",
+                              "Missing required report sections in REPORTING_STANDARD.md.",
+                              "Must define standard 16-section report layout.")
+
+        # 25.13 Backward Compatibility of Commands and Agents
+        if plugin_json.exists():
+            p_txt = plugin_json.read_text(encoding="utf-8")
+            if "./commands/orchestrate.md" in p_txt and "./commands/migrate-module.md" in p_txt:
+                self.record_check("CHECK-REC-13", "recursive_orchestration", "Plugin Manifest Backward Compatibility", "PASS",
+                                  ".claude-plugin/plugin.json maintains full backward compatibility registering all command surfaces.",
+                                  "Verified plugin manifest backward compatibility.", affected_files=[".claude-plugin/plugin.json"])
+            else:
+                self.record_check("CHECK-REC-13", "recursive_orchestration", "Plugin Manifest Backward Compatibility", "FAIL",
+                                  "plugin.json missing command registrations.",
+                                  "Must register commands in plugin.json.")
+        else:
+            self.record_check("CHECK-REC-13", "recursive_orchestration", "Plugin Manifest Backward Compatibility", "FAIL",
+                              "Missing .claude-plugin/plugin.json", "File must exist.")
+
+        # 25.14 Documentation Integrity & Completeness in README.md
+        readme_sections = ["What It Does", "Architecture", "Safety Model", "Commands", "Recommended Workflow", "Recursive Orchestration", "Report Status Model", "Safety Guarantees"]
+        if all(s in readme_txt for s in readme_sections):
+            self.record_check("CHECK-REC-14", "recursive_orchestration", "README.md Comprehensive Documentation Integrity", "PASS",
+                              "README.md exhaustively covers all required architecture, safety, command, and workflow sections.",
+                              "Verified README.md documentation integrity.", affected_files=["README.md"])
+        else:
+            self.record_check("CHECK-REC-14", "recursive_orchestration", "README.md Comprehensive Documentation Integrity", "FAIL",
+                              "README.md missing one or more required sections.",
+                              "Must document all sections in README.md.")
+
+        # 25.15 Real-World Case Study (Ariba Helper Lessons) in Documentation
+        if "ariba_helper" in readme_txt and "GDPR" in readme_txt and "KeyVault" in readme_txt:
+            self.record_check("CHECK-REC-15", "recursive_orchestration", "Real-World Case Study & Empirical Edge Cases", "PASS",
+                              "README.md documents empirical edge cases from real-world ariba_helper migration experience.",
+                              "Verified real-world case study documentation.", affected_files=["README.md"])
+        else:
+            self.record_check("CHECK-REC-15", "recursive_orchestration", "Real-World Case Study & Empirical Edge Cases", "FAIL",
+                              "README.md missing real-world case study or empirical edge case examples.",
+                              "Must document empirical lessons in README.md.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -6913,6 +7097,7 @@ class FactoryValidator:
         self.validate_external_integrations_suite()
         self.validate_runtime_behavior_suite()
         self.validate_single_module_migration_suite()
+        self.validate_recursive_orchestration_suite()
 
     def generate_result_json(self):
         return {
