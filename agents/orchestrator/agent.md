@@ -122,7 +122,7 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
      - Advance waves until 100% of workspace components reach terminal states (`COMPLETED`, `BLOCKED`, `SKIPPED`).
    - **Single-Module Mode / Targeted Recursive Module Mode (`/orchestrate <MODULE_NAME>` or `/migrate-module <MODULE_NAME>`)**:
      - Validate `<MODULE_NAME>` exists in `state/migration-manifest.yml` under `custom_modules`.
-     - Construct the ancestor sub-DAG ($\text{Ancestors}(M) \cup \{M\}$) and perform cycle detection.
+     - Construct the ancestor sub-DAG ($\text{Ancestors}(M) \cup \{M\}$) including any coupled external Drupal-integrated PHP artifacts, and perform cycle detection.
      - For each unmigrated custom dependency $D$ in bottom-up topological order:
        - Recursively execute targeted migration for $D$.
         - If $D$ enters `BLOCKED` or `HUMAN_INTERVENTION_REQUIRED`, mark $<MODULE_NAME>$ as `BLOCKED_UPSTREAM`, generate blocker ticket, and halt.

@@ -214,3 +214,14 @@ evidence_summary:
 ## 22. Baseline Audit Findings & Risks
 - **Risk Assessment**:
 - **Recommended Sequence Overrides**:
+
+---
+
+## 23. External Drupal-Integrated Code Inventory
+
+| Artifact Path | Classification | Confidence | Drupal Coupling Evidence (Bootstrap / DB / APIs / Modules) | Callers / Invocations | Target Modern Architecture | Migration Status |
+|---|---|---|---|---|---|---|
+| `scripts/sync_runner.php` | `MIGRATION_RELEVANT` | `HIGH` | `DRUPAL_ROOT`, `drupal_bootstrap()`, `node_load()` | Crontab / CLI | `QueueWorker` / `Drush Command` | `DISCOVERED` |
+| `includes/standalone_api.php` | `MIGRATION_RELEVANT` | `HIGH` | Queries `{users}`, calls `user_authenticate()` | HTTP Webhook | `Controller` (`src/Controller/`) | `DISCOVERED` |
+| `tools/benchmark.php` | `DRUPAL_INDEPENDENT` | `HIGH` | Zero Drupal APIs / DB calls | CLI standalone | N/A | `EXCLUDED` |
+

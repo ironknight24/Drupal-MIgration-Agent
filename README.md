@@ -27,6 +27,7 @@ Migrating from Drupal 7 to Drupal 10/11 is an architectural transformation. The 
 - **Preflight Environment Validation**: Guarantees path safety and configuration validity before modifying files.
 - **Targeted Single-Module Migration**: Run isolated migrations on individual modules (`/orchestrate <MODULE_NAME>` or `/migrate-module <MODULE_NAME>`).
 - **Architectural Replacement Detection & Behavioral Mapping**: Recognizes when source functionality is represented by a different target architecture and maps underlying behavior rather than performing blind API translation.
+- **External Drupal-Integrated Code Discovery & Remediation**: Discovers, classifies, and remediates custom standalone PHP scripts, endpoints, CLI tools, and integration gateways residing outside standard module directories based on multi-vector empirical evidence.
 - **Recursive Dependency Resolution**: Automatically resolves ancestor sub-DAGs with cycle detection.
 - **3-Path Remediation Engine**: Distinguishes auto-fixable gaps from human decision gates and runtime-unverified items.
 - **Evidence-First Completion Contract**: "Implemented" ≠ "migrated completely". Tasks complete only with empirical proof.

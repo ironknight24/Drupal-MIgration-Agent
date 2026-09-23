@@ -842,10 +842,47 @@ Step 23 establishes explicit boundaries with prior capabilities:
 - **Step 22 (External Integrations)**: External HTTP clients, endpoints, webhooks, authentication protocols, and third-party SDKs.
 - **Step 23 (Runtime & Security)**: Runtime behavior, cache/session semantics, security-sensitive runtime behavior, lifecycle behavior, concurrency, environment/runtime dependencies, and runtime verification requirements.
 
+### 102. External Drupal-Integrated PHP Code Discovery & Evidence Filtering Protocol (Step 24)
+When discovering PHP source files residing outside standard `modules/` and `themes/` directories (e.g. standalone scripts, integration scripts, CLI tools, custom endpoints, cron/worker runners, bootstrap scripts, external library folders):
+
+1. **Multi-Vector Evidence Engine & Assessment**:
+   Never classify an external PHP file as migration-relevant based solely on file location or name. Require concrete repository evidence:
+   - *Drupal Bootstrap Evidence*: `DRUPAL_ROOT`, `drupal_bootstrap()`, `includes/bootstrap.inc`, `$user`, `node_load()`, `user_load()`, `taxonomy_*`, `variable_get()`, `variable_set()`, `module_invoke()`, `watchdog()`, `drupal_set_message()`, etc.
+   - *Drupal Database Evidence*: Queries targeting core tables (`{node}`, `{users}`, `{variable}`) or custom Drupal module tables with table prefix `{...}` syntax.
+   - *Drupal Module Coupling Evidence*: Invocations of custom or contrib module functions, classes, hooks, or service wrappers.
+   - *Runtime Entry Point Evidence*: HTTP endpoints bootstrapping Drupal, CLI scripts, scheduled cron runners, QueueWorker dispatchers, webhooks, or callbacks referenced by Drupal code/config.
+   - *Deployment/Configuration References*: References in `.htaccess`, crontab configurations, or Drush alias files.
+
+2. **Confidence Scoring & Standard Functional Role Classification**:
+   Assign deterministic confidence levels (`HIGH`, `MEDIUM`, `LOW`) and classify functional roles:
+   - `CLI_SCRIPT`: Standalone command-line or maintenance script.
+   - `WEBHOOK_ENDPOINT`: Standalone HTTP receiver or webhook script.
+   - `STANDALONE_GATEWAY`: Standalone API wrapper or payment gateway client.
+   - `CRON_WORKER`: Standalone cron runner or batch background worker.
+   - `SHARED_UTILITY`: Shared domain library used across Drupal and external applications.
+   - `OBSOLETE_SCRIPT`: Dead or superseded standalone script with zero active callers.
+
+3. **Classification & Relevance Taxonomy**:
+   - `MIGRATION_RELEVANT`: Direct Drupal coupling discovered; artifact contains behavior requiring migration into modern D10/D11 architecture.
+   - `DRUPAL_INDEPENDENT` (`EXCLUDED`): Standalone utility or external library with zero Drupal coupling; excluded from migration with documented rationale.
+   - `SHARED`: Shared domain library or API client consumed by both Drupal and external non-Drupal systems; evaluate whether to migrate Drupal-facing interface or retain as external dependency.
+   - `OBSOLETE`: Dead code or deprecated test script with verified zero active callers across codebase, crontab, and configuration.
+   - `SUPERSEDED` / `REPLACED`: Subsystem or script replaced by modern platform or core capabilities (e.g. standalone cron script $\to$ Drupal QueueWorker).
+   - `HUMAN_INTERVENTION_REQUIRED`: Ambiguous coupling, unverified external dependencies, or unclear architecture.
+
+4. **Multi-Behavior Decomposition per External Artifact**:
+   A single external file may host multiple distinct behaviors (e.g. auth check, user lookup, external sync, logging). Apply Behavior Unit Decomposition to decompose the artifact into discrete behavior units so each receives its own canonical status (`COMPLETE`, `PARTIAL`, `MISSING`, `REPLACED`, `SUPERSEDED`, `OBSOLETE`, `HUMAN_INTERVENTION_REQUIRED`, `RUNTIME_UNVERIFIED`).
+
+5. **Obsolete Code Verification Protocol**:
+   Before classifying any standalone external code as `OBSOLETE`, verify across multiple evidence sources (code callers, crontab, webserver configs, deployment configs). If dead-code status cannot be conclusively established from evidence, mark as `UNVERIFIED` / `HUMAN_INTERVENTION_REQUIRED`.
+
+6. **Secret & Credential Redaction Protocol (Rule 10)**:
+   Detect and redact API keys, tokens, passwords, and connection strings in external scripts (`[REDACTED]`). Never copy raw secrets into discovery manifests, reports, or generated target code. Preserves strict D7 Read-Only Source Protection.
+
 ---
 
 ## Output Reporting Standard
 All discovery outputs must:
-1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, JavaScript behavior names, library identifiers, view IDs, display IDs, plugin IDs, theme names, template names, dynamic expressions, probe targets, external endpoints, runtime behavior IDs, and line numbers (`[OBSERVED FACT]`).
-2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, `dynamic_dependency_items`, `external_integrations_items`, and `runtime_behavior_items` in `state/migration-manifest.yml`.
-3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback / dynamic JS setting / dynamic View ID / dynamic template suggestion / dynamic callable / external endpoint / runtime behavior as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.
+1. Provide verifiable file paths, class names, method signatures, table names, hook names, config keys, entity types, field names, form IDs, JavaScript behavior names, library identifiers, view IDs, display IDs, plugin IDs, theme names, template names, dynamic expressions, probe targets, external endpoints, runtime behavior IDs, and external Drupal code paths (`[OBSERVED FACT]`).
+2. Populate `custom_php_files`, `inc_files`, `custom_database_tables`, `hook_implementations`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, `dynamic_dependency_items`, `external_integrations_items`, `runtime_behavior_items`, and `external_code_items` in `state/migration-manifest.yml`.
+3. Flag any dynamic or unresolvable include / reflection / dynamic instantiation / dynamic SQL / dynamic hook call / dynamic config key / dynamic entity type / dynamic form ID / dynamic callback / dynamic JS setting / dynamic View ID / dynamic template suggestion / dynamic callable / external endpoint / runtime behavior / ambiguous external code as `[UNVERIFIED RESULT]` or `HUMAN_DECISION_REQUIRED`.

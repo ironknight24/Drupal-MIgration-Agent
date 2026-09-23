@@ -89,3 +89,12 @@ Every architectural replacement must evaluate each decomposed source behavior ag
 3. **Data Model & Permission Preservation**: Ensure that custom permissions, roles, and schema relationships are preserved in the target architecture's storage and access models.
 4. **Access & Cache Modernization**: Verify that legacy cache bin clears are converted to modern cache tags/contexts, and legacy access callbacks are converted to modern access checkers or route requirements.
 5. **No False Equivalence**: Never assume similarly named classes/methods represent identical behavior without empirical verification.
+
+---
+
+## External Drupal-Integrated Code Accounting & Validation (Step 24)
+
+When validating migration-relevant external PHP scripts and standalone integration files:
+1. **Multi-Behavior Verification**: Every discrete behavior unit identified in the external artifact must achieve an approved terminal outcome (`COMPLETE`, `PARTIAL`, `MISSING`, `REPLACED`, `SUPERSEDED`, `OBSOLETE`, `EXCLUDED`, `HUMAN_INTERVENTION_REQUIRED`, `RUNTIME_UNVERIFIED`).
+2. **Side-by-Side Equivalence Testing**: Verify that modern services, controllers, Drush commands, or QueueWorkers produce equivalent business outcomes (database records, API payloads, responses) compared to the legacy standalone script.
+3. **Runtime Boundaries**: If external scripts depend on live database records or external web services that cannot be reached during static testing, classify as `RUNTIME_UNVERIFIED` without claiming false completion.

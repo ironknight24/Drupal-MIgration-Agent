@@ -131,24 +131,32 @@ For components involving subsystem architectural replacements:
 - **Replacement Gaps**:
   Detailed classification across `MISSING`, `PARTIAL`, `BLOCKED`, `HUMAN_INTERVENTION_REQUIRED`, and `RUNTIME_UNVERIFIED`.
 
-## 12. Obsolete & Excluded Items
+## 12. External Drupal-Integrated Code Discovery & Analysis
+When external PHP code outside standard modules/themes is detected or in scope:
+- **EXTERNAL DRUPAL-INTEGRATED CODE DISCOVERY**: Summary of scan parameters, files examined, evidence-backed classification (Drupal-integrated vs Independent vs Shared vs Obsolete/Uncertain), and secret redaction status.
+- **EXTERNAL CODE INVENTORY**: Table of discovered external artifacts with classified role, bootstrap methods, entry points, and confidence scores (`HIGH` / `MEDIUM` / `LOW`).
+- **EXTERNAL CODE BEHAVIORAL MAPPING**: Granular breakdown of individual behavior units per artifact (e.g. auth, queries, business logic) mapped to modern D10/D11 destinations (Controller, Service, Drush command, QueueWorker, etc.).
+- **EXTERNAL CODE REPLACEMENT ANALYSIS**: Evaluation against existing target implementations to establish functional equivalence before generating new code.
+- **EXTERNAL CODE Gaps & Remediation**: Unmigrated behaviors classified as `MISSING`, `PARTIAL`, `BLOCKED`, or `HUMAN_INTERVENTION_REQUIRED` with associated remediation tasks.
+
+## 13. Obsolete & Excluded Items
 Dead code, legacy D7 shims, or out-of-scope utilities with proof of zero live callers.
 
-## 13. Remediation Tasks
+## 14. Remediation Tasks
 Numbered list of actionable remediation tasks with stable IDs.
 
-## 14. Dependency Analysis
-Inbound and outbound dependency mappings across custom, contrib, and core modules.
+## 15. Dependency Analysis
+Inbound and outbound dependency mappings across custom, contrib, core modules, and external scripts.
 
-## 15. Validation Requirements
+## 16. Validation Requirements
 Required PHPUnit tests, PHPStan levels, linting, and behavioral assertion checks.
 
-## 16. Final Status & Verdict
+## 17. Final Status & Verdict
 Exactly one of: `PASS`, `PASS_WITH_GAPS`, `FAIL`, `BLOCKED`, `HUMAN_INTERVENTION_REQUIRED`, `UNVERIFIED`.
 
 ---
 
-## 17. LLM REMEDIATION INPUT
+## 18. LLM REMEDIATION INPUT
 Structured, copy-pasteable task specifications for consumption by standard LLM chats.
 ```
 

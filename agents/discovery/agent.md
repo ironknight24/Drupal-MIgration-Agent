@@ -30,7 +30,8 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
 - Discovering field definitions, field instances, field types, widgets, formatters, cardinalities, and custom storage engines.
 - Discovering revision tables, revision flags, log fields, timestamps, and revision tracking logic.
 - Discovering multilingual configuration, `$language`, `LANGUAGE_NONE`, translation tables, and field translation setups.
-- Populating static component scope in `state/migration-manifest.yml` (including `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, and `dynamic_dependency_items`).
+- Populating static component scope in `state/migration-manifest.yml` (including `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, `dynamic_dependency_items`, `external_integrations_items`, `runtime_behavior_items`, and `external_code_items`).
+- Discovering, classifying, and extracting evidence for custom PHP code outside standard `modules/` and `themes/` directories (`external_code_items`).
 - Classifying observed facts (`[OBSERVED FACT]`) vs inferences (`[INFERENCE]`) vs unverified results (`[UNVERIFIED RESULT]`).
 
 ---
@@ -203,9 +204,13 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
     - Analyze request lifecycle hooks (`hook_boot`, `hook_init`, `hook_exit`), cron implementations (`hook_cron`), queue workers (`hook_cron_queue_info`, `DrupalQueue`), batch operations (`batch_set`, `batch_process`), lock API (`lock_acquire`, `lock_release`), database transactions (`db_transaction`), and concurrency controls.
     - Catalog environment dependencies (`getenv`, `phpversion`, `extension_loaded`), time/locale dependencies (`REQUEST_TIME`, `format_date`), user/role context, global/static state (`$conf`, `$GLOBALS`, `drupal_static`), runtime registries, error handlers (`set_error_handler`, `try/catch`), and fallback behaviors.
     - Map each item to 40 target architectures and 25 migration strategies with zero secrets, zero real cookie/session values, and explicit resolution confidence.
-22. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, `dynamic_dependency_items`, `external_integrations_items`, and `runtime_behavior_items` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
-23. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
-24. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
+22. **External Drupal-Integrated PHP Code Discovery (Section 102 / Step 24)**:
+    - Recursively scan for custom standalone PHP files, scripts, endpoints, and utilities outside standard `modules/` and `themes/` directories.
+    - Evaluate multi-vector evidence (Drupal bootstrap, database queries on core/custom tables, custom module function calls, runtime entry points).
+    - Classify confidence (`HIGH`, `MEDIUM`, `LOW`), assign functional roles (`CLI_SCRIPT`, `WEBHOOK_ENDPOINT`, `STANDALONE_GATEWAY`, `CRON_WORKER`, `SHARED_UTILITY`, `OBSOLETE_SCRIPT`), and enforce Rule 10 secret redaction.
+23. **Populate Scope Manifest**: Write discovered components into `state/migration-manifest.yml` under `custom_modules` (with complete `inc_files`, `custom_php_files`, `hook_implementations`, `custom_database_tables`, `configuration_state_items`, `entities_fields_items`, `forms_ajax_items`, `frontend_assets_items`, `views_plugins_items`, `theme_items`, `dynamic_dependency_items`, `external_integrations_items`, `runtime_behavior_items`, and `external_code_items` accounting), `contrib_modules`, `themes`, `configuration`, `data_migrations`, `integrations`.
+24. **Author Discovery Audit Report**: Generate `reports/discovery/DISCOVERY-AUDIT-<DATE>.md` using `templates/discovery-report.md`.
+25. **Generate `agent_result`**: Output canonical result payload proposing transition of discovered components to `DISCOVERED` and advancing phase to `phase_2_dependencies`.
 
 ---
 

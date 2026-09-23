@@ -250,3 +250,16 @@ When migrating subsystems where the underlying architecture has fundamentally ch
 3. **Existing Target Architecture First**: Discovers existing target classes/services first; extends existing code rather than creating duplicate competing classes.
 4. **Behavioral Equivalence Verification**: Audits the migrated behavior in the target architecture and validates functional equivalence without assuming identical class names or literal syntax.
 5. **Human Decision Boundary**: Escalate low-confidence or ambiguous architectural replacements to `HUMAN_INTERVENTION_REQUIRED` without inventing requirements.
+
+---
+
+## 9. External Drupal-Integrated PHP Code Architecture & Isolation
+
+When custom PHP scripts, integration clients, entry points, or utilities reside outside standard Drupal module/theme directories:
+
+1. **Multi-Vector Evidence Engine**: Proves Drupal integration via Drupal bootstrap (`DRUPAL_ROOT`, `drupal_bootstrap()`), direct table queries (`{users}`, `{node}`), custom module function invocations, runtime entry patterns, or deployment references. Disregards uncoupled generic PHP.
+2. **Confidence Grading**: Assigns deterministic confidence (`HIGH`, `MEDIUM`, `LOW`) and classifies role (`CLI_SCRIPT`, `WEBHOOK_ENDPOINT`, `STANDALONE_GATEWAY`, `CRON_WORKER`, `SHARED_UTILITY`, `OBSOLETE_SCRIPT`).
+3. **Behavior Unit Decomposition**: Deconstructs multi-purpose external scripts into granular behavior units, evaluating migration status (`COMPLETE`, `PARTIAL`, `MISSING`, `OBSOLETE`, etc.) per behavior unit rather than applying a blanket file-level verdict.
+4. **Target Precedence & Scoped DAG Integration**: Checks existing D10/D11 target code for pre-existing implementations before scaffolding new classes. Integrates external artifacts into the dependency DAG and includes them in targeted `/orchestrate <MODULE>` runs only when empirical dependency edges exist.
+5. **Safety & Zero Secret Leakage**: Enforces D7 read-only source protection, target path isolation, and redacts all discovered tokens, keys, and credentials from reports and generated code.
+

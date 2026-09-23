@@ -45,6 +45,8 @@ evidence_summary:
 - **Theme Settings Forms Accounted For**: {{ THEME_SETTINGS_ACCOUNTED_COUNT }} / {{ THEME_SETTINGS_TOTAL_COUNT }}
 - **Dynamic & Runtime Dependencies Accounted For**: {{ DYNAMIC_ACCOUNTED_COUNT }} / {{ DYNAMIC_TOTAL_COUNT }}
 - **External Integrations & APIs Accounted For**: {{ INTEGRATIONS_ACCOUNTED_COUNT }} / {{ INTEGRATIONS_TOTAL_COUNT }}
+- **External Drupal-Integrated PHP Artifacts Accounted For**: {{ EXTERNAL_PHP_ACCOUNTED_COUNT }} / {{ EXTERNAL_PHP_TOTAL_COUNT }}
+- **External Code Behavior Units Accounted For**: {{ EXTERNAL_BEHAVIORS_ACCOUNTED_COUNT }} / {{ EXTERNAL_BEHAVIORS_TOTAL_COUNT }}
 - **Cache, Session, Security & Runtime Behaviors Accounted For**: {{ RUNTIME_ACCOUNTED_COUNT }} / {{ RUNTIME_TOTAL_COUNT }}
 
 ---
@@ -101,6 +103,17 @@ evidence_summary:
 | `includes/helper.inc` | `{{ COMPONENT }}_calc()` | N/A | `src/Service/CalcService.php` | `MIGRATED` | Kernel test verified math parity |
 | `includes/drush.inc` | `drush_{{ COMPONENT }}_sync()` | N/A | `src/Drush/Commands/SyncCommands.php` | `MIGRATED` | CLI execution verified |
 | `lib/LegacyCompat.php` | `class LegacyCompat` | `none` | N/A | `OBSOLETE` | Deprecated D6 compatibility shim |
+
+---
+
+### 3.1 External Drupal-Integrated Code Behavioral Accounting
+
+| External Artifact / Script | Behavior Unit ID | D7 Role / Context | D10 Target Architecture / Class | Behavioral Status | Verification Evidence / Rationale |
+|---|---|---|---|---|---|
+| `scripts/sync.php` | `EXT-SYNC-01` | Bootstrap & Authenticate | `src/Service/IntegrationAuthService.php` | `COMPLETE` | Service test passed with bearer token validation |
+| `scripts/sync.php` | `EXT-SYNC-02` | User Entity Lookup | `src/Service/UserLookupService.php` | `COMPLETE` | User entity query & cache tags verified |
+| `scripts/sync.php` | `EXT-SYNC-03` | Legacy flat file logging | N/A (Migrated to Monolog/logger.channel) | `COMPLETE` | `logger.channel` service invocation verified |
+| `scripts/sync.php` | `EXT-SYNC-04` | Obsolete reporting mailer | N/A | `OBSOLETE` | Dead legacy mailer replaced by standard core mail system |
 
 ---
 

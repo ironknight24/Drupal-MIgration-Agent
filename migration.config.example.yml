@@ -140,3 +140,21 @@ architectural_replacements:
   #       - source_behavior: "membership"
   #         target_behavior: "group_membership"
 
+# ------------------------------------------------------------------------------
+# 10. External Drupal-Integrated Code Discovery & Analysis (Optional)
+# ------------------------------------------------------------------------------
+# Configure scanning of custom PHP scripts located outside standard modules/themes.
+# Discovery is evidence-driven: files without verifiable Drupal bootstrap/calls
+# are automatically filtered out.
+external_code:
+  enabled: true
+  scan_source_tree: true
+  include_patterns:
+    - "*.php"
+  exclude_patterns:
+    - "vendor/**"
+    - "node_modules/**"
+  require_drupal_evidence: true
+  confidence_threshold: "medium" # high | medium | low
+
+

@@ -179,3 +179,19 @@ When an architectural replacement is detected for a source module or subsystem:
 2. **Recursive Sub-DAG Expansion**: If the target replacement architecture relies on unmigrated upstream custom modules or services, expand the dependency sub-DAG to include those upstream components.
 3. **Cycle Guard**: Run standard DFS cycle detection over the combined dependency graph. If the replacement creates a dependency loop, emit a `BLOCKED-CYCLE` ticket and pause for human architectural resolution.
 4. **Topological Precedence**: Upstream dependencies of the target replacement architecture must be validated and completed before the dependent replacement behaviors are remediated.
+
+---
+
+## External Drupal-Integrated Code Dependency & Call Graph Analysis
+
+When external PHP artifacts (outside `modules/` and `themes/`) are identified as migration-relevant:
+1. **Inbound & Outbound Coupling Tracing**:
+   - `Drupal -> External`: Module or theme includes/calls external script or class.
+   - `External -> Drupal`: External script bootstraps Drupal, invokes module functions, or queries Drupal database tables.
+   - `External -> External API / Database`: External script communicates with third-party service or custom data store.
+2. **Targeted Sub-DAG Scope Enforcement**:
+   - For single-module targeted migrations (`/orchestrate <MODULE_NAME>`), include an external artifact **only** if evidence proves it is a direct dependency, caller, or requirement of `<MODULE_NAME>`.
+   - Unrelated external scripts remain outside the targeted sub-DAG.
+3. **DAG Participation & Edge Typing**:
+   - Represent external code edges as `EXTERNAL_INCLUDE`, `EXTERNAL_CALL`, `BOOTSTRAP_INVOCATION`, or `DATABASE_COUPLING`.
+   - Resolve upstream custom module dependencies before migrating dependent external behaviors.

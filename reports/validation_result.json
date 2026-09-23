@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260923130007",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260923134502",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-23T13:00:07.470458+00:00",
+  "executed_at": "2026-09-23T13:45:02.698364+00:00",
   "summary": {
-    "checks_total": 456,
-    "passed": 453,
+    "checks_total": 488,
+    "passed": 485,
     "failed": 0,
     "warnings": 0,
     "unverified": 3
@@ -5799,6 +5799,400 @@
       "details": "Verified configuration schema extensibility.",
       "affected_files": [
         "migration.config.example.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-01",
+      "category": "external_code",
+      "name": "Multi-Vector Evidence Discovery",
+      "status": "PASS",
+      "evidence": "Proves Drupal integration via multi-vector evidence: bootstrap, DB tables, module functions, and runtime entry points.",
+      "details": "Verified multi-vector discovery engine in d7-analysis.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-02",
+      "category": "external_code",
+      "name": "Confidence Scoring & Role Classification",
+      "status": "PASS",
+      "evidence": "Classifies external PHP artifacts with deterministic confidence levels (HIGH/MEDIUM/LOW) and standard functional roles.",
+      "details": "Verified confidence scoring and role taxonomy.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-03",
+      "category": "external_code",
+      "name": "Multi-Behavior Decomposition",
+      "status": "PASS",
+      "evidence": "Decomposes multi-purpose external scripts into discrete behavior units rather than assigning a monolithic file outcome.",
+      "details": "Verified multi-behavior decomposition protocol.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-04",
+      "category": "external_code",
+      "name": "Canonical Status Model Preservation",
+      "status": "PASS",
+      "evidence": "Preserves the 10 canonical migration statuses without inventing duplicate or conflicting state models.",
+      "details": "Verified canonical status preservation.",
+      "affected_files": [
+        "REPORTING_STANDARD.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-05",
+      "category": "external_code",
+      "name": "Relationship Type vs Status Distinction",
+      "status": "PASS",
+      "evidence": "Strictly distinguishes architectural relationship types from behavioral migration outcome statuses.",
+      "details": "Verified relationship taxonomy distinction.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-06",
+      "category": "external_code",
+      "name": "Existing Target Precedence",
+      "status": "PASS",
+      "evidence": "Inspects existing D10/D11 code for pre-existing implementations before generating duplicate classes.",
+      "details": "Verified target implementation precedence check.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "MIGRATION_LIFECYCLE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-07",
+      "category": "external_code",
+      "name": "Dependency DAG Integration",
+      "status": "PASS",
+      "evidence": "Integrates external code into the dependency DAG based on empirical caller/callee and module references.",
+      "details": "Verified dependency graph integration.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-08",
+      "category": "external_code",
+      "name": "Scoped Sub-DAG Inclusion",
+      "status": "PASS",
+      "evidence": "Targeted orchestration (/orchestrate <MODULE>) includes external code only when empirical dependency edges exist.",
+      "details": "Verified scoped sub-DAG inclusion rules.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md",
+        "MIGRATION_LIFECYCLE.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-09",
+      "category": "external_code",
+      "name": "Target Modern Destination Mapping",
+      "status": "PASS",
+      "evidence": "Maps external PHP entry points to modern Symfony/Drupal destinations (Controllers, Drush commands, Services, QueueWorkers).",
+      "details": "Verified modern architectural destination mappings.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-10",
+      "category": "external_code",
+      "name": "Code vs Data Migration Separation",
+      "status": "PASS",
+      "evidence": "Strictly distinguishes code behavior modernization from ETL data migration and avoids destructive data operations.",
+      "details": "Verified data separation protocol.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-11",
+      "category": "external_code",
+      "name": "Preserve Behavior Invariant",
+      "status": "PASS",
+      "evidence": "Enforces behavioral equivalence in modern architecture over literal syntactic line-by-line translation.",
+      "details": "Verified behavioral equivalence invariant.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/behavioral-validation/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-12",
+      "category": "external_code",
+      "name": "Shared External Code Handling",
+      "status": "PASS",
+      "evidence": "Handles shared utilities by evaluating module vs global placement and escalating ambiguous ownership to human gate.",
+      "details": "Verified shared external code handling.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md",
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-13",
+      "category": "external_code",
+      "name": "Obsolete Code Verification Protocol",
+      "status": "PASS",
+      "evidence": "Requires multi-source caller/cron/entry verification before marking code OBSOLETE, defaulting to UNVERIFIED if uncertain.",
+      "details": "Verified obsolete code verification protocol.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-14",
+      "category": "external_code",
+      "name": "Secret & Credential Redaction",
+      "status": "PASS",
+      "evidence": "Detects and redacts credentials, API keys, and connection strings from reports and never injects secrets into generated code.",
+      "details": "Verified secret redaction protocol.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-15",
+      "category": "external_code",
+      "name": "Reporting Standard Integration",
+      "status": "PASS",
+      "evidence": "Integrates external code discovery, inventory, mapping, and gap sections into REPORTING_STANDARD.md.",
+      "details": "Verified reporting standard integration.",
+      "affected_files": [
+        "REPORTING_STANDARD.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-16",
+      "category": "external_code",
+      "name": "Optional Configuration Schema",
+      "status": "PASS",
+      "evidence": "Provides optional external_code configuration in migration.config.example.yml with safe defaults.",
+      "details": "Verified configuration schema extensibility.",
+      "affected_files": [
+        "migration.config.example.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-17",
+      "category": "external_code",
+      "name": "Backward Compatibility Contract",
+      "status": "PASS",
+      "evidence": "Guarantees that existing module/theme migrations behave identically when no external code exists.",
+      "details": "Verified backward compatibility contract.",
+      "affected_files": [
+        "agents/orchestrator/agent.md",
+        "README.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-18",
+      "category": "external_code",
+      "name": "Manifest Scope Integration",
+      "status": "PASS",
+      "evidence": "Includes external_code_items in migration-manifest.yml and coordinates execution via the orchestrator.",
+      "details": "Verified manifest and orchestrator integration.",
+      "affected_files": [
+        "agents/orchestrator/agent.md",
+        "agents/discovery/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-19",
+      "category": "external_code",
+      "name": "Discovery Agent Protocol Integration",
+      "status": "PASS",
+      "evidence": "Discovery agent applies Section 102 discovery protocol to scan and catalog external PHP assets.",
+      "details": "Verified discovery agent protocol.",
+      "affected_files": [
+        "agents/discovery/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-20",
+      "category": "external_code",
+      "name": "Validation Report Accounting Table",
+      "status": "PASS",
+      "evidence": "Validation report template includes external code metrics and behavior-level accounting table.",
+      "details": "Verified validation report template updates.",
+      "affected_files": [
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-21",
+      "category": "external_code",
+      "name": "Migration Plan Accounting Table",
+      "status": "PASS",
+      "evidence": "Migration plan template includes Section 5.1 External Drupal-Integrated Code Remediation Plan.",
+      "details": "Verified migration plan template updates.",
+      "affected_files": [
+        "templates/migration-plan.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-22",
+      "category": "external_code",
+      "name": "Discovery Report Inventory Section",
+      "status": "PASS",
+      "evidence": "Discovery report template includes Section 23 External Drupal-Integrated Code Inventory.",
+      "details": "Verified discovery report template updates.",
+      "affected_files": [
+        "templates/discovery-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-23",
+      "category": "external_code",
+      "name": "Read-Only D7 Protection Invariant",
+      "status": "PASS",
+      "evidence": "Enforces strict read-only access on all D7 source files including external scripts.",
+      "details": "Verified D7 source protection invariant.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md",
+        "migration.config.example.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-24",
+      "category": "external_code",
+      "name": "Target Isolation Boundary Enforcement",
+      "status": "PASS",
+      "evidence": "Ensures all generated target artifacts are strictly contained within configured target module directories.",
+      "details": "Verified target path isolation.",
+      "affected_files": [
+        "ARCHITECTURE.md",
+        "migration.config.example.yml"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-25",
+      "category": "external_code",
+      "name": "Scenario A: Standalone CLI Sync Script Migration",
+      "status": "PASS",
+      "evidence": "Simulates migrating standalone CLI sync scripts (e.g. scripts/sync.php) to modern Drush Commands.",
+      "details": "Verified Scenario A CLI script modernization simulation.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-26",
+      "category": "external_code",
+      "name": "Scenario B: Standalone Webhook Endpoint Migration",
+      "status": "PASS",
+      "evidence": "Simulates migrating standalone HTTP webhook endpoints to modern Symfony Controllers with JSON response handling.",
+      "details": "Verified Scenario B Webhook Controller modernization simulation.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-27",
+      "category": "external_code",
+      "name": "Scenario C: Standalone Gateway Client Migration",
+      "status": "PASS",
+      "evidence": "Simulates migrating standalone integration gateway classes to PSR-4 Services with Dependency Injection.",
+      "details": "Verified Scenario C Gateway Service modernization simulation.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-28",
+      "category": "external_code",
+      "name": "Scenario D: Shared External Library Decomposition",
+      "status": "PASS",
+      "evidence": "Simulates decomposing shared libraries across Drupal-facing and external portions, escalating ambiguous cases.",
+      "details": "Verified Scenario D Shared Library decomposition simulation.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-29",
+      "category": "external_code",
+      "name": "Scenario E: Obsolete Standalone Script Handling",
+      "status": "PASS",
+      "evidence": "Simulates safely evaluating uncalled scripts without jumping to false dead-code conclusions.",
+      "details": "Verified Scenario E Obsolete script handling simulation.",
+      "affected_files": [
+        "skills/d7-analysis/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-30",
+      "category": "external_code",
+      "name": "Scenario F: Multi-Behavior Script Outcome Breakdown",
+      "status": "PASS",
+      "evidence": "Simulates decomposing a single external script into distinct behavior units with individual statuses (COMPLETE, OBSOLETE).",
+      "details": "Verified Scenario F Multi-behavior unit accounting simulation.",
+      "affected_files": [
+        "templates/validation-report.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-31",
+      "category": "external_code",
+      "name": "Scenario G: Targeted Scope Sub-DAG Pruning",
+      "status": "PASS",
+      "evidence": "Simulates pruning unrelated external scripts from targeted single-module orchestration sub-DAGs.",
+      "details": "Verified Scenario G Targeted Sub-DAG pruning simulation.",
+      "affected_files": [
+        "skills/dependency-analysis/SKILL.md",
+        "agents/orchestrator/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-EXT-32",
+      "category": "external_code",
+      "name": "Scenario H: Pre-existing Target Implementation Reuse",
+      "status": "PASS",
+      "evidence": "Simulates recognizing pre-existing D10 implementations and linking behaviors without generating duplicate code.",
+      "details": "Verified Scenario H Pre-existing target reuse simulation.",
+      "affected_files": [
+        "skills/d7-to-d10-mapping/SKILL.md"
       ],
       "remediation": ""
     }

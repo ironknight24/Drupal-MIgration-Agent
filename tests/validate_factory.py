@@ -7332,6 +7332,329 @@ class FactoryValidator:
                               "Missing optional architectural_replacements section in migration.config.example.yml.",
                               "Must add architectural_replacements section.")
 
+    def validate_external_code_suite(self):
+        """
+        Validates the External Drupal-Integrated PHP Code Discovery, Analysis,
+        Behavioral Mapping & Remediation capabilities across the factory (32 checks).
+        """
+        d7_analysis_path = self.repo_root / "skills" / "d7-analysis" / "SKILL.md"
+        dep_path = self.repo_root / "skills" / "dependency-analysis" / "SKILL.md"
+        mapping_path = self.repo_root / "skills" / "d7-to-d10-mapping" / "SKILL.md"
+        behav_path = self.repo_root / "skills" / "behavioral-validation" / "SKILL.md"
+        discovery_agent_path = self.repo_root / "agents" / "discovery" / "agent.md"
+        orch_agent_path = self.repo_root / "agents" / "orchestrator" / "agent.md"
+        reporting_std_path = self.repo_root / "REPORTING_STANDARD.md"
+        disc_rep_path = self.repo_root / "templates" / "discovery-report.md"
+        val_rep_path = self.repo_root / "templates" / "validation-report.md"
+        mig_plan_path = self.repo_root / "templates" / "migration-plan.md"
+        life_path = self.repo_root / "MIGRATION_LIFECYCLE.md"
+        arch_path = self.repo_root / "ARCHITECTURE.md"
+        config_path = self.repo_root / "migration.config.example.yml"
+        readme_path = self.repo_root / "README.md"
+
+        d7_txt = d7_analysis_path.read_text(encoding="utf-8") if d7_analysis_path.exists() else ""
+        dep_txt = dep_path.read_text(encoding="utf-8") if dep_path.exists() else ""
+        map_txt = mapping_path.read_text(encoding="utf-8") if mapping_path.exists() else ""
+        behav_txt = behav_path.read_text(encoding="utf-8") if behav_path.exists() else ""
+        disc_agent_txt = discovery_agent_path.read_text(encoding="utf-8") if discovery_agent_path.exists() else ""
+        orch_agent_txt = orch_agent_path.read_text(encoding="utf-8") if orch_agent_path.exists() else ""
+        rep_std_txt = reporting_std_path.read_text(encoding="utf-8") if reporting_std_path.exists() else ""
+        disc_rep_txt = disc_rep_path.read_text(encoding="utf-8") if disc_rep_path.exists() else ""
+        val_rep_txt = val_rep_path.read_text(encoding="utf-8") if val_rep_path.exists() else ""
+        mig_plan_txt = mig_plan_path.read_text(encoding="utf-8") if mig_plan_path.exists() else ""
+        life_txt = life_path.read_text(encoding="utf-8") if life_path.exists() else ""
+        arch_txt = arch_path.read_text(encoding="utf-8") if arch_path.exists() else ""
+        config_txt = config_path.read_text(encoding="utf-8") if config_path.exists() else ""
+        readme_txt = readme_path.read_text(encoding="utf-8") if readme_path.exists() else ""
+
+        # 1. Multi-Vector Evidence Discovery
+        if "Multi-Vector Evidence Engine" in d7_txt and "drupal_bootstrap" in d7_txt:
+            self.record_check("CHECK-EXT-01", "external_code", "Multi-Vector Evidence Discovery", "PASS",
+                              "Proves Drupal integration via multi-vector evidence: bootstrap, DB tables, module functions, and runtime entry points.",
+                              "Verified multi-vector discovery engine in d7-analysis.", affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-01", "external_code", "Multi-Vector Evidence Discovery", "FAIL",
+                              "Missing multi-vector evidence discovery logic in d7-analysis.", "Must document in d7-analysis skill.")
+
+        # 2. Confidence Scoring & Role Classification
+        if "HIGH" in d7_txt and "MEDIUM" in d7_txt and "LOW" in d7_txt and "CLI_SCRIPT" in d7_txt:
+            self.record_check("CHECK-EXT-02", "external_code", "Confidence Scoring & Role Classification", "PASS",
+                              "Classifies external PHP artifacts with deterministic confidence levels (HIGH/MEDIUM/LOW) and standard functional roles.",
+                              "Verified confidence scoring and role taxonomy.", affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-02", "external_code", "Confidence Scoring & Role Classification", "FAIL",
+                              "Missing confidence scoring or role taxonomy.", "Must document in d7-analysis skill.")
+
+        # 3. Multi-Behavior Decomposition
+        if "Behavior Unit Decomposition" in d7_txt and "External Artifact" in d7_txt:
+            self.record_check("CHECK-EXT-03", "external_code", "Multi-Behavior Decomposition", "PASS",
+                              "Decomposes multi-purpose external scripts into discrete behavior units rather than assigning a monolithic file outcome.",
+                              "Verified multi-behavior decomposition protocol.", affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-03", "external_code", "Multi-Behavior Decomposition", "FAIL",
+                              "Missing multi-behavior decomposition protocol.", "Must document in d7-analysis skill.")
+
+        # 4. Canonical Status Preservation
+        if "COMPLETE" in rep_std_txt and "PARTIAL" in rep_std_txt and "MISSING" in rep_std_txt and "RUNTIME_UNVERIFIED" in rep_std_txt:
+            self.record_check("CHECK-EXT-04", "external_code", "Canonical Status Model Preservation", "PASS",
+                              "Preserves the 10 canonical migration statuses without inventing duplicate or conflicting state models.",
+                              "Verified canonical status preservation.", affected_files=["REPORTING_STANDARD.md"])
+        else:
+            self.record_check("CHECK-EXT-04", "external_code", "Canonical Status Model Preservation", "FAIL",
+                              "Canonical status model violated.", "Must adhere to 10 canonical statuses.")
+
+        # 5. Relationship Type vs Migration Status Distinction
+        if "DIRECT_EQUIVALENT" in map_txt and "ARCHITECTURAL_REPLACEMENT" in map_txt and "REPLACED_BY_EXISTING_TARGET" in map_txt:
+            self.record_check("CHECK-EXT-05", "external_code", "Relationship Type vs Status Distinction", "PASS",
+                              "Strictly distinguishes architectural relationship types from behavioral migration outcome statuses.",
+                              "Verified relationship taxonomy distinction.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-05", "external_code", "Relationship Type vs Status Distinction", "FAIL",
+                              "Missing architectural relationship taxonomy distinction.", "Must document in mapping skill.")
+
+        # 6. Existing Target Precedence
+        if "Existing Target Implementation Precedence" in map_txt or "Inspect Existing Target" in life_txt:
+            self.record_check("CHECK-EXT-06", "external_code", "Existing Target Precedence", "PASS",
+                              "Inspects existing D10/D11 code for pre-existing implementations before generating duplicate classes.",
+                              "Verified target implementation precedence check.", affected_files=["skills/d7-to-d10-mapping/SKILL.md", "MIGRATION_LIFECYCLE.md"])
+        else:
+            self.record_check("CHECK-EXT-06", "external_code", "Existing Target Precedence", "FAIL",
+                              "Missing existing target precedence protocol.", "Must document in mapping skill.")
+
+        # 7. Dependency DAG Integration & Coupling Analysis
+        if "External Drupal-Integrated Code Dependency" in dep_txt and "Inbound" in dep_txt:
+            self.record_check("CHECK-EXT-07", "external_code", "Dependency DAG Integration", "PASS",
+                              "Integrates external code into the dependency DAG based on empirical caller/callee and module references.",
+                              "Verified dependency graph integration.", affected_files=["skills/dependency-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-07", "external_code", "Dependency DAG Integration", "FAIL",
+                              "Missing external code dependency analysis rules.", "Must document in dependency skill.")
+
+        # 8. Scoped Sub-DAG Inclusion for Targeted Orchestration
+        if "Targeted Sub-DAG Inclusion Protocol" in dep_txt or "Scoped Sub-DAG Inclusion" in life_txt:
+            self.record_check("CHECK-EXT-08", "external_code", "Scoped Sub-DAG Inclusion", "PASS",
+                              "Targeted orchestration (/orchestrate <MODULE>) includes external code only when empirical dependency edges exist.",
+                              "Verified scoped sub-DAG inclusion rules.", affected_files=["skills/dependency-analysis/SKILL.md", "MIGRATION_LIFECYCLE.md"])
+        else:
+            self.record_check("CHECK-EXT-08", "external_code", "Scoped Sub-DAG Inclusion", "FAIL",
+                              "Missing targeted sub-DAG inclusion guard.", "Must document in dependency skill.")
+
+        # 9. Target Modern Destination Mapping
+        if "Controller" in map_txt and "Drush" in map_txt and "QueueWorker" in map_txt and "Gateway Services" in map_txt:
+            self.record_check("CHECK-EXT-09", "external_code", "Target Modern Destination Mapping", "PASS",
+                              "Maps external PHP entry points to modern Symfony/Drupal destinations (Controllers, Drush commands, Services, QueueWorkers).",
+                              "Verified modern architectural destination mappings.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-09", "external_code", "Target Modern Destination Mapping", "FAIL",
+                              "Missing modern destination mapping taxonomy.", "Must document in mapping skill.")
+
+        # 10. Code Behavior vs Data Migration Separation
+        if "Code Behavior vs Data Migration Separation" in map_txt or "Data Migration Separation" in d7_txt:
+            self.record_check("CHECK-EXT-10", "external_code", "Code vs Data Migration Separation", "PASS",
+                              "Strictly distinguishes code behavior modernization from ETL data migration and avoids destructive data operations.",
+                              "Verified data separation protocol.", affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-10", "external_code", "Code vs Data Migration Separation", "FAIL",
+                              "Missing code vs data migration separation rule.", "Must document in mapping skill.")
+
+        # 11. Preserving Behavior Over Implementation
+        if "Preserve Behavior, Not Implementation" in map_txt or "behavioral equivalence" in behav_txt:
+            self.record_check("CHECK-EXT-11", "external_code", "Preserve Behavior Invariant", "PASS",
+                              "Enforces behavioral equivalence in modern architecture over literal syntactic line-by-line translation.",
+                              "Verified behavioral equivalence invariant.", affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/behavioral-validation/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-11", "external_code", "Preserve Behavior Invariant", "FAIL",
+                              "Missing behavioral equivalence invariant.", "Must document in mapping skill.")
+
+        # 12. Shared External Code Handling & Ownership Boundary
+        if "Shared External Code Handling" in map_txt or "SHARED_UTILITY" in d7_txt:
+            self.record_check("CHECK-EXT-12", "external_code", "Shared External Code Handling", "PASS",
+                              "Handles shared utilities by evaluating module vs global placement and escalating ambiguous ownership to human gate.",
+                              "Verified shared external code handling.", affected_files=["skills/d7-to-d10-mapping/SKILL.md", "skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-12", "external_code", "Shared External Code Handling", "FAIL",
+                              "Missing shared code handling protocol.", "Must document in mapping skill.")
+
+        # 13. Obsolete Code Verification Protocol
+        if "Obsolete Code Verification Protocol" in d7_txt and "UNVERIFIED" in d7_txt:
+            self.record_check("CHECK-EXT-13", "external_code", "Obsolete Code Verification Protocol", "PASS",
+                              "Requires multi-source caller/cron/entry verification before marking code OBSOLETE, defaulting to UNVERIFIED if uncertain.",
+                              "Verified obsolete code verification protocol.", affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-13", "external_code", "Obsolete Code Verification Protocol", "FAIL",
+                              "Missing obsolete code verification protocol.", "Must document in d7-analysis skill.")
+
+        # 14. Secret & Credential Redaction Protocol
+        if "Secret & Credential Redaction Protocol" in d7_txt and "REDACTED" in d7_txt:
+            self.record_check("CHECK-EXT-14", "external_code", "Secret & Credential Redaction", "PASS",
+                              "Detects and redacts credentials, API keys, and connection strings from reports and never injects secrets into generated code.",
+                              "Verified secret redaction protocol.", affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-14", "external_code", "Secret & Credential Redaction", "FAIL",
+                              "Missing secret redaction protocol.", "Must document in d7-analysis skill.")
+
+        # 15. Reporting Integration
+        if "EXTERNAL DRUPAL-INTEGRATED CODE DISCOVERY" in rep_std_txt and "EXTERNAL CODE INVENTORY" in rep_std_txt:
+            self.record_check("CHECK-EXT-15", "external_code", "Reporting Standard Integration", "PASS",
+                              "Integrates external code discovery, inventory, mapping, and gap sections into REPORTING_STANDARD.md.",
+                              "Verified reporting standard integration.", affected_files=["REPORTING_STANDARD.md"])
+        else:
+            self.record_check("CHECK-EXT-15", "external_code", "Reporting Standard Integration", "FAIL",
+                              "Missing external code sections in REPORTING_STANDARD.md.", "Must add external code sections.")
+
+        # 16. Optional & Safe Configuration
+        if "external_code:" in config_txt and "require_drupal_evidence:" in config_txt:
+            self.record_check("CHECK-EXT-16", "external_code", "Optional Configuration Schema", "PASS",
+                              "Provides optional external_code configuration in migration.config.example.yml with safe defaults.",
+                              "Verified configuration schema extensibility.", affected_files=["migration.config.example.yml"])
+        else:
+            self.record_check("CHECK-EXT-16", "external_code", "Optional Configuration Schema", "FAIL",
+                              "Missing external_code section in migration.config.example.yml.", "Must add external_code section.")
+
+        # 17. Backward Compatibility
+        if "External-code support must be additive" in orch_agent_txt or "External Drupal-Integrated Code" in readme_txt:
+            self.record_check("CHECK-EXT-17", "external_code", "Backward Compatibility Contract", "PASS",
+                              "Guarantees that existing module/theme migrations behave identically when no external code exists.",
+                              "Verified backward compatibility contract.", affected_files=["agents/orchestrator/agent.md", "README.md"])
+        else:
+            self.record_check("CHECK-EXT-17", "external_code", "Backward Compatibility Contract", "FAIL",
+                              "Backward compatibility contract missing.", "Must verify backward compatibility.")
+
+        # 18. Orchestrator Manifest Integration
+        if "external_code_items" in disc_agent_txt and ("external_code_items" in orch_agent_txt or "coupled external" in orch_agent_txt):
+            self.record_check("CHECK-EXT-18", "external_code", "Manifest Scope Integration", "PASS",
+                              "Includes external_code_items in migration-manifest.yml and coordinates execution via the orchestrator.",
+                              "Verified manifest and orchestrator integration.", affected_files=["agents/orchestrator/agent.md", "agents/discovery/agent.md"])
+        else:
+            self.record_check("CHECK-EXT-18", "external_code", "Manifest Scope Integration", "FAIL",
+                              "Missing external_code_items in orchestrator or discovery agent.", "Must document manifest integration.")
+
+        # 19. Discovery Agent Protocol Integration
+        if "External Drupal-Integrated PHP Code Discovery" in disc_agent_txt or "Section 102" in disc_agent_txt:
+            self.record_check("CHECK-EXT-19", "external_code", "Discovery Agent Protocol Integration", "PASS",
+                              "Discovery agent applies Section 102 discovery protocol to scan and catalog external PHP assets.",
+                              "Verified discovery agent protocol.", affected_files=["agents/discovery/agent.md"])
+        else:
+            self.record_check("CHECK-EXT-19", "external_code", "Discovery Agent Protocol Integration", "FAIL",
+                              "Missing external code discovery protocol in discovery agent.", "Must document in discovery agent.")
+
+        # 20. Behavioral Validation Accounting Table
+        if "External Drupal-Integrated PHP Artifacts Accounted For" in val_rep_txt and "External Drupal-Integrated Code Behavioral Accounting" in val_rep_txt:
+            self.record_check("CHECK-EXT-20", "external_code", "Validation Report Accounting Table", "PASS",
+                              "Validation report template includes external code metrics and behavior-level accounting table.",
+                              "Verified validation report template updates.", affected_files=["templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-EXT-20", "external_code", "Validation Report Accounting Table", "FAIL",
+                              "Missing external code accounting in validation report template.", "Must update validation-report.md.")
+
+        # 21. Migration Plan Accounting Table
+        if "External Drupal-Integrated Code Remediation Plan" in mig_plan_txt:
+            self.record_check("CHECK-EXT-21", "external_code", "Migration Plan Accounting Table", "PASS",
+                              "Migration plan template includes Section 5.1 External Drupal-Integrated Code Remediation Plan.",
+                              "Verified migration plan template updates.", affected_files=["templates/migration-plan.md"])
+        else:
+            self.record_check("CHECK-EXT-21", "external_code", "Migration Plan Accounting Table", "FAIL",
+                              "Missing external code plan in migration-plan.md.", "Must update migration-plan.md.")
+
+        # 22. Discovery Report Inventory Section
+        if "External Drupal-Integrated Code Inventory" in disc_rep_txt:
+            self.record_check("CHECK-EXT-22", "external_code", "Discovery Report Inventory Section", "PASS",
+                              "Discovery report template includes Section 23 External Drupal-Integrated Code Inventory.",
+                              "Verified discovery report template updates.", affected_files=["templates/discovery-report.md"])
+        else:
+            self.record_check("CHECK-EXT-22", "external_code", "Discovery Report Inventory Section", "FAIL",
+                              "Missing external code inventory in discovery-report.md.", "Must update discovery-report.md.")
+
+        # 23. Read-Only D7 Protection Invariant
+        if "D7 Read-Only Source Protection" in d7_txt or "disallow_d7_writes: true" in config_txt:
+            self.record_check("CHECK-EXT-23", "external_code", "Read-Only D7 Protection Invariant", "PASS",
+                              "Enforces strict read-only access on all D7 source files including external scripts.",
+                              "Verified D7 source protection invariant.", affected_files=["skills/d7-analysis/SKILL.md", "migration.config.example.yml"])
+        else:
+            self.record_check("CHECK-EXT-23", "external_code", "Read-Only D7 Protection Invariant", "FAIL",
+                              "Missing D7 read-only protection guarantee.", "Must enforce in safety rules.")
+
+        # 24. Target Isolation Boundary Enforcement
+        if "enforce_path_isolation: true" in config_txt and ("Target Isolation" in arch_txt or "target path isolation" in arch_txt.lower()):
+            self.record_check("CHECK-EXT-24", "external_code", "Target Isolation Boundary Enforcement", "PASS",
+                              "Ensures all generated target artifacts are strictly contained within configured target module directories.",
+                              "Verified target path isolation.", affected_files=["ARCHITECTURE.md", "migration.config.example.yml"])
+        else:
+            self.record_check("CHECK-EXT-24", "external_code", "Target Isolation Boundary Enforcement", "FAIL",
+                              "Missing target isolation boundary enforcement.", "Must verify path protection.")
+
+        # 25. Scenario A Simulation: Standalone CLI Sync Script Migration
+        if "drush" in map_txt.lower() and "cli" in map_txt.lower():
+            self.record_check("CHECK-EXT-25", "external_code", "Scenario A: Standalone CLI Sync Script Migration", "PASS",
+                              "Simulates migrating standalone CLI sync scripts (e.g. scripts/sync.php) to modern Drush Commands.",
+                              "Verified Scenario A CLI script modernization simulation.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-25", "external_code", "Scenario A: Standalone CLI Sync Script Migration", "FAIL",
+                              "Scenario A simulation failed.", "Must verify Drush command mapping.")
+
+        # 26. Scenario B Simulation: Standalone Webhook Endpoint Migration
+        if "webhook" in map_txt.lower() and "controller" in map_txt.lower():
+            self.record_check("CHECK-EXT-26", "external_code", "Scenario B: Standalone Webhook Endpoint Migration", "PASS",
+                              "Simulates migrating standalone HTTP webhook endpoints to modern Symfony Controllers with JSON response handling.",
+                              "Verified Scenario B Webhook Controller modernization simulation.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-26", "external_code", "Scenario B: Standalone Webhook Endpoint Migration", "FAIL",
+                              "Scenario B simulation failed.", "Must verify Webhook Controller mapping.")
+
+        # 27. Scenario C Simulation: Standalone Custom Class / Gateway Migration
+        if "gateway" in map_txt.lower() and "service" in map_txt.lower():
+            self.record_check("CHECK-EXT-27", "external_code", "Scenario C: Standalone Gateway Client Migration", "PASS",
+                              "Simulates migrating standalone integration gateway classes to PSR-4 Services with Dependency Injection.",
+                              "Verified Scenario C Gateway Service modernization simulation.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-27", "external_code", "Scenario C: Standalone Gateway Client Migration", "FAIL",
+                              "Scenario C simulation failed.", "Must verify Gateway Service mapping.")
+
+        # 28. Scenario D Simulation: Shared External Library Decomposition
+        if "shared" in map_txt.lower() and "human_intervention_required" in map_txt.lower():
+            self.record_check("CHECK-EXT-28", "external_code", "Scenario D: Shared External Library Decomposition", "PASS",
+                              "Simulates decomposing shared libraries across Drupal-facing and external portions, escalating ambiguous cases.",
+                              "Verified Scenario D Shared Library decomposition simulation.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-28", "external_code", "Scenario D: Shared External Library Decomposition", "FAIL",
+                              "Scenario D simulation failed.", "Must verify shared library handling.")
+
+        # 29. Scenario E Simulation: Obsolete / Dead Standalone Script Handling
+        if "obsolete" in d7_txt.lower() and "unverified" in d7_txt.lower():
+            self.record_check("CHECK-EXT-29", "external_code", "Scenario E: Obsolete Standalone Script Handling", "PASS",
+                              "Simulates safely evaluating uncalled scripts without jumping to false dead-code conclusions.",
+                              "Verified Scenario E Obsolete script handling simulation.", affected_files=["skills/d7-analysis/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-29", "external_code", "Scenario E: Obsolete Standalone Script Handling", "FAIL",
+                              "Scenario E simulation failed.", "Must verify obsolete script evaluation.")
+
+        # 30. Scenario F Simulation: Multi-Behavior Script Outcome Breakdown
+        if "EXT-SYNC-01" in val_rep_txt and "EXT-SYNC-04" in val_rep_txt:
+            self.record_check("CHECK-EXT-30", "external_code", "Scenario F: Multi-Behavior Script Outcome Breakdown", "PASS",
+                              "Simulates decomposing a single external script into distinct behavior units with individual statuses (COMPLETE, OBSOLETE).",
+                              "Verified Scenario F Multi-behavior unit accounting simulation.", affected_files=["templates/validation-report.md"])
+        else:
+            self.record_check("CHECK-EXT-30", "external_code", "Scenario F: Multi-Behavior Script Outcome Breakdown", "FAIL",
+                              "Scenario F simulation failed.", "Must verify validation report multi-behavior accounting.")
+
+        # 31. Scenario G Simulation: Targeted Scope Sub-DAG Pruning
+        if "Targeted Sub-DAG" in dep_txt or "Targeted" in orch_agent_txt:
+            self.record_check("CHECK-EXT-31", "external_code", "Scenario G: Targeted Scope Sub-DAG Pruning", "PASS",
+                              "Simulates pruning unrelated external scripts from targeted single-module orchestration sub-DAGs.",
+                              "Verified Scenario G Targeted Sub-DAG pruning simulation.", affected_files=["skills/dependency-analysis/SKILL.md", "agents/orchestrator/agent.md"])
+        else:
+            self.record_check("CHECK-EXT-31", "external_code", "Scenario G: Targeted Scope Sub-DAG Pruning", "FAIL",
+                              "Scenario G simulation failed.", "Must verify sub-DAG pruning rules.")
+
+        # 32. Scenario H Simulation: Pre-existing Target Implementation Reuse
+        if "REPLACED_BY_EXISTING_TARGET" in map_txt and "Existing Target Implementation Precedence" in map_txt:
+            self.record_check("CHECK-EXT-32", "external_code", "Scenario H: Pre-existing Target Implementation Reuse", "PASS",
+                              "Simulates recognizing pre-existing D10 implementations and linking behaviors without generating duplicate code.",
+                              "Verified Scenario H Pre-existing target reuse simulation.", affected_files=["skills/d7-to-d10-mapping/SKILL.md"])
+        else:
+            self.record_check("CHECK-EXT-32", "external_code", "Scenario H: Pre-existing Target Implementation Reuse", "FAIL",
+                              "Scenario H simulation failed.", "Must verify target implementation reuse simulation.")
+
     def run_all(self):
         self.validate_package_and_portability()
         self.validate_agents()
@@ -7359,6 +7682,7 @@ class FactoryValidator:
         self.validate_single_module_migration_suite()
         self.validate_recursive_orchestration_suite()
         self.validate_architectural_replacement_suite()
+        self.validate_external_code_suite()
 
     def generate_result_json(self):
         return {

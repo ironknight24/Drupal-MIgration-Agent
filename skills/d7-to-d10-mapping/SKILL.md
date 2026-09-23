@@ -458,3 +458,43 @@ If the D10 target codebase already contains an implementation of the replacement
 - **`HIGH`**: Direct repository evidence confirms target architecture, dependencies, and code bindings.
 - **`MEDIUM`**: Strong architectural alignment exists, but dynamic/runtime aspects require static-only verification (`RUNTIME_UNVERIFIED`).
 - **`LOW`**: Insufficient evidence or multiple conflicting candidate architectures $\to$ Escalate immediately to `HUMAN_INTERVENTION_REQUIRED` without guessing.
+
+## 17. External Drupal-Integrated PHP Artifact to Modern Architecture Mapping (Step 24)
+
+When migrating custom PHP code discovered outside standard `modules/` and `themes/` directories:
+
+### 1. Entry-Point to Modern Architecture Transformation Matrix
+| Legacy External D7 Entry Point | Target Drupal 10/11 Architecture | Target Destination Path |
+| :--- | :--- | :--- |
+| Standalone HTTP Endpoint / Webhook Script | Symfony Controller / JSON:API / REST Plugin | `<target_module_dir>/<MODULE>/src/Controller/` or `src/Plugin/rest/resource/` |
+| Standalone Cron / Worker Script | Drupal Queue API Plugin (`@QueueWorker`) or Cron Service | `<target_module_dir>/<MODULE>/src/Plugin/QueueWorker/` |
+| Standalone CLI Maintenance Script | Drush Command Class (`#[Drush\Command]`) | `<target_module_dir>/<MODULE>/src/Drush/Commands/` |
+| External Integration Client / API Wrapper | Guzzle Gateway Services with Constructor DI | `<target_module_dir>/<MODULE>/src/Service/` |
+| Custom Application-Layer Class | PSR-4 Domain Service or Plugin | `<target_module_dir>/<MODULE>/src/Service/` |
+| Standalone Bootstrap Wrapper | Event Subscriber or Middleware | `<target_module_dir>/<MODULE>/src/EventSubscriber/` |
+
+### 2. Preserve Behavior, Not Implementation Invariant
+The objective is D7 behavioral equivalence using the correct D10/D11 architecture, not line-by-line or file-by-file translation. The target implementation must preserve observable business behavior (inputs, outputs, database effects, access rules, cache invalidations) while conforming strictly to modern Drupal 10/11 object-oriented architecture.
+
+### 3. Architectural Relationship Types for External Code
+- `DIRECT_EQUIVALENT`: 1:1 mapping to a dedicated modern D10/D11 class or service.
+- `ARCHITECTURAL_REPLACEMENT`: Transformed into a modern paradigm (e.g. standalone script $\to$ Drush Command or QueueWorker).
+- `PARTIAL_REPLACEMENT`: Portions migrated to Drupal service; other portions remain external.
+- `REPLACED_BY_EXISTING_TARGET`: Modern D10/D11 codebase already contains an equivalent service, controller, or command.
+- `SUPERSEDED`: Absorbed into modern core or contrib ecosystem.
+- `OBSOLETE`: Dead code with zero active callers.
+- `NO_REPLACEMENT_FOUND`: Unclear target pattern; escalates to `HUMAN_INTERVENTION_REQUIRED`.
+
+### 4. Existing Target Implementation Precedence
+Before authoring a new service, controller, or command:
+1. Search existing target custom modules, core services, and contrib modules.
+2. If the target already provides the behavior, mark the behavior as `REPLACED_BY_EXISTING_TARGET` or `COMPLETE` citing target file lines.
+3. If partial behavior exists, extend the existing target class/service rather than creating a duplicate competing class.
+
+### 5. Code Behavior vs Data Migration Separation
+Strictly separate code logic modernization from database table data migration (ETL). External PHP SQL queries do not authorize silent or destructive data operations. Data migration must only occur when explicitly configured.
+
+### 6. Shared External Code Handling
+For `SHARED` external utilities consumed across systems:
+- Determine whether it belongs in a Drupal custom module, a Composer library, or external system.
+- If ambiguous, set `HUMAN_INTERVENTION_REQUIRED` without assuming automatic absorption into Drupal.

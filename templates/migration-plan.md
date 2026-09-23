@@ -106,6 +106,16 @@ evidence_summary:
 
 ---
 
+## 5.1 External Drupal-Integrated Code Remediation Plan
+
+| Discovered External Script | Behavior Unit ID | Role / Entry Pattern | Target Modern Destination | Relationship / Transformation | Validation Strategy |
+|---|---|---|---|---|---|
+| `scripts/sync.php` | `EXT-SYNC-01` | CLI Batch / Sync entry point | `src/Drush/Commands/SyncCommands.php` | `DIRECT_EQUIVALENT` | Drush execution test |
+| `scripts/endpoint.php` | `EXT-END-01` | HTTP Webhook / Custom endpoint | `src/Controller/WebhookController.php` | `DIRECT_EQUIVALENT` | Functional HTTP response test |
+| `includes/ext_auth.php` | `EXT-AUTH-01` | Integration Auth Client | `src/Service/IntegrationAuthClient.php` | `REPLACED_BY_EXISTING_TARGET` | Unit mock test |
+
+---
+
 ## 6. File Mapping & Scaffolding Checklist
 
 | Action | Target D10 File | Source D7 Origin | Architectural Purpose |

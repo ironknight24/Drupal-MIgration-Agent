@@ -190,7 +190,34 @@ RE-AUDIT & CONVERGENCE (Loop 1..3 until COMPLETE or escalated)
 
 ---
 
-## 7. Task-Level Recursion & Iterative Remediation
+## 7. External Drupal-Integrated Code Lifecycle & Orchestration
+
+When external PHP files exist outside standard custom module/theme directories (e.g. `scripts/`, `bin/`, `cron/`, `endpoints/`, `lib/`):
+
+```text
+EXTERNAL PHP DISCOVERY (Multi-vector evidence scan: bootstrap, DB, module API, entry points)
+       ↓
+CONFIDENCE & ROLE CLASSIFICATION (HIGH / MEDIUM / LOW; CLI, Webhook, Service, Shared, Obsolete)
+       ↓
+MULTI-BEHAVIOR DECOMPOSITION (Decompose file into discrete behavior units)
+       ↓
+DEPENDENCY DAG & SCOPE RESOLUTION (Couple to module DAG if inbound/outbound edges exist)
+       ↓
+TARGET ARCHITECTURE MAPPING (Map each behavior unit to Drush Command, Controller, Service, QueueWorker)
+       ↓
+EXISTING TARGET PRECEDENCE (Verify if modern target already implements behavior before scaffolding)
+       ↓
+BEHAVIOR-LEVEL STATUS ACCOUNTING (Classify units: COMPLETE, PARTIAL, MISSING, OBSOLETE, etc.)
+       ↓
+EVIDENCE-BACKED REMEDIATION & VALIDATION (Kernel/Functional/CLI tests)
+```
+
+1. **Scoped Sub-DAG Inclusion**: During targeted orchestration (`/orchestrate <MODULE>`), external code is ONLY scheduled if evidence establishes a direct caller/callee or configuration dependency with that module.
+2. **Behavior-Level Completeness**: A single external file is never given a monolithic outcome. Each behavior unit is tracked and verified independently.
+
+---
+
+## 8. Task-Level Recursion & Iterative Remediation
 
 Within an individual component migration:
 
