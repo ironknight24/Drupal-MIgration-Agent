@@ -24,8 +24,8 @@ For deep technical catalogs, consult:
 
 ## Analysis Workflow & Heuristics
 
-### 1. Recursive Source File Discovery & Inventory
-For every custom module in scope, recursively discover all PHP source files regardless of directory nesting:
+### 1. Exact Path Derivation & Recursive Source File Discovery
+For every custom module in scope, derive its exact path `SOURCE_MODULE_PATH = os.path.join(source.path, source.custom_modules_path, MODULE)` from `migration.config.yml`. Confine all discovery strictly to `SOURCE_MODULE_PATH` without broad searches across adjacent directories (Rule 16 & Rule 18):
 - **Target File Extensions**: `*.php`, `*.inc`, `*.module`, `*.install`, `*.profile`, `*.drush.inc`, `*.admin.inc`, `*.pages.inc`, `*.forms.inc`.
 - **Zero Naming Assumptions**: Never assume PHP or `.inc` files follow fixed naming conventions (`filename != architecture`). Discover files at the module root, in `includes/`, `lib/`, `classes/`, `src/`, `admin/`, `commands/`, or arbitrary subdirectories (e.g., `module.inc`, `admin.inc`, `pages.inc`, `forms.inc`, `functions.inc`, `includes/foo.inc`, `includes/bar.inc`, `custom-command.inc`, `arbitrary-name.inc`, `MyProcessor.php`, `LegacyClass.php`, `arbitrary-name.php`).
 - **Discovery Output**: Record relative path, file type, line count, byte size, and detected constructs in the manifest.

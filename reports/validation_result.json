@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260925163259",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260925173952",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-25T16:32:59.152512+00:00",
+  "executed_at": "2026-09-25T17:39:52.915870+00:00",
   "summary": {
-    "checks_total": 492,
-    "passed": 489,
+    "checks_total": 493,
+    "passed": 490,
     "failed": 0,
     "warnings": 0,
     "unverified": 3
@@ -5358,6 +5358,21 @@
       "details": "Verified continuous dependency resolution protocol.",
       "affected_files": [
         "commands/migrate-module.md",
+        "skills/custom-module-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-20",
+      "category": "single_module",
+      "name": "Mandatory Step 0 Zero-Search Exact Path Derivation",
+      "status": "PASS",
+      "evidence": "Strictly enforces config-first path derivation and prohibits broad workspace searches across the repository.",
+      "details": "Verified Mandatory Step 0 Zero-Search Exact Path Derivation protocol.",
+      "affected_files": [
+        "commands/migrate-module.md",
+        "SAFETY_RULES.md",
+        "agents/custom-module/agent.md",
         "skills/custom-module-migration/SKILL.md"
       ],
       "remediation": ""

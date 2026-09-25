@@ -17,17 +17,21 @@ Run the master orchestrator to manage the complete, dependency-aware, dynamicall
 
 ### Mode 1: Targeted Recursive Module Migration (`/orchestrate <MODULE_NAME>`)
 When a specific module name is provided (e.g. `/orchestrate ariba_helper`):
-1. **Target Validation**: Verify that `<MODULE_NAME>` exists in `state/migration-manifest.yml` as a `custom_module`.
-2. **Recursive Dependency Discovery & Ordering**:
+1. **Mandatory Step 0: Zero-Search Exact Path Derivation (Rule 18)**:
+   - Programmatically compute `SOURCE_MODULE_PATH = os.path.join(source.path, source.custom_modules_path, MODULE_NAME)` and `TARGET_MODULE_PATH = os.path.join(target.path, target_custom_modules_path, MODULE_NAME)`.
+   - Never search broad workspace directories (`find .`, `glob`, `grep`) for module locations.
+   - Halt immediately if `SOURCE_MODULE_PATH` is missing from the configured path.
+2. **Target Validation**: Verify that `<MODULE_NAME>` exists in `state/migration-manifest.yml` as a `custom_module`.
+3. **Recursive Dependency Discovery & Ordering**:
    - Inspect declared and implicit custom dependencies from `state/migration-manifest.yml` and `reports/dependencies/`.
    - Build the recursive ancestor graph ($\text{Ancestors}(M) \cup \{M\}$).
    - Perform cycle detection. If a cycle exists, halt with `BLOCKED-CYCLE-XXX.md`.
    - Recursively process and validate unmigrated upstream dependencies in topological order before initiating the parent module.
-3. **Module Execution & Baseline Snapshot**:
+4. **Module Execution & Baseline Snapshot**:
    - Snapshot existing target module files and checksums (`EXISTING_TARGET_MODULE` vs `NEW_TARGET_MODULE`).
    - Dispatch `custom-module` agent with `component_id: <MODULE_NAME>` and `execution_scope: SINGLE_MODULE`.
-   - Enforce strict write isolation: writes restricted exclusively to `<target_custom_modules_path>/<MODULE_NAME>/**/*`.
-4. **Comparative Completeness Audit**:
+   - Enforce strict write isolation: writes restricted exclusively to `TARGET_MODULE_PATH/**/*` (`<target_custom_modules_path>/<MODULE_NAME>/**/*`).
+5. **Comparative Completeness Audit**:
    - Perform forensic D7 $\to$ D10 audit matching 100% of discovered hooks, classes, forms, routes, cache bins, queries, and integrations.
    - Classify every item into the 10 canonical statuses (`COMPLETE`, `PARTIAL`, `MISSING`, `BLOCKED`, `HUMAN_INTERVENTION_REQUIRED`, `RUNTIME_UNVERIFIED`, `SUPERSEDED`, `REPLACED`, `OBSOLETE`, `EXCLUDED`).
 5. **Iterative Remediation Loop**:

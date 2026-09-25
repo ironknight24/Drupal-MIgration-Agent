@@ -6936,6 +6936,17 @@ class FactoryValidator:
                               "Missing continuous dependency resolution protocol.",
                               "Must minimize unnecessary human blockers.")
 
+        # 24.20 Mandatory Step 0 Zero-Search Exact Path Derivation
+        if "Mandatory Step 0: Zero-Search Exact Path Derivation" in c_txt and "RULE 18: Mandatory Step 0 Zero-Search" in safety_txt and "Rule 18" in (cm_agent.read_text(encoding="utf-8") if cm_agent.exists() else ""):
+            self.record_check("CHECK-SMM-20", "single_module", "Mandatory Step 0 Zero-Search Exact Path Derivation", "PASS",
+                              "Strictly enforces config-first path derivation and prohibits broad workspace searches across the repository.",
+                              "Verified Mandatory Step 0 Zero-Search Exact Path Derivation protocol.",
+                              affected_files=["commands/migrate-module.md", "SAFETY_RULES.md", "agents/custom-module/agent.md", "skills/custom-module-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-SMM-20", "single_module", "Mandatory Step 0 Zero-Search Exact Path Derivation", "FAIL",
+                              "Missing Mandatory Step 0 Zero-Search Exact Path Derivation protocol.",
+                              "Must enforce Rule 18 zero-search path derivation.")
+
     def validate_recursive_orchestration_suite(self):
         """Validates recursive dependency resolution, 3-path remediation, 10 canonical statuses, loop prevention, and LLM REMEDIATION INPUT."""
         orch_cmd = self.repo_root / "commands" / "orchestrate.md"

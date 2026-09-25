@@ -1,10 +1,10 @@
 # Safety Rules & Guardrails
 
-This document establishes the 15 non-negotiable safety rules governing all agent behaviors in the Drupal Migration Framework. Violations will trigger an immediate halt and raise a safety exception.
+This document establishes the 18 non-negotiable safety rules governing all agent behaviors in the Drupal Migration Framework. Violations will trigger an immediate halt and raise a safety exception.
 
 ---
 
-## The 15 Cardinal Safety Rules
+## The 18 Cardinal Safety Rules
 
 ### RULE 1: Never Delete Source Drupal 7 Files
 The source Drupal 7 codebase is historic reference material. Under no circumstances may an agent invoke `rm`, delete, unlink, or prune files or directories within `source.path`.
@@ -56,6 +56,9 @@ All source code reads must be strictly confined to `source.path` and all target 
 
 ### RULE 17: Pure Drupal 10 Standards for From-Scratch Module Generation
 When a custom module exists in `source.path` and does not exist in `target.path`, the agent must scaffold and generate the modern D10 module from scratch. It must faithfully reproduce the D7 module's business behavior, caching mechanisms (tags/contexts/max-age), security controls (permissions/CSRF/access checkers), and inter-module interactions (events/hooks/services) using 100% pure modern Drupal 10/11 standards (PSR-4 autoloading, Constructor Dependency Injection, CMI YAML configuration, Twig templates).
+
+### RULE 18: Mandatory Step 0 Zero-Search Exact Path Derivation
+When invoked to migrate or analyze a custom module, the agent MUST read `migration.config.yml` first and programmatically construct the exact module path: `SOURCE_MODULE_PATH = os.path.join(source.path, source.custom_modules_path, MODULE_NAME)`. Broad workspace searches (`glob`, `find .`, `grep` across root or sibling folders) are strictly forbidden. If `SOURCE_MODULE_PATH` does not exist on disk, the agent must halt immediately with an explicit error rather than searching elsewhere.
 
 ---
 

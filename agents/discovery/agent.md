@@ -37,6 +37,7 @@ Conducts comprehensive, strictly read-only inspection of the legacy Drupal 7 cod
 ---
 
 ## 4. Forbidden Scope
+- Searching, inspecting, or scanning directories outside the configured `source.path` and `target.path` (Rule 16 & Rule 18).
 - Writing, modifying, or deleting any file within `source.path` (Rule 1 & Rule 2).
 - Mutating target application code or installing packages.
 - Performing dependency graph solving or wave batching (delegated to `dependency`).

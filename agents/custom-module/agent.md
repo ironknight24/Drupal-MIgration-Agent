@@ -20,30 +20,32 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 ---
 
 ## 3. Allowed Scope
-- Extracting and accounting for business rules, procedural hook implementations, and logic from all D7 module source files strictly within `<source.path>/.../<MODULE>/` (`.info`, `.module`, `.inc`, `.install`, `.admin.inc`, `.pages.inc`, `.drush.inc`, `*.php`, and all nested custom classes/traits/interfaces).
+- **Mandatory Step 0 Exact Path Derivation (Rule 18)**: Reading `migration.config.yml` first and constructing exact paths (`SOURCE_MODULE_PATH = os.path.join(source.path, source.custom_modules_path, MODULE)` and `TARGET_MODULE_PATH = os.path.join(target.path, target_custom_modules_path, MODULE)`).
+- Extracting and accounting for business rules, procedural hook implementations, and logic from all D7 module source files strictly within `SOURCE_MODULE_PATH` (`.info`, `.module`, `.inc`, `.install`, `.admin.inc`, `.pages.inc`, `.drush.inc`, `*.php`, and all nested custom classes/traits/interfaces).
 - **Target `composer.json` & Contrib Introspection**: Introspecting `<target.path>/composer.json`, `<target.path>/composer.lock`, and `<target.path>/web/modules/contrib/` to discover installed Drupal core subsystems and modern contrib packages, auto-resolving legacy D7 dependencies to active modern services/plugins without raising unnecessary human blockers.
-- **From-Scratch Scaffolding (`NEW_TARGET_MODULE`)**: When `<MODULE>` is absent in `<target.path>`, scaffolding the modern D10 module from the ground up, faithfully reproducing business logic, cache metadata (`#cache['tags']`, `#cache['contexts']`, `#cache['max-age']`), custom permissions, access checkers, CSRF tokens, output sanitization, and Symfony Event Subscribers using 100% pure modern Drupal 10 standards.
-- **Existing Target Reconciliation (`EXISTING_TARGET_MODULE`)**: When `<MODULE>` already exists in `<target.path>`, reconciling gaps surgically without overwriting working D10 implementations.
+- **From-Scratch Scaffolding (`NEW_TARGET_MODULE`)**: When `<MODULE>` is absent in `<target.path>`, scaffolding the modern D10 module from the ground up inside `TARGET_MODULE_PATH`, faithfully reproducing business logic, cache metadata (`#cache['tags']`, `#cache['contexts']`, `#cache['max-age']`), custom permissions, access checkers, CSRF tokens, output sanitization, and Symfony Event Subscribers using 100% pure modern Drupal 10 standards.
+- **Existing Target Reconciliation (`EXISTING_TARGET_MODULE`)**: When `<MODULE>` already exists in `TARGET_MODULE_PATH`, reconciling gaps surgically without overwriting working D10 implementations.
 - Re-engineering procedural hook implementations (core, contrib, custom, alter, entity, form, theme, install/update) into modern PSR-4 classes, Symfony event subscribers, plugins, and services.
 - Decomposing `hook_menu()` into modern routing (`.routing.yml`), Controllers (`src/Controller/`), Form classes (`src/Form/`), custom Access Checkers (`src/Access/`), Menu links (`.links.menu.yml`), and Local tasks (`.links.task.yml`).
 - Re-engineering custom entities into modern Drupal 10/11 `@ContentEntityType` or `@ConfigEntityType` definitions (`src/Entity/`), interfaces (`src/Entity/<CustomEntity>Interface.php`), custom access control handlers (`src/Access/<CustomEntity>AccessControlHandler.php`), view builders (`src/Entity/<CustomEntity>ViewBuilder.php`), and storage handlers (`src/Storage/`).
 - Re-engineering legacy field instances into modern base field definitions (`baseFieldDefinitions()`) or CMI field configurations (`config/sync/field.storage.*.yml`, `config/sync/field.field.*.yml`).
 - Re-engineering custom database schemas and tables into appropriate D10/D11 targets: Content Entities (`src/Entity/`), Config Entities, Config API (`config.factory`), State API (`\Drupal::state()`), KeyValue stores, or dedicated Repository Services (`src/Repository/`) utilizing `\Drupal\Core\Database\Connection`.
 - Authoring module migration plans in `reports/custom-modules/PLAN-<MODULE>.md` (and `reports/migration/<MODULE>/<MODULE>_MIGRATION_PLAN.md`) with exhaustive file-to-class/function, hook-to-architecture, database table, and entity/field accounting.
-- Scaffolding modern module architecture in `<target.path>/<target_custom_modules_path>/<MODULE>/`.
+- Scaffolding modern module architecture in `TARGET_MODULE_PATH` (`<target.path>/<target_custom_modules_path>/<MODULE>/`).
 - Generating `.info.yml`, `.services.yml`, `.routing.yml`, `.permissions.yml`, `.links.menu.yml`, `.links.task.yml`, `.links.action.yml`, `.links.contextual.yml`, and `drush.services.yml`.
 - Authoring modern PSR-4 OOP classes (`src/Service/`, `src/Controller/`, `src/Form/`, `src/Plugin/`, `src/EventSubscriber/`, `src/Access/`, `src/Drush/Commands/`, `src/Entity/`, `src/Repository/`).
 - Modernizing constructors: converting legacy `ClassName()` and `__construct()` global dependencies into clean constructor Dependency Injection.
 - Delegating scoped service refactoring and database query modernization to `api-modernization`.
-- Scaffolding Unit and Kernel test suites in `<target.path>/<target_custom_modules_path>/<MODULE>/tests/`.
+- Scaffolding Unit and Kernel test suites in `TARGET_MODULE_PATH/tests/`.
 - Logging all mutations in `logs/file-change-log/`.
 - Proposing component state transitions via `agent_result` with explicit outcome statuses for all files, classes, callables, procedural hooks, database tables, and entity/field definitions.
-- Supporting both `FULL_WORKSPACE` orchestration waves and explicit `SINGLE_MODULE` execution (`/migrate-module <MODULE>`), enforcing strict write boundaries exclusively to `<target.path>/<target_custom_modules_path>/<MODULE>/`.
-- Flagging any required cross-boundary modifications outside `<target.path>/<target_custom_modules_path>/<MODULE>/` as `REQUIRES_EXTERNAL_CHANGE` rather than silently mutating external files.
+- Supporting both `FULL_WORKSPACE` orchestration waves and explicit `SINGLE_MODULE` execution (`/migrate-module <MODULE>`), enforcing strict write boundaries exclusively to `TARGET_MODULE_PATH`.
+- Flagging any required cross-boundary modifications outside `TARGET_MODULE_PATH` as `REQUIRES_EXTERNAL_CHANGE` rather than silently mutating external files.
 
 ---
 
 ## 4. Forbidden Scope
+- Running broad workspace searches (`glob`, `grep`, `find .`, `FileSearch`) across root or sibling folders to locate modules (Rule 18).
 - Searching, inspecting, grepping, or referencing files in sibling folders, parent directories, or backup repositories outside the configured `source.path` and `target.path` (Rule 16).
 - Raising unnecessary `HUMAN_INTERVENTION_REQUIRED` blockers for dependencies that are already absorbed into D10 core or present in target `composer.json` / `web/modules/contrib/`.
 - Blind 1:1 procedural code conversion, mechanical file renaming, or inline static `\Drupal::*` substitutions in service classes.
@@ -124,18 +126,23 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 ---
 
 ## 12. Operational Execution Procedure
-1. Verify all declared upstream custom dependencies are `COMPLETED` in `state/migration-state.yml`.
-2. **Target Introspection**: Parse `<target.path>/composer.json` and `<target.path>/web/modules/contrib/` to inventory all available modern modules and services.
-3. Inspect legacy source files under `source.path` for the module, cataloging all hooks, classes, `.inc` files, database queries, and variables.
-4. Auto-resolve legacy contrib dependencies:
+1. **Mandatory Step 0: Zero-Search Exact Path Derivation (Rule 18)**:
+   - Read `migration.config.yml` first and programmatically derive:
+     - `SOURCE_MODULE_PATH = os.path.join(source.path, source.custom_modules_path, MODULE)`
+     - `TARGET_MODULE_PATH = os.path.join(target.path, target_custom_modules_path, MODULE)`
+   - Verify `SOURCE_MODULE_PATH` exists on disk. If not found, halt immediately with error without running broad workspace searches.
+2. Verify all declared upstream custom dependencies are `COMPLETED` in `state/migration-state.yml`.
+3. **Target Introspection**: Parse `<target.path>/composer.json` and `<target.path>/web/modules/contrib/` to inventory all available modern modules and services.
+4. Inspect legacy source files strictly within `SOURCE_MODULE_PATH` for the module, cataloging all hooks, classes, `.inc` files, database queries, and variables.
+5. Auto-resolve legacy contrib dependencies:
    - Check if absorbed into D10 core $\to$ map directly to modern core service.
    - Check if present in target `composer.json` $\to$ map directly to active contrib API.
    - Only mark `HUMAN_INTERVENTION_REQUIRED` if fully unresolvable with available project information.
-5. Determine Scaffolding Mode:
-   - If target directory does not exist $\to$ `NEW_TARGET_MODULE`: Scaffold modern D10 module from scratch with full behavioral fidelity (caching, security, inter-module hooks/services) using 100% modern Drupal 10 standards.
+6. Determine Scaffolding Mode:
+   - If target directory does not exist $\to$ `NEW_TARGET_MODULE`: Scaffold modern D10 module from scratch inside `TARGET_MODULE_PATH` with full behavioral fidelity (caching, security, inter-module hooks/services) using 100% modern Drupal 10 standards.
    - If target directory exists $\to$ `EXISTING_TARGET_MODULE`: Reconcile gaps without destroying working code.
-6. Author the module migration plan in `reports/custom-modules/PLAN-<MODULE>.md` detailing target classes, routes, services, schemas, and test suites.
-7. Scaffold modern module layout in `<target.path>/<target_custom_modules_path>/<MODULE>/`:
+7. Author the module migration plan in `reports/custom-modules/PLAN-<MODULE>.md` detailing target classes, routes, services, schemas, and test suites.
+8. Scaffold modern module layout in `TARGET_MODULE_PATH`:
    - `<MODULE>.info.yml` (module metadata, dependencies).
    - `<MODULE>.services.yml` (services, event subscribers, access checkers).
    - `<MODULE>.routing.yml` (routes, permissions, controller bindings).

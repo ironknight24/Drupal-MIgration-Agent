@@ -11,9 +11,10 @@ allowed-tools: Read, Grep, Find
 
 ## Overview
 This skill provides the operational engineering playbook for re-engineering Drupal 7 custom modules into modern, object-oriented Drupal 10 and Drupal 11 modules without altering source files. It enforces:
-1. **Strict Path Boundary Confinement**: All source reads are strictly confined to `<source.path>` and target operations to `<target.path>`. The agent is strictly prohibited from searching, reading, or referencing files in adjacent directories, sibling folders, parent directories, or backup repositories outside the configured paths (Rule 16).
-2. **From-Scratch Scaffolding Protocol (`NEW_TARGET_MODULE`)**: When `<MODULE>` is absent in `<target.path>`, the agent scaffolds the modern D10 module from the ground up, faithfully reproducing legacy business behavior, caching mechanisms (bubbleable cache tags, contexts, max-age), security controls (permissions, access checkers, CSRF, output sanitization), and inter-module interactions using 100% pure modern Drupal 10/11 standards (PSR-4, Constructor Dependency Injection, CMI YAML, Twig).
-3. **Existing Target Reconciliation (`EXISTING_TARGET_MODULE`)**: When `<MODULE>` already exists in `<target.path>`, the agent reconciles gaps surgically without destroying working D10 implementations.
+1. **Mandatory Step 0 Zero-Search Exact Path Derivation (Rule 18)**: Construct `SOURCE_MODULE_PATH = os.path.join(source.path, source.custom_modules_path, MODULE)` and `TARGET_MODULE_PATH = os.path.join(target.path, target_custom_modules_path, MODULE)` strictly from `migration.config.yml`. Never run broad workspace searches (`glob`, `grep`, `find .`) across root or sibling directories.
+2. **Strict Path Boundary Confinement (Rule 16)**: All source reads are strictly confined to `SOURCE_MODULE_PATH` and target operations to `TARGET_MODULE_PATH`. The agent is strictly prohibited from searching, reading, or referencing files in adjacent directories, sibling folders, parent directories, or backup repositories outside the configured paths.
+3. **From-Scratch Scaffolding Protocol (`NEW_TARGET_MODULE`, Rule 17)**: When `<MODULE>` is absent in `<target.path>`, the agent scaffolds the modern D10 module from the ground up inside `TARGET_MODULE_PATH`, faithfully reproducing legacy business behavior, caching mechanisms (bubbleable cache tags, contexts, max-age), security controls (permissions, access checkers, CSRF, output sanitization), and inter-module interactions using 100% pure modern Drupal 10/11 standards (PSR-4, Constructor Dependency Injection, CMI YAML, Twig).
+4. **Existing Target Reconciliation (`EXISTING_TARGET_MODULE`)**: When `<MODULE>` already exists in `TARGET_MODULE_PATH`, the agent reconciles gaps surgically without destroying working D10 implementations.
 
 ---
 
@@ -42,7 +43,9 @@ Determine target version from project configuration (`target.core_version`):
 
 ## The 13-Step Modernization Playbook
 
-1. **Step 1: Recursive Inventory, Source Asset, Hook, Entity, Form, Frontend, Views & Integration Discovery**
+1. **Step 1: Exact Path Derivation, Recursive Inventory & Source Discovery**
+   - Read `migration.config.yml` and compute `SOURCE_MODULE_PATH = os.path.join(source.path, source.custom_modules_path, MODULE)`.
+   - Confine file scanning strictly to `SOURCE_MODULE_PATH` without broad searches across adjacent folders.
    - Recursively catalog all source files (`.info`, `.module`, `.inc`, `.install`, `*.php`, `*.profile`, `.drush.inc`, `.js`, `.css`, `*.views_default.inc`, `*.views.inc`) across root and subdirectories (`includes/`, `lib/`, `classes/`, `src/`, `admin/`, `commands/`, `views/`, etc.).
    - Dissect every custom PHP file, class, interface, trait, constructor, procedural hook implementation, custom entity type, field definition, revision mechanism, translation setting, form builder, form alter, AJAX callback, configuration/state access, frontend behavior, Views definition / custom handler plugin, external system integration, and runtime behavior.
    - Catalog discovered artifacts into the respective taxonomies (9-type hook taxonomy, 20-type configuration taxonomy, 26-target entity taxonomy, 19-target form/AJAX taxonomy, 21-target frontend taxonomy, 30-target Views taxonomy, 35-target dynamic taxonomy, 35-target integration taxonomy, 40-target runtime taxonomy).
