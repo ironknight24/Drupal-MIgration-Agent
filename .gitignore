@@ -31,5 +31,9 @@ scratch/
 tmp/
 *.tmp
 
+# Memory & Context Persistence
+memory.json
+memory*.json
+
 # Ensure gitkeeps are tracked
 !.gitkeep
