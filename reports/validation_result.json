@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260925173952",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260925180220",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-25T17:39:52.915870+00:00",
+  "executed_at": "2026-09-25T18:02:20.383915+00:00",
   "summary": {
-    "checks_total": 493,
-    "passed": 490,
+    "checks_total": 494,
+    "passed": 491,
     "failed": 0,
     "warnings": 0,
     "unverified": 3
@@ -5374,6 +5374,18 @@
         "SAFETY_RULES.md",
         "agents/custom-module/agent.md",
         "skills/custom-module-migration/SKILL.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-21",
+      "category": "single_module",
+      "name": "Root CLAUDE.md Runtime Directive & Zero-Search Confinement",
+      "status": "PASS",
+      "evidence": "Root CLAUDE.md codifies non-negotiable zero-search rules and forces Claude Code runtime to read migration.config.yml first.",
+      "details": "Verified CLAUDE.md runtime directive.",
+      "affected_files": [
+        "CLAUDE.md"
       ],
       "remediation": ""
     },

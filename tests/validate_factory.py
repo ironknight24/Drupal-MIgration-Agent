@@ -6947,6 +6947,19 @@ class FactoryValidator:
                               "Missing Mandatory Step 0 Zero-Search Exact Path Derivation protocol.",
                               "Must enforce Rule 18 zero-search path derivation.")
 
+        # 24.21 Root CLAUDE.md Runtime Directive & Zero-Search Confinement
+        claude_md = self.repo_root / "CLAUDE.md"
+        claude_txt = claude_md.read_text(encoding="utf-8") if claude_md.exists() else ""
+        if claude_md.exists() and "MANDATORY ZERO-SEARCH CONFIG CONFINEMENT" in claude_txt and "RULE 18" in claude_txt:
+            self.record_check("CHECK-SMM-21", "single_module", "Root CLAUDE.md Runtime Directive & Zero-Search Confinement", "PASS",
+                              "Root CLAUDE.md codifies non-negotiable zero-search rules and forces Claude Code runtime to read migration.config.yml first.",
+                              "Verified CLAUDE.md runtime directive.",
+                              affected_files=["CLAUDE.md"])
+        else:
+            self.record_check("CHECK-SMM-21", "single_module", "Root CLAUDE.md Runtime Directive & Zero-Search Confinement", "FAIL",
+                              "Missing or incomplete root CLAUDE.md.",
+                              "Must provide CLAUDE.md at repository root enforcing Rule 18 zero-search config confinement.")
+
     def validate_recursive_orchestration_suite(self):
         """Validates recursive dependency resolution, 3-path remediation, 10 canonical statuses, loop prevention, and LLM REMEDIATION INPUT."""
         orch_cmd = self.repo_root / "commands" / "orchestrate.md"
