@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260923134502",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260925144148",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-23T13:45:02.698364+00:00",
+  "executed_at": "2026-09-25T14:41:48.012056+00:00",
   "summary": {
-    "checks_total": 488,
-    "passed": 485,
+    "checks_total": 490,
+    "passed": 487,
     "failed": 0,
     "warnings": 0,
     "unverified": 3
@@ -266,7 +266,7 @@
       "category": "agents",
       "name": "Agent Handoff Integrity (custom-module)",
       "status": "PASS",
-      "evidence": "Downstream handoffs target valid lifecycle agents/roles: ['testing', 'validation']",
+      "evidence": "Downstream handoffs target valid lifecycle agents/roles: ['testing', 'validation', 'orchestrator']",
       "details": "Verified relational workflow continuity.",
       "affected_files": [
         "agents/custom-module/agent.md"
@@ -5304,6 +5304,34 @@
       "affected_files": [
         "commands/orchestrate.md",
         "agents/orchestrator/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-16",
+      "category": "single_module",
+      "name": "Path Boundary Confinement & Adjacent Directory Prohibition",
+      "status": "PASS",
+      "evidence": "Strictly confines source reads to source.path and target writes to target.path, prohibiting adjacent directory searches.",
+      "details": "Verified path boundary confinement and adjacent directory prohibition.",
+      "affected_files": [
+        "commands/migrate-module.md",
+        "SAFETY_RULES.md",
+        "agents/custom-module/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-17",
+      "category": "single_module",
+      "name": "From-Scratch D10 Generation Protocol for New Modules",
+      "status": "PASS",
+      "evidence": "Mandates scaffolding new D10 modules from scratch preserving behavior, caching, security, and inter-module hooks via pure D10 standards.",
+      "details": "Verified from-scratch D10 generation protocol.",
+      "affected_files": [
+        "commands/migrate-module.md",
+        "skills/custom-module-migration/SKILL.md",
+        "SAFETY_RULES.md"
       ],
       "remediation": ""
     },

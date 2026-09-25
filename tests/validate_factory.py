@@ -6889,6 +6889,29 @@ class FactoryValidator:
                               "Global /orchestrate workflow was compromised.",
                               "Must maintain full-workspace orchestration integrity.")
 
+        # 24.16 Path Boundary Confinement & Adjacent Directory Prohibition
+        safety_txt = (self.repo_root / "SAFETY_RULES.md").read_text(encoding="utf-8") if (self.repo_root / "SAFETY_RULES.md").exists() else ""
+        if "Adjacent Directory Prohibition" in c_txt and "RULE 16: Strict Path Confinement" in safety_txt and "Rule 16" in (cm_agent.read_text(encoding="utf-8") if cm_agent.exists() else ""):
+            self.record_check("CHECK-SMM-16", "single_module", "Path Boundary Confinement & Adjacent Directory Prohibition", "PASS",
+                              "Strictly confines source reads to source.path and target writes to target.path, prohibiting adjacent directory searches.",
+                              "Verified path boundary confinement and adjacent directory prohibition.",
+                              affected_files=["commands/migrate-module.md", "SAFETY_RULES.md", "agents/custom-module/agent.md"])
+        else:
+            self.record_check("CHECK-SMM-16", "single_module", "Path Boundary Confinement & Adjacent Directory Prohibition", "FAIL",
+                              "Missing path boundary confinement or adjacent directory prohibition.",
+                              "Must enforce Rule 16 path boundary confinement.")
+
+        # 24.17 From-Scratch D10 Generation Protocol for New Modules
+        if "NEW_TARGET_MODULE" in c_txt and "From-Scratch Scaffolding Protocol" in (cm_skill.read_text(encoding="utf-8") if cm_skill.exists() else "") and "RULE 17: Pure Drupal 10 Standards" in safety_txt:
+            self.record_check("CHECK-SMM-17", "single_module", "From-Scratch D10 Generation Protocol for New Modules", "PASS",
+                              "Mandates scaffolding new D10 modules from scratch preserving behavior, caching, security, and inter-module hooks via pure D10 standards.",
+                              "Verified from-scratch D10 generation protocol.",
+                              affected_files=["commands/migrate-module.md", "skills/custom-module-migration/SKILL.md", "SAFETY_RULES.md"])
+        else:
+            self.record_check("CHECK-SMM-17", "single_module", "From-Scratch D10 Generation Protocol for New Modules", "FAIL",
+                              "Missing from-scratch D10 generation protocol.",
+                              "Must enforce Rule 17 from-scratch scaffolding standards.")
+
     def validate_recursive_orchestration_suite(self):
         """Validates recursive dependency resolution, 3-path remediation, 10 canonical statuses, loop prevention, and LLM REMEDIATION INPUT."""
         orch_cmd = self.repo_root / "commands" / "orchestrate.md"

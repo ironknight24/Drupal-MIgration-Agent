@@ -55,23 +55,37 @@ Execute an isolated, recursive, dependency-aware, forensics-backed migration for
 
 ---
 
-### 4. Target Module Snapshot & Idempotency Check
-1. Resolve target module directory: `<target_custom_modules_path>/<MODULE_NAME>/`.
+### 4. Target Module Snapshot, Path Confinement & Scaffolding Mode
+1. **Strict Path Resolution & Boundary Lockdown**:
+   - Resolve target module directory strictly as: `<target.path>/<target_custom_modules_path>/<MODULE_NAME>/`.
+   - Resolve source module directory strictly within `<source.path>/.../<MODULE_NAME>/`.
+   - **Adjacent Directory Prohibition**: The agent is strictly **FORBIDDEN** from inspecting, grepping, or referencing files in sibling folders, parent directories, or backup repositories outside the configured `source.path` and `target.path`.
 2. Check existing state in `state/migration-state.yml`:
    - If `<MODULE_NAME>` is already `COMPLETE`:
      - If user did not pass `--force` or explicit re-run intent, notify user that module is already migrated and offer re-validation.
-3. If target module directory `<target_custom_modules_path>/<MODULE_NAME>/` already exists on disk:
-   - Snapshot existing files, calculate file list and checksums.
-   - Tag status as `EXISTING_TARGET_MODULE` (vs `NEW_TARGET_MODULE`).
-   - Reconcile legacy D7 functionality against existing D10 implementation rather than blindly overwriting.
+3. **Scaffolding Mode Selection**:
+   - **Mode A: Existing Target Module (`EXISTING_TARGET_MODULE`)**:
+     - If `<target.path>/<target_custom_modules_path>/<MODULE_NAME>/` already exists on disk:
+       - Snapshot existing files, calculate file list and checksums.
+       - Reconcile legacy D7 functionality against existing D10 implementation rather than blindly overwriting.
+       - Surgically add missing services, routes, or classes without destroying existing working D10 code.
+   - **Mode B: From-Scratch Module Generation (`NEW_TARGET_MODULE`)**:
+     - If `<MODULE_NAME>` does **NOT** exist in `<target.path>`:
+       - Scaffold the modern Drupal 10 module from scratch inside `<target.path>/<target_custom_modules_path>/<MODULE_NAME>/`.
+       - Re-engineer 100% of the D7 module's business rules, calculations, and workflows.
+       - Modernize caching to bubbleable cache metadata (`#cache['tags']`, `#cache['contexts']`, `#cache['max-age']`).
+       - Modernize security (custom permissions, access checkers, CSRF tokens, output sanitization, Rule 10 secret isolation).
+       - Modernize inter-module hooks and interactions into Symfony Event Subscribers and modern D10 hooks.
+       - Implement strictly using modern Drupal 10 standards: PSR-4 autoloading, Constructor Dependency Injection, CMI YAML (`config/install/`), and Twig templates (`templates/`).
 
 ---
 
 ### 5. D7 Source Baseline & Forensics
-1. Conduct exhaustive read-only inspection of D7 source at `<source_custom_modules_path>/<MODULE_NAME>/`:
-   - Scan all `.module`, `.install`, `.inc`, `.php`, `.info`, `.js`, `.css`, template, and asset files.
+1. Conduct exhaustive read-only inspection of D7 source strictly within `<source.path>/.../<MODULE_NAME>/`:
+   - Scan all `.module`, `.install`, `.inc`, `.php`, `.info`, `.js`, `.css`, template, and asset files belonging to this module.
+   - Never drift into adjacent modules or directories.
    - Catalog all functions, procedural hooks, custom OOP classes, constructors, methods, forms, routes, permissions, database queries (`hook_schema`), entity definitions, cache bins/tags, and external integrations.
-2. Create baseline report in `reports/migration/<MODULE_NAME>/<MODULE_NAME>_D7_BASELINE.md`.
+2. Create baseline report in `reports/migration/<MODULE_NAME>/<MODULE_NAME_D7_BASELINE.md`.
 
 ---
 
@@ -94,10 +108,11 @@ Execute an isolated, recursive, dependency-aware, forensics-backed migration for
 1. Dispatch `custom-module` agent (`agents/custom-module/agent.md`) with:
    - `component_id`: `<MODULE_NAME>`
    - `execution_scope`: `SINGLE_MODULE`
-   - `target_dir`: `<target_custom_modules_path>/<MODULE_NAME>/`
+   - `source_dir`: `<source.path>/.../<MODULE_NAME>/`
+   - `target_dir`: `<target.path>/<target_custom_modules_path>/<MODULE_NAME>/`
 2. **Strict Write Boundary Enforcement**:
-   - Authorized write target: **ONLY** `<target_custom_modules_path>/<MODULE_NAME>/**/*` and `reports/migration/<MODULE_NAME>/*`.
-   - **FORBIDDEN WRITES**: D7 source (strictly READ-ONLY), other custom modules, contrib modules, Drupal core, vendor, themes, global config.
+   - Authorized write target: **ONLY** `<target.path>/<target_custom_modules_path>/<MODULE_NAME>/**/*` and `reports/migration/<MODULE_NAME>/*`.
+   - **FORBIDDEN WRITES & READS**: Sibling directories, adjacent workspaces, D7 source (strictly READ-ONLY), other custom modules, contrib modules, Drupal core, vendor, themes, global config.
    - Log all created/updated files in `logs/file-change-log/`.
 
 ---

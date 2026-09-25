@@ -51,6 +51,12 @@ Direct 1:1 translation of procedural code into static classes or global calls is
 ### RULE 15: Preserve Business Behavior Unless Explicitly Documented
 Business rules, validation logic, access restrictions, calculation routines, and workflow triggers must remain functionally identical to D7 unless a deliberate change was specified and documented in the approved migration plan.
 
+### RULE 16: Strict Path Confinement & Adjacent Directory Prohibition
+All source code reads must be strictly confined to `source.path` and all target code writes/inspections must be strictly confined to `target.path` as declared in `migration.config.yml`. The agent is strictly prohibited from searching, inspecting, referencing, or importing code from adjacent directories, sibling folders, parent directories, or backup repositories outside the configured `source.path` and `target.path`.
+
+### RULE 17: Pure Drupal 10 Standards for From-Scratch Module Generation
+When a custom module exists in `source.path` and does not exist in `target.path`, the agent must scaffold and generate the modern D10 module from scratch. It must faithfully reproduce the D7 module's business behavior, caching mechanisms (tags/contexts/max-age), security controls (permissions/CSRF/access checkers), and inter-module interactions (events/hooks/services) using 100% pure modern Drupal 10/11 standards (PSR-4 autoloading, Constructor Dependency Injection, CMI YAML configuration, Twig templates).
+
 ---
 
 ## Enforceable Path Protection Mechanics

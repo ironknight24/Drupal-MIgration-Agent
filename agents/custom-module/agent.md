@@ -20,28 +20,31 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 ---
 
 ## 3. Allowed Scope
-- Extracting and accounting for business rules, procedural hook implementations, and logic from all D7 module source files (`.info`, `.module`, `.inc`, `.install`, `.admin.inc`, `.pages.inc`, `.drush.inc`, `*.php`, and all nested custom classes/traits/interfaces).
+- Extracting and accounting for business rules, procedural hook implementations, and logic from all D7 module source files strictly within `<source.path>/.../<MODULE>/` (`.info`, `.module`, `.inc`, `.install`, `.admin.inc`, `.pages.inc`, `.drush.inc`, `*.php`, and all nested custom classes/traits/interfaces).
 - Consuming the custom PHP class, constructor, procedural hook, alter hook, `.inc` discovery analysis, include graphs, custom database schemas (`hook_schema`), custom entities (`hook_entity_info`), field definitions, and caller references produced by `discovery`.
+- **From-Scratch Scaffolding (`NEW_TARGET_MODULE`)**: When `<MODULE>` is absent in `<target.path>`, scaffolding the modern D10 module from the ground up, faithfully reproducing business logic, cache metadata (`#cache['tags']`, `#cache['contexts']`, `#cache['max-age']`), custom permissions, access checkers, CSRF tokens, output sanitization, and Symfony Event Subscribers using 100% pure modern Drupal 10 standards.
+- **Existing Target Reconciliation (`EXISTING_TARGET_MODULE`)**: When `<MODULE>` already exists in `<target.path>`, reconciling gaps surgically without overwriting working D10 implementations.
 - Re-engineering procedural hook implementations (core, contrib, custom, alter, entity, form, theme, install/update) into modern PSR-4 classes, Symfony event subscribers, plugins, and services.
 - Decomposing `hook_menu()` into modern routing (`.routing.yml`), Controllers (`src/Controller/`), Form classes (`src/Form/`), custom Access Checkers (`src/Access/`), Menu links (`.links.menu.yml`), and Local tasks (`.links.task.yml`).
 - Re-engineering custom entities into modern Drupal 10/11 `@ContentEntityType` or `@ConfigEntityType` definitions (`src/Entity/`), interfaces (`src/Entity/<CustomEntity>Interface.php`), custom access control handlers (`src/Access/<CustomEntity>AccessControlHandler.php`), view builders (`src/Entity/<CustomEntity>ViewBuilder.php`), and storage handlers (`src/Storage/`).
 - Re-engineering legacy field instances into modern base field definitions (`baseFieldDefinitions()`) or CMI field configurations (`config/sync/field.storage.*.yml`, `config/sync/field.field.*.yml`).
 - Re-engineering custom database schemas and tables into appropriate D10/D11 targets: Content Entities (`src/Entity/`), Config Entities, Config API (`config.factory`), State API (`\Drupal::state()`), KeyValue stores, or dedicated Repository Services (`src/Repository/`) utilizing `\Drupal\Core\Database\Connection`.
 - Authoring module migration plans in `reports/custom-modules/PLAN-<MODULE>.md` (and `reports/migration/<MODULE>/<MODULE>_MIGRATION_PLAN.md`) with exhaustive file-to-class/function, hook-to-architecture, database table, and entity/field accounting.
-- Scaffolding modern module architecture in `<target_module_dir>/<MODULE>/`.
+- Scaffolding modern module architecture in `<target.path>/<target_custom_modules_path>/<MODULE>/`.
 - Generating `.info.yml`, `.services.yml`, `.routing.yml`, `.permissions.yml`, `.links.menu.yml`, `.links.task.yml`, `.links.action.yml`, `.links.contextual.yml`, and `drush.services.yml`.
 - Authoring modern PSR-4 OOP classes (`src/Service/`, `src/Controller/`, `src/Form/`, `src/Plugin/`, `src/EventSubscriber/`, `src/Access/`, `src/Drush/Commands/`, `src/Entity/`, `src/Repository/`).
 - Modernizing constructors: converting legacy `ClassName()` and `__construct()` global dependencies into clean constructor Dependency Injection.
 - Delegating scoped service refactoring and database query modernization to `api-modernization`.
-- Scaffolding Unit and Kernel test suites in `<target_module_dir>/<MODULE>/tests/`.
+- Scaffolding Unit and Kernel test suites in `<target.path>/<target_custom_modules_path>/<MODULE>/tests/`.
 - Logging all mutations in `logs/file-change-log/`.
 - Proposing component state transitions via `agent_result` with explicit outcome statuses for all files, classes, callables, procedural hooks, database tables, and entity/field definitions.
-- Supporting both `FULL_WORKSPACE` orchestration waves and explicit `SINGLE_MODULE` execution (`/migrate-module <MODULE>`), enforcing strict write boundaries exclusively to `<target_module_dir>/<MODULE>/`.
-- Flagging any required cross-boundary modifications outside `<target_module_dir>/<MODULE>/` as `REQUIRES_EXTERNAL_CHANGE` rather than silently mutating external files.
+- Supporting both `FULL_WORKSPACE` orchestration waves and explicit `SINGLE_MODULE` execution (`/migrate-module <MODULE>`), enforcing strict write boundaries exclusively to `<target.path>/<target_custom_modules_path>/<MODULE>/`.
+- Flagging any required cross-boundary modifications outside `<target.path>/<target_custom_modules_path>/<MODULE>/` as `REQUIRES_EXTERNAL_CHANGE` rather than silently mutating external files.
 
 ---
 
 ## 4. Forbidden Scope
+- Searching, inspecting, grepping, or referencing files in sibling folders, parent directories, or backup repositories outside the configured `source.path` and `target.path` (Rule 16).
 - Blind 1:1 procedural code conversion, mechanical file renaming, or inline static `\Drupal::*` substitutions in service classes.
 - Silently omitting or dropping any discovered custom PHP file, class, interface, trait, function, constructor, entity type, bundle, or field definition.
 - Mutating D7 source code under `source.path` (Rule 1 & Rule 2).
@@ -53,7 +56,7 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 ---
 
 ## 5. Read Permissions
-- `source.path/**/*` (D7 custom module files - read-only).
+- `source.path/<source_custom_modules_path>/<MODULE>/**/*` (D7 custom module files strictly inside `source.path` - read-only).
 - `state/migration-manifest.yml` (component inventory, `custom_php_files`, `inc_files`, `entities_fields_items` & dependencies).
 - `state/migration-state.yml` (runtime status of dependencies).
 - `reports/discovery/**/*` (discovery findings & class inventory).
@@ -63,7 +66,7 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 ---
 
 ## 6. Write Permissions
-- `<target_module_dir>/<MODULE>/**/*` (scaffolding and OOP code in target).
+- `<target.path>/<target_custom_modules_path>/<MODULE>/**/*` (scaffolding and OOP code strictly in target module directory).
 - `reports/custom-modules/PLAN-<MODULE>.md` (Step 7 plan with class/function/entity mapping matrix).
 - `reports/custom-modules/REPORT-<MODULE>.md` (Step 12 report with class/file/entity verification outcomes).
 - `reports/blocked/BLOCKED-<MODULE>-*.md` (module blocker tickets).
@@ -71,9 +74,10 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 
 ---
 
-## 7. Forbidden Writes
+## 7. Forbidden Writes & Reads
 - `source.path/**/*` (strictly read-only).
-- Target files outside `<target_module_dir>/<MODULE>/`.
+- Files outside `source.path` or `target.path` (strictly prohibited).
+- Target files outside `<target.path>/<target_custom_modules_path>/<MODULE>/`.
 - `state/migration-state.yml` (owned by Orchestrator).
 - `state/migration-manifest.yml` (owned by Discovery).
 
@@ -98,144 +102,130 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 ## 10. Required Inputs
 - Legacy module files under `source.path` (including all root and sub-directory `.php`, `.inc`, and `.module` files).
 - Target namespace and Drupal version from `migration.config.yml`.
-- Upstream service definitions in target codebase.
-- Standard templates: `templates/migration-plan.md` and `templates/file-change-log.md`.
+- Discovery inventory for the module from `state/migration-manifest.yml`.
+- Dependency coupling analysis from `reports/dependencies/`.
 
 ---
 
 ## 11. Skill & Reference Dependencies
-- **Primary Associated Skills**:
-  - [`skills/custom-module-migration`](../../skills/custom-module-migration/SKILL.md) (12-step modernization playbook with class, entity, & `.inc` re-engineering)
-  - [`skills/d7-to-d10-mapping`](../../skills/d7-to-d10-mapping/SKILL.md) (Procedural & legacy OOP to modern D10/D11 architecture mapping)
-  - [`skills/d10-architecture`](../../skills/d10-architecture/SKILL.md) (Modern DI standards, container injection, PHP 8 attributes)
-- **Canonical References**:
-  - [Drupal 10 & 11 Plugin Types & Modern Architecture](../../references/drupal-10/plugin-types.md)
-  - [Drupal 7 Hooks to Modern Architecture Catalog](../../references/drupal-7/hooks.md)
-  - [Common Migration & Modernization Patterns](../../references/migration-patterns/common-conversions.md)
+- `skills/custom-module-migration/SKILL.md` (Modernization methodology).
+- `skills/d7-to-d10-mapping/SKILL.md` (Hook/API mapping rules).
+- `skills/d10-architecture/SKILL.md` (OOP, plugins, services).
+- `skills/configuration-migration/SKILL.md` (Schema & variables).
+- `skills/testing/SKILL.md` (Test generation).
+- `skills/behavioral-validation/SKILL.md` (Verification).
+- `references/drupal-10/plugin-types.md` (Plugin references).
+- `references/drupal-7/hooks.md` (Hook references).
+- `references/migration-patterns/common-conversions.md` (Conversion patterns).
 
 ---
 
 ## 12. Operational Execution Procedure
-1. **Source, Class, `.inc` & Entity Inventory Review (Steps 1–6)**:
-   - Audit all legacy `.module`, `.install`, `.php`, and `.inc` files.
-   - Review class definitions, interfaces, traits, and constructors (`__construct()` or legacy `ClassName()`).
-   - Analyze constructor dependencies, global state usage (`$user`, `$language`, `variable_get()`), entity definitions, and call trees.
-2. **D10/D11 Architectural Mapping (Non-1:1 Transformation)**:
-   - Determine modern PSR-4 Drupal 10/11 target for each class and functional unit:
-     - **Architectural Replacement vs Direct Port**: If the subsystem was replaced by a modern paradigm (e.g. legacy procedural group/community subsystem $\to$ modern entity/access architecture), decompose source behaviors and map to target architecture rather than attempting literal syntax translation.
-     - **Inspect Existing Target Implementations First**: Inspect existing classes, services, and plugins in target codebase; extend existing implementations to satisfy missing behaviors rather than creating duplicate competing classes.
-     - D7 business logic class $\rightarrow$ D10 Service class in `src/Service/` registered in `.services.yml`
-     - D7 custom entity $\rightarrow$ `@ContentEntityType` / `@ConfigEntityType` in `src/Entity/` with interface in `src/Entity/`
-     - D7 page/router callback $\rightarrow$ D10 Controller in `src/Controller/`
-     - D7 standard form callback/builder $\rightarrow$ D10 `FormBase` class in `src/Form/`
-     - D7 admin settings form / `system_settings_form()` $\rightarrow$ D10 `ConfigFormBase` in `src/Form/`
-     - D7 confirmation form / `confirm_form()` $\rightarrow$ D10 `ConfirmFormBase` in `src/Form/`
-     - D7 entity edit form $\rightarrow$ D10 `ContentEntityForm` in `src/Form/`
-     - D7 AJAX callback $\rightarrow$ D10 `AjaxResponse` returning `CommandInterface` objects
-     - D7 client-side JavaScript / `Drupal.behaviors` $\rightarrow$ D10 `once()` behavior in `js/` registered in `<module>.libraries.yml` with `core/drupal`, `core/drupalSettings`, `core/once`
-     - D7 `Drupal.settings` $\rightarrow$ D10 `#attached['drupalSettings']` + client `drupalSettings` parameter
-     - D7 CSS stylesheets $\rightarrow$ D10 SMACSS structured `<module>.libraries.yml` definitions in `css/`
-     - D7 Views definition / `hook_views_default_views()` $\rightarrow$ D10 CMI View in `config/install/views.view.<view_id>.yml`
-     - D7 custom Views handler / plugin $\rightarrow$ D10 annotated plugin in `src/Plugin/views/` (`@ViewsField`, `@ViewsFilter`, `@ViewsArgument`, `@ViewsSort`, `@ViewsRelationship`, `@ViewsArea`, `@ViewsPager`, `@ViewsAccess`, `@ViewsQuery`, `@ViewsStyle`, `@ViewsRow`, `@ViewsDisplay`)
-     - D7 Views data definition (`hook_views_data`) $\rightarrow$ D10 `hook_views_data()` in `<module>.views.inc`
-     - D7 form alter (`hook_form_alter`) $\rightarrow$ D10 `hook_form_alter()` or EventSubscriber
-     - D7 Drush command $\rightarrow$ modern Drush Command class in `src/Drush/Commands/`
-     - D7 access callback $\rightarrow$ D10 Custom Access Check service in `src/Access/` or `EntityAccessControlHandler`
-     - D7 batch/queue callback $\rightarrow$ D10 Batch API / QueueWorker plugin in `src/Plugin/QueueWorker/`
-     - D7 value object $\rightarrow$ PSR-4 typed class in `src/Model/` or `src/ValueObject/`
-   - Consolidate or decompose files as justified (one legacy PHP file may produce multiple D10 classes; multiple legacy files may merge into one cohesive service).
-3. **Constructor Modernization & Dependency Injection**:
-   - Refactor constructors to modern `public function __construct(...)` with explicit typehints.
-   - Convert global references and static API calls to constructor-injected services (`database`, `entity_type.manager`, `config.factory`, `current_user`).
-   - Avoid unnecessary service proliferation; only inject genuinely required dependencies.
-4. **Author Migration Plan (Step 7)**:
-   - Write `reports/custom-modules/PLAN-<MODULE>.md` detailing modern class hierarchy, entity definitions, form classes, service container definitions, library declarations, JavaScript behaviors, CSS stylesheets, Views configurations, custom Views plugins, routing, and an exhaustive File-to-Class/Function/Entity/Form/Frontend/Views Accounting Table.
-5. **Target Scaffolding (Step 8)**:
-   - Create `<target_module_dir>/<MODULE>/<MODULE>.info.yml`.
-   - Scaffold `<MODULE>.services.yml`, `<MODULE>.routing.yml`, `<MODULE>.permissions.yml`, `<MODULE>.libraries.yml`, `drush.services.yml`, `<MODULE>.views.inc` where needed.
-6. **OOP, Entity, Form, Frontend & Views Implementation & Scoped Delegation**:
-   - Implement controllers, form classes (`FormBase`, `ConfigFormBase`, `ConfirmFormBase`, `ContentEntityForm`), AJAX handlers, JavaScript `once()` behaviors (`js/`), SMACSS stylesheets (`css/`), `.libraries.yml` definitions, Views configurations (`config/install/views.view.*.yml`), custom Views plugins (`src/Plugin/views/`), services, custom entities, Drush commands, and plugins with constructor Dependency Injection.
-   - If complex procedural-to-service conversion is required, delegate scoped service authoring to `api-modernization`.
-   - Author Unit and Kernel test classes in `tests/src/Unit/` and `tests/src/Kernel/`.
-7. **Log File Mutations**: Register every created file in `logs/file-change-log/`.
-8. **Author Implementation Report & LLM Remediation Input (Step 12)**:
-    - Generate `reports/custom-modules/REPORT-<MODULE>.md` and `reports/migration/<MODULE>/<MODULE>_FINAL_VERDICT.md` recording explicit status for every source file, class, method, entity/field, form definition, frontend asset, View definition, and custom Views plugin classified under the 10 canonical statuses:
-      `COMPLETE`, `PARTIAL`, `MISSING`, `BLOCKED`, `HUMAN_INTERVENTION_REQUIRED`, `RUNTIME_UNVERIFIED`, `SUPERSEDED`, `REPLACED`, `OBSOLETE`, `EXCLUDED`.
-    - Apply the 3-Path Remediation Engine: auto-remediate evidence-backed gaps, escalate ambiguous decisions to `HUMAN_INTERVENTION_REQUIRED` without guessing, and mark dynamic items as `RUNTIME_UNVERIFIED`.
-    - Embed the structured `## LLM REMEDIATION INPUT` section with stable Task IDs (e.g. `<MODULE>-SERVICE-001`).
-9. **Generate `agent_result`**: Output canonical result payload proposing transition to `COMPLETE` (or `PARTIAL`/`BLOCKED`/`HUMAN_INTERVENTION_REQUIRED`) with class, entity, form, frontend, and Views accounting evidence and requesting downstream handoff to `testing`.
+1. Verify all declared upstream dependencies are `COMPLETED` in `state/migration-state.yml`.
+2. Inspect legacy source files under `source.path` for the module, cataloging all hooks, classes, `.inc` files, database queries, and variables.
+3. Determine Scaffolding Mode:
+   - If target directory does not exist $\to$ `NEW_TARGET_MODULE`: Scaffold modern D10 module from scratch with full behavioral fidelity (caching, security, inter-module hooks/services) using 100% modern Drupal 10 standards.
+   - If target directory exists $\to$ `EXISTING_TARGET_MODULE`: Reconcile gaps without destroying working code.
+4. Author the module migration plan in `reports/custom-modules/PLAN-<MODULE>.md` detailing target classes, routes, services, schemas, and test suites.
+5. Scaffold modern module layout in `<target.path>/<target_custom_modules_path>/<MODULE>/`:
+   - `<MODULE>.info.yml` (module metadata, dependencies).
+   - `<MODULE>.services.yml` (services, event subscribers, access checkers).
+   - `<MODULE>.routing.yml` (routes, permissions, controller bindings).
+   - `<MODULE>.permissions.yml` (custom permissions).
+   - `<MODULE>.links.menu.yml` / `<MODULE>.links.task.yml` (menu hierarchy).
+   - `<MODULE>.libraries.yml` (frontend assets).
+6. Author modern PSR-4 PHP classes in `src/`:
+   - `src/Service/` (re-engineered procedural functions and business logic).
+   - `src/Controller/` (page callbacks).
+   - `src/Form/` (forms extending `FormBase`, `ConfigFormBase`, `ConfirmFormBase`).
+   - `src/Plugin/` (Blocks, Field Formatters, Views plugins).
+   - `src/EventSubscriber/` (custom events and lifecycle hooks).
+   - `src/Entity/` (Content and Config entities).
+   - `src/Drush/Commands/` (Drush 12/13 command classes).
+7. Modernize all constructors to use Constructor Dependency Injection.
+8. Scaffold Unit and Kernel test suites in `tests/src/Unit/` and `tests/src/Kernel/`.
+9. Log all file writes to `logs/file-change-log/`.
+10. Generate the post-migration report in `reports/custom-modules/REPORT-<MODULE>.md`.
+11. Propose state transition via `agent_result` JSON payload with verified item outcomes.
 
 ---
 
 ## 13. Decision Rules & Target Version Branching
-- Reads `target.core_version` from `migration.config.yml`.
-- If D10.2+ or D11: prefers PHP 8 Attributes for new plugins (e.g. `#[Block]`, `#[FieldFormatter]`, `#[Drush\Command]`).
-- If D10.0-D10.1: uses DocBlock Annotations.
-- Enforces strict return types and typed properties for PHP >= 8.1 / 8.3.
-- If legacy class functionality is obsolete, explicitly mark as `OBSOLETE` or `EXCLUDED_WITH_REASON` with documented evidence; never drop silently.
+- If `target.drupal_version` is `10`:
+  - Target PHP >= 8.1.
+  - Use DocBlock annotations for plugins (`@Block`, `@FieldFormatter`).
+  - Use Constructor Promotion where clean, or standard constructor property assignment.
+- If `target.drupal_version` is `11`:
+  - Target PHP >= 8.3.
+  - Use PHP 8 Attributes for supported plugins (`#[Block]`, `#[FieldFormatter]`).
+  - Use strict types (`declare(strict_types=1);`) and typed class properties.
+- If legacy module uses `variable_get()` with default values:
+  - Migrate to CMI schema in `config/schema/<MODULE>.schema.yml` and default YAML in `config/install/<MODULE>.settings.yml`.
+- If legacy module uses `variable_get()` for runtime flags or timestamps:
+  - Migrate to State API (`\Drupal::state()`).
 
 ---
 
 ## 14. Artifact & Evidence Outputs
-- Modernized module in `<target_module_dir>/<MODULE>/`.
-- Module Migration Plan: `reports/custom-modules/PLAN-<MODULE>.md` (with class, `.inc`, and entity accounting).
-- Implementation Report: `reports/custom-modules/REPORT-<MODULE>.md` (with outcome verification).
-- Append entries in `logs/file-change-log/`.
-- Canonical result: `agent_result` payload.
+- Modernized module directory: `<target.path>/<target_custom_modules_path>/<MODULE>/`
+- Migration plan: `reports/custom-modules/PLAN-<MODULE>.md`
+- Migration report: `reports/custom-modules/REPORT-<MODULE>.md`
+- Blocker tickets: `reports/blocked/BLOCKED-<MODULE>-*.md` (if blocked)
+- File change log entries: `logs/file-change-log/`
 
 ---
 
 ## 15. Proposed State Updates
-- Proposes updating component state:
-  `READY` -> `PLANNED` -> `SCAFFOLDED` -> `IN_PROGRESS` -> `proposed_to_state: CODE_COMPLETE`.
+The agent proposes transitions for `component_states.<MODULE>` via `agent_result`:
+- Target state: `CODE_COMPLETE` (on successful scaffolding and modernization).
+- Target state: `BLOCKED` (if unresolvable dependency or missing core requirement encountered).
+- Provides item-level status breakdowns for all discovered files, classes, hooks, schemas, and variables.
 
 ---
 
 ## 16. Structured Result Generation
-```yaml
-agent_result:
-  schema_version: "1.0"
-  execution_id: "exec-custom_booking-001"
-  attempt_number: 1
-  agent_name: "custom-module"
-  component_id: "custom_module.custom_booking"
-  lifecycle_phase: "phase_4_implementation"
-  current_wave: "wave_1"
-  execution_status: "SUCCESS"
-  state_transition:
-    from_state: "IN_PROGRESS"
-    proposed_to_state: "CODE_COMPLETE"
-  outputs:
-    code_artifacts:
-      - "<target_module_dir>/custom_booking/custom_booking.info.yml"
-      - "<target_module_dir>/custom_booking/src/Entity/Booking.php"
-      - "<target_module_dir>/custom_booking/src/BookingService.php"
-      - "<target_module_dir>/custom_booking/src/Drush/Commands/BookingCommands.php"
-    report_artifacts:
-      - "reports/custom-modules/REPORT-custom_booking.md"
-  evidence:
-    observed_facts:
-      - "Scaffolded modern module with 1 Content Entity, 2 PSR-4 services, 1 controller, 1 Drush command class"
-      - "All 4 discovered custom PHP/inc files, 3 classes, and 1 custom entity accounted for with 100% verified outcomes"
-  blockers: []
-  decisions_required: []
-  files_changed:
-    - path: "<target_module_dir>/custom_booking/custom_booking.info.yml"
-      operation: "CREATE"
-      reason: "Module declaration"
-  next_action:
-    target_agent: "testing"
+The agent produces a canonical `agent_result` payload:
+```json
+{
+  "schema_version": "1.0",
+  "agent": "custom-module",
+  "component_id": "example_module",
+  "component_type": "custom_module",
+  "status": "SUCCESS",
+  "proposed_state": "CODE_COMPLETE",
+  "items_summary": {
+    "total": 12,
+    "complete": 10,
+    "partial": 0,
+    "missing": 0,
+    "superseded": 2,
+    "blocked": 0,
+    "human_intervention_required": 0,
+    "runtime_unverified": 0
+  },
+  "artifacts_created": [
+    "custom/modules/example_module/example_module.info.yml",
+    "custom/modules/example_module/example_module.services.yml",
+    "custom/modules/example_module/src/Service/ExampleService.php"
+  ],
+  "reports_generated": [
+    "reports/custom-modules/PLAN-example_module.md",
+    "reports/custom-modules/REPORT-example_module.md"
+  ]
+}
 ```
 
 ---
 
 ## 17. Stop Conditions & Failure Handling
-- **`STOPPED`**: Upstream module dependency not completed.
-- **`BLOCKED`**: Undocumented business logic prevents architecture design (`BLOCKED-<MODULE>-BUSINESS-LOGIC.md`).
-- **`ESCALATED`**: Legacy code performs undocumented raw database mutations requiring architectural decision.
-- **`FAILED`**: Syntax errors or failed service container bindings.
+- **Missing Upstream Dependency**: If an upstream dependency is not `COMPLETED`, halt and propose `BLOCKED_UPSTREAM`.
+- **D7 Source Write Attempt**: Trigger security exception and halt immediately (Rule 1 & Rule 2).
+- **Out-of-Bounds Write Attempt**: If a write target resolves outside `<target.path>/<target_custom_modules_path>/<MODULE>/`, halt immediately.
+- **Unresolved Business Logic**: If procedural code contains ambiguous domain logic, record `[ASSUMPTION]` in plan and flag for human review (Rule 11).
 
 ---
 
 ## 18. Downstream Handoff
-- Hands off completed module code to the **Testing Agent** (`testing`) for test execution and static analysis, followed by `validation` for behavioral verification.
+- Hands off to `testing` agent for test execution and verification.
+- Hands off to `validation` agent for 12-dimensional behavioral parity audit.
+- Returns structured `agent_result` to `orchestrator`.
