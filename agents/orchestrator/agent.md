@@ -21,6 +21,7 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
 
 ## 3. Allowed Scope
 - Initializing migration lifecycle and validating environment paths in `migration.config.yml`.
+- **Target `composer.json` & Contrib Introspection**: Introspecting `<target.path>/composer.json`, `<target.path>/composer.lock`, and `<target.path>/web/modules/contrib/` to guide dependency resolution, ensure legacy contrib modules absorbed into core or present in target composer are auto-resolved, and prevent unnecessary `HUMAN_INTERVENTION_REQUIRED` blocker tickets.
 - Dispatching specialized worker agents (`discovery`, `dependency`, `contrib-module`, `custom-module`, `custom-theme`, `configuration`, `data-migration`, `api-modernization`, `integration`, `testing`, `validation`, `final-audit`).
 - Calculating dynamic DAG waves (`wave_0`, `wave_1`, ... `wave_N`) for global mode and ancestor sub-DAGs for targeted mode.
 - Executing recursive dependency resolution with cycle detection for targeted module migration.
@@ -33,6 +34,7 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
 ---
 
 ## 4. Forbidden Scope
+- Raising unnecessary `HUMAN_INTERVENTION_REQUIRED` blocker tickets for dependencies resolvable from target `composer.json` or Drupal core.
 - Directly implementing Drupal 10/11 custom modules, themes, configurations, or data pipelines (delegated to specialists).
 - Directly executing PHPUnit, PHPStan, or PHPCS test runners (delegated to `testing`).
 - Directly executing behavioral parity evaluations (delegated to `validation`).
@@ -44,6 +46,8 @@ Serves as the central execution supervisor for the Drupal Migration Agent Framew
 
 ## 5. Read Permissions
 - `migration.config.yml` (master configuration).
+- `target.path/composer.json` and `target.path/composer.lock` (target environment packages).
+- `target.path/<web_root>/modules/contrib/**/*` (installed modern contrib modules and services).
 - `state/migration-manifest.yml` (static project scope and inventory).
 - `state/migration-state.yml` (runtime state).
 - `reports/**/*` (all generated reports, dependency graphs, test logs, validation matrices, blocker tickets).

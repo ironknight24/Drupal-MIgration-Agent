@@ -10,7 +10,9 @@ allowed-tools: Read, Grep, Find
 # Dependency Analysis & Wave Scheduling Skill
 
 ## Overview
-This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, configuration, state, procedural hook execution ordering, module weights (`{system}.weight`), alter sequencing (`hook_module_implements_alter`), custom PHP class instantiations, entity reference graphs, revision/translation hierarchies, form builders, form alters, AJAX callbacks, legacy `.inc` function couplings, Views / custom plugin dependencies, theme / presentation layer inheritance, and dynamic runtime dependencies across legacy Drupal 7 components. It constructs a Directed Acyclic Graph (DAG) with explicit edge types (STATIC vs DYNAMIC vs RUNTIME_ONLY vs UNRESOLVED), detects circular dependencies, resolves dynamic fan-out, and organizes components into executable topological waves.
+This skill provides the procedural playbook and algorithms for discovering code, schema, lifecycle, configuration, state, procedural hook execution ordering, module weights (`{system}.weight`), alter sequencing (`hook_module_implements_alter`), custom PHP class instantiations, entity reference graphs, revision/translation hierarchies, form builders, form alters, AJAX callbacks, legacy `.inc` function couplings, Views / custom plugin dependencies, theme / presentation layer inheritance, and dynamic runtime dependencies across legacy Drupal 7 components.
+
+It integrates the **Target `composer.json` & Contrib Introspection Engine** to inspect `<target.path>/composer.json`, `<target.path>/composer.lock`, and `<target.path>/web/modules/contrib/`, automatically resolving legacy contrib dependencies to active modern D10 core subsystems or target packages without raising unnecessary human blockers. It constructs a Directed Acyclic Graph (DAG) with explicit edge types (STATIC vs DYNAMIC vs RUNTIME_ONLY vs UNRESOLVED), detects circular dependencies, resolves dynamic fan-out, and organizes components into executable topological waves.
 
 ---
 
@@ -24,9 +26,13 @@ This skill provides the procedural playbook and algorithms for discovering code,
 
 To establish an accurate DAG, inspect source assets across 11 distinct coupling vectors:
 
-### 1. Declared Dependencies
+### 1. Declared Dependencies & Target Environment Introspection
 - Parse `dependencies[]` declarations in source `.info` files (`[OBSERVED FACT]`).
 - Distinguish core module dependencies (`dependencies[] = taxonomy`) from contrib/custom dependencies.
+- **Target `composer.json` & Core Auto-Resolution**:
+  - Check if legacy dependency was absorbed into D10 core (e.g. `entityreference`, `date`, `views`, `ctools` plugin types, `block_class`) $\to$ resolve edge as `RESOLVED_BY_CORE`.
+  - Check if legacy dependency exists in `<target.path>/composer.json` (e.g. `drupal/group`, `drupal/paragraphs`, `drupal/token`, `drupal/key`) $\to$ resolve edge as `RESOLVED_BY_TARGET_CONTRIB`.
+  - Only mark as `UNRESOLVED_BLOCKER` if completely absent from both D10 core and target `composer.json` and unresolvable from available repository evidence.
 
 ### 2. Implicit Hook, Function & Class Couplings
 - Search for inter-module function calls, class instantiations, and hook invocations across `.module`, `.php`, and `.inc` files:

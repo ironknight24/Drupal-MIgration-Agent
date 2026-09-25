@@ -47,8 +47,12 @@ Determine target version from project configuration (`target.core_version`):
    - Dissect every custom PHP file, class, interface, trait, constructor, procedural hook implementation, custom entity type, field definition, revision mechanism, translation setting, form builder, form alter, AJAX callback, configuration/state access, frontend behavior, Views definition / custom handler plugin, external system integration, and runtime behavior.
    - Catalog discovered artifacts into the respective taxonomies (9-type hook taxonomy, 20-type configuration taxonomy, 26-target entity taxonomy, 19-target form/AJAX taxonomy, 21-target frontend taxonomy, 30-target Views taxonomy, 35-target dynamic taxonomy, 35-target integration taxonomy, 40-target runtime taxonomy).
 
-2. **Step 2: Dependency, Caller Graph, Hook Invocation, Entity Reference & Config Lifecycle Mapping**
-   - Identify core module, contrib module, custom module, entity reference, form dependency, frontend asset dependency, Views dependency, configuration/state dependencies, external integration dependencies, and runtime dependencies using `skills/dependency-analysis`.
+2. **Step 2: Dependency, Target Environment Introspection, Hook Invocation & Config Lifecycle Mapping**
+   - **Target `composer.json` & Contrib Introspection**: Parse `<target.path>/composer.json`, `<target.path>/composer.lock`, and `<target.path>/web/modules/contrib/` to discover all installed Drupal core subsystems, contrib packages, and third-party libraries available in the target site.
+   - **Continuous Auto-Resolution Protocol**:
+     - Check if D7 dependency was absorbed into D10 core (e.g. `entityreference`, `date`, `views`, `ctools` plugin types, `block_class`) $\to$ auto-map to modern Core API.
+     - Check if D7 dependency replacement is in target `composer.json` (e.g. `drupal/group`, `drupal/paragraphs`, `drupal/token`, `drupal/key`) $\to$ inspect installed `.services.yml` and classes to auto-map calls without raising blockers.
+     - Only escalate to `HUMAN_INTERVENTION_REQUIRED` if a dependency is completely absent from both D10 core and target `composer.json` and cannot be resolved from available project information.
    - Map inter-file and inter-module calls to custom classes (`new ClassName()`, static calls), procedural functions, custom hook subscribers/callers, entity reference topologies, form callers, AJAX endpoints, Views handlers, configuration reads/writes/deletes, and external system egress/ingress.
    - Analyze hook execution order, module weights (`{system}.weight`), alter sequencing (`hook_module_implements_alter`), entity reference hierarchy, variable lifecycle (`CREATE -> READ -> MODIFY -> DELETE`), external integration DAG edges, and runtime lifecycle edges.
 

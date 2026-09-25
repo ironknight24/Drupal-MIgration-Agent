@@ -21,7 +21,7 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 
 ## 3. Allowed Scope
 - Extracting and accounting for business rules, procedural hook implementations, and logic from all D7 module source files strictly within `<source.path>/.../<MODULE>/` (`.info`, `.module`, `.inc`, `.install`, `.admin.inc`, `.pages.inc`, `.drush.inc`, `*.php`, and all nested custom classes/traits/interfaces).
-- Consuming the custom PHP class, constructor, procedural hook, alter hook, `.inc` discovery analysis, include graphs, custom database schemas (`hook_schema`), custom entities (`hook_entity_info`), field definitions, and caller references produced by `discovery`.
+- **Target `composer.json` & Contrib Introspection**: Introspecting `<target.path>/composer.json`, `<target.path>/composer.lock`, and `<target.path>/web/modules/contrib/` to discover installed Drupal core subsystems and modern contrib packages, auto-resolving legacy D7 dependencies to active modern services/plugins without raising unnecessary human blockers.
 - **From-Scratch Scaffolding (`NEW_TARGET_MODULE`)**: When `<MODULE>` is absent in `<target.path>`, scaffolding the modern D10 module from the ground up, faithfully reproducing business logic, cache metadata (`#cache['tags']`, `#cache['contexts']`, `#cache['max-age']`), custom permissions, access checkers, CSRF tokens, output sanitization, and Symfony Event Subscribers using 100% pure modern Drupal 10 standards.
 - **Existing Target Reconciliation (`EXISTING_TARGET_MODULE`)**: When `<MODULE>` already exists in `<target.path>`, reconciling gaps surgically without overwriting working D10 implementations.
 - Re-engineering procedural hook implementations (core, contrib, custom, alter, entity, form, theme, install/update) into modern PSR-4 classes, Symfony event subscribers, plugins, and services.
@@ -45,6 +45,7 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 
 ## 4. Forbidden Scope
 - Searching, inspecting, grepping, or referencing files in sibling folders, parent directories, or backup repositories outside the configured `source.path` and `target.path` (Rule 16).
+- Raising unnecessary `HUMAN_INTERVENTION_REQUIRED` blockers for dependencies that are already absorbed into D10 core or present in target `composer.json` / `web/modules/contrib/`.
 - Blind 1:1 procedural code conversion, mechanical file renaming, or inline static `\Drupal::*` substitutions in service classes.
 - Silently omitting or dropping any discovered custom PHP file, class, interface, trait, function, constructor, entity type, bundle, or field definition.
 - Mutating D7 source code under `source.path` (Rule 1 & Rule 2).
@@ -57,6 +58,8 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 
 ## 5. Read Permissions
 - `source.path/<source_custom_modules_path>/<MODULE>/**/*` (D7 custom module files strictly inside `source.path` - read-only).
+- `target.path/composer.json` and `target.path/composer.lock` (target environment introspection).
+- `target.path/<web_root>/modules/contrib/**/*` (installed modern contrib modules, services, and plugins).
 - `state/migration-manifest.yml` (component inventory, `custom_php_files`, `inc_files`, `entities_fields_items` & dependencies).
 - `state/migration-state.yml` (runtime status of dependencies).
 - `reports/discovery/**/*` (discovery findings & class inventory).
@@ -84,7 +87,7 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 ---
 
 ## 8. Conceptual Tool Capabilities
-- **Read**: Inspect legacy D7 code files, custom classes, constructors, include graphs, entities, fields, and target interfaces.
+- **Read**: Inspect legacy D7 code files, target `composer.json`, contrib services, custom classes, constructors, include graphs, entities, fields, and target interfaces.
 - **Search / Inspect**: AST search, hook detection, class searches, entity/field searches, Drush command extraction.
 - **Write (Target Code & Reports)**: Create and edit modern PSR-4 PHP files, entity classes, Drush classes, and plans strictly within assigned module directory.
 - **Forbidden Operations**: Writes to source, arbitrary shell commands, git operations.
@@ -101,7 +104,7 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 
 ## 10. Required Inputs
 - Legacy module files under `source.path` (including all root and sub-directory `.php`, `.inc`, and `.module` files).
-- Target namespace and Drupal version from `migration.config.yml`.
+- Target `composer.json` / `composer.lock` and target namespace and Drupal version from `migration.config.yml`.
 - Discovery inventory for the module from `state/migration-manifest.yml`.
 - Dependency coupling analysis from `reports/dependencies/`.
 
@@ -121,20 +124,25 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
 ---
 
 ## 12. Operational Execution Procedure
-1. Verify all declared upstream dependencies are `COMPLETED` in `state/migration-state.yml`.
-2. Inspect legacy source files under `source.path` for the module, cataloging all hooks, classes, `.inc` files, database queries, and variables.
-3. Determine Scaffolding Mode:
+1. Verify all declared upstream custom dependencies are `COMPLETED` in `state/migration-state.yml`.
+2. **Target Introspection**: Parse `<target.path>/composer.json` and `<target.path>/web/modules/contrib/` to inventory all available modern modules and services.
+3. Inspect legacy source files under `source.path` for the module, cataloging all hooks, classes, `.inc` files, database queries, and variables.
+4. Auto-resolve legacy contrib dependencies:
+   - Check if absorbed into D10 core $\to$ map directly to modern core service.
+   - Check if present in target `composer.json` $\to$ map directly to active contrib API.
+   - Only mark `HUMAN_INTERVENTION_REQUIRED` if fully unresolvable with available project information.
+5. Determine Scaffolding Mode:
    - If target directory does not exist $\to$ `NEW_TARGET_MODULE`: Scaffold modern D10 module from scratch with full behavioral fidelity (caching, security, inter-module hooks/services) using 100% modern Drupal 10 standards.
    - If target directory exists $\to$ `EXISTING_TARGET_MODULE`: Reconcile gaps without destroying working code.
-4. Author the module migration plan in `reports/custom-modules/PLAN-<MODULE>.md` detailing target classes, routes, services, schemas, and test suites.
-5. Scaffold modern module layout in `<target.path>/<target_custom_modules_path>/<MODULE>/`:
+6. Author the module migration plan in `reports/custom-modules/PLAN-<MODULE>.md` detailing target classes, routes, services, schemas, and test suites.
+7. Scaffold modern module layout in `<target.path>/<target_custom_modules_path>/<MODULE>/`:
    - `<MODULE>.info.yml` (module metadata, dependencies).
    - `<MODULE>.services.yml` (services, event subscribers, access checkers).
    - `<MODULE>.routing.yml` (routes, permissions, controller bindings).
    - `<MODULE>.permissions.yml` (custom permissions).
    - `<MODULE>.links.menu.yml` / `<MODULE>.links.task.yml` (menu hierarchy).
    - `<MODULE>.libraries.yml` (frontend assets).
-6. Author modern PSR-4 PHP classes in `src/`:
+8. Author modern PSR-4 PHP classes in `src/`:
    - `src/Service/` (re-engineered procedural functions and business logic).
    - `src/Controller/` (page callbacks).
    - `src/Form/` (forms extending `FormBase`, `ConfigFormBase`, `ConfirmFormBase`).
@@ -142,11 +150,11 @@ Re-engineers legacy Drupal 7 custom modules, custom PHP classes, interfaces, tra
    - `src/EventSubscriber/` (custom events and lifecycle hooks).
    - `src/Entity/` (Content and Config entities).
    - `src/Drush/Commands/` (Drush 12/13 command classes).
-7. Modernize all constructors to use Constructor Dependency Injection.
-8. Scaffold Unit and Kernel test suites in `tests/src/Unit/` and `tests/src/Kernel/`.
-9. Log all file writes to `logs/file-change-log/`.
-10. Generate the post-migration report in `reports/custom-modules/REPORT-<MODULE>.md`.
-11. Propose state transition via `agent_result` JSON payload with verified item outcomes.
+9. Modernize all constructors to use Constructor Dependency Injection.
+10. Scaffold Unit and Kernel test suites in `tests/src/Unit/` and `tests/src/Kernel/`.
+11. Log all file writes to `logs/file-change-log/`.
+12. Generate the post-migration report in `reports/custom-modules/REPORT-<MODULE>.md`.
+13. Propose state transition via `agent_result` JSON payload with verified item outcomes.
 
 ---
 

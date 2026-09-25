@@ -21,6 +21,7 @@ Analyzes inter-module couplings, core requirements, contributed module dependenc
 
 ## 3. Allowed Scope
 - Analyzing declared dependencies in `.info` files (`dependencies[]`).
+- **Target `composer.json` & Contrib Introspection**: Parsing `<target.path>/composer.json`, `<target.path>/composer.lock`, and `<target.path>/web/modules/contrib/` to auto-resolve legacy D7 dependencies to active modern D10 core subsystems or modern contrib modules without raising unnecessary human blockers.
 - Analyzing implicit code couplings across `.module`, `.php`, and `.inc` files (`module_invoke`, `module_exists`, `drupal_alter`, direct cross-module `.inc` function calls, cross-module class instantiations `new ClassName()`, static method calls).
 - Analyzing procedural hook execution order dependencies, module weights (`{system}.weight`), `hook_module_implements_alter()`, alter ordering, and custom hook invocation chains (`module_invoke_all`).
 - Analyzing database schema couplings (foreign keys, custom database table ownership, cross-table queries, and entity reference relationships).
@@ -32,6 +33,7 @@ Analyzes inter-module couplings, core requirements, contributed module dependenc
 ---
 
 ## 4. Forbidden Scope
+- Raising unnecessary `HUMAN_INTERVENTION_REQUIRED` blockers for legacy dependencies satisfied by D10 core or target `composer.json`.
 - Mutating D7 source code under `source.path` (Rule 1 & Rule 2).
 - Directly mutating `state/migration-state.yml` (proposes state transitions via `agent_result`).
 - Directly dispatching worker agents (delegated to Orchestrator).
@@ -43,6 +45,8 @@ Analyzes inter-module couplings, core requirements, contributed module dependenc
 - `state/migration-manifest.yml` (discovered inventory including `.inc` files).
 - `reports/discovery/**/*` (discovery audit findings).
 - `source.path/**/*` (D7 `.info`, `.module`, `.inc`, `.install`, `.php` files - read-only).
+- `target.path/composer.json` and `target.path/composer.lock` (target environment packages).
+- `target.path/<web_root>/modules/contrib/**/*` (installed modern contrib modules and services).
 - `migration.config.yml`.
 
 ---

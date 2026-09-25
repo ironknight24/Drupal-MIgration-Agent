@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
-  "validation_id": "VAL-FACTORY-v1.0.0-20260925144148",
+  "validation_id": "VAL-FACTORY-v1.0.0-20260925163259",
   "validator": "drupal-migration:factory-self-validation",
-  "executed_at": "2026-09-25T14:41:48.012056+00:00",
+  "executed_at": "2026-09-25T16:32:59.152512+00:00",
   "summary": {
-    "checks_total": 490,
-    "passed": 487,
+    "checks_total": 492,
+    "passed": 489,
     "failed": 0,
     "warnings": 0,
     "unverified": 3
@@ -5332,6 +5332,33 @@
         "commands/migrate-module.md",
         "skills/custom-module-migration/SKILL.md",
         "SAFETY_RULES.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-18",
+      "category": "single_module",
+      "name": "Target Environment Introspection Engine",
+      "status": "PASS",
+      "evidence": "Introspects target composer.json, composer.lock, and web/modules/contrib/ to discover active D10 modules and services.",
+      "details": "Verified target environment introspection engine.",
+      "affected_files": [
+        "commands/migrate-module.md",
+        "agents/custom-module/agent.md",
+        "agents/dependency/agent.md"
+      ],
+      "remediation": ""
+    },
+    {
+      "check_id": "CHECK-SMM-19",
+      "category": "single_module",
+      "name": "Continuous Dependency Resolution & Human Blocker Minimization",
+      "status": "PASS",
+      "evidence": "Auto-resolves dependencies from core and target composer.json; restricts HUMAN_INTERVENTION_REQUIRED strictly to unresolvable contradictions.",
+      "details": "Verified continuous dependency resolution protocol.",
+      "affected_files": [
+        "commands/migrate-module.md",
+        "skills/custom-module-migration/SKILL.md"
       ],
       "remediation": ""
     },

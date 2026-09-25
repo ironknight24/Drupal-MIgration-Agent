@@ -40,12 +40,20 @@ Execute an isolated, recursive, dependency-aware, forensics-backed migration for
 
 ---
 
-### 3. Recursive Dependency Resolution & Ordering
-1. Read dependency metadata for `<MODULE_NAME>` from `state/migration-manifest.yml` and `reports/dependencies/`:
-   - Categorize dependencies into:
-     - **A. Core / Contrib dependencies**: Verify compatibility with target Drupal version.
-     - **B. D7 Custom Module dependencies**: Identify all custom modules upon which `<MODULE_NAME>` depends.
-2. Build the targeted module ancestor sub-DAG ($\text{Ancestors}(M) \cup \{M\}$):
+### 3. Target Environment Introspection & Continuous Dependency Resolution
+1. **Target `composer.json` & Contrib Introspection Engine**:
+   - Parse `<target.path>/composer.json` and `<target.path>/composer.lock` to discover all installed Drupal core subsystems, contrib packages, and third-party libraries available in the modern site.
+   - Scan `<target.path>/web/modules/contrib/` (or `<target.path>/modules/contrib/`) to inspect active service definitions (`.services.yml`), plugin managers, and namespaces.
+2. **Continuous Auto-Resolution Protocol**:
+   - For every D7 dependency or API call referenced by `<MODULE_NAME>`:
+     - **Check 1: Drupal 10 Core Absorption**: If the legacy feature/module was merged into D10 core (e.g. `entityreference`, `date`, `views`, `ctools` plugin types, `block_class`), auto-map directly to the modern Core API/service.
+     - **Check 2: Target Contrib Availability**: If the replacement exists in `<target.path>/composer.json` (e.g. `drupal/group`, `drupal/paragraphs`, `drupal/token`, `drupal/key`, `drupal/pathauto`), inspect its modern service IDs and classes, and auto-map legacy calls to the active modern contrib API.
+     - **Check 3: Architectural Adapter Scaffolding**: If an architectural replacement pattern is identified, scaffold modern event subscribers or service decorators to bridge the behavior.
+3. **Strict Human Gate Escalation Threshold**:
+   - **DO NOT** halt with `HUMAN_INTERVENTION_REQUIRED` for known core absorptions or dependencies satisfied by target `composer.json`.
+   - **ONLY** escalate to `HUMAN_INTERVENTION_REQUIRED` if a dependency is completely absent from both D10 core and target `composer.json`, has zero discoverable equivalent in installed code, and cannot be resolved with available project evidence.
+4. **Recursive Custom Dependency Resolution**:
+   - Build the targeted module ancestor sub-DAG ($\text{Ancestors}(M) \cup \{M\}$) for custom D7 modules.
    - Execute cycle detection. If a cycle is detected, emit `reports/blocked/BLOCKED-<MODULE_NAME>-001-CYCLE.md` and halt.
    - For every custom module dependency $D$:
      - Check the runtime state of $D$ in `state/migration-state.yml`.

@@ -6912,6 +6912,30 @@ class FactoryValidator:
                               "Missing from-scratch D10 generation protocol.",
                               "Must enforce Rule 17 from-scratch scaffolding standards.")
 
+        # 24.18 Target Environment Introspection Engine
+        dep_agent = self.repo_root / "agents" / "dependency" / "agent.md"
+        dep_txt = dep_agent.read_text(encoding="utf-8") if dep_agent.exists() else ""
+        if "Target `composer.json` & Contrib Introspection" in c_txt and "Target `composer.json` & Contrib Introspection" in (cm_agent.read_text(encoding="utf-8") if cm_agent.exists() else "") and "target.path/composer.json" in dep_txt:
+            self.record_check("CHECK-SMM-18", "single_module", "Target Environment Introspection Engine", "PASS",
+                              "Introspects target composer.json, composer.lock, and web/modules/contrib/ to discover active D10 modules and services.",
+                              "Verified target environment introspection engine.",
+                              affected_files=["commands/migrate-module.md", "agents/custom-module/agent.md", "agents/dependency/agent.md"])
+        else:
+            self.record_check("CHECK-SMM-18", "single_module", "Target Environment Introspection Engine", "FAIL",
+                              "Missing target environment introspection engine.",
+                              "Must implement target composer.json and contrib introspection.")
+
+        # 24.19 Continuous Dependency Resolution & Human Blocker Minimization
+        if "Continuous Auto-Resolution Protocol" in c_txt and "Strict Human Gate Escalation Threshold" in c_txt and "ONLY" in c_txt and "HUMAN_INTERVENTION_REQUIRED" in c_txt:
+            self.record_check("CHECK-SMM-19", "single_module", "Continuous Dependency Resolution & Human Blocker Minimization", "PASS",
+                              "Auto-resolves dependencies from core and target composer.json; restricts HUMAN_INTERVENTION_REQUIRED strictly to unresolvable contradictions.",
+                              "Verified continuous dependency resolution protocol.",
+                              affected_files=["commands/migrate-module.md", "skills/custom-module-migration/SKILL.md"])
+        else:
+            self.record_check("CHECK-SMM-19", "single_module", "Continuous Dependency Resolution & Human Blocker Minimization", "FAIL",
+                              "Missing continuous dependency resolution protocol.",
+                              "Must minimize unnecessary human blockers.")
+
     def validate_recursive_orchestration_suite(self):
         """Validates recursive dependency resolution, 3-path remediation, 10 canonical statuses, loop prevention, and LLM REMEDIATION INPUT."""
         orch_cmd = self.repo_root / "commands" / "orchestrate.md"
